@@ -7,6 +7,13 @@
 
 WiFiClient espClient;
 int status = WL_IDLE_STATUS;
+uint32_t lastTxTime = 0;
+
+#define txInterval 15 * 60 * 1000
+const String LAT = "3302.03S";      // por corregir               // write your latitude
+const String LON = "07134.42W";     //por corregir   
+const String IGATE = "CD2RXU-10";
+
 
 void setup_lora() {
   Serial.println("Set LoRa pins!");
@@ -112,6 +119,8 @@ void setup() {
 
 void loop() {  
   String mensaje_recibido = "";
+  String mensaje_beacon_estacion = IGATE + ">APLG01,TCPIP*,qAC,T2BRAZIL:=" + LAT + "L" + LON + "&" + "\n"; //
+  uint32_t lastTx = millis() - lastTxTime;
   bool valida_inicio;
   int packetSize = LoRa.parsePacket();
   if (packetSize) {
@@ -121,4 +130,9 @@ void loop() {
     }
     valida_y_procesa_packet(mensaje_recibido);          //Serial.println("Mensaje Recibido   : " + String(mensaje_recibido));
   }
+  if (lastTx >= txInterval) {
+    Serial.println("enviando Beacon Estacion/iGate");
+    connect_and_upload_to_APRS_IS(mensaje_beacon_estacion);
+    lastTxTime = millis();
+		}
 }
