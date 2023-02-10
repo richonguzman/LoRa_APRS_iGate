@@ -43,27 +43,7 @@ void setup_wifi() {
   Serial.println(WiFi.localIP());
 }
 
-void setup() {
-  Serial.begin(115200);
-  setup_wifi();
-  btStop();
-  setup_lora();
-  Serial.println("Starting iGate\n");
-}
-
-void procesa_y_sube_APRS_IS(String mensaje) {
-  String packet_para_APRS_IS = "";
-  String callsign_y_path_tracker = "";
-  String gps_info_tracker;
-
-  int posicion_dos_puntos = mensaje.indexOf(':');
-  callsign_y_path_tracker = mensaje.substring(3, posicion_dos_puntos);
-  gps_info_tracker = mensaje.substring(posicion_dos_puntos);
-  packet_para_APRS_IS = callsign_y_path_tracker + ",qAO," + callsign_igate + gps_info_tracker + "\n";
-  //Serial.print("Mensaje APRS_IS    : "); Serial.println(packet_para_APRS_IS);
-  //packet = "CD2RXU-9>APLT00,qAO,CD2RXU-10:=" + LAT + "/" + LON + ">" +  "\n"; // ejemplo!!!
-
-  delay(200);
+void connect_and_upload_to_APRS_IS(String packet) {
   int count = 0;
   String aprsauth;
   Serial.println("Conectando a APRS-IS");
@@ -84,15 +64,29 @@ void procesa_y_sube_APRS_IS(String mensaje) {
     while (espClient.connected()) {
       delay(1000);
       aprsauth = "user " + callsign_igate + " pass " + passcode_igate + "\n"; //info igate
-      espClient.write(aprsauth.c_str());                    //Serial.println("Run client.connected()");
+      espClient.write(aprsauth.c_str());         //Serial.println("Run client.connected()");
       delay(500);
-      espClient.write(packet_para_APRS_IS.c_str());         //Serial.println("Send client.write=" + aprsauth);
-      delay(500);                                           //Serial.println("Send espClient.write = " + packet_para_APRS_IS);
+      espClient.write(packet.c_str());           //Serial.println("Send client.write=" + aprsauth);
+      delay(500);                                //Serial.println("Send espClient.write = " + packet_para_APRS_IS);
       Serial.println("Packet uploaded =)\n");
       espClient.stop();
-      espClient.flush();                                    //Serial.println("(Telnet client disconnect)\n");
+      espClient.flush();                         //Serial.println("(Telnet client disconnect)\n");
     }
   }
+}
+
+void procesa_y_sube_APRS_IS(String mensaje) {
+  String packet_para_APRS_IS = "";
+  String callsign_y_path_tracker = "";
+  String payload_tracker;
+
+  int posicion_dos_puntos = mensaje.indexOf(':');
+  callsign_y_path_tracker = mensaje.substring(3, posicion_dos_puntos);
+  payload_tracker = mensaje.substring(posicion_dos_puntos);
+  packet_para_APRS_IS = callsign_y_path_tracker + ",qAO," + callsign_igate + payload_tracker + "\n";
+  //Serial.print("Mensaje APRS_IS    : "); Serial.println(packet_para_APRS_IS);
+  //packet = "CD2RXU-9>APLT00,qAO,CD2RXU-10:=" + LAT + "/" + LON + ">" +  "\n"; // ejemplo!!!
+  connect_and_upload_to_APRS_IS(packet_para_APRS_IS);
 }
 
 void valida_y_procesa_packet(String mensaje) {
@@ -108,6 +102,14 @@ void valida_y_procesa_packet(String mensaje) {
   }
 }
 
+void setup() {
+  Serial.begin(115200);
+  setup_wifi();
+  btStop();
+  setup_lora();
+  Serial.println("Starting iGate\n");
+}
+
 void loop() {  
   String mensaje_recibido = "";
   bool valida_inicio;
@@ -117,7 +119,6 @@ void loop() {
       int inChar = LoRa.read();
       mensaje_recibido += (char)inChar;
     }
-    
     valida_y_procesa_packet(mensaje_recibido);          //Serial.println("Mensaje Recibido   : " + String(mensaje_recibido));
   }
 }
