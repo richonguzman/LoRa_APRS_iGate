@@ -13,6 +13,7 @@ uint32_t lastTxTime = 0;
 const String LAT = "3302.03S";      // por corregir               // write your latitude
 const String LON = "07134.42W";     //por corregir   
 const String IGATE = "CD2RXU-10";
+const String Mensaje_iGate = "DIY ESP32 - LoRa APRS iGATE";
 
 
 void setup_lora() {
@@ -119,7 +120,7 @@ void setup() {
 
 void loop() {  
   String mensaje_recibido = "";
-  String mensaje_beacon_estacion = IGATE + ">APLG01,TCPIP*,qAC,T2BRAZIL:=" + LAT + "L" + LON + "&" + "\n"; //
+  String mensaje_beacon_estacion = IGATE + ">APLG01,TCPIP*,qAC,T2BRAZIL:=" + LAT + "L" + LON + "&" +  Mensaje_iGate+ "\n"; //
   uint32_t lastTx = millis() - lastTxTime;
   bool valida_inicio;
   int packetSize = LoRa.parsePacket();
