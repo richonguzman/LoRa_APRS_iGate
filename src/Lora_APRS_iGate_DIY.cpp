@@ -2,17 +2,7 @@
 #include <LoRa.h>
 #include <WiFi.h>
 #include "iGate_config.h"
-
-
-#define DBM 20 //20 serian 100mW   # con otro mas potente serian 8=100mA y 20=1000W(1W)
-
-// SPI LoRa Radio
-#define LORA_SCK 5        // GPIO5 - SX1276 SCK
-#define LORA_MISO 19     // GPIO19 - SX1276 MISO
-#define LORA_MOSI 27    // GPIO27 -  SX1276 MOSI
-#define LORA_CS 18     // GPIO18 -   SX1276 CS ---> NSS
-#define LORA_RST 14   // GPIO14 -    SX1276 RST
-#define LORA_IRQ 26  // GPIO26 -     SX1276 IRQ ---->DIO0
+#include "pins_config.h"
 
 
 WiFiClient espClient;
@@ -36,7 +26,7 @@ void setup_lora() {
   LoRa.setCodingRate4(5);
   LoRa.enableCrc();
   LoRa.setTxPower(20);
-  Serial.println("LoRa init done!");
+  Serial.println("LoRa init done!\n");
 }
 
 void setup_wifi() {
@@ -58,8 +48,6 @@ void setup() {
   setup_wifi();
   btStop();
   setup_lora();
-  
-  Serial.println("");
   Serial.println("Starting iGate\n");
 }
 
@@ -72,9 +60,8 @@ void procesa_y_sube_APRS_IS(String mensaje) {
   callsign_y_path_tracker = mensaje.substring(3, posicion_dos_puntos);
   gps_info_tracker = mensaje.substring(posicion_dos_puntos);
   packet_para_APRS_IS = callsign_y_path_tracker + ",qAO," + callsign_igate + gps_info_tracker + "\n";
-  //Serial.print("Mensaje APRS_IS    : ");
-  //Serial.println(packet_para_APRS_IS);
-  //packet = "CD2RXU-9>APLT00,qAO,CD2RXU-10:=" + LAT + "/" + LON + ">" +  "\n";
+  //Serial.print("Mensaje APRS_IS    : "); Serial.println(packet_para_APRS_IS);
+  //packet = "CD2RXU-9>APLT00,qAO,CD2RXU-10:=" + LAT + "/" + LON + ">" +  "\n"; // ejemplo!!!
 
   delay(200);
   int count = 0;
@@ -96,21 +83,14 @@ void procesa_y_sube_APRS_IS(String mensaje) {
     Serial.println("Connected with server: " + String(SERVER) + " APRSPORT: " + String(APRSPORT));
     while (espClient.connected()) {
       delay(1000);
-      //Serial.println("Run client.connected()");
-      
-      //aprsauth = "user " + USER + " pass " + PAS + "\n";
       aprsauth = "user " + callsign_igate + " pass " + passcode_igate + "\n"; //info igate
-      espClient.write(aprsauth.c_str());
+      espClient.write(aprsauth.c_str());                    //Serial.println("Run client.connected()");
       delay(500);
-      //Serial.println("Send client.write=" + aprsauth);
-      
-      espClient.write(packet_para_APRS_IS.c_str());
-      delay(500);
-      //Serial.println("Send espClient.write = " + packet_para_APRS_IS);
+      espClient.write(packet_para_APRS_IS.c_str());         //Serial.println("Send client.write=" + aprsauth);
+      delay(500);                                           //Serial.println("Send espClient.write = " + packet_para_APRS_IS);
       Serial.println("Packet uploaded =)\n");
       espClient.stop();
-      espClient.flush();
-      //Serial.println("(Telnet client disconnect)\n");
+      espClient.flush();                                    //Serial.println("(Telnet client disconnect)\n");
     }
   }
 }
@@ -137,7 +117,7 @@ void loop() {
       int inChar = LoRa.read();
       mensaje_recibido += (char)inChar;
     }
-    //Serial.println("Mensaje Recibido   : " + String(mensaje_recibido));
-    valida_y_procesa_packet(mensaje_recibido);
+    
+    valida_y_procesa_packet(mensaje_recibido);          //Serial.println("Mensaje Recibido   : " + String(mensaje_recibido));
   }
 }
