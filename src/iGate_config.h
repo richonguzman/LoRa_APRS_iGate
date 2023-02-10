@@ -1,6 +1,8 @@
 #ifndef IGATE_CONFIG_H_
 #define IGATE_CONFIG_H_
 
+#include <Arduino.h>
+
 #define WIFI_SSID "Richon"
 #define WIFI_PASSWORD "k4fPnmg5qnyf"
 

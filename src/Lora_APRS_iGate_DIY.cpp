@@ -1,9 +1,9 @@
+#include <Arduino.h>
 #include <SPI.h>
 #include <LoRa.h>
 #include <WiFi.h>
 #include "iGate_config.h"
 #include "pins_config.h"
-
 
 WiFiClient espClient;
 int status = WL_IDLE_STATUS;

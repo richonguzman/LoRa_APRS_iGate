@@ -1,6 +1,9 @@
 #ifndef PINS_CONFIG_H_
 #define PINS_CONFIG_H_
 
+#include <Arduino.h>
+
+
 #define LORA_SCK    5       // GPIO5    - SX1276 SCK
 #define LORA_MISO   19      // GPIO19   - SX1276 MISO
 #define LORA_MOSI   27      // GPIO27   - SX1276 MOSI
