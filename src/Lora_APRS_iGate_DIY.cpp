@@ -1,4 +1,3 @@
-#include <Arduino.h>
 #include <SPI.h>
 #include <LoRa.h>
 #include <WiFi.h>
@@ -6,15 +5,7 @@
 #include "pins_config.h"
 
 WiFiClient espClient;
-int status = WL_IDLE_STATUS;
 uint32_t lastTxTime = 0;
-
-#define txInterval 15 * 60 * 1000
-const String LAT = "3302.03S";      // por corregir               // write your latitude
-const String LON = "07134.42W";     //por corregir   
-const String IGATE = "CD2RXU-10";
-const String Mensaje_iGate = "DIY ESP32 - LoRa APRS iGATE";
-
 
 void setup_lora() {
   Serial.println("Set LoRa pins!");
@@ -38,6 +29,7 @@ void setup_lora() {
 }
 
 void setup_wifi() {
+  int status = WL_IDLE_STATUS;
   WiFi.mode(WIFI_STA);
   WiFi.disconnect();
   delay(100);
@@ -119,8 +111,7 @@ void setup() {
 }
 
 void loop() {  
-  String mensaje_recibido = "";
-  String mensaje_beacon_estacion = IGATE + ">APLG01,TCPIP*,qAC,T2BRAZIL:=" + LAT + "L" + LON + "&" +  Mensaje_iGate+ "\n"; //
+  String receivedPacket = "";
   uint32_t lastTx = millis() - lastTxTime;
   bool beacon_update = true;
 
@@ -128,18 +119,18 @@ void loop() {
   if (packetSize) {
     while (LoRa.available()) {
       int inChar = LoRa.read();
-      mensaje_recibido += (char)inChar;
+      receivedPacket += (char)inChar;
     }
-    valida_y_procesa_packet(mensaje_recibido);    //Serial.println("Mensaje Recibido   : " + String(mensaje_recibido));
+    valida_y_procesa_packet(receivedPacket);    //Serial.println("Mensaje Recibido   : " + String(receivedPacket));
   }
 
-  if (lastTx >= txInterval) {
+  if (lastTx >= BeaconInterval) {
     beacon_update = true;    
 	}
 
   if (beacon_update) { 
     Serial.println("enviando Beacon Estacion/iGate");
-    connect_and_upload_to_APRS_IS(mensaje_beacon_estacion);
+    connect_and_upload_to_APRS_IS(iGateBeaconPacket);
     lastTxTime = millis();
     beacon_update = false;
   }
