@@ -70,12 +70,12 @@ void connect_and_upload_to_APRS_IS(String packet) {
   } else {
     Serial.println("Connected with server: " + String(SERVER) + " APRSPORT: " + String(APRSPORT));
     while (espClient.connected()) {
-      delay(1000);
-      aprsauth = "user " + callsign_igate + " pass " + passcode_igate + "\n"; //info igate
+      delay(200);
+      aprsauth = "user " + iGate_Callsign + " pass " + passcode_igate + "\n"; //info igate
       espClient.write(aprsauth.c_str());         //Serial.println("Run client.connected()");
-      delay(500);
+      delay(200);
       espClient.write(packet.c_str());           //Serial.println("Send client.write=" + aprsauth);
-      delay(500);                                //Serial.println("Send espClient.write = " + packet_para_APRS_IS);
+      delay(200);                                //Serial.println("Send espClient.write = " + packet_para_APRS_IS);
       Serial.println("Packet uploaded =)\n");
       espClient.stop();
       espClient.flush();                         //Serial.println("(Telnet client disconnect)\n");
@@ -91,7 +91,7 @@ void procesa_y_sube_APRS_IS(String mensaje) {
   int posicion_dos_puntos = mensaje.indexOf(':');
   callsign_y_path_tracker = mensaje.substring(3, posicion_dos_puntos);
   payload_tracker = mensaje.substring(posicion_dos_puntos);
-  packet_para_APRS_IS = callsign_y_path_tracker + ",qAO," + callsign_igate + payload_tracker + "\n";
+  packet_para_APRS_IS = callsign_y_path_tracker + ",qAO," + iGate_Callsign + payload_tracker + "\n";
   //Serial.print("Mensaje APRS_IS    : "); Serial.println(packet_para_APRS_IS);
   //packet = "CD2RXU-9>APLT00,qAO,CD2RXU-10:=" + LAT + "/" + LON + ">" +  "\n"; // ejemplo!!!
   connect_and_upload_to_APRS_IS(packet_para_APRS_IS);
@@ -122,18 +122,25 @@ void loop() {
   String mensaje_recibido = "";
   String mensaje_beacon_estacion = IGATE + ">APLG01,TCPIP*,qAC,T2BRAZIL:=" + LAT + "L" + LON + "&" +  Mensaje_iGate+ "\n"; //
   uint32_t lastTx = millis() - lastTxTime;
-  bool valida_inicio;
+  bool beacon_update = true;
+
   int packetSize = LoRa.parsePacket();
   if (packetSize) {
     while (LoRa.available()) {
       int inChar = LoRa.read();
       mensaje_recibido += (char)inChar;
     }
-    valida_y_procesa_packet(mensaje_recibido);          //Serial.println("Mensaje Recibido   : " + String(mensaje_recibido));
+    valida_y_procesa_packet(mensaje_recibido);    //Serial.println("Mensaje Recibido   : " + String(mensaje_recibido));
   }
+
   if (lastTx >= txInterval) {
+    beacon_update = true;    
+	}
+
+  if (beacon_update) { 
     Serial.println("enviando Beacon Estacion/iGate");
     connect_and_upload_to_APRS_IS(mensaje_beacon_estacion);
     lastTxTime = millis();
-		}
+    beacon_update = false;
+  }
 }

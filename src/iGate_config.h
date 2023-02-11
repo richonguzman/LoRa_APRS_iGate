@@ -3,10 +3,10 @@
 
 #include <Arduino.h>
 
-#define WIFI_SSID "Richon"
-#define WIFI_PASSWORD "k4fPnmg5qnyf"
+#define WIFI_SSID       "Richon"
+#define WIFI_PASSWORD   "k4fPnmg5qnyf"
 
-String callsign_igate = "CD2RXU-10";
+String iGate_Callsign = "CD2RXU-10";
 String passcode_igate = "23201";
 
 const String SERVER = "brazil.aprs2.net";       // write the address of the aprs server
