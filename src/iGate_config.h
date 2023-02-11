@@ -12,7 +12,7 @@ String passcode_igate = "23201";
 const String LAT = "3302.03S";      // por corregir               // write your latitude
 const String LON = "07134.42W";     //por corregir   
 
-const String iGate_Comment = "DIY ESP32 - LoRa APRS iGATE";
+const String iGate_Comment = "DIY ESP32 - LoRa APRS iGATE https://github.com/richonguzman/LoRa_APRS_iGate";
 
 const String SERVER = "brazil.aprs2.net";       // write the address of the aprs server
 const int APRSPORT = 14579;                     // write the aprs server APRSPORT
