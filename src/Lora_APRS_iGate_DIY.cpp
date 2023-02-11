@@ -112,8 +112,7 @@ void setup() {
 
 void loop() {  
   String receivedPacket = "";
-  uint32_t lastTx = millis() - lastTxTime;
-  bool beacon_update = true;
+  static bool beacon_update = true;
 
   int packetSize = LoRa.parsePacket();
   if (packetSize) {
@@ -124,9 +123,10 @@ void loop() {
     valida_y_procesa_packet(receivedPacket);    //Serial.println("Mensaje Recibido   : " + String(receivedPacket));
   }
 
+  uint32_t lastTx = millis() - lastTxTime;
   if (lastTx >= BeaconInterval) {
     beacon_update = true;    
-	}
+  }
 
   if (beacon_update) { 
     Serial.println("enviando Beacon Estacion/iGate");

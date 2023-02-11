@@ -4,7 +4,7 @@
 #define WIFI_SSID       "Richon"
 #define WIFI_PASSWORD   "k4fPnmg5qnyf"
 
-#define BeaconInterval 15*60*1000 // 15 minutes
+#define BeaconInterval 900000 // 15 minutes = 900000 seg
 
 String iGate_Callsign = "CD2RXU-10";
 String passcode_igate = "23201";
