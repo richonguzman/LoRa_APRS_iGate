@@ -91,13 +91,20 @@ void procesa_y_sube_APRS_IS(String mensaje) {
 
 void valida_y_procesa_packet(String mensaje) {
   String packetStart = "";
+  String packetStart2 = "";
   Serial.print("MENSAJE RECIBIDO!!!   ");
   Serial.print("(Validando inicio ---> ");
   packetStart = mensaje.substring(0, 3);
+  packetStart2 = mensaje.substring(0, 3);
   if (packetStart == "\x3c\xff\x01") {
     Serial.println("Packet Valido)");
     procesa_y_sube_APRS_IS(mensaje);
-  } else {
+  }else if (packetStart2 == "\x77\x65\x61") {
+    LoRa.beginPacket();
+    LoRa.print("hello from iGate");
+    LoRa.endPacket();
+    Serial.println("enviando_lora");
+  }  else {
     Serial.println("Packet NO Valido)");
   }
 }
@@ -121,7 +128,7 @@ void loop() {
       receivedPacket += (char)inChar;
     }
     valida_y_procesa_packet(receivedPacket);    //Serial.println("Mensaje Recibido   : " + String(receivedPacket));
-  }
+  };
 
   uint32_t lastTx = millis() - lastTxTime;
   if (lastTx >= BeaconInterval) {
