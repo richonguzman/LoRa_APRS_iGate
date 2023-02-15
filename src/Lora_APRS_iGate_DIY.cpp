@@ -95,15 +95,15 @@ void valida_y_procesa_packet(String mensaje) {
   Serial.print("MENSAJE RECIBIDO!!!   ");
   Serial.print("(Validando inicio ---> ");
   packetStart = mensaje.substring(0, 3);
-  packetStart2 = mensaje.substring(0, 3);
+  packetStart2 = mensaje.substring(0, 4);
   if (packetStart == "\x3c\xff\x01") {
     Serial.println("Packet Valido)");
     procesa_y_sube_APRS_IS(mensaje);
-  }else if (packetStart2 == "\x77\x65\x61") {
+  }else if (packetStart2 == "\x77\x63\x6c\x70") {
     LoRa.beginPacket();
-    LoRa.print("hello from iGate");
+    LoRa.print("Weather Response from iGate");
     LoRa.endPacket();
-    Serial.println("enviando_lora");
+    Serial.println("Enviando Respuesta LoRa a Tracker");
   }  else {
     Serial.println("Packet NO Valido)");
   }
