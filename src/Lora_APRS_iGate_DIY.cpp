@@ -109,6 +109,43 @@ void valida_y_procesa_packet(String mensaje) {
   }
 }
 
+void APRS_IS_READ(){
+  int count = 0;
+  String aprsauth;
+  Serial.println("Conectando a APRS-IS");
+  while (!espClient.connect(SERVER.c_str(), APRSPORT) && count < 20) {
+    Serial.println("Didn't connect with server: " + String(SERVER) + " APRSPORT: " + String(APRSPORT));
+    delay(1000);
+    espClient.stop();
+    espClient.flush();
+    Serial.println("Run client.stop");
+    Serial.println("Trying to connect with server: " + String(SERVER) + " APRSPORT: " + String(APRSPORT));
+    count++;
+    Serial.println("Try: " + String(count));
+  }
+  if (count == 20) {
+    Serial.println("Tried: " + String(count) + " don't send the packet!");
+  } else {
+    Serial.println("Connected with server: " + String(SERVER) + " APRSPORT: " + String(APRSPORT));
+    
+    String aprsisData;
+    while (espClient.connected()) {
+      aprsauth = "user " + iGate_Callsign + " pass " + passcode_igate + "\n"; //info igate
+      espClient.write(aprsauth.c_str());     
+      delay(200);
+      char c = espClient.read();
+        //if (c == '\r') continue;
+        if (c == '\n') {
+          Serial.println(aprsisData);
+          aprsisData = "";
+        }
+        aprsisData += c;
+      
+    }
+    
+  }
+}
+
 void setup() {
   Serial.begin(115200);
   setup_wifi();
@@ -118,6 +155,9 @@ void setup() {
 }
 
 void loop() {  
+  //APRS_IS_READ();
+
+  /*
   String receivedPacket = "";
   static bool beacon_update = true;
 
@@ -141,4 +181,5 @@ void loop() {
     lastTxTime = millis();
     beacon_update = false;
   }
+  */
 }
