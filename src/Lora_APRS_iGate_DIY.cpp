@@ -157,7 +157,6 @@ void setup() {
 void loop() {  
   //APRS_IS_READ();
 
-  /*
   String receivedPacket = "";
   static bool beacon_update = true;
 
@@ -181,5 +180,4 @@ void loop() {
     lastTxTime = millis();
     beacon_update = false;
   }
-  */
 }
