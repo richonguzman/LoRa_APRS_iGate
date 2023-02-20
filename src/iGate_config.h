@@ -16,12 +16,9 @@ const String LON = "07134.42W";     //por corregir
 
 const String iGate_Comment = "DIY ESP32 - LoRa APRS iGATE https://github.com/richonguzman/LoRa_APRS_iGate";
 
-const String SERVER = "brazil.aprs2.net";       // write the address of the aprs server
-const int APRSPORT = 14579;                     // write the aprs server APRSPORT
-//funciona con 14579 y 14580
-
-//const String SERVER = "radioaficion.pro";       // write the address of the aprs server
-//const int APRSPORT = 14580;                     // write the aprs server APRSPORT
+const String SERVER = "radioaficion.pro";       // write the address of the aprs server   //const String SERVER = "brazil.aprs2.net";
+const int APRSPORT = 14580;                     // write the aprs server APRSPORT
+// 14579 port is allready filtered
 
 
 String iGateBeaconPacket = iGate_Callsign + ">APLG01,TCPIP*,qAC,T2BRAZIL:=" + LAT + "L" + LON + "&" +  iGate_Comment + "\n";

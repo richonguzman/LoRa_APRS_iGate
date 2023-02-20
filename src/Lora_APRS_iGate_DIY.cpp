@@ -131,7 +131,7 @@ void APRS_connect(){
   } else {
     Serial.println("Connected with server: " + String(SERVER) + " APRSPORT: " + String(APRSPORT));
     
-    aprsauth = "user " + iGate_Callsign + " pass " + passcode_igate + " vers " + "ESP32_TEST" + " " + "0.2" + " filter " + "b/CD*/CA*/CE*/XQ*" + "\n\r"; //info igate
+    aprsauth = "user " + iGate_Callsign + " pass " + passcode_igate + " vers " + "ESP32_TEST" + " " + "0.2" + " filter " + "r/-33.034/-70.573/200" + "\n\r"; //info igate
     espClient.write(aprsauth.c_str());  
     delay(200);
   }
@@ -141,12 +141,14 @@ void APRS_connect(){
 void APRS_IS_READ(){
   String aprsisData;
   while (espClient.connected()) {
-    char c = espClient.read();
-    if (c == '\n') {
-      Serial.print(aprsisData);
-      aprsisData = "";
+    while (espClient.available() > 0) {
+      char c = espClient.read();
+      if (c == '\n') {
+        Serial.print(aprsisData);
+        aprsisData = "";
+      }
+      aprsisData += c;
     }
-    aprsisData += c;  
   }
 }
 
@@ -155,15 +157,15 @@ void setup() {
   Serial.begin(115200);
   setup_wifi();
   btStop();
-  setup_lora();
+  //setup_lora();
   Serial.println("Starting iGate\n");
-  //APRS_connect();
+  APRS_connect();
 }
 
 void loop() {  
-  //APRS_IS_READ();
+  APRS_IS_READ();
 
-  String receivedPacket = "";
+  /*String receivedPacket = "";
   static bool beacon_update = true;
 
   int packetSize = LoRa.parsePacket();
@@ -185,5 +187,5 @@ void loop() {
     connect_and_upload_to_APRS_IS(iGateBeaconPacket);
     lastTxTime = millis();
     beacon_update = false;
-  }
+  }*/
 }
