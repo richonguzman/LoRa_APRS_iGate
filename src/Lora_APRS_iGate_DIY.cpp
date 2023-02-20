@@ -1,3 +1,4 @@
+#include <Arduino.h>
 #include <SPI.h>
 #include <LoRa.h>
 #include <WiFi.h>
@@ -109,7 +110,9 @@ void valida_y_procesa_packet(String mensaje) {
   }
 }
 
-void APRS_IS_READ(){
+
+
+void APRS_connect(){
   int count = 0;
   String aprsauth;
   Serial.println("Conectando a APRS-IS");
@@ -128,23 +131,25 @@ void APRS_IS_READ(){
   } else {
     Serial.println("Connected with server: " + String(SERVER) + " APRSPORT: " + String(APRSPORT));
     
-    String aprsisData;
-    while (espClient.connected()) {
-      aprsauth = "user " + iGate_Callsign + " pass " + passcode_igate + "\n"; //info igate
-      espClient.write(aprsauth.c_str());     
-      delay(200);
-      char c = espClient.read();
-        //if (c == '\r') continue;
-        if (c == '\n') {
-          Serial.println(aprsisData);
-          aprsisData = "";
-        }
-        aprsisData += c;
-      
-    }
-    
+    aprsauth = "user " + iGate_Callsign + " pass " + passcode_igate + " vers " + "ESP32_TEST" + " " + "0.2" + " filter " + "b/CD*/CA*/CE*/XQ*" + "\n\r"; //info igate
+    espClient.write(aprsauth.c_str());  
+    delay(200);
   }
 }
+
+
+void APRS_IS_READ(){
+  String aprsisData;
+  while (espClient.connected()) {
+    char c = espClient.read();
+    if (c == '\n') {
+      Serial.print(aprsisData);
+      aprsisData = "";
+    }
+    aprsisData += c;  
+  }
+}
+
 
 void setup() {
   Serial.begin(115200);
@@ -152,6 +157,7 @@ void setup() {
   btStop();
   setup_lora();
   Serial.println("Starting iGate\n");
+  //APRS_connect();
 }
 
 void loop() {  

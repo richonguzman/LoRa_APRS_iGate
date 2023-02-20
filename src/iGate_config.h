@@ -1,12 +1,14 @@
 #ifndef IGATE_CONFIG_H_
 #define IGATE_CONFIG_H_
 
+#include <Arduino.h>
+
 #define WIFI_SSID       "Richon"
 #define WIFI_PASSWORD   "k4fPnmg5qnyf"
 
 #define BeaconInterval 900000 // 15 minutes = 900000 seg
 
-String iGate_Callsign = "CD2RXU-10";
+String iGate_Callsign = "CD2RXU-11";
 String passcode_igate = "23201";
 
 const String LAT = "3302.03S";      // por corregir               // write your latitude
@@ -16,8 +18,14 @@ const String iGate_Comment = "DIY ESP32 - LoRa APRS iGATE https://github.com/ric
 
 const String SERVER = "brazil.aprs2.net";       // write the address of the aprs server
 const int APRSPORT = 14579;                     // write the aprs server APRSPORT
+//funciona con 14579 y 14580
+
+//const String SERVER = "radioaficion.pro";       // write the address of the aprs server
+//const int APRSPORT = 14580;                     // write the aprs server APRSPORT
+
 
 String iGateBeaconPacket = iGate_Callsign + ">APLG01,TCPIP*,qAC,T2BRAZIL:=" + LAT + "L" + LON + "&" +  iGate_Comment + "\n";
+//String iGateBeaconPacket = iGate_Callsign + ">APLG01,TCPIP*,qAC,CHILE:=" + LAT + "L" + LON + "&" +  iGate_Comment + "\n";
 
 
 #endif
