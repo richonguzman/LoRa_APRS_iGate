@@ -47,14 +47,23 @@ void APRS_connect(){
 
 void APRS_IS_READ(){
   String aprsisData;
+  //String mensaje;
   while (espClient.connected()) {
     while (espClient.available() > 0) {
       char c = espClient.read();
       if (c == '\n') {
         Serial.print(aprsisData);
+        //Serial.println(aprsisData.indexOf("CD2RXU-9"));
+        /*mensaje = aprsisData;
+        delay(50);
+        if (mensaje.indexOf("CD2RXU-9") >= 0){
+          Serial.print("CD2RXU-9 con info!!!!!!!!!!!!!");
+        }*/
         aprsisData = "";
+        //mensaje = "";
       }
       aprsisData += c;
+      
     }
   }
 }
