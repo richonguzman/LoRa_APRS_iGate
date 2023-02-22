@@ -14,7 +14,8 @@ const String AprsServer             = "radioaficion.pro";       // write the add
 const int AprsServerPort            = 14580;                   // 14579 port is allready filtered so use 14580
 const String AprsSoftwareName       = "ESP32_TEST";
 const String AprsSoftwareVersion    = "0.1.0";
-const String AprsFilter             = "t/poms/CD2RXU-10/50";
+const int ReportingDistance         = 50;
+const String AprsFilter             = "t/poms/CD2RXU-10/50"; //cambio a : "t/poms/" + WeatherReportCallsign + "/" + String(ReportingDistance)
 
 const String WeatherReportComment   = "LoRa APRS Weather Report https://github.com/richonguzman/ESP32_APRS_Weather_Report";
 

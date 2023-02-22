@@ -67,10 +67,12 @@ void setup() {
   APRS_connect();
 }
 
-void loop() {  
+void loop() {
   APRS_IS_READ();
 
-  uint32_t lastTx = millis() - lastTxTime;
+
+
+  /*uint32_t lastTx = millis() - lastTxTime;
   if (lastTx >= BeaconInterval) {
     beacon_update = true;    
   }
@@ -80,5 +82,5 @@ void loop() {
     espClient.write(WeatherReportBeaconPacket.c_str()); 
     lastTxTime = millis();
     beacon_update = false;
-  }
+  }*/
 }
