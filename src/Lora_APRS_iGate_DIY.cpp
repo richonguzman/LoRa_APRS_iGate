@@ -131,7 +131,8 @@ void APRS_connect(){
   } else {
     Serial.println("Connected with server: " + String(SERVER) + " APRSPORT: " + String(APRSPORT));
     
-    aprsauth = "user " + iGate_Callsign + " pass " + passcode_igate + " vers " + "ESP32_TEST" + " " + "0.2" + " filter " + "r/-33.034/-70.573/200" + "\n\r"; //info igate
+    //aprsauth = "user " + iGate_Callsign + " pass " + passcode_igate + " vers " + "ESP32_TEST" + " " + "0.2" + " filter " + "r/-33.034/-70.573/50 t/ms" + "\n\r"; //info igate
+    aprsauth = "user " + iGate_Callsign + " pass " + passcode_igate + " vers " + "ESP32_TEST" + " " + "0.2" + " filter " + "t/poms/CD2RXU-10/50" + "\n\r"; //info igate
     espClient.write(aprsauth.c_str());  
     delay(200);
   }
