@@ -8,21 +8,19 @@
 
 #define BeaconInterval 900000 // 15 minutes = 900000 seg
 
-String iGate_Callsign = "CD2RXU-11";
-String passcode_igate = "23201";
+const String WeatherReportCallsign  = "CD2RXU-11";
+const String WeatherReportPasscode  = "23201";
+const String AprsServer             = "radioaficion.pro";       // write the address of the aprs server   //const String SERVER = "brazil.aprs2.net";
+const int AprsServerPort            = 14580;                   // 14579 port is allready filtered so use 14580
+const String AprsSoftwareName       = "ESP32_TEST";
+const String AprsSoftwareVersion    = "0.1.0";
+const String AprsFilter             = "t/poms/CD2RXU-10/50";
 
-const String LAT = "3302.03S";      // por corregir               // write your latitude
-const String LON = "07134.42W";     //por corregir   
+const String WeatherReportComment   = "LoRa APRS Weather Report https://github.com/richonguzman/ESP32_APRS_Weather_Report";
 
-const String iGate_Comment = "DIY ESP32 - LoRa APRS iGATE https://github.com/richonguzman/LoRa_APRS_iGate";
+const String LAT                    = "3302.03S";      // por corregir               // write your latitude
+const String LON                    = "07134.42W";     //por corregir   
 
-const String SERVER = "radioaficion.pro";       // write the address of the aprs server   //const String SERVER = "brazil.aprs2.net";
-const int APRSPORT = 14580;                     // write the aprs server APRSPORT
-// 14579 port is allready filtered
-
-
-//String iGateBeaconPacket = iGate_Callsign + ">APLG01,TCPIP*,qAC,T2BRAZIL:=" + LAT + "L" + LON + "&" +  iGate_Comment + "\n";
-String iGateBeaconPacket = iGate_Callsign + ">APLG01,TCPIP*,qAC,CHILE:=" + LAT + "L" + LON + "&" +  iGate_Comment + "\n";
-
+String WeatherReportBeaconPacket    = WeatherReportCallsign + ">APLG01,TCPIP*,qAC,CHILE:=" + LAT + "L" + LON + "&" +  WeatherReportComment + "\n";
 
 #endif
