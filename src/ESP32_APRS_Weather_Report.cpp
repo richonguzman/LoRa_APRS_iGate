@@ -1,33 +1,9 @@
 #include <Arduino.h>
-#include <SPI.h>
-#include <LoRa.h>
 #include <WiFi.h>
-#include "iGate_config.h"
-#include "pins_config.h"
+#include "config.h"
 
 WiFiClient espClient;
 uint32_t lastTxTime = 0;
-
-void setup_lora() {
-  Serial.println("Set LoRa pins!");
-  SPI.begin(LORA_SCK, LORA_MISO, LORA_MOSI, LORA_CS);
-  LoRa.setPins(LORA_CS, LORA_RST, LORA_IRQ); 
-
-  long freq = 433775000;
-  Serial.print("frequency: ");
-  Serial.println(String(freq));
-  if (!LoRa.begin(freq)) {
-    Serial.println("Starting LoRa failed!");
-    while (true) {
-    }
-  }
-  LoRa.setSpreadingFactor(12);
-  LoRa.setSignalBandwidth(125000);
-  LoRa.setCodingRate4(5);
-  LoRa.enableCrc();
-  LoRa.setTxPower(20);
-  Serial.println("LoRa init done!\n");
-}
 
 void setup_wifi() {
   int status = WL_IDLE_STATUS;
@@ -90,28 +66,6 @@ void procesa_y_sube_APRS_IS(String mensaje) {
   connect_and_upload_to_APRS_IS(packet_para_APRS_IS);
 }
 
-void valida_y_procesa_packet(String mensaje) {
-  String packetStart = "";
-  String packetStart2 = "";
-  Serial.print("MENSAJE RECIBIDO!!!   ");
-  Serial.print("(Validando inicio ---> ");
-  packetStart = mensaje.substring(0, 3);
-  packetStart2 = mensaje.substring(0, 4);
-  if (packetStart == "\x3c\xff\x01") {
-    Serial.println("Packet Valido)");
-    procesa_y_sube_APRS_IS(mensaje);
-  }else if (packetStart2 == "\x77\x63\x6c\x70") {
-    LoRa.beginPacket();
-    LoRa.print("Weather Response from iGate");
-    LoRa.endPacket();
-    Serial.println("Enviando Respuesta LoRa a Tracker");
-  }  else {
-    Serial.println("Packet NO Valido)");
-  }
-}
-
-
-
 void APRS_connect(){
   int count = 0;
   String aprsauth;
@@ -158,7 +112,6 @@ void setup() {
   Serial.begin(115200);
   setup_wifi();
   btStop();
-  //setup_lora();
   Serial.println("Starting iGate\n");
   APRS_connect();
 }
@@ -166,19 +119,7 @@ void setup() {
 void loop() {  
   APRS_IS_READ();
 
-  /*String receivedPacket = "";
-  static bool beacon_update = true;
-
-  int packetSize = LoRa.parsePacket();
-  if (packetSize) {
-    while (LoRa.available()) {
-      int inChar = LoRa.read();
-      receivedPacket += (char)inChar;
-    }
-    valida_y_procesa_packet(receivedPacket);    //Serial.println("Mensaje Recibido   : " + String(receivedPacket));
-  };
-
-  uint32_t lastTx = millis() - lastTxTime;
+  /*uint32_t lastTx = millis() - lastTxTime;
   if (lastTx >= BeaconInterval) {
     beacon_update = true;    
   }

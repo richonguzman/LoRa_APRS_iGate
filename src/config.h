@@ -21,8 +21,8 @@ const int APRSPORT = 14580;                     // write the aprs server APRSPOR
 // 14579 port is allready filtered
 
 
-String iGateBeaconPacket = iGate_Callsign + ">APLG01,TCPIP*,qAC,T2BRAZIL:=" + LAT + "L" + LON + "&" +  iGate_Comment + "\n";
-//String iGateBeaconPacket = iGate_Callsign + ">APLG01,TCPIP*,qAC,CHILE:=" + LAT + "L" + LON + "&" +  iGate_Comment + "\n";
+//String iGateBeaconPacket = iGate_Callsign + ">APLG01,TCPIP*,qAC,T2BRAZIL:=" + LAT + "L" + LON + "&" +  iGate_Comment + "\n";
+String iGateBeaconPacket = iGate_Callsign + ">APLG01,TCPIP*,qAC,CHILE:=" + LAT + "L" + LON + "&" +  iGate_Comment + "\n";
 
 
 #endif
