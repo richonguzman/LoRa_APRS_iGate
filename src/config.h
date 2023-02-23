@@ -8,8 +8,8 @@
 
 #define BeaconInterval 900000 // 15 minutes = 900000 seg
 
-const String WeatherReportCallsign  = "CD2RXU-10";
-const String WeatherReportPasscode  = "23201";
+const String WeatherReportCallsign  = "WRCLP";
+const String WeatherReportPasscode  = "14332";
 const String AprsServer             = "radioaficion.pro";       // write the address of the aprs server   //const String SERVER = "brazil.aprs2.net";
 const int AprsServerPort            = 14580;                   // 14579 port is allready filtered so use 14580
 const String AprsSoftwareName       = "ESP32_TEST";

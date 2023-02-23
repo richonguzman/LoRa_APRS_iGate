@@ -69,24 +69,24 @@ void APRS_IS_READ(){
       }
 
 
+      // ver como responder el ack !!!
 
-
-      aprsisData = espClient.readStringUntil('\n');       //char c = espClient.read();      //if (c == '\n') {
-      Serial.println(aprsisData);      //Serial.println(aprsisData.indexOf("CD2RXU-9"));
+      aprsisData = espClient.readStringUntil('\n');
+      Serial.println(aprsisData);
       packet.concat(aprsisData);
-      if (packet.indexOf("CD2RXU-10") > 0){
+      if (packet.indexOf("WRCLP") > 0){
         if (packet.indexOf("::")>0) {
           mensaje1 = packet.substring(packet.indexOf("::")+2);
           mensaje2 = mensaje1.substring(mensaje1.indexOf(":")+1);
           emisario = packet.substring(0,packet.indexOf(">"));
-          Serial.print("--> es un mensaje para CD2RXU-10 = ");
+          Serial.print("--> es un mensaje para WRCLP = ");
           Serial.println(mensaje2);
           Serial.print("--> enviado por : ");
           Serial.println(emisario);
           for(int i = emisario.length(); i < 9; i++) {
             emisario += ' ';
           }
-          mensajeRespuesta = "CD2RXU-10>APLG01,TCPIP*,qAC,CHILE::" + emisario + ":" + "hola para ti tambien5" + "\n";  
+          mensajeRespuesta = "WRCLP>APLG01,TCPIP*,qAC,CHILE::" + emisario + ":" + "hola para ti tambien5" + "\n";  
           Serial.print(mensajeRespuesta);
           espClient.write(mensajeRespuesta.c_str());
           
@@ -96,7 +96,7 @@ void APRS_IS_READ(){
       packet = "";
       mensaje1 = "";
       mensaje2 = "";
-      emisario = "";      //}      //aprsisData += c;      
+      emisario = "";
     }
   }
 }
