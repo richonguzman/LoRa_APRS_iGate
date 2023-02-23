@@ -46,24 +46,57 @@ void APRS_connect(){
 }
 
 void APRS_IS_READ(){
-  String aprsisData;
-  //String mensaje;
+  String aprsisData = "";
+  String packet = "";
+  String mensaje1 = "";
+  String mensaje2 = "";
+  String emisario = "";
+  String mensajeRespuesta;
+
+
   while (espClient.connected()) {
-    while (espClient.available() > 0) {
-      char c = espClient.read();
-      if (c == '\n') {
-        Serial.print(aprsisData);
-        //Serial.println(aprsisData.indexOf("CD2RXU-9"));
-        /*mensaje = aprsisData;
-        delay(50);
-        if (mensaje.indexOf("CD2RXU-9") >= 0){
-          Serial.print("CD2RXU-9 con info!!!!!!!!!!!!!");
-        }*/
-        aprsisData = "";
-        //mensaje = "";
+    while (espClient.available()) {
+      uint32_t lastTx = millis() - lastTxTime;
+      if (lastTx >= BeaconInterval) {
+        beacon_update = true;    
       }
-      aprsisData += c;
-      
+
+      if (beacon_update) { 
+        Serial.println("enviando Beacon Estacion/iGate");
+        espClient.write(WeatherReportBeaconPacket.c_str()); 
+        lastTxTime = millis();
+        beacon_update = false;
+      }
+
+
+
+
+      aprsisData = espClient.readStringUntil('\n');       //char c = espClient.read();      //if (c == '\n') {
+      Serial.println(aprsisData);      //Serial.println(aprsisData.indexOf("CD2RXU-9"));
+      packet.concat(aprsisData);
+      if (packet.indexOf("CD2RXU-10") > 0){
+        if (packet.indexOf("::")>0) {
+          mensaje1 = packet.substring(packet.indexOf("::")+2);
+          mensaje2 = mensaje1.substring(mensaje1.indexOf(":")+1);
+          emisario = packet.substring(0,packet.indexOf(">"));
+          Serial.print("--> es un mensaje para CD2RXU-10 = ");
+          Serial.println(mensaje2);
+          Serial.print("--> enviado por : ");
+          Serial.println(emisario);
+          for(int i = emisario.length(); i < 9; i++) {
+            emisario += ' ';
+          }
+          mensajeRespuesta = "CD2RXU-10>APLG01,TCPIP*,qAC,CHILE::" + emisario + ":" + "hola para ti tambien5" + "\n";  
+          Serial.print(mensajeRespuesta);
+          espClient.write(mensajeRespuesta.c_str());
+          
+        }
+      }
+      aprsisData = "";
+      packet = "";
+      mensaje1 = "";
+      mensaje2 = "";
+      emisario = "";      //}      //aprsisData += c;      
     }
   }
 }

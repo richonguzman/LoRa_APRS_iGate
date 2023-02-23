@@ -8,13 +8,13 @@
 
 #define BeaconInterval 900000 // 15 minutes = 900000 seg
 
-const String WeatherReportCallsign  = "CD2RXU-11";
+const String WeatherReportCallsign  = "CD2RXU-10";
 const String WeatherReportPasscode  = "23201";
 const String AprsServer             = "radioaficion.pro";       // write the address of the aprs server   //const String SERVER = "brazil.aprs2.net";
 const int AprsServerPort            = 14580;                   // 14579 port is allready filtered so use 14580
 const String AprsSoftwareName       = "ESP32_TEST";
 const String AprsSoftwareVersion    = "0.1.0";
-const int ReportingDistance         = 50;
+const int ReportingDistance         = 30;
 const String AprsFilter             = "t/poms/CD2RXU-10/50"; //cambio a : "t/poms/" + WeatherReportCallsign + "/" + String(ReportingDistance)
 
 const String WeatherReportComment   = "LoRa APRS Weather Report https://github.com/richonguzman/ESP32_APRS_Weather_Report";
