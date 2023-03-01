@@ -149,14 +149,14 @@ void loop() {
             }
             if (subpacket2.indexOf("{")>0) {                                  // if questioner solicitates ack 
               ackNumber = subpacket2.substring(subpacket2.indexOf("{")+1);
-              ackMessage = "WRCLP>APLG01,TCPIP*,qAC,CHILE::" + questioner + ":ack" + ackNumber + "\n";
-              Serial.print("---> " + ackMessage);
+              ackMessage = "WRCLP>APRS,TCPIP*,qAC,CHILE::" + questioner + ":ack" + ackNumber + "\n";
+              //Serial.print("---> " + ackMessage);
               espClient.write(ackMessage.c_str());
               delay(500);
             }
             currentDate = getDateTime();
-            answerMessage = "WRCLP>APLG01,TCPIP*,qAC,CHILE::" + questioner + ":" + "hola, " + questioner + " " + currentDate + "\n";  
-            Serial.print("-------> " + answerMessage);
+            answerMessage = "WRCLP>APRS,TCPIP*,qAC,CHILE::" + questioner + ":" + "hola, " + questioner + " " + currentDate + "\n";  
+            Serial.print("\n-------> " + answerMessage + "\n");
             espClient.write(answerMessage.c_str());          
           }
         }
