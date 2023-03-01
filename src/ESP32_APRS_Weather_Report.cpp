@@ -56,12 +56,40 @@ String getDateTime() {
     return "no time info... restarting";
     ESP.restart();
   }
+
   year = (String)(timeinfo.tm_year + 1900);
+
   month = (String)(timeinfo.tm_mon+1);
+  if (month.length() == 1) {
+    month = "0" + month;
+  }
+
   day = (String)(timeinfo.tm_mday);
+  if (day.length() == 1) {
+    day = "0" + day;
+  }
+
   hour = (String)(timeinfo.tm_hour);
+  if (hour == 0) {
+    hour = "00";
+  } else if (hour.length() == 1) {
+    hour = "0" + hour;
+  }
+
   minute = (String)(timeinfo.tm_min);
+  if (minute == 0) {
+    minute = "00";
+  } else if (minute.length() == 1) {
+    minute = "0" + minute;
+  }
+
   seconds = (String)(timeinfo.tm_sec);
+  if (seconds == 0) {
+    seconds = "00";
+  } else if (seconds.length() == 1) {
+    seconds = "0" + seconds;
+  }
+
   currentTime = year + "/" + month + "/" + day + " " + hour + ":" + minute + ":" + seconds;
   //Serial.println(currentTime);
   return currentTime;
