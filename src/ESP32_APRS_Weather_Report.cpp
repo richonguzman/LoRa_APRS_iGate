@@ -1,10 +1,13 @@
 #include <Arduino.h>
 #include <WiFi.h>
+#include "time.h"
 #include "config.h"
 
+
 WiFiClient espClient;
-uint32_t lastTxTime = 0;
-static bool beacon_update = true;
+uint32_t lastTxTime                 = 0;
+static bool beacon_update           = true;
+unsigned long previousWiFiMillis    = 0;
 
 void setup_wifi() {
   int status = WL_IDLE_STATUS;
@@ -21,10 +24,10 @@ void setup_wifi() {
   Serial.println(WiFi.localIP());
 }
 
-void APRS_connect(){
+void APRS_IS_connect(){
   int count = 0;
   String aprsauth;
-  Serial.println("Conectando a APRS-IS");
+  Serial.println("Connecting to APRS-IS ...");
   while (!espClient.connect(AprsServer.c_str(), AprsServerPort) && count < 20) {
     Serial.println("Didn't connect with server...");
     delay(1000);
@@ -45,84 +48,91 @@ void APRS_connect(){
   }
 }
 
-void APRS_IS_READ(){
-  String aprsisData = "";
-  String packet = "";
-  String mensaje1 = "";
-  String mensaje2 = "";
-  String emisario = "";
-  String mensajeRespuesta;
-
-
-  while (espClient.connected()) {
-    while (espClient.available()) {
-      uint32_t lastTx = millis() - lastTxTime;
-      if (lastTx >= BeaconInterval) {
-        beacon_update = true;    
-      }
-
-      if (beacon_update) { 
-        Serial.println("enviando Beacon Estacion/iGate");
-        espClient.write(WeatherReportBeaconPacket.c_str()); 
-        lastTxTime = millis();
-        beacon_update = false;
-      }
-
-
-      // ver como responder el ack !!!
-
-      aprsisData = espClient.readStringUntil('\n');
-      Serial.println(aprsisData);
-      packet.concat(aprsisData);
-      if (packet.indexOf("WRCLP") > 0){
-        if (packet.indexOf("::")>0) {
-          mensaje1 = packet.substring(packet.indexOf("::")+2);
-          mensaje2 = mensaje1.substring(mensaje1.indexOf(":")+1);
-          emisario = packet.substring(0,packet.indexOf(">"));
-          Serial.print("--> es un mensaje para WRCLP = ");
-          Serial.println(mensaje2);
-          Serial.print("--> enviado por : ");
-          Serial.println(emisario);
-          for(int i = emisario.length(); i < 9; i++) {
-            emisario += ' ';
-          }
-          mensajeRespuesta = "WRCLP>APLG01,TCPIP*,qAC,CHILE::" + emisario + ":" + "hola para ti tambien5" + "\n";  
-          Serial.print(mensajeRespuesta);
-          espClient.write(mensajeRespuesta.c_str());
-          
-        }
-      }
-      aprsisData = "";
-      packet = "";
-      mensaje1 = "";
-      mensaje2 = "";
-      emisario = "";
-    }
+String GetTime() {
+  struct tm timeinfo;
+  String currentTime, year, month, day, hour, minute, seconds;  
+  if(!getLocalTime(&timeinfo)){
+    Serial.println("Failed to obtain time");
+    return "no time info... restarting";
+    ESP.restart();
   }
+  year = (String)(timeinfo.tm_year + 1900);
+  month = (String)(timeinfo.tm_mon+1);
+  day = (String)(timeinfo.tm_mday);
+  hour = (String)(timeinfo.tm_hour);
+  minute = (String)(timeinfo.tm_min);
+  seconds = (String)(timeinfo.tm_sec);
+  currentTime = year + "/" + month + "/" + day + " " + hour + ":" + minute + ":" + seconds;
+  //Serial.println(currentTime);
+  return currentTime;
 }
 
 void setup() {
   Serial.begin(115200);
   setup_wifi();
   btStop();
+  configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
+  GetTime();
   Serial.println("Starting Weather Report APRS\n");
-  APRS_connect();
 }
 
 void loop() {
-  APRS_IS_READ();
+  unsigned long currentWiFiMillis   = millis();
 
-
-
-  /*uint32_t lastTx = millis() - lastTxTime;
-  if (lastTx >= BeaconInterval) {
-    beacon_update = true;    
+  if ((WiFi.status() != WL_CONNECTED) && (currentWiFiMillis - previousWiFiMillis >= WifiCheckInterval)) {   // if WiFi is down, try reconnecting
+    Serial.print(millis());
+    Serial.println("Reconnecting to WiFi...");
+    WiFi.disconnect();
+    WiFi.reconnect();
+    previousWiFiMillis = currentWiFiMillis;
   }
 
-  if (beacon_update) { 
-    Serial.println("enviando Beacon Estacion/iGate");
-    espClient.write(WeatherReportBeaconPacket.c_str()); 
-    lastTxTime = millis();
-    beacon_update = false;
-  }*/
+  if (!espClient.connected()) {
+    APRS_IS_connect();
+  }
+  
+  while (espClient.connected()) {
+    while (espClient.available()) {
+      uint32_t lastTx = millis() - lastTxTime;
+      
+      if (lastTx >= BeaconInterval) {
+        beacon_update = true;    
+      }
+      if (beacon_update) { 
+        Serial.println("---- Sending WeatherReport Beacon ----");
+        espClient.write(WeatherReportBeaconPacket.c_str()); 
+        lastTxTime = millis();
+        beacon_update = false;
+      }
+      
+      String aprsisData, packet, subpacket1, subpacket2, questioner, answerMessage, ackNumber, ackMessage, currentDate;
+
+      aprsisData = espClient.readStringUntil('\n');
+      packet.concat(aprsisData);
+      if (!packet.startsWith("#")){
+        Serial.println(packet);
+        if (packet.indexOf("WRCLP") > 0){
+          if (packet.indexOf("::")>0) {
+            subpacket1 = packet.substring(packet.indexOf("::")+2);
+            subpacket2 = subpacket1.substring(subpacket1.indexOf(":")+1);
+            questioner = packet.substring(0,packet.indexOf(">"));
+            for(int i = questioner.length(); i < 9; i++) {
+              questioner += ' ';
+            }
+            if (subpacket2.indexOf("{")>0) {                                  // if questioner solicitates ack 
+              ackNumber = subpacket2.substring(subpacket2.indexOf("{")+1);
+              ackMessage = "WRCLP>APLG01,TCPIP*,qAC,CHILE::" + questioner + ":ack" + ackNumber + "\n";
+              Serial.print("---> " + ackMessage);
+              espClient.write(ackMessage.c_str());
+              delay(500);
+            }
+            currentDate = GetTime();
+            answerMessage = "WRCLP>APLG01,TCPIP*,qAC,CHILE::" + questioner + ":" + "hola, " + questioner + " " + currentDate + "\n";  
+            Serial.print("-------> " + answerMessage);
+            espClient.write(answerMessage.c_str());          
+          }
+        }
+      }
+    }
+  }
 }
