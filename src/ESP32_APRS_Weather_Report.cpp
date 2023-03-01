@@ -127,7 +127,7 @@ void loop() {
         beacon_update = true;    
       }
       if (beacon_update) { 
-        Serial.println("---- Sending WeatherReport Beacon ----");
+        Serial.println("\n---- Sending WeatherReport Beacon ----\n");
         espClient.write(WeatherReportBeaconPacket.c_str()); 
         lastTxTime = millis();
         beacon_update = false;
