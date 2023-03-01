@@ -48,7 +48,7 @@ void APRS_IS_connect(){
   }
 }
 
-String GetTime() {
+String getDateTime() {
   struct tm timeinfo;
   String currentTime, year, month, day, hour, minute, seconds;  
   if(!getLocalTime(&timeinfo)){
@@ -72,7 +72,7 @@ void setup() {
   setup_wifi();
   btStop();
   configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
-  GetTime();
+  getDateTime();
   Serial.println("Starting Weather Report APRS\n");
 }
 
@@ -126,7 +126,7 @@ void loop() {
               espClient.write(ackMessage.c_str());
               delay(500);
             }
-            currentDate = GetTime();
+            currentDate = getDateTime();
             answerMessage = "WRCLP>APLG01,TCPIP*,qAC,CHILE::" + questioner + ":" + "hola, " + questioner + " " + currentDate + "\n";  
             Serial.print("-------> " + answerMessage);
             espClient.write(answerMessage.c_str());          
