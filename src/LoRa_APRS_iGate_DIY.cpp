@@ -5,17 +5,27 @@
 #include "iGate_config.h"
 #include "pins_config.h"
 
-#define VERSION "V.0.0.9" //Still Beta?
+#define VERSION "V.0.1.0"
+
 WiFiClient espClient;
-int status = WL_IDLE_STATUS;
-uint32_t lastTxTime = 0;
+uint32_t lastTxTime                 = 0;
+static bool beacon_update           = true;
+unsigned long previousWiFiMillis    = 0;
 
-#define txInterval 15 * 60 * 1000
-const String LAT = "3302.03S";      // por corregir               // write your latitude
-const String LON = "07134.42W";     //por corregir   
-const String IGATE = "CD2RXU-10";
-const String Mensaje_iGate = "DIY ESP32 - LoRa APRS iGATE";
-
+void setup_wifi() {
+  int status = WL_IDLE_STATUS;
+  WiFi.mode(WIFI_STA);
+  WiFi.disconnect();
+  delay(100);
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  Serial.print("\nConnecting to '"); Serial.print(WIFI_SSID); Serial.println("' WiFi ...");
+  while (WiFi.status() != WL_CONNECTED) {
+    Serial.print('.');
+    delay(1000);
+  }
+  Serial.print("Connected as ");
+  Serial.println(WiFi.localIP());
+}
 
 void setup_lora() {
   Serial.println("Set LoRa pins!");
@@ -38,76 +48,49 @@ void setup_lora() {
   Serial.println("LoRa init done!\n");
 }
 
-void setup_wifi() {
-  WiFi.mode(WIFI_STA);
-  WiFi.disconnect();
-  delay(100);
-  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-  Serial.print("\nConnecting to '"); Serial.print(WIFI_SSID); Serial.println("' WiFi ...");
-  while (WiFi.status() != WL_CONNECTED) {
-    Serial.print('.');
-    delay(1000);
-  }
-  Serial.print("Connected as ");
-  Serial.println(WiFi.localIP());
-}
-
-void connect_and_upload_to_APRS_IS(String packet) {
+void APRS_IS_connect(){
   int count = 0;
   String aprsauth;
-  Serial.println("Conectando a APRS-IS");
-  while (!espClient.connect(SERVER.c_str(), APRSPORT) && count < 20) {
-    Serial.println("Didn't connect with server: " + String(SERVER) + " APRSPORT: " + String(APRSPORT));
+  Serial.println("Connecting to APRS-IS ...");
+  while (!espClient.connect(AprsServer.c_str(), AprsServerPort) && count < 20) {
+    Serial.println("Didn't connect with server...");
     delay(1000);
     espClient.stop();
     espClient.flush();
     Serial.println("Run client.stop");
-    Serial.println("Trying to connect with server: " + String(SERVER) + " APRSPORT: " + String(APRSPORT));
+    Serial.println("Trying to connect with Server: " + String(AprsServer) + " AprsServerPort: " + String(AprsServerPort));
     count++;
     Serial.println("Try: " + String(count));
   }
   if (count == 20) {
-    Serial.println("Tried: " + String(count) + " don't send the packet!");
+    Serial.println("Tried: " + String(count) + " FAILED!");
   } else {
-    Serial.println("Connected with server: " + String(SERVER) + " APRSPORT: " + String(APRSPORT));
-    while (espClient.connected()) {
-      delay(1000);
-      aprsauth = "user " + callsign_igate + " pass " + passcode_igate + "\n"; //info igate
-      espClient.write(aprsauth.c_str());         //Serial.println("Run client.connected()");
-      delay(500);
-      espClient.write(packet.c_str());           //Serial.println("Send client.write=" + aprsauth);
-      delay(500);                                //Serial.println("Send espClient.write = " + packet_para_APRS_IS);
-      Serial.println("Packet uploaded =)\n");
-      espClient.stop();
-      espClient.flush();                         //Serial.println("(Telnet client disconnect)\n");
-    }
+    Serial.println("Connected with Server: " + String(AprsServer) + " Port: " + String(AprsServerPort));
+    aprsauth = "user " + iGateCallsign + " pass " + iGatePasscode + " vers " + AprsSoftwareName + " " + AprsSoftwareVersion + " filter " + AprsFilter + "\n\r"; 
+    espClient.write(aprsauth.c_str());  
+    delay(200);
   }
 }
 
-void procesa_y_sube_APRS_IS(String mensaje) {
-  String packet_para_APRS_IS = "";
-  String callsign_y_path_tracker = "";
-  String payload_tracker;
-
-  int posicion_dos_puntos = mensaje.indexOf(':');
-  callsign_y_path_tracker = mensaje.substring(3, posicion_dos_puntos);
-  payload_tracker = mensaje.substring(posicion_dos_puntos);
-  packet_para_APRS_IS = callsign_y_path_tracker + ",qAO," + callsign_igate + payload_tracker + "\n";
-  //Serial.print("Mensaje APRS_IS    : "); Serial.println(packet_para_APRS_IS);
-  //packet = "CD2RXU-9>APLT00,qAO,CD2RXU-10:=" + LAT + "/" + LON + ">" +  "\n"; // ejemplo!!!
-  connect_and_upload_to_APRS_IS(packet_para_APRS_IS);
+String process_packet(String unprocessedPacket) {
+  String callsign_and_path_tracker, payload_tracker, processedPacket;
+  int two_dots_position = unprocessedPacket.indexOf(':');
+  callsign_and_path_tracker = unprocessedPacket.substring(3, two_dots_position);
+  payload_tracker = unprocessedPacket.substring(two_dots_position);
+  processedPacket = callsign_and_path_tracker + ",qAO," + iGateCallsign + payload_tracker + "\n";
+  Serial.print("APRS_IS Message       : "); Serial.println(processedPacket);
+  return processedPacket;
 }
 
-void valida_y_procesa_packet(String mensaje) {
-  String packetStart = "";
-  Serial.print("MENSAJE RECIBIDO!!!   ");
-  Serial.print("(Validando inicio ---> ");
-  packetStart = mensaje.substring(0, 3);
+void validate_lora_packet(String packet) {
+  String packetStart, aprsPacket;
+  packetStart = packet.substring(0, 3);
   if (packetStart == "\x3c\xff\x01") {
-    Serial.println("Packet Valido)");
-    procesa_y_sube_APRS_IS(mensaje);
+    Serial.println("   ---> Valid LoRa Packet)");
+    aprsPacket = process_packet(packet);
+    espClient.write(aprsPacket.c_str()); 
   } else {
-    Serial.println("Packet NO Valido)");
+    Serial.println("   ---> Not Valid LoRa Packet (Ignore))");
   }
 }
 
@@ -116,26 +99,49 @@ void setup() {
   setup_wifi();
   btStop();
   setup_lora();
-  Serial.println("Starting iGate\n");
+  Serial.println("Starting iGate: " + iGateCallsign + "\n");
 }
 
 void loop() {  
-  String mensaje_recibido = "";
-  String mensaje_beacon_estacion = IGATE + ">APLG01,TCPIP*,qAC,T2BRAZIL:=" + LAT + "L" + LON + "&" +  Mensaje_iGate+ "\n"; //
-  uint32_t lastTx = millis() - lastTxTime;
-  bool valida_inicio;
-  int packetSize = LoRa.parsePacket();
-  if (packetSize) {
-    while (LoRa.available()) {
-      int inChar = LoRa.read();
-      mensaje_recibido += (char)inChar;
-    }
-    valida_y_procesa_packet(mensaje_recibido);          //Serial.println("Mensaje Recibido   : " + String(mensaje_recibido));
+  unsigned long currentWiFiMillis   = millis();
+
+  if ((WiFi.status() != WL_CONNECTED) && (currentWiFiMillis - previousWiFiMillis >= WifiCheckInterval)) {   // if WiFi is down, try reconnecting
+    Serial.print(millis());
+    Serial.println("Reconnecting to WiFi...");
+    WiFi.disconnect();
+    WiFi.reconnect();
+    previousWiFiMillis = currentWiFiMillis;
   }
-  if (lastTx >= txInterval) {
-    Serial.println("enviando Beacon Estacion/iGate");
-    connect_and_upload_to_APRS_IS(mensaje_beacon_estacion);
-    lastTxTime = millis();
+
+  if (!espClient.connected()) {
+    APRS_IS_connect();
+  }
+
+  while (espClient.connected()) {
+    while (espClient.available()) {
+
+      uint32_t lastTx = millis() - lastTxTime;
+      if (lastTx >= BeaconInterval) {
+        beacon_update = true;    
+      }
+      if (beacon_update) { 
+        Serial.println("---- Sending WeatherReport Beacon ----");
+        espClient.write(iGateBeaconPacket.c_str()); 
+        lastTxTime = millis();
+        beacon_update = false;
+      }
+
+      String loraPacket = "";
+      int packetSize = LoRa.parsePacket();
+      if (packetSize) {
+        while (LoRa.available()) {
+          int inChar = LoRa.read();
+          loraPacket += (char)inChar;
+        }
+        Serial.print("\nReceived Lora Message : " + String(loraPacket));
+        validate_lora_packet(loraPacket);
+      }
     }
+  }
 }
   
