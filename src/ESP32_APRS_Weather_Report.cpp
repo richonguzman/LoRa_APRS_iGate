@@ -1,13 +1,17 @@
 #include <Arduino.h>
 #include <WiFi.h>
+#include <HTTPClient.h>
+#include <ArduinoJson.h>
 #include "time.h"
 #include "config.h"
 
 
 WiFiClient espClient;
+HTTPClient http;
 uint32_t lastTxTime                 = 0;
 static bool beacon_update           = true;
 unsigned long previousWiFiMillis    = 0;
+
 
 void setup_wifi() {
   int status = WL_IDLE_STATUS;
@@ -95,6 +99,80 @@ String getDateTime() {
   return currentTime;
 }
 
+String getWeatherForecast(String infoJson){
+  StaticJsonDocument<700> doc;
+  DeserializationError error = deserializeJson(doc, infoJson);
+  if (error) {        // Test if parsing succeeds.
+    Serial.print(F("deserializeJson() failed: "));
+    Serial.println(error.f_str());
+    return "No Location info for Callsign";
+  }
+  String latitude = doc["entries"][0]["lat"];
+  String longitude = doc["entries"][0]["lng"];
+  latitude = latitude.substring(0,latitude.indexOf(".")+3);
+  longitude = longitude.substring(0,longitude.indexOf(".")+3);
+
+  //openweather api key
+  String OpenWeatherApiKey;
+  OpenWeatherApiKey = "ac33704cb73d416103ede5e5d86aabd5";
+  //OpenWeatherApiKey = "d732610ae742d5d2d057c10825e3e7eb";
+  String request_info;
+  request_info = "https://api.openweathermap.org/data/2.5/weather?lat=" + (String)latitude + "&lon=" + (String)longitude + "&appid=" + OpenWeatherApiKey + "&units=metric";
+
+    String payload;
+  int httpResponseCode;
+  
+  http.begin(request_info.c_str());
+  httpResponseCode =  http.GET();
+  if (httpResponseCode > 0) {                   //    Serial.print("HTTP Response code: ");      //Serial.println(httpResponseCode);
+    payload = http.getString();                 //    Serial.println(payload);
+  } else {                                      //    Serial.print("Error code: ");             //Serial.println(httpResponseCode);
+    payload = "0";
+  }
+  http.end();
+
+  if (payload != "0") {
+    StaticJsonDocument<1000> doc2;
+    DeserializationError error2 = deserializeJson(doc2, payload);
+    if (error2) {        // Test if parsing succeeds.
+      Serial.print(F("deserializeJson() failed: "));
+      Serial.println(error2.f_str());
+      return "No WeatherForcast Available";
+    }
+
+    String resumen      = doc2["weather"][0]["description"];
+    String temperatura  = doc2["main"]["temp"];
+    String presion      = doc2["main"]["pressure"];
+    String humedad      = doc2["main"]["humidity"];
+    String viento       = doc2["wind"]["speed"];
+    String lugar        = doc2["name"];
+    String respuesta    = lugar + ", " + resumen + ",T:" + temperatura.substring(0,temperatura.indexOf(".")) + ",P:" + presion + ",H:" + humedad + ",W:" + viento.substring(0,viento.indexOf("."));
+    return respuesta;
+  }
+}
+
+String GetWeatherForecast(String callsign) {
+  String request_info, payload, weatherForecast;
+  int httpResponseCode;
+  callsign.trim();
+  request_info = "https://api.aprs.fi/api/get?name=" + callsign + "&what=loc&apikey=" + APRS_API_KEY + "&format=json";
+  http.begin(request_info.c_str());
+  httpResponseCode =  http.GET();
+  if (httpResponseCode > 0) {           //Serial.print("HTTP Response code: ");    //Serial.println(httpResponseCode);
+    payload = http.getString();         //Serial.println(payload);
+  } else {
+    //Serial.print("Error code: ");     //Serial.println(httpResponseCode);
+    payload = "0";
+  }
+  http.end();
+  if (payload != "0") {
+    weatherForecast = getWeatherForecast(payload);
+    return weatherForecast;
+  } else {
+    return "No WeatherForcast Available";
+  }
+}
+
 void setup() {
   Serial.begin(115200);
   setup_wifi();
@@ -133,7 +211,7 @@ void loop() {
         beacon_update = false;
       }
       
-      String aprsisData, packet, subpacket1, subpacket2, questioner, answerMessage, ackNumber, ackMessage, currentDate;
+      String aprsisData, packet, subpacket1, receivedMessage, questioner, answerMessage, ackNumber, ackMessage, currentDate, weatherForecast;
 
       aprsisData = espClient.readStringUntil('\n');
       packet.concat(aprsisData);
@@ -142,20 +220,37 @@ void loop() {
         if (packet.indexOf("WRCLP") > 0){
           if (packet.indexOf("::")>0) {
             subpacket1 = packet.substring(packet.indexOf("::")+2);
-            subpacket2 = subpacket1.substring(subpacket1.indexOf(":")+1);
+            receivedMessage = subpacket1.substring(subpacket1.indexOf(":")+1);
             questioner = packet.substring(0,packet.indexOf(">"));
-            for(int i = questioner.length(); i < 9; i++) {
-              questioner += ' ';
-            }
-            if (subpacket2.indexOf("{")>0) {                                  // if questioner solicitates ack 
-              ackNumber = subpacket2.substring(subpacket2.indexOf("{")+1);
+            //Serial.println(receivedMessage);
+
+            if (receivedMessage.indexOf("{")>0) {                                  // if questioner solicitates ack 
+              ackNumber = receivedMessage.substring(receivedMessage.indexOf("{")+1);
+              for(int i = questioner.length(); i < 9; i++) {
+                questioner += ' ';
+              }
               ackMessage = "WRCLP>APRS,TCPIP*,qAC,CHILE::" + questioner + ":ack" + ackNumber + "\n";
               //Serial.print("---> " + ackMessage);
               espClient.write(ackMessage.c_str());
               delay(500);
+              receivedMessage = receivedMessage.substring(0,receivedMessage.indexOf("{"));
+              //Serial.println(receivedMessage);
             }
-            currentDate = getDateTime();
-            answerMessage = "WRCLP>APRS,TCPIP*,qAC,CHILE::" + questioner + ":" + "hola, " + questioner + " " + currentDate + "\n";  
+
+            for(int i = questioner.length(); i < 9; i++) {
+                questioner += ' ';
+            }
+            receivedMessage.trim();
+            if (receivedMessage == "hora") {
+              currentDate = getDateTime();
+              answerMessage = "WRCLP>APRS,TCPIP*,qAC,CHILE::" + questioner + ":" + currentDate + "\n";
+            } else if (receivedMessage == "clima") {
+              weatherForecast = GetWeatherForecast(questioner);
+              answerMessage = "WRCLP>APRS,TCPIP*,qAC,CHILE::" + questioner + ":" + weatherForecast + "\n";  
+            } else {
+              answerMessage = "WRCLP>APRS,TCPIP*,qAC,CHILE::" + questioner + ":" + "hola " + questioner + "\n";  
+            }
+
             Serial.print("\n-------> " + answerMessage + "\n");
             espClient.write(answerMessage.c_str());          
           }

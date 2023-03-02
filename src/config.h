@@ -4,7 +4,10 @@
 #include <Arduino.h>
 
 #define WIFI_SSID       "Richon"
+//#define WIFI_SSID       "Jimenita"
 #define WIFI_PASSWORD   "k4fPnmg5qnyf"
+//#define WIFI_PASSWORD   "mg6wyMhqRnxk"
+#define APRS_API_KEY    "172828.INx7f7KxnpajX3"
 
 #define BeaconInterval 900000       // 15 minutes = 900000 seg
 #define WifiCheckInterval 60000     // wificheck after one minute
