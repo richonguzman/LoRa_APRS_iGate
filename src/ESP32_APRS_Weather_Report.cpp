@@ -5,7 +5,7 @@
 #include "time.h"
 #include "config.h"
 
-#define VERSION "V.0.0.9" // 2023.03.02
+#define VERSION "V.0.0.9" // 2023.03.02 BETA
 
 WiFiClient espClient;
 HTTPClient http;
