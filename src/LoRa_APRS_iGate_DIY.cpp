@@ -5,6 +5,7 @@
 #include "iGate_config.h"
 #include "pins_config.h"
 
+#define VERSION "V.0.0.9" //Still Beta?
 WiFiClient espClient;
 int status = WL_IDLE_STATUS;
 uint32_t lastTxTime = 0;
