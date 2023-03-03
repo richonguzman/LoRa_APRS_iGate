@@ -155,14 +155,17 @@ void loop() {
       aprsisData = espClient.readStringUntil('\n');
       aprsisPacket.concat(aprsisData);
       if (!aprsisPacket.startsWith("#")){
-        Serial.println("APRS-IS to Tracker    : " + aprsisPacket);
-        newLoraMessage = process_aprsisPacket(aprsisPacket);
-        LoRa.beginPacket(); 
-        LoRa.write('<');
-        LoRa.write(0xFF);
-        LoRa.write(0x01);
-        LoRa.write((const uint8_t *)newLoraMessage.c_str(), newLoraMessage.length());
-        LoRa.endPacket();
+        if (aprsisPacket.indexOf("::")>0) {
+          Serial.println("APRS-IS to Tracker    : " + aprsisPacket);
+          newLoraMessage = process_aprsisPacket(aprsisPacket);
+          LoRa.beginPacket(); 
+          LoRa.write('<');
+          LoRa.write(0xFF);
+          LoRa.write(0x01);
+          LoRa.write((const uint8_t *)newLoraMessage.c_str(), newLoraMessage.length());
+          LoRa.endPacket();
+          Serial.println("packet LoRa enviado!");
+        }        
       }
     }
   }
