@@ -72,13 +72,13 @@ void APRS_IS_connect(){
   }
 }
 
-String process_packet(String unprocessedPacket) {
+String process_loraPacket(String unprocessedPacket) {
   String callsign_and_path_tracker, payload_tracker, processedPacket;
   int two_dots_position = unprocessedPacket.indexOf(':');
   callsign_and_path_tracker = unprocessedPacket.substring(3, two_dots_position);
   payload_tracker = unprocessedPacket.substring(two_dots_position);
   processedPacket = callsign_and_path_tracker + ",qAO," + iGateCallsign + payload_tracker + "\n";
-  Serial.print("APRS_IS Message       : "); Serial.println(processedPacket);
+  Serial.print("Message uploaded      : "); Serial.println(processedPacket);
   return processedPacket;
 }
 
@@ -87,11 +87,15 @@ void validate_lora_packet(String packet) {
   packetStart = packet.substring(0, 3);
   if (packetStart == "\x3c\xff\x01") {
     Serial.println("   ---> Valid LoRa Packet!");
-    aprsPacket = process_packet(packet);
+    aprsPacket = process_loraPacket(packet);
     espClient.write(aprsPacket.c_str());
   } else {
     Serial.println("   ---> Not Valid LoRa Packet (Ignore)");
   }
+}
+
+void process_aprsisPacket(String aprsisMessage) {
+  Serial.println(aprsisMessage);
 }
 
 void setup() {
@@ -125,7 +129,7 @@ void loop() {
       beacon_update = true;    
     }
     if (beacon_update) { 
-      Serial.println("---- Sending WeatherReport Beacon ----");
+      Serial.println("---- Sending iGate Beacon ----");
       espClient.write(iGateBeaconPacket.c_str()); 
       lastTxTime = millis();
       beacon_update = false;
@@ -142,7 +146,8 @@ void loop() {
       validate_lora_packet(loraPacket);
     }
     
-    /*delay(100);
+    
+    
     if (espClient.available()) {
 
       String aprsisData, aprsisPacket, subpacket1, receivedMessage, questioner, answerMessage, ackNumber, ackMessage, currentDate, weatherForecast;
@@ -150,9 +155,10 @@ void loop() {
       aprsisData = espClient.readStringUntil('\n');
       aprsisPacket.concat(aprsisData);
       if (!aprsisPacket.startsWith("#")){
-        Serial.println("APRS MESSAGE     : " + aprsisPacket);
+        Serial.println("APRS-IS to Tracker    : " + aprsisPacket);
+        process_aprsisPacket(aprsisPacket);
       }
-    }*/
+    }
         /*
         if (packet.indexOf("WRCLP") > 0){
           if (packet.indexOf("::")>0) {
