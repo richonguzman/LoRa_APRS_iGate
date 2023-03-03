@@ -96,6 +96,7 @@ void validate_lora_packet(String packet) {
 
 void process_aprsisPacket(String aprsisMessage) {
   Serial.println(aprsisMessage);
+  // aqui toda la modificacion del mensaje antes de responder por lora!!!
 }
 
 void setup() {
