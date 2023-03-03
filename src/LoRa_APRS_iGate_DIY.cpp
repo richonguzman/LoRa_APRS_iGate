@@ -94,9 +94,13 @@ void validate_lora_packet(String packet) {
   }
 }
 
-void process_aprsisPacket(String aprsisMessage) {
-  Serial.println(aprsisMessage);
-  // aqui toda la modificacion del mensaje antes de responder por lora!!!
+String process_aprsisPacket(String aprsisMessage) {
+  String firstPart, messagePart, newLoraPacket;
+  firstPart = aprsisMessage.substring(0, aprsisMessage.indexOf("*"));
+  messagePart = aprsisMessage.substring(aprsisMessage.indexOf("::")+2);
+  newLoraPacket = "}" + firstPart + "," + iGateCallsign + "*::" + messagePart + "\n";
+  Serial.print(newLoraPacket);
+  return newLoraPacket;
 }
 
 void setup() {
@@ -123,7 +127,6 @@ void loop() {
   }
 
   while (espClient.connected()) {
-    //while (espClient.available()) {
 
     uint32_t lastTx = millis() - lastTxTime;
     if (lastTx >= BeaconInterval) {
@@ -147,59 +150,21 @@ void loop() {
       validate_lora_packet(loraPacket);
     }
     
-    
-    
     if (espClient.available()) {
-
-      String aprsisData, aprsisPacket, subpacket1, receivedMessage, questioner, answerMessage, ackNumber, ackMessage, currentDate, weatherForecast;
-
+      String aprsisData, aprsisPacket, newLoraMessage;
       aprsisData = espClient.readStringUntil('\n');
       aprsisPacket.concat(aprsisData);
       if (!aprsisPacket.startsWith("#")){
         Serial.println("APRS-IS to Tracker    : " + aprsisPacket);
-        process_aprsisPacket(aprsisPacket);
+        newLoraMessage = process_aprsisPacket(aprsisPacket);
+        LoRa.beginPacket(); 
+        LoRa.write('<');
+        LoRa.write(0xFF);
+        LoRa.write(0x01);
+        LoRa.write((const uint8_t *)newLoraMessage.c_str(), newLoraMessage.length());
+        LoRa.endPacket();
       }
     }
-        /*
-        if (packet.indexOf("WRCLP") > 0){
-          if (packet.indexOf("::")>0) {
-            subpacket1 = packet.substring(packet.indexOf("::")+2);
-            receivedMessage = subpacket1.substring(subpacket1.indexOf(":")+1);
-            questioner = packet.substring(0,packet.indexOf(">"));
-            //Serial.println(receivedMessage);
-
-            if (receivedMessage.indexOf("{")>0) {                                  // if questioner solicitates ack 
-              ackNumber = receivedMessage.substring(receivedMessage.indexOf("{")+1);
-              for(int i = questioner.length(); i < 9; i++) {
-                questioner += ' ';
-              }
-              ackMessage = "WRCLP>APRS,TCPIP*,qAC,CHILE::" + questioner + ":ack" + ackNumber + "\n";
-              //Serial.print("---> " + ackMessage);
-              espClient.write(ackMessage.c_str());
-              delay(500);
-              receivedMessage = receivedMessage.substring(0,receivedMessage.indexOf("{"));
-              //Serial.println(receivedMessage);
-            }
-
-            for(int i = questioner.length(); i < 9; i++) {
-                questioner += ' ';
-            }
-            receivedMessage.trim();
-            if (receivedMessage == "utc" || receivedMessage == "Utc" || receivedMessage == "UTC" || receivedMessage == "time"|| receivedMessage == "Time" || receivedMessage == "TIME") {
-              currentDate = getDateTime();
-              answerMessage = "WRCLP>APRS,TCPIP*,qAC,CHILE::" + questioner + ":" + currentDate + "\n";
-            } else if (receivedMessage == "clima" || receivedMessage == "Clima" || receivedMessage == "CLIMA" || receivedMessage == "weather"|| receivedMessage == "Weather" || receivedMessage == "WEATHER") {
-              weatherForecast = GetWeatherForecast(questioner);
-              answerMessage = "WRCLP>APRS,TCPIP*,qAC,CHILE::" + questioner + ":" + weatherForecast + "\n";  
-            } else {
-              answerMessage = "WRCLP>APRS,TCPIP*,qAC,CHILE::" + questioner + ":" + "hola " + questioner + "\n";  
-            }
-            Serial.print("-------> " + answerMessage);
-            espClient.write(answerMessage.c_str());          
-          }*/
-
-      
-    
   }
 }
   
