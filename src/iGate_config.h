@@ -23,7 +23,7 @@ const int AprsServerPort            = 14580;
 const String AprsSoftwareName       = "ESP32_LoRa_iGate";
 const String AprsSoftwareVersion    = "0.1.0";
 const int AprsReportingDistance     = 50;                       // kms
-const String AprsFilter             = "t/ms/" + iGateCallsign + "/" + (String)AprsReportingDistance;
+const String AprsFilter             = "t/m/" + iGateCallsign + "/" + (String)AprsReportingDistance;
 
 const String iGateComment           = "DIY ESP32 LoRa_APRS_iGate https://github.com/richonguzman/LoRa_APRS_iGate";
 
