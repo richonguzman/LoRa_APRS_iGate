@@ -5,7 +5,7 @@
 #include "iGate_config.h"
 #include "pins_config.h"
 
-#define VERSION "V.0.1.0"
+#define VERSION "V.0.0.9" //BETA STILL
 
 WiFiClient espClient;
 uint32_t lastTxTime                 = 0;
