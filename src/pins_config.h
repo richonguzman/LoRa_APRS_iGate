@@ -26,4 +26,7 @@ REST                        14
 GND                         -
 */
 
+#define OLED_SDA 21
+#define OLED_SCL 22
+
 #endif
