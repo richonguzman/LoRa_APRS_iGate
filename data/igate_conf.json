@@ -4,12 +4,16 @@
 	"wifi": {
 		"active": true,
 		"AP": [
-			{	"SSID": "Jimenicita",	"password": "mg6wyMhqRnxk"	},
-			{	"SSID": "Richon",		"password": "k4fPnmg5qnyf"	}
-		],
-		"wifiPositions": [
-			{	"latitude": -33.0312173, "longitude": -71.5795816	},
-			{	"latitude": -33.0337121, "longitude": -71.5738217 	}
+			{	"SSID": "Jimenicita",
+				"Password": "mg6wyMhqRnxk",
+				"Latitude": -33.0312173,
+				"Longitude": -71.5795816
+			},
+			{	"SSID": "Richon",
+				"Password": "k4fPnmg5qnyf",
+				"Latitude": -33.0337121,
+				"Longitude": -71.5738217
+			}
 		]
 	},
 	"aprs_is": {
@@ -27,6 +31,6 @@
 	},
 	"display": {
 		"always_on": true,
-		"timeout": 10
+		"timeout": 5
 	}
 }

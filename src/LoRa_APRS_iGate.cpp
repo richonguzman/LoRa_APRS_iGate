@@ -2,19 +2,30 @@
 #include <SPI.h>
 #include <LoRa.h>
 #include <WiFi.h>
-#include "iGate_config.h"
-#include "pins_config.h"
-#include <Wire.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
-#include "display.h"
+#include <Wire.h>
 
-WiFiClient espClient;
+#include "pins_config.h"
+#include "igate_config.h"
+#include "display.h"
+#include "iGate_config_OLD.h"
+
+WiFiClient      espClient;
+String ConfigurationFilePath   = "/igate_conf.json";
+Configuration   Config(ConfigurationFilePath);
+
+
 uint32_t lastTxTime                 = 0;
 static bool beacon_update           = true;
 unsigned long previousWiFiMillis    = 0;
 static uint32_t lastRxTxTime        = millis();
 static bool displayEcoMode          = true;
+
+static int myWiFiAPIndex            = 0;
+int myWiFiAPSize                    = Config.wifiAPs.size();
+WiFi_AP *currentWiFi                = &Config.wifiAPs[myWiFiAPIndex];
+
 String firstLine, secondLine, thirdLine, fourthLine;
 
 void load_config() {
@@ -118,6 +129,23 @@ String process_aprsisPacket(String aprsisMessage) {
   return newLoraPacket;
 }
 
+void showConfig() {
+  Serial.println(myWiFiAPSize);
+  Serial.println(myWiFiAPIndex);
+  if(myWiFiAPIndex >= (myWiFiAPSize-1)) {
+    myWiFiAPIndex = 0;
+  } else {
+    myWiFiAPIndex++;
+  }
+  Serial.println(myWiFiAPIndex);
+  currentWiFi = &Config.wifiAPs[myWiFiAPIndex];
+  Serial.println(currentWiFi->ssid);
+  Serial.println(currentWiFi->password);
+  Serial.println(currentWiFi->latitude);
+  Serial.println(currentWiFi->longitude);
+  Serial.println(Config.callsign);
+}
+
 void setup() {
   Serial.begin(115200);
   Serial.println("Starting iGate: " + iGateCallsign + "\n");
@@ -129,7 +157,9 @@ void setup() {
 }
 
 void loop() {
-  String wifiState, aprsisState;
+  showConfig();
+  delay(2000);
+  /*String wifiState, aprsisState;
   firstLine = "LoRa iGate: " + iGateCallsign;
   secondLine = " ";
   thirdLine   = " ";
@@ -216,4 +246,6 @@ void loop() {
       }
     }
   }
+
+  */
 }
