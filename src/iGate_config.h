@@ -21,15 +21,14 @@ public:
   int     passcode;
   String  server;
   int     port;
-
 };
 
-class LoRa {
+class LoraModule {
 public:
   long frequency;
-  int  spreadingFactor;
-  long signalBandwidth;
-  int  codingRate4;
+  int  spreading_factor;
+  long signal_bandwidth;
+  int  coding_rate4;
   int  power;
 };
 
@@ -45,6 +44,9 @@ public:
   String callsign;  
   String comment;
   std::vector<WiFi_AP> wifiAPs;
+  APRS_IS aprs_is;
+  LoraModule loramodule;
+  Display display;
 
   Configuration(String &filePath) {
     _filePath = filePath;
@@ -77,90 +79,24 @@ private:
       wifiAPs.push_back(wifiap);
     }
 
-    callsign = data["callsign"].as<String>();
-    comment  = data["comment"].as<String>();
+    callsign                    = data["callsign"].as<String>();
+    comment                     = data["comment"].as<String>();
 
+    aprs_is.active              = data["aprs_is"]["active"].as<bool>();
+    aprs_is.passcode            = data["aprs_is"]["passcode"].as<int>();
+    aprs_is.server              = data["aprs_is"]["server"].as<String>();
+    aprs_is.port                = data["aprs_is"]["port"].as<int>();
 
-    /*conf.aprs_is.active     = data["aprs_is"]["active"];
-    conf.aprs_is.passcode   = data["aprs_is"]["passcode"];
-    conf.aprs_is.server     = data["aprs_is"]["server"];
-    conf.aprs_is.port       = data["aprs_is"]["port"];
+    loramodule.frequency          = data["lora"]["frequency"].as<long>();
+    loramodule.spreading_factor   = data["lora"]["spreading_factor"].as<int>();
+    loramodule.signal_bandwidth   = data["lora"]["signal_bandwidth"].as<long>();
+    loramodule.coding_rate4       = data["lora"]["coding_rate4"].as<int>();
+    loramodule.power              = data["lora"]["power"].as<int>();
 
-    conf.lora.port          = data["lora"]["frequency"];
-    conf.lora.port          = data["lora"]["spreading_factor"];
-    conf.lora.port          = data["lora"]["signal_bandwidth"];
-    conf.lora.port          = data["lora"]["coding_rate4"];
-    conf.lora.port          = data["lora"]["power"];
-    
-    conf.display.always_on  = data["display"]["always_on"];
-    conf.display.timeout    = data["display"]["timeout"];*/
-
+    display.always_on           = data["display"]["always_on"].as<bool>();
+    display.timeout             = data["display"]["timeout"].as<int>();
 
     configFile.close();
   }
 };
 #endif
-
-/*class Configuration {
-public:
-  /*class WiFiAccessPoint {
-  public:
-    class WiFiAP {
-      WiFiAP(): SSID(), Password(), Latitude(), Longitude() {
-      }
-      std::string SSID;
-      std::string Password;
-      long Latitude;
-      long Longitude;
-    }
-
-    WiFiAccessPoint() : active() {
-    }
-    bool active;
-  };*/
-
-  /*class APRSIS {
-  public:
-    APRSIS() : active(), passcode(), server(), port() {
-    }
-    bool    active;
-    int     passcode;
-    String  server;
-    int     port;
-
-  };
-
-  class LoRa {
-  public:
-    LoRa() : frequency(), power(), spreadingFactor(), signalBandwidth(), codingRate4() {
-    }
-    long frequency;
-    int  spreadingFactor;
-    long signalBandwidth;
-    int  codingRate4;
-    int  power;
-  };
-
-  class Display {
-  public:
-    Display() : always_on(), timeout() {
-    }
-    bool always_on;
-    int  timeout;
-  };
-
-
-  Configuration() : callsign(), comment() {
-  }
-
-  String            callsign;
-  String            comment;
-  /// WIFI
-  std::list<Beacon> beacons;
-  ///
-  WiFiAccessPioint  wifiap;
-  APRSIS            aprsis;
-  LoRa              lora;
-  Display           display;
-
-};*/

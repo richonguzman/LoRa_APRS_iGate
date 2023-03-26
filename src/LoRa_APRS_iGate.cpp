@@ -12,33 +12,29 @@
 #include "iGate_config_OLD.h"
 
 WiFiClient      espClient;
-String ConfigurationFilePath   = "/igate_conf.json";
+String          ConfigurationFilePath = "/igate_conf.json";
 Configuration   Config(ConfigurationFilePath);
 
 
-uint32_t lastTxTime                 = 0;
-static bool beacon_update           = true;
-unsigned long previousWiFiMillis    = 0;
-static uint32_t lastRxTxTime        = millis();
-static bool displayEcoMode          = true;
+uint32_t        lastTxTime            = 0;
+static bool     beacon_update         = true;
+unsigned long   previousWiFiMillis    = 0;
+static uint32_t lastRxTxTime          = millis();
+//static bool     displayEcoMode        = true;
 
-static int myWiFiAPIndex            = 0;
-int myWiFiAPSize                    = Config.wifiAPs.size();
-WiFi_AP *currentWiFi                = &Config.wifiAPs[myWiFiAPIndex];
+static int      myWiFiAPIndex         = 1;
+int             myWiFiAPSize          = Config.wifiAPs.size();
+WiFi_AP         *currentWiFi          = &Config.wifiAPs[myWiFiAPIndex];
 
 String firstLine, secondLine, thirdLine, fourthLine;
 
-void load_config() {
-  Serial.println("cargando configuracion desde SPIFFS");
-}
-
 void setup_wifi() {
   int status = WL_IDLE_STATUS;
-  Serial.print("\nConnecting to '"); Serial.print(WIFI_SSID); Serial.println("' WiFi ...");
+  Serial.print("\nConnecting to '"); Serial.print(currentWiFi->ssid); Serial.println("' WiFi ...");
   WiFi.mode(WIFI_STA);
   WiFi.disconnect();
   delay(100);
-  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  WiFi.begin(currentWiFi->ssid.c_str(), currentWiFi->password.c_str());
   while (WiFi.status() != WL_CONNECTED) {
     Serial.print('.');
     delay(1000);
@@ -50,18 +46,16 @@ void setup_wifi() {
 void setup_lora() {
   SPI.begin(LORA_SCK, LORA_MISO, LORA_MOSI, LORA_CS);
   LoRa.setPins(LORA_CS, LORA_RST, LORA_IRQ); 
-
-  long freq = 433775000;
-  if (!LoRa.begin(freq)) {
+  if (!LoRa.begin(Config.loramodule.frequency)) {
     Serial.println("Starting LoRa failed!");
     while (true) {
     }
   }
-  LoRa.setSpreadingFactor(12);
-  LoRa.setSignalBandwidth(125000);
-  LoRa.setCodingRate4(5);
+  LoRa.setSpreadingFactor(Config.loramodule.spreading_factor);
+  LoRa.setSignalBandwidth(Config.loramodule.signal_bandwidth);
+  LoRa.setCodingRate4(Config.loramodule.coding_rate4);
   LoRa.enableCrc();
-  LoRa.setTxPower(20);
+  LoRa.setTxPower(Config.loramodule.power);
   Serial.println("LoRa init done!\n");
 }
 
@@ -69,21 +63,21 @@ void APRS_IS_connect(){
   int count = 0;
   String aprsauth;
   Serial.println("Connecting to APRS-IS ...");
-  while (!espClient.connect(AprsServer.c_str(), AprsServerPort) && count < 20) {
+  while (!espClient.connect(Config.aprs_is.server.c_str(), Config.aprs_is.port) && count < 20) {
     Serial.println("Didn't connect with server...");
     delay(1000);
     espClient.stop();
     espClient.flush();
     Serial.println("Run client.stop");
-    Serial.println("Trying to connect with Server: " + String(AprsServer) + " AprsServerPort: " + String(AprsServerPort));
+    Serial.println("Trying to connect with Server: " + String(Config.aprs_is.server) + " AprsServerPort: " + String(Config.aprs_is.port));
     count++;
     Serial.println("Try: " + String(count));
   }
   if (count == 20) {
     Serial.println("Tried: " + String(count) + " FAILED!");
   } else {
-    Serial.println("Connected with Server: '" + String(AprsServer) + "' (port: " + String(AprsServerPort)+ ")");
-    aprsauth = "user " + iGateCallsign + " pass " + iGatePasscode + " vers " + AprsSoftwareName + " " + AprsSoftwareVersion + " filter " + AprsFilter + "\n\r"; 
+    Serial.println("Connected with Server: '" + String(Config.aprs_is.server) + "' (port: " + String(Config.aprs_is.port)+ ")");
+    aprsauth = "user " + Config.callsign + " pass " + Config.aprs_is.passcode + " vers " + AprsSoftwareName + " " + AprsSoftwareVersion + " filter " + AprsFilter + "\n\r"; 
     espClient.write(aprsauth.c_str());  
     delay(200);
   }
@@ -94,7 +88,7 @@ String createAPRSPacket(String unprocessedPacket) {
   int two_dots_position = unprocessedPacket.indexOf(':');
   callsign_and_path_tracker = unprocessedPacket.substring(3, two_dots_position);
   payload_tracker = unprocessedPacket.substring(two_dots_position);
-  processedPacket = callsign_and_path_tracker + ",qAO," + iGateCallsign + payload_tracker + "\n";
+  processedPacket = callsign_and_path_tracker + ",qAO," + Config.callsign + payload_tracker;
   return processedPacket;
 }
 
@@ -108,11 +102,11 @@ void validate_and_upload(String packet) {
     espClient.write(aprsPacket.c_str());
     Serial.print("Message uploaded      : "); Serial.println(aprsPacket);
     if (aprsPacket.indexOf("::") >= 10) {
-      show_display("LoRa iGate: " + iGateCallsign, secondLine, String(aprsPacket.substring(0,aprsPacket.indexOf(">"))) + " MESSAGE",  1000);
+      show_display("LoRa iGate: " + Config.callsign, secondLine, String(aprsPacket.substring(0,aprsPacket.indexOf(">"))) + " MESSAGE",  1000);
     } else if (aprsPacket.indexOf(":>") >= 10) {
-      show_display("LoRa iGate: " + iGateCallsign, secondLine, String(aprsPacket.substring(0,aprsPacket.indexOf(">"))) + " NEW STATUS", 1000);
+      show_display("LoRa iGate: " + Config.callsign, secondLine, String(aprsPacket.substring(0,aprsPacket.indexOf(">"))) + " NEW STATUS", 1000);
     } else {
-      show_display("LoRa iGate: " + iGateCallsign, secondLine, String(aprsPacket.substring(0,aprsPacket.indexOf(">"))) + " GPS BEACON", 1000);
+      show_display("LoRa iGate: " + Config.callsign, secondLine, String(aprsPacket.substring(0,aprsPacket.indexOf(">"))) + " GPS BEACON", 1000);
     }
     
   } else {
@@ -124,12 +118,12 @@ String process_aprsisPacket(String aprsisMessage) {
   String firstPart, messagePart, newLoraPacket;
   firstPart = aprsisMessage.substring(0, aprsisMessage.indexOf("*"));
   messagePart = aprsisMessage.substring(aprsisMessage.indexOf("::")+2);
-  newLoraPacket = "}" + firstPart + "," + iGateCallsign + "*::" + messagePart + "\n";
+  newLoraPacket = "}" + firstPart + "," + Config.callsign + "*::" + messagePart + "\n";
   Serial.print(newLoraPacket);
   return newLoraPacket;
 }
 
-void showConfig() {
+/*void showConfig() {
   Serial.println(myWiFiAPSize);
   Serial.println(myWiFiAPIndex);
   if(myWiFiAPIndex >= (myWiFiAPSize-1)) {
@@ -144,12 +138,24 @@ void showConfig() {
   Serial.println(currentWiFi->latitude);
   Serial.println(currentWiFi->longitude);
   Serial.println(Config.callsign);
-}
+  Serial.println(Config.comment);
+  Serial.println(Config.aprs_is.active);
+  Serial.println(Config.aprs_is.passcode);
+  Serial.println(Config.aprs_is.server);
+  Serial.println(Config.aprs_is.port);
+  Serial.println(Config.loramodule.frequency);
+  Serial.println(Config.loramodule.spreading_factor);
+  Serial.println(Config.loramodule.signal_bandwidth);
+  Serial.println(Config.loramodule.coding_rate4);
+  Serial.println(Config.loramodule.power);
+  Serial.println(Config.display.always_on);
+  Serial.println(Config.display.timeout);
+  Serial.println(" ");
+}*/
 
 void setup() {
   Serial.begin(115200);
-  Serial.println("Starting iGate: " + iGateCallsign + "\n");
-  load_config();
+  Serial.println("Starting iGate: " + Config.callsign + "\n");
   setup_display();
   setup_wifi();
   btStop();
@@ -157,10 +163,10 @@ void setup() {
 }
 
 void loop() {
-  showConfig();
-  delay(2000);
-  /*String wifiState, aprsisState;
-  firstLine = "LoRa iGate: " + iGateCallsign;
+  //showConfig();
+  //delay(2000);
+  String wifiState, aprsisState;
+  firstLine = "LoRa iGate: " + Config.callsign;
   secondLine = " ";
   thirdLine   = " ";
   fourthLine  = " ";
@@ -185,8 +191,8 @@ void loop() {
 
   while (espClient.connected()) {
     uint32_t lastRxTx = millis() - lastRxTxTime;
-    if (displayEcoMode) {
-      if (lastRxTx >= EcoModeDisplayTime) {
+    if (Config.display.always_on) {
+      if (lastRxTx >= Config.display.timeout*1000) {
         display_toggle(false);
       }
     }
@@ -201,6 +207,9 @@ void loop() {
     if (beacon_update) {
       display_toggle(true);
       Serial.println("---- Sending iGate Beacon ----");
+      //String iGateBeaconPacket = Config.callsign + ">APRS,TCPIP*,qAC,CHILE:=" + currentWiFi->latitude + "L" + currentWiFi->longitude + "&" + Config.comment;
+      String iGateBeaconPacket = Config.callsign + ">APRS,TCPIP*,qAC,CHILE:=" + Latitude + "L" + Longitude + "&" + Config.comment + "\n";
+      Serial.println(iGateBeaconPacket);
       espClient.write(iGateBeaconPacket.c_str()); 
       lastTxTime = millis();
       display_toggle(true);
@@ -246,6 +255,4 @@ void loop() {
       }
     }
   }
-
-  */
 }
