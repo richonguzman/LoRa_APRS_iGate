@@ -21,6 +21,9 @@ public:
   int     passcode;
   String  server;
   int     port;
+  String  software_name;
+  String  software_version;
+  int     reporting_distance;
 };
 
 class LoraModule {
@@ -43,6 +46,7 @@ public:
 
   String callsign;  
   String comment;
+  int beacon_interval;
   std::vector<WiFi_AP> wifiAPs;
   APRS_IS aprs_is;
   LoraModule loramodule;
@@ -81,12 +85,16 @@ private:
 
     callsign                    = data["callsign"].as<String>();
     comment                     = data["comment"].as<String>();
+    beacon_interval             = data["beacon_interval"].as<int>();
 
     aprs_is.active              = data["aprs_is"]["active"].as<bool>();
     aprs_is.passcode            = data["aprs_is"]["passcode"].as<int>();
     aprs_is.server              = data["aprs_is"]["server"].as<String>();
     aprs_is.port                = data["aprs_is"]["port"].as<int>();
-
+    aprs_is.software_name       = data["aprs_is"]["software_name"].as<String>();
+    aprs_is.software_version    = data["aprs_is"]["software_version"].as<String>();
+    aprs_is.reporting_distance  = data["aprs_is"]["reporting_distance"].as<int>();
+		
     loramodule.frequency          = data["lora"]["frequency"].as<long>();
     loramodule.spreading_factor   = data["lora"]["spreading_factor"].as<int>();
     loramodule.signal_bandwidth   = data["lora"]["signal_bandwidth"].as<long>();

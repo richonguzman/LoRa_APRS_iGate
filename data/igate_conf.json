@@ -1,6 +1,7 @@
 {
 	"callsign": "CD2RXU-11",
 	"comment": "LoRa_APRS_iGate https://github.com/richonguzman/LoRa_APRS_iGate",
+	"beacon_interval": 15,
 	"wifi": {
 		"active": true,
 		"AP": [
@@ -20,7 +21,10 @@
 		"active": true,
 		"passcode": "23201",
 		"server": "radioaficion.pro",
-		"port": 14580
+		"port": 14580,
+		"software_name" : "ESP32_LoRa_iGate",
+		"software_version" : "0.0.9",
+		"reporting_distance" : 30
 	},
 	"lora": {
 		"frequency": 433775000,
@@ -31,6 +35,6 @@
 	},
 	"display": {
 		"always_on": true,
-		"timeout": 5
+		"timeout": 2
 	}
 }

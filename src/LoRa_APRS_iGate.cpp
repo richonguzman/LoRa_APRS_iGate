@@ -77,7 +77,7 @@ void APRS_IS_connect(){
     Serial.println("Tried: " + String(count) + " FAILED!");
   } else {
     Serial.println("Connected with Server: '" + String(Config.aprs_is.server) + "' (port: " + String(Config.aprs_is.port)+ ")");
-    aprsauth = "user " + Config.callsign + " pass " + Config.aprs_is.passcode + " vers " + AprsSoftwareName + " " + AprsSoftwareVersion + " filter " + AprsFilter + "\n\r"; 
+    aprsauth = "user " + Config.callsign + " pass " + Config.aprs_is.passcode + " vers " + Config.aprs_is.software_name + " " + Config.aprs_is.software_version + " filter t/m/" + Config.callsign + "/" + (String)Config.aprs_is.reporting_distance + "\n\r"; 
     espClient.write(aprsauth.c_str());  
     delay(200);
   }
@@ -88,7 +88,7 @@ String createAPRSPacket(String unprocessedPacket) {
   int two_dots_position = unprocessedPacket.indexOf(':');
   callsign_and_path_tracker = unprocessedPacket.substring(3, two_dots_position);
   payload_tracker = unprocessedPacket.substring(two_dots_position);
-  processedPacket = callsign_and_path_tracker + ",qAO," + Config.callsign + payload_tracker;
+  processedPacket = callsign_and_path_tracker + ",qAO," + Config.callsign + payload_tracker + "\n";
   return processedPacket;
 }
 
@@ -201,7 +201,7 @@ void loop() {
 
     show_display(firstLine, secondLine, thirdLine, fourthLine, 0);
     uint32_t lastTx = millis() - lastTxTime;
-    if (lastTx >= BeaconInterval) {
+    if (lastTx >= Config.beacon_interval*60*1000) {
       beacon_update = true;    
     }
     if (beacon_update) {
