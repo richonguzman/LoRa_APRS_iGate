@@ -1,17 +1,16 @@
 {
 	"callsign": "CD2RXU-11",
+	"comment": "LoRa_APRS_iGate https://github.com/richonguzman/LoRa_APRS_iGate",
 	"wifi": {
 		"active": true,
 		"AP": [
-			{	"SSID": "Richon", "password": "k4fPnmg5qnyf"}
-		]
-	},
-	"beacon": {
-		"comment": "LoRa_APRS_iGate https://github.com/richonguzman/LoRa_APRS_iGate",
-		"positions": [
-			{	"latitude": -33.0337121, "longitude": -71.5738217}
+			{	"SSID": "Jimenicita",	"password": "mg6wyMhqRnxk"	},
+			{	"SSID": "Richon",		"password": "k4fPnmg5qnyf"	}
 		],
-		"timeout": 15
+		"wifiPositions": [
+			{	"latitude": -33.0312173, "longitude": -71.5795816	},
+			{	"latitude": -33.0337121, "longitude": -71.5738217 	}
+		]
 	},
 	"aprs_is": {
 		"active": true,
@@ -20,20 +19,14 @@
 		"port": 14580
 	},
 	"lora": {
-		"frequency_rx": 433775000,
-		"gain_rx": 0,
-		"frequency_tx": 433775000,
-		"power": 20,
+		"frequency": 433775000,
 		"spreading_factor": 12,
 		"signal_bandwidth": 125000,
 		"coding_rate4": 5,
-		"tx_enable": false
+		"power": 20
 	},
 	"display": {
 		"always_on": true,
-		"timeout": 10,
-		"overwrite_pin": 0,
-		"turn180": true
-	},
-	"ntp_server": "pool.ntp.org"
+		"timeout": 10
+	}
 }

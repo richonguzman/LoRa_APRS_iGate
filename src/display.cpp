@@ -8,7 +8,6 @@
 
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
-// cppcheck-suppress unusedFunction
 void setup_display() {
   Wire.begin(OLED_SDA, OLED_SCL);
 
@@ -27,7 +26,6 @@ void setup_display() {
   display.display();
 }
 
-// cppcheck-suppress unusedFunction
 void display_toggle(bool toggle) {
   if (toggle) {
     display.ssd1306_command(SSD1306_DISPLAYON);
@@ -36,7 +34,6 @@ void display_toggle(bool toggle) {
   }
 }
 
-// cppcheck-suppress unusedFunction
 void show_display(String line1, int wait) {
   display.clearDisplay();
   display.setTextColor(WHITE);
@@ -49,7 +46,6 @@ void show_display(String line1, int wait) {
   delay(wait);
 }
 
-// cppcheck-suppress unusedFunction
 void show_display(String line1, String line2, int wait) {
   display.clearDisplay();
   display.setTextColor(WHITE);
@@ -64,7 +60,6 @@ void show_display(String line1, String line2, int wait) {
   delay(wait);
 }
 
-// cppcheck-suppress unusedFunction
 void show_display(String line1, String line2, String line3, int wait) {
   display.clearDisplay();
   display.setTextColor(WHITE);
@@ -81,7 +76,6 @@ void show_display(String line1, String line2, String line3, int wait) {
   delay(wait);
 }
 
-// cppcheck-suppress unusedFunction
 void show_display(String line1, String line2, String line3, String line4, int wait) {
   display.clearDisplay();
   display.setTextColor(WHITE);
