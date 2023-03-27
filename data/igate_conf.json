@@ -3,7 +3,6 @@
 	"comment": "LoRa_APRS_iGate https://github.com/richonguzman/LoRa_APRS_iGate",
 	"beacon_interval": 15,
 	"wifi": {
-		"active": true,
 		"AP": [
 			{	"SSID": "Jimenicita",
 				"Password": "mg6wyMhqRnxk",
@@ -18,7 +17,6 @@
 		]
 	},
 	"aprs_is": {
-		"active": true,
 		"passcode": "23201",
 		"server": "soam.aprs2.net",
 		"port": 14580,

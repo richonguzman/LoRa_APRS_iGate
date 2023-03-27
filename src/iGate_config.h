@@ -17,7 +17,6 @@ public:
 
 class APRS_IS {
 public:
-  bool    active;
   int     passcode;
   String  server;
   int     port;
@@ -86,8 +85,7 @@ private:
     callsign                    = data["callsign"].as<String>();
     comment                     = data["comment"].as<String>();
     beacon_interval             = data["beacon_interval"].as<int>();
-
-    aprs_is.active              = data["aprs_is"]["active"].as<bool>();
+    
     aprs_is.passcode            = data["aprs_is"]["passcode"].as<int>();
     aprs_is.server              = data["aprs_is"]["server"].as<String>();
     aprs_is.port                = data["aprs_is"]["port"].as<int>();
