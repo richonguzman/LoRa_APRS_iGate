@@ -20,7 +20,7 @@ static bool     beacon_update         = true;
 unsigned long   previousWiFiMillis    = 0;
 static uint32_t lastRxTxTime          = millis();
 
-static int      myWiFiAPIndex         = 1;
+static int      myWiFiAPIndex         = 0;
 int             myWiFiAPSize          = Config.wifiAPs.size();
 WiFi_AP         *currentWiFi          = &Config.wifiAPs[myWiFiAPIndex];
 
