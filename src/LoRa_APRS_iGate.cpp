@@ -109,7 +109,9 @@ void validate_and_upload(String packet) {
   if ((packet.substring(0, 3) == "\x3c\xff\x01") && (packet.substring(4, 5) != "}")) {
     Serial.println("   ---> Valid LoRa Packet!");
     aprsPacket = createAPRSPacket(packet);
-    display_toggle(true);
+    if (!Config.display.always_on) {
+      display_toggle(true);
+    }
     lastRxTxTime = millis();
     espClient.write(aprsPacket.c_str());
     Serial.print("Message uploaded      : "); Serial.println(aprsPacket);
@@ -222,8 +224,24 @@ void loop() {
     APRS_IS_connect();
   }
 
-  if (WiFi.status() == WL_CONNECTED) wifiState = "OK"; else wifiState = "--"; display_toggle(true); lastRxTxTime = millis();
-  if (espClient.connected()) aprsisState = "OK"; else aprsisState = "--"; display_toggle(true); lastRxTxTime = millis();
+  if (WiFi.status() == WL_CONNECTED) {
+    wifiState = "OK"; 
+  } else {
+    wifiState = "--";
+    if (!Config.display.always_on) {
+      display_toggle(true);
+    }
+    lastRxTxTime = millis();
+  }
+  if (espClient.connected()) {
+    aprsisState = "OK"; 
+  } else {
+    aprsisState = "--";
+    if (!Config.display.always_on) {
+      display_toggle(true);
+    }
+    lastRxTxTime = millis();
+  }
   secondLine  = "WiFi: " + wifiState + "/ APRS-IS: " + aprsisState;
   
   show_display(firstLine, secondLine, thirdLine, fourthLine, 0);
@@ -252,7 +270,6 @@ void loop() {
       //Serial.println(iGateBeaconPacket);
       espClient.write(iGateBeaconPacket.c_str()); 
       lastTxTime = millis();
-      display_toggle(true);
       lastRxTxTime = millis();
       show_display(firstLine, secondLine, thirdLine, "*SENDING iGate BEACON", 1000);
       beacon_update = false;
