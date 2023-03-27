@@ -21,7 +21,7 @@
 		"server": "soam.aprs2.net",
 		"port": 14580,
 		"software_name" : "ESP32_LoRa_iGate",
-		"software_version" : "0.0.9",
+		"software_version" : "0.1.0",
 		"reporting_distance" : 30
 	},
 	"lora": {
@@ -32,7 +32,7 @@
 		"power": 20
 	},
 	"display": {
-		"always_on": true,
+		"always_on": false,
 		"timeout": 2
 	}
 }
