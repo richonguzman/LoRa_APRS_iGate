@@ -20,7 +20,7 @@
 	"aprs_is": {
 		"active": true,
 		"passcode": "23201",
-		"server": "radioaficion.pro",
+		"server": "soam.aprs2.net",
 		"port": 14580,
 		"software_name" : "ESP32_LoRa_iGate",
 		"software_version" : "0.0.9",

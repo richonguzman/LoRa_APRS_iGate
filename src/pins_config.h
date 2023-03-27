@@ -14,7 +14,7 @@
 #define OLED_SCL 22
 
 /* (Same pins for LILYGO LoRa32 and ESP32 Wroom Dev )
-SX1278-------------------> ESP32 TTGO LILYGO 2.1 or 1.6.1
+SX1278-------------------> ESP32 ttgo-lora32-v21 and ESP32 WROOM Dev
 GND                         GND
 DIO1                        -
 DIO2                        -
@@ -26,6 +26,5 @@ SCLK                        5
 NSS                         18
 DIO0                        26
 REST                        14
-GND                         -
-*/
+GND                         -  */
 #endif

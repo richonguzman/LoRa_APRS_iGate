@@ -18,12 +18,17 @@ void setup_display() {
 
   display.clearDisplay();
   display.setTextColor(WHITE);
-  display.setTextSize(0);
+  display.setTextSize(1);
   display.setCursor(0, 0);
-  display.print("LORA iGate by CD2RXU");
+  display.print("   LoRa APRS iGate");
+  display.setCursor(0, 8);
+  display.print("     ( CD2RXU )");
+  display.setCursor(0, 16);
+  display.print("   by Richonguzman");
   display.ssd1306_command(SSD1306_SETCONTRAST);
   display.ssd1306_command(1);
   display.display();
+  delay(4000);
 }
 
 void display_toggle(bool toggle) {
