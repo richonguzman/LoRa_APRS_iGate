@@ -1,5 +1,5 @@
-#ifndef GPS_CONFIG_H_
-#define GPS_CONFIG_H_
+#ifndef IGATE_CONFIG_H_
+#define IGATE_CONFIG_H_
 
 #include <Arduino.h>
 #include <SPIFFS.h>
