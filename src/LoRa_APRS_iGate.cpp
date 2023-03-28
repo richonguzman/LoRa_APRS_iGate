@@ -100,7 +100,7 @@ String createAPRSPacket(String unprocessedPacket) {
   int two_dots_position = unprocessedPacket.indexOf(':');
   callsign_and_path_tracker = unprocessedPacket.substring(3, two_dots_position);
   payload_tracker = unprocessedPacket.substring(two_dots_position);
-  processedPacket = callsign_and_path_tracker + ",qAC," + Config.callsign + payload_tracker + "\n";
+  processedPacket = callsign_and_path_tracker + ",qAO," + Config.callsign + payload_tracker + "\n";
   return processedPacket;
 }
 
@@ -266,7 +266,7 @@ void loop() {
       Serial.println("---- Sending iGate Beacon ----");
       iGateLatitude = create_lat_aprs(currentWiFi->latitude);
       iGateLongitude = create_lng_aprs(currentWiFi->longitude);
-      String iGateBeaconPacket = Config.callsign + ">APRS,TCPIP*,qAO:=" + iGateLatitude + "L" + iGateLongitude + "&" + Config.comment + "\n";
+      String iGateBeaconPacket = Config.callsign + ">APRS,qAC:=" + iGateLatitude + "L" + iGateLongitude + "&" + Config.comment + "\n";
       //Serial.println(iGateBeaconPacket);
       espClient.write(iGateBeaconPacket.c_str()); 
       lastTxTime = millis();
