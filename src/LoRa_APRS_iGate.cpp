@@ -266,7 +266,7 @@ void loop() {
       Serial.println("---- Sending iGate Beacon ----");
       iGateLatitude = create_lat_aprs(currentWiFi->latitude);
       iGateLongitude = create_lng_aprs(currentWiFi->longitude);
-      String iGateBeaconPacket = Config.callsign + ">APRS,qAC:=" + iGateLatitude + "L" + iGateLongitude + "&" + Config.comment + "\n";
+      String iGateBeaconPacket = Config.callsign + ">APLG01,qAC:=" + iGateLatitude + "L" + iGateLongitude + "&" + Config.comment + "\n";
       //Serial.println(iGateBeaconPacket);
       espClient.write(iGateBeaconPacket.c_str()); 
       lastTxTime = millis();
