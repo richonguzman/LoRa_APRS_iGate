@@ -307,7 +307,7 @@ void loop() {
           AddresseAndMessage = newLoraMessage.substring(newLoraMessage.indexOf("::")+2);
           Addressee = AddresseAndMessage.substring(0, AddresseAndMessage.indexOf(":"));
           Message = AddresseAndMessage.substring(AddresseAndMessage.indexOf(":")+1);
-          show_display(firstLine, secondLine, Sender + " --> " + Addressee, Message, 2000);
+          show_display(firstLine, secondLine, Sender + " -> " + Addressee, Message, 2000);
         }        
       }
     }
