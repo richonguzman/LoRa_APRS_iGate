@@ -5,7 +5,7 @@
 	"wifi": {
 		"AP": [
 			{	"SSID": "WiFi_AP_1",
-				"Password": "password_WiFi_1",
+				"Password": "password_WiFi_2",
 				"Latitude": 0.0000000,
 				"Longitude": 0.0000000
 			},
@@ -17,7 +17,7 @@
 		]
 	},
 	"aprs_is": {
-		"passcode": "",
+		"passcode": "23201",
 		"server": "soam.aprs2.net",
 		"port": 14580,
 		"software_name" : "ESP32_LoRa_iGate",

@@ -158,15 +158,16 @@ String create_lat_aprs(double lat) {
   String north_south, latitude, convDeg3;
   float convDeg, convDeg2;
 
+  if (abs(degrees.toFloat()) < 10) {
+    latitude += "0";
+  }
+  Serial.println(latitude);
   if (degrees.indexOf("-") == 0) {
     north_south = "S";
-    latitude = degrees.substring(1,degrees.indexOf("."));
+    latitude += degrees.substring(1,degrees.indexOf("."));
   } else {
     north_south = "N";
-    latitude = degrees.substring(0,degrees.indexOf("."));
-  }
-  if (latitude.length() == 1) {
-    latitude = "0" + latitude;
+    latitude += degrees.substring(0,degrees.indexOf("."));
   }
   convDeg = abs(degrees.toFloat()) - abs(int(degrees.toFloat()));
   convDeg2 = (convDeg * 60)/100;
@@ -184,15 +185,15 @@ String create_lng_aprs(double lng) {
   if (abs(degrees.toFloat()) < 100) {
     longitude += "0";
   }
+  if (abs(degrees.toFloat()) < 10) {
+    longitude += "0";
+  }
   if (degrees.indexOf("-") == 0) {
     east_west = "W";
     longitude += degrees.substring(1,degrees.indexOf("."));
   } else {
     east_west = "E";
     longitude += degrees.substring(0,degrees.indexOf("."));
-  }
-  if (longitude.length() == 1) {
-    longitude = "0" + longitude;
   }
   convDeg = abs(degrees.toFloat()) - abs(int(degrees.toFloat()));
   convDeg2 = (convDeg * 60)/100;
