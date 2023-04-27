@@ -5,6 +5,7 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 #include <Wire.h>
+#include <SPIFFS.h>
 
 #include "pins_config.h"
 #include "igate_config.h"
@@ -164,6 +165,9 @@ String create_lat_aprs(double lat) {
     north_south = "N";
     latitude = degrees.substring(0,degrees.indexOf("."));
   }
+  if (latitude.length() == 1) {
+    latitude = "0" + latitude;
+  }
   convDeg = abs(degrees.toFloat()) - abs(int(degrees.toFloat()));
   convDeg2 = (convDeg * 60)/100;
   convDeg3 = String(convDeg2,6);
@@ -186,6 +190,9 @@ String create_lng_aprs(double lng) {
   } else {
     east_west = "E";
     longitude += degrees.substring(0,degrees.indexOf("."));
+  }
+  if (longitude.length() == 1) {
+    longitude = "0" + longitude;
   }
   convDeg = abs(degrees.toFloat()) - abs(int(degrees.toFloat()));
   convDeg2 = (convDeg * 60)/100;
