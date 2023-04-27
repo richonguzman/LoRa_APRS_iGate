@@ -17,7 +17,7 @@
 		]
 	},
 	"aprs_is": {
-		"passcode": "23201",
+		"passcode": "XYZVW",
 		"server": "soam.aprs2.net",
 		"port": 14580,
 		"software_name" : "ESP32_LoRa_iGate",
