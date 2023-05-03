@@ -11,6 +11,7 @@ Achievements:
 - listening to LoRa packets the same as messages for Stations/Callsing in near 50Kms.
 - transmiting messages listened from APRS-IS to LoRa
 
+__________________________________________
 
 Instrucctions (add your information into the '/data/igate_conf.json'):
 
