@@ -107,7 +107,7 @@ String createAPRSPacket(String unprocessedPacket) {
 
 void validate_and_upload(String packet) {
   String aprsPacket;
-  if ((packet.substring(0, 3) == "\x3c\xff\x01") && (packet.substring(4, 5) != "}")) {
+  if ((packet.substring(0, 3) == "\x3c\xff\x01") && (packet.substring(3, 4) != "}")) {
     Serial.println("   ---> Valid LoRa Packet!");
     aprsPacket = createAPRSPacket(packet);
     if (!Config.display.always_on) {
