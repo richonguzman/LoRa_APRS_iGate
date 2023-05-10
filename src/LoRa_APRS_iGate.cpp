@@ -25,6 +25,8 @@ static int      myWiFiAPIndex         = 0;
 int             myWiFiAPSize          = Config.wifiAPs.size();
 WiFi_AP         *currentWiFi          = &Config.wifiAPs[myWiFiAPIndex];
 
+//static bool     LoRaTransmiting       = false;
+
 String firstLine, secondLine, thirdLine, fourthLine;
 
 void setup_wifi() {
@@ -107,15 +109,16 @@ String createAPRSPacket(String unprocessedPacket) {
 
 void validate_and_upload(String packet) {
   String aprsPacket;
-  if ((packet.substring(0, 3) == "\x3c\xff\x01") && (packet.substring(3, 4) != "}")) {
-    Serial.println("   ---> Valid LoRa Packet!");
+  Serial.print("Received Lora Message : " + String(packet));
+  if ((packet.substring(0, 3) == "\x3c\xff\x01") && (packet.indexOf("TCPIP") == -1) && (packet.indexOf("NOGATE") == -1) && (packet.indexOf("RFONLY") == -1)) {
+    Serial.print("   ---> Valid LoRa Packet!");
     aprsPacket = createAPRSPacket(packet);
     if (!Config.display.always_on) {
       display_toggle(true);
     }
     lastRxTxTime = millis();
     espClient.write(aprsPacket.c_str());
-    Serial.print("Message uploaded      : "); Serial.println(aprsPacket);
+    Serial.println("   ---> Message uploaded!\n");
     if (aprsPacket.indexOf("::") >= 10) {
       show_display("LoRa iGate: " + Config.callsign, secondLine, "Callsign = " + String(aprsPacket.substring(0,aprsPacket.indexOf(">"))), "Type --> MESSAGE",  1000);
     } else if (aprsPacket.indexOf(":>") >= 10) {
@@ -125,16 +128,18 @@ void validate_and_upload(String packet) {
     }
     
   } else {
-    Serial.println("   ---> Not Valid LoRa Packet (Ignore)");
+    Serial.println("   ---> Not Valid LoRa Packet (Ignore)\n");
   }
 }
 
 String process_aprsisPacket(String aprsisMessage) {
   String firstPart, messagePart, newLoraPacket;
-  firstPart = aprsisMessage.substring(0, aprsisMessage.indexOf("*"));
+  aprsisMessage.trim();
+  firstPart = aprsisMessage.substring(0, aprsisMessage.indexOf(","));
   messagePart = aprsisMessage.substring(aprsisMessage.indexOf("::")+2);
-  newLoraPacket = "}" + firstPart + "," + Config.callsign + "*::" + messagePart + "\n";
-  Serial.print(newLoraPacket);
+  newLoraPacket = firstPart + ",TCPIP," + Config.callsign + "*::" + messagePart;
+  Serial.println("Received from APRS-IS : " + aprsisMessage);
+  Serial.print("Reformated Packet     : " + newLoraPacket);
   return newLoraPacket;
 }
 
@@ -201,6 +206,20 @@ String create_lng_aprs(double lng) {
   longitude += convDeg3.substring(convDeg3.indexOf(".")+1,convDeg3.indexOf(".")+3) + "." + convDeg3.substring(convDeg3.indexOf(".")+3,convDeg3.indexOf(".")+5);
   longitude += east_west;
   return longitude;
+}
+
+void sendNewLoraPacket(String typeOfMessage, String newPacket) {
+  LoRa.beginPacket();
+  LoRa.write('<');
+  if (typeOfMessage == "APRS")  {
+    LoRa.write(0xFF);
+  } else if (typeOfMessage == "LoRa") {
+    LoRa.write(0xF8);
+  }
+  LoRa.write(0x01);
+  LoRa.write((const uint8_t *)newPacket.c_str(), newPacket.length());
+  LoRa.endPacket();
+  Serial.println("   ---> LoRa Packet Sended!");
 }
 
 void setup() {
@@ -283,6 +302,7 @@ void loop() {
       beacon_update = false;
     }
 
+    //if (!LoRaTransmiting) {
     String loraPacket = "";
     int packetSize = LoRa.parsePacket();
     if (packetSize) {
@@ -290,27 +310,22 @@ void loop() {
         int inChar = LoRa.read();
         loraPacket += (char)inChar;
       }
-      Serial.print("\nReceived Lora Message : " + String(loraPacket));
       validate_and_upload(loraPacket);
     }
+  //  }
     
     if (espClient.available()) {
       String aprsisData, aprsisPacket, newLoraMessage, Sender, AddresseAndMessage, Addressee, Message;
-      aprsisData = espClient.readStringUntil('\n');
+      aprsisData = espClient.readStringUntil('\r'); // or '\n'
       aprsisPacket.concat(aprsisData);
       if (!aprsisPacket.startsWith("#")){
         if (aprsisPacket.indexOf("::")>0) {
-          Serial.println("APRS-IS to Tracker    : " + aprsisPacket);
+          //LoRaTransmiting = true;
           newLoraMessage = process_aprsisPacket(aprsisPacket);
-          LoRa.beginPacket(); 
-          LoRa.write('<');
-          LoRa.write(0xFF);
-          LoRa.write(0x01);
-          LoRa.write((const uint8_t *)newLoraMessage.c_str(), newLoraMessage.length());
-          LoRa.endPacket();
-          Serial.println("packet LoRa enviado!");
+          sendNewLoraPacket("APRS", newLoraMessage);
           display_toggle(true);
           lastRxTxTime = millis();
+          //LoRaTransmiting = false;
           Sender = newLoraMessage.substring(1,newLoraMessage.indexOf(">"));
           AddresseAndMessage = newLoraMessage.substring(newLoraMessage.indexOf("::")+2);
           Addressee = AddresseAndMessage.substring(0, AddresseAndMessage.indexOf(":"));
