@@ -1,14 +1,14 @@
-# LoRa_APRS_iGate
+# Richonguzman / CD2RXU LoRa APRS iGate
+# Firmware for Tx and Rx !!!
 
 LoRa APRS iGATE for:
-
 - LILYGO ESP32 LoRa v2-1-1.6
 - ESP32 Wroom Dev +  SX1278 LoRa Module for a DIY Version
 
 __________________________________________
 
 Achievements:
-- listening to LoRa packets the same as messages for Stations/Callsing in near 50Kms.
+- listening to LoRa packets the same as messages for Stations/Callsing in near 80Kms.
 - transmiting messages listened from APRS-IS to LoRa
 
 __________________________________________
@@ -28,5 +28,5 @@ Instrucctions (add your information into the '/data/igate_conf.json'):
 
 Enjoy!!!
 
-CD2RXU, Valparaiso , CHILE.
+# Hope You Enjoy this, 73 !!  CD2RXU , Valparaiso, Chile
 
