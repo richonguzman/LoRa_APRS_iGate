@@ -11,6 +11,8 @@
 #include "igate_config.h"
 #include "display.h"
 
+#define VERSION   "2023.05.17"
+
 WiFiClient      espClient;
 String          ConfigurationFilePath = "/igate_conf.json";
 Configuration   Config(ConfigurationFilePath);
@@ -224,7 +226,7 @@ void sendNewLoraPacket(String typeOfMessage, String newPacket) {
 
 void setup() {
   Serial.begin(115200);
-  Serial.println("Starting iGate: " + Config.callsign + "\n");
+  Serial.println("Starting iGate: " + Config.callsign + "   Version: " + String(VERSION) + "\n");
   setup_display();
   setup_wifi();
   btStop();
