@@ -6,6 +6,7 @@
 #include <Adafruit_SSD1306.h>
 #include <Wire.h>
 #include <SPIFFS.h>
+#include <vector>
 
 #include "pins_config.h"
 #include "igate_config.h"
@@ -27,7 +28,9 @@ static int      myWiFiAPIndex         = 0;
 int             myWiFiAPSize          = Config.wifiAPs.size();
 WiFi_AP         *currentWiFi          = &Config.wifiAPs[myWiFiAPIndex];
 
-//static bool     LoRaTransmiting       = false;
+std::vector<String> lastHeardStation;
+std::vector<String> lastHeardStation2;
+static uint32_t startUpTime           = millis();
 
 String firstLine, secondLine, thirdLine, fourthLine;
 
@@ -109,11 +112,29 @@ String createAPRSPacket(String unprocessedPacket) {
   return processedPacket;
 }
 
+void updateLastHeardStationList(String station) {
+  Serial.println(station);
+  bool stationHeard = false;
+  for (int i=0; i<lastHeardStation.size(); i++) {
+    if (lastHeardStation[i] == station) {
+      stationHeard = true;
+    }
+  }
+  if (!stationHeard) {
+    lastHeardStation.push_back(station);
+  }
+  Serial.println("\n\nImprimiendo Estaciones");
+  for (int i=0; i<lastHeardStation.size(); i++) {
+    Serial.println(lastHeardStation[i]);
+  }
+}
+
 void validate_and_upload(String packet) {
-  String aprsPacket;
+  String aprsPacket, Station;
   Serial.print("Received Lora Message : " + String(packet));
   if ((packet.substring(0, 3) == "\x3c\xff\x01") && (packet.indexOf("TCPIP") == -1) && (packet.indexOf("NOGATE") == -1) && (packet.indexOf("RFONLY") == -1)) {
     Serial.print("   ---> Valid LoRa Packet!");
+    
     aprsPacket = createAPRSPacket(packet);
     if (!Config.display.always_on) {
       display_toggle(true);
@@ -121,12 +142,14 @@ void validate_and_upload(String packet) {
     lastRxTxTime = millis();
     espClient.write(aprsPacket.c_str());
     Serial.println("   ---> Message uploaded!\n");
+    Station = aprsPacket.substring(0,aprsPacket.indexOf(">"));
+    updateLastHeardStationList(Station);
     if (aprsPacket.indexOf("::") >= 10) {
-      show_display("LoRa iGate: " + Config.callsign, secondLine, "Callsign = " + String(aprsPacket.substring(0,aprsPacket.indexOf(">"))), "Type --> MESSAGE",  1000);
+      show_display("LoRa iGate: " + Config.callsign, secondLine, "Callsign = " + Station, "Type --> MESSAGE",  1000);
     } else if (aprsPacket.indexOf(":>") >= 10) {
-      show_display("LoRa iGate: " + Config.callsign, secondLine, "Callsign = " + String(aprsPacket.substring(0,aprsPacket.indexOf(">"))), "Type --> NEW STATUS", 1000);
+      show_display("LoRa iGate: " + Config.callsign, secondLine, "Callsign = " + Station, "Type --> NEW STATUS", 1000);
     } else {
-      show_display("LoRa iGate: " + Config.callsign, secondLine, "Callsign = " + String(aprsPacket.substring(0,aprsPacket.indexOf(">"))), "Type --> GPS BEACON", 1000);
+      show_display("LoRa iGate: " + Config.callsign, secondLine, "Callsign = " + Station, "Type --> GPS BEACON", 1000);
     }
     
   } else {
@@ -304,7 +327,6 @@ void loop() {
       beacon_update = false;
     }
 
-    //if (!LoRaTransmiting) {
     String loraPacket = "";
     int packetSize = LoRa.parsePacket();
     if (packetSize) {
@@ -322,12 +344,10 @@ void loop() {
       aprsisPacket.concat(aprsisData);
       if (!aprsisPacket.startsWith("#")){
         if (aprsisPacket.indexOf("::")>0) {
-          //LoRaTransmiting = true;
           newLoraMessage = process_aprsisPacket(aprsisPacket);
           sendNewLoraPacket("APRS", newLoraMessage);
           display_toggle(true);
           lastRxTxTime = millis();
-          //LoRaTransmiting = false;
           Sender = newLoraMessage.substring(1,newLoraMessage.indexOf(">"));
           AddresseAndMessage = newLoraMessage.substring(newLoraMessage.indexOf("::")+2);
           Addressee = AddresseAndMessage.substring(0, AddresseAndMessage.indexOf(":"));
