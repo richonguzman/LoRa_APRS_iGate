@@ -112,6 +112,22 @@ String createAPRSPacket(String unprocessedPacket) {
   return processedPacket;
 }
 
+void deleteNotHeardStation() {
+  uint32_t minReportingTime = 5*60*1000; // 30 minutes // from .json and CONFIGURATION?????
+  for (int i=0; i<lastHeardStation.size(); i++) {
+    String deltaTimeString = lastHeardStation[i].substring(lastHeardStation[i].indexOf(",")+1);
+    uint32_t deltaTime = deltaTimeString.toInt();
+    if ((millis() - deltaTime) < minReportingTime) {
+      lastHeardStation2.push_back(lastHeardStation[i]);
+    }
+  }
+  lastHeardStation.clear();
+  for (int j; j<lastHeardStation2.size(); j++) {
+    lastHeardStation.push_back(lastHeardStation2[j]);
+  }
+  lastHeardStation2.clear();
+}
+
 void updateLastHeardStation(String station) {
   bool stationHeard = false;
   for (int i=0; i<lastHeardStation.size(); i++) {
@@ -123,27 +139,9 @@ void updateLastHeardStation(String station) {
   if (!stationHeard) {
     lastHeardStation.push_back(station + "," + String(millis()));
   }
-  //
-  uint32_t minReportingTime = 30*60*1000; // 30 minutes
-  //
-  for (int i=0; i<lastHeardStation.size(); i++) {
-    String deltaTimeString = lastHeardStation[i].substring(lastHeardStation[i].indexOf(",")+1);
-    uint32_t deltaTime = deltaTimeString.toInt();
-    if ((millis() - deltaTime) < minReportingTime) {
-      lastHeardStation2.push_back(lastHeardStation[i]);
-    } 
-    ///// delete this "else"
-    else {
-      Serial.print(lastHeardStation[i].substring(0,lastHeardStation[i].indexOf(","))); Serial.println(" eliminado de la lista");
-    }
-  }
-  lastHeardStation.clear();
-  for (int j; j<lastHeardStation2.size(); j++) {
-    lastHeardStation.push_back(lastHeardStation2[j]);
-  }
-  lastHeardStation2.clear();
 
-  Serial.println("Heard Stations (last 30 minutes):");
+  //////
+  Serial.println("Stations Near (last 30 minutes):");
   for (int k=0; k<lastHeardStation.size(); k++) {
     Serial.println(lastHeardStation[k]);
   }
@@ -155,15 +153,15 @@ void validate_and_upload(String packet) {
   Serial.print("Received Lora Message : " + String(packet));
   if ((packet.substring(0, 3) == "\x3c\xff\x01") && (packet.indexOf("TCPIP") == -1) && (packet.indexOf("NOGATE") == -1) && (packet.indexOf("RFONLY") == -1)) {
     Serial.print("   ---> Valid LoRa Packet!");
-    
     aprsPacket = createAPRSPacket(packet);
     if (!Config.display.always_on) {
       display_toggle(true);
     }
     lastRxTxTime = millis();
     espClient.write(aprsPacket.c_str());
-    Serial.println("   ---> Message uploaded!");
+    Serial.println("   ---> Packet Uploaded to APRS-IS");
     Station = aprsPacket.substring(0,aprsPacket.indexOf(">"));
+    deleteNotHeardStation();
     updateLastHeardStation(Station);
     if (aprsPacket.indexOf("::") >= 10) {
       show_display("LoRa iGate: " + Config.callsign, secondLine, "Callsign = " + Station, "Type --> MESSAGE",  1000);
@@ -265,7 +263,7 @@ void sendNewLoraPacket(String typeOfMessage, String newPacket) {
   LoRa.write(0x01);
   LoRa.write((const uint8_t *)newPacket.c_str(), newPacket.length());
   LoRa.endPacket();
-  Serial.println("   ---> LoRa Packet Sended!");
+  Serial.println("   ---> LoRa Packet Tx");
 }
 
 void setup() {
