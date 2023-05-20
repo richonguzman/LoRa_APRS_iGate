@@ -112,6 +112,15 @@ String createAPRSPacket(String unprocessedPacket) {
   return processedPacket;
 }
 
+bool checkValidHeardStation(String station) {
+  for (int i=0; i<lastHeardStation.size(); i++) {
+    if (lastHeardStation[i].substring(0,lastHeardStation[i].indexOf(",")) == station) {
+      return true;
+    } 
+  }
+  return false;
+}
+
 void deleteNotHeardStation() {
   uint32_t minReportingTime = 5*60*1000; // 30 minutes // from .json and CONFIGURATION?????
   for (int i=0; i<lastHeardStation.size(); i++) {
@@ -122,7 +131,7 @@ void deleteNotHeardStation() {
     }
   }
   lastHeardStation.clear();
-  for (int j; j<lastHeardStation2.size(); j++) {
+  for (int j=0; j<lastHeardStation2.size(); j++) {
     lastHeardStation.push_back(lastHeardStation2[j]);
   }
   lastHeardStation2.clear();
@@ -263,7 +272,7 @@ void sendNewLoraPacket(String typeOfMessage, String newPacket) {
   LoRa.write(0x01);
   LoRa.write((const uint8_t *)newPacket.c_str(), newPacket.length());
   LoRa.endPacket();
-  Serial.println("   ---> LoRa Packet Tx");
+  Serial.println("   ---> LoRa Packet Tx\n");
 }
 
 void setup() {
@@ -359,19 +368,27 @@ void loop() {
     
     if (espClient.available()) {
       String aprsisData, aprsisPacket, newLoraMessage, Sender, AddresseAndMessage, Addressee, Message;
+      bool validHeardStation = false;
       aprsisData = espClient.readStringUntil('\r'); // or '\n'
       aprsisPacket.concat(aprsisData);
       if (!aprsisPacket.startsWith("#")){
         if (aprsisPacket.indexOf("::")>0) {
           newLoraMessage = process_aprsisPacket(aprsisPacket);
-          sendNewLoraPacket("APRS", newLoraMessage);
-          display_toggle(true);
-          lastRxTxTime = millis();
-          Sender = newLoraMessage.substring(1,newLoraMessage.indexOf(">"));
+          Sender = newLoraMessage.substring(0,newLoraMessage.indexOf(">"));
           AddresseAndMessage = newLoraMessage.substring(newLoraMessage.indexOf("::")+2);
           Addressee = AddresseAndMessage.substring(0, AddresseAndMessage.indexOf(":"));
+          Addressee.trim();
           Message = AddresseAndMessage.substring(AddresseAndMessage.indexOf(":")+1);
-          show_display(firstLine, secondLine, Sender + " -> " + Addressee, Message, 2000);
+          deleteNotHeardStation();
+          validHeardStation = checkValidHeardStation(Addressee);
+          if (validHeardStation) {
+            sendNewLoraPacket("APRS", newLoraMessage);
+            display_toggle(true);
+            lastRxTxTime = millis();
+            show_display(firstLine, secondLine, Sender + " -> " + Addressee, Message, 2000);
+          } else {
+            Serial.println("   ---> Station not Heard for last 30 min (Not Tx)");
+          }   
         }        
       }
     }
