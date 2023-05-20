@@ -12,7 +12,7 @@
 #include "igate_config.h"
 #include "display.h"
 
-#define VERSION   "2023.05.17"
+#define VERSION   "2023.05.20"
 
 WiFiClient      espClient;
 String          ConfigurationFilePath = "/igate_conf.json";
@@ -118,7 +118,7 @@ bool checkValidHeardStation(String station) {
       return true;
     } 
   }
-  Serial.println("   ---> Station not Heard for last 30 min (Not Tx)");
+  Serial.println("   ---> Station not Heard for last 30 min (Not Tx)\n");
   return false;
 }
 
