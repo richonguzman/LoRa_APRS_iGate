@@ -112,21 +112,42 @@ String createAPRSPacket(String unprocessedPacket) {
   return processedPacket;
 }
 
-void updateLastHeardStationList(String station) {
-  Serial.println(station);
+void updateLastHeardStation(String station) {
   bool stationHeard = false;
   for (int i=0; i<lastHeardStation.size(); i++) {
-    if (lastHeardStation[i] == station) {
+    if (lastHeardStation[i].substring(0,lastHeardStation[i].indexOf(",")) == station) {
+      lastHeardStation[i] = station + "," + String(millis());
       stationHeard = true;
     }
   }
   if (!stationHeard) {
-    lastHeardStation.push_back(station);
+    lastHeardStation.push_back(station + "," + String(millis()));
   }
-  Serial.println("\n\nImprimiendo Estaciones");
+  //
+  uint32_t minReportingTime = 30*60*1000; // 30 minutes
+  //
   for (int i=0; i<lastHeardStation.size(); i++) {
-    Serial.println(lastHeardStation[i]);
+    String deltaTimeString = lastHeardStation[i].substring(lastHeardStation[i].indexOf(",")+1);
+    uint32_t deltaTime = deltaTimeString.toInt();
+    if ((millis() - deltaTime) < minReportingTime) {
+      lastHeardStation2.push_back(lastHeardStation[i]);
+    } 
+    ///// delete this "else"
+    else {
+      Serial.print(lastHeardStation[i].substring(0,lastHeardStation[i].indexOf(","))); Serial.println(" eliminado de la lista");
+    }
   }
+  lastHeardStation.clear();
+  for (int j; j<lastHeardStation2.size(); j++) {
+    lastHeardStation.push_back(lastHeardStation2[j]);
+  }
+  lastHeardStation2.clear();
+
+  Serial.println("Heard Stations (last 30 minutes):");
+  for (int k=0; k<lastHeardStation.size(); k++) {
+    Serial.println(lastHeardStation[k]);
+  }
+  Serial.println(" ");
 }
 
 void validate_and_upload(String packet) {
@@ -141,9 +162,9 @@ void validate_and_upload(String packet) {
     }
     lastRxTxTime = millis();
     espClient.write(aprsPacket.c_str());
-    Serial.println("   ---> Message uploaded!\n");
+    Serial.println("   ---> Message uploaded!");
     Station = aprsPacket.substring(0,aprsPacket.indexOf(">"));
-    updateLastHeardStationList(Station);
+    updateLastHeardStation(Station);
     if (aprsPacket.indexOf("::") >= 10) {
       show_display("LoRa iGate: " + Config.callsign, secondLine, "Callsign = " + Station, "Type --> MESSAGE",  1000);
     } else if (aprsPacket.indexOf(":>") >= 10) {
