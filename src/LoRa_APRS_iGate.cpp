@@ -123,7 +123,7 @@ bool checkValidHeardStation(String station) {
 }
 
 void deleteNotHeardStation() {
-  uint32_t minReportingTime = 5*60*1000; // 30 minutes // from .json and CONFIGURATION?????
+  uint32_t minReportingTime = 30*60*1000; // 30 minutes // from .json and CONFIGURATION?????
   for (int i=0; i<lastHeardStation.size(); i++) {
     String deltaTimeString = lastHeardStation[i].substring(lastHeardStation[i].indexOf(",")+1);
     uint32_t deltaTime = deltaTimeString.toInt();
