@@ -118,6 +118,7 @@ bool checkValidHeardStation(String station) {
       return true;
     } 
   }
+  Serial.println("   ---> Station not Heard for last 30 min (Not Tx)");
   return false;
 }
 
@@ -386,8 +387,6 @@ void loop() {
             display_toggle(true);
             lastRxTxTime = millis();
             show_display(firstLine, secondLine, Sender + " -> " + Addressee, Message, 2000);
-          } else {
-            Serial.println("   ---> Station not Heard for last 30 min (Not Tx)");
           }   
         }        
       }
