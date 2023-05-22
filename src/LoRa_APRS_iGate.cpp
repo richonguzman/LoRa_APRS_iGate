@@ -18,7 +18,6 @@ WiFiClient      espClient;
 String          ConfigurationFilePath = "/igate_conf.json";
 Configuration   Config(ConfigurationFilePath);
 
-
 uint32_t        lastTxTime            = 0;
 static bool     beacon_update         = true;
 unsigned long   previousWiFiMillis    = 0;
