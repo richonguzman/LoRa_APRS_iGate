@@ -104,9 +104,9 @@ void APRS_IS_connect(){
 
 String createAPRSPacket(String unprocessedPacket) {
   String callsign_and_path_tracker, payload_tracker, processedPacket;
-  int two_dots_position = unprocessedPacket.indexOf(':');
-  callsign_and_path_tracker = unprocessedPacket.substring(3, two_dots_position);
-  payload_tracker = unprocessedPacket.substring(two_dots_position);
+  int dotsPosition = unprocessedPacket.indexOf(':');
+  callsign_and_path_tracker = unprocessedPacket.substring(3, dotsPosition);
+  payload_tracker = unprocessedPacket.substring(dotsPosition);
   processedPacket = callsign_and_path_tracker + ",qAO," + Config.callsign + payload_tracker + "\n";
   return processedPacket;
 }
