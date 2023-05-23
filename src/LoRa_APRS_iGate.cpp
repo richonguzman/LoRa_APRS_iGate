@@ -178,7 +178,7 @@ String processQueryAnswer(String query, String station) {
   } else if (query.indexOf("?APRSV") == 0 || query.indexOf("?aprsv") == 0 || query.indexOf("?Aprsv") == 0) {
     processedQuery = Config.aprs_is.software_name + " " + Config.aprs_is.software_version;
   } else if (query.indexOf("?APRSP") == 0 || query.indexOf("?aprsp") == 0 || query.indexOf("?Aprsp") == 0) {
-    processedQuery = "iGate Position : " + String(currentWiFi->latitude) + " " + String(currentWiFi->longitude);
+    processedQuery = "iGate QTH: " + String(currentWiFi->latitude) + " " + String(currentWiFi->longitude);
   } else if (query.indexOf("?APRSL") == 0 || query.indexOf("?aprsl") == 0 || query.indexOf("?Aprsl") == 0) {
     for (int i=0; i<lastHeardStation.size(); i++) {
       processedQuery += lastHeardStation[i].substring(0,lastHeardStation[i].indexOf(",")) + " ";

@@ -1,13 +1,13 @@
 {
-	"callsign": "CD2RXU-10",
+	"callsign": "NOCALL-10",
 	"comment": "LoRa_APRS_iGate https://github.com/richonguzman/LoRa_APRS_iGate",
 	"beacon_interval": 15,
 	"wifi": {
 		"AP": [
-			{	"SSID": "Richon",
-				"Password": "k4fPnmg5qnyf",
-				"Latitude": -33.0337938,
-				"Longitude": -71.5736974
+			{	"SSID": "WiFi_AP_1",
+				"Password": "password_WiFi_1",
+				"Latitude": 0.0000000,
+				"Longitude": 0.0000000
 			},
 			{	"SSID": "WiFi_AP_2",
 				"Password": "password_WiFi_2",
@@ -17,7 +17,7 @@
 		]
 	},
 	"aprs_is": {
-		"passcode": "23201",
+		"passcode": "VWXYZ",
 		"server": "soam.aprs2.net",
 		"port": 14580,
 		"software_name" : "ESP32_LoRa_iGate",
@@ -32,7 +32,7 @@
 		"power": 20
 	},
 	"display": {
-		"always_on": false,
+		"always_on": true,
 		"timeout": 2
 	}
 }
