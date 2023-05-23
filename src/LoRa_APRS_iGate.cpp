@@ -112,13 +112,17 @@ String createAPRSPacket(String unprocessedPacket) {
 }
 
 bool checkValidHeardStation(String station) {
+  bool validStation = false;
   for (int i=0; i<lastHeardStation.size(); i++) {
     if (lastHeardStation[i].substring(0,lastHeardStation[i].indexOf(",")) == station) {
-      return true;
+      validStation = true;
+      Serial.println(" ---> Listened Station");
     } 
   }
-  Serial.println("   ---> Station not Heard for last 30 min (Not Tx)\n");
-  return false;
+  if (!validStation) {
+    Serial.println("   ---> Station not Heard for last 30 min (Not Tx)\n");
+  }
+  return validStation;
 }
 
 void deleteNotHeardStation() {
@@ -168,10 +172,11 @@ void sendNewLoraPacket(String typeOfMessage, String newPacket) {
   LoRa.write(0x01);
   LoRa.write((const uint8_t *)newPacket.c_str(), newPacket.length());
   LoRa.endPacket();
-  Serial.print("\n---> LoRa Packet Tx : ");
+  Serial.print("---> LoRa Packet Tx    : ");
+  Serial.println(newPacket);
 }
 
-String processQueryAnswer(String query, String station) {
+String processQueryAnswer(String query, String station, String queryOrigin) {
   String processedQuery, queryAnswer;
   if (query.indexOf("?APRS?") == 0 || query.indexOf("?aprs?") == 0 || query.indexOf("?Aprs?") == 0) {
     processedQuery = "?APRSV ?APRSP ?APRSL ?APRSH ?WHERE callsign";
@@ -196,16 +201,20 @@ String processQueryAnswer(String query, String station) {
   for(int i = station.length(); i < 9; i++) {
     station += ' ';
   }
-  queryAnswer = Config.callsign + ">APLG01,RFONLY::" + station + ":" + processedQuery;
+  if (queryOrigin == "APRSIS") {
+    queryAnswer = Config.callsign + ">APLG01,TCPIP,qAC::" + station + ":" + processedQuery + "\n";
+  } else if (queryOrigin == "LoRa") {
+    queryAnswer = Config.callsign + ">APLG01,RFONLY::" + station + ":" + processedQuery;
+  }
   return queryAnswer;
 }
 
 void checkReceivedPacket(String packet) {
   bool queryMessage = false;
   String aprsPacket, Sender, AddresseeAndMessage, Addressee, ackMessage, receivedMessage, queryAnswer;
-  Serial.print("Received Lora Message : " + String(packet));
+  Serial.print("Received Lora Packet   : " + String(packet));
   if ((packet.substring(0, 3) == "\x3c\xff\x01") && (packet.indexOf("TCPIP") == -1) && (packet.indexOf("NOGATE") == -1) && (packet.indexOf("RFONLY") == -1)) {
-    Serial.print("   ---> Valid LoRa Packet!");
+    Serial.print("   ---> APRS LoRa Packet!");
     Sender = packet.substring(3,packet.indexOf(">"));
     if (Sender != Config.callsign) {   // avoid listening yourself by digirepeating                                
       if (packet.indexOf("::") > 10) {    // its a Message!
@@ -218,14 +227,17 @@ void checkReceivedPacket(String packet) {
             ackMessage.trim();
             delay(4000);
             Serial.println(ackMessage);
-            //sendMessage(Sender, ackMessage);
+            for(int i = Sender.length(); i < 9; i++) {
+              Sender += ' ';
+            }
+            sendNewLoraPacket("APRS", Config.callsign + ">APLG01,RFONLY::" + Sender + ":" + ackMessage);
             receivedMessage = AddresseeAndMessage.substring(AddresseeAndMessage.indexOf(":")+1, AddresseeAndMessage.indexOf("{"));
           } else {
             receivedMessage = AddresseeAndMessage.substring(AddresseeAndMessage.indexOf(":")+1);
           }
           if (receivedMessage.indexOf("?") == 0) {
             queryMessage = true;
-            queryAnswer = processQueryAnswer(receivedMessage, Sender);
+            queryAnswer = processQueryAnswer(receivedMessage, Sender, "LoRa");
             delay(2000);
             if (!Config.display.always_on) {
               display_toggle(true);
@@ -244,7 +256,7 @@ void checkReceivedPacket(String packet) {
         }
         lastRxTxTime = millis();
         espClient.write(aprsPacket.c_str());
-        Serial.println("   ---> Packet Uploaded to APRS-IS");
+        Serial.println("   ---> Uploaded to APRS-IS");
         deleteNotHeardStation();
         updateLastHeardStation(Sender);
         if (aprsPacket.indexOf("::") >= 10) {
@@ -257,7 +269,7 @@ void checkReceivedPacket(String packet) {
       }
     }    
   } else {
-    Serial.println("   ---> Not Valid LoRa Packet (Ignore)\n");
+    Serial.println("   ---> Not APRS Packet (Ignore)\n");
   }
 }
 
@@ -267,8 +279,8 @@ String processAPRSISPacket(String aprsisMessage) {
   firstPart = aprsisMessage.substring(0, aprsisMessage.indexOf(","));
   messagePart = aprsisMessage.substring(aprsisMessage.indexOf("::")+2);
   newLoraPacket = firstPart + ",TCPIP," + Config.callsign + "::" + messagePart;
-  Serial.println("Received from APRS-IS : " + aprsisMessage);
-  Serial.print("Reformated Packet     : " + newLoraPacket);
+  Serial.print("Received from APRS-IS  : " + aprsisMessage);
+  //Serial.print("Reformated Packet     : " + newLoraPacket);
   return newLoraPacket;
 }
 
@@ -410,7 +422,8 @@ void loop() {
       display_toggle(true);
       Serial.println("---- Sending iGate Beacon ----");
       
-      String iGateBeaconPacket = Config.callsign + ">APLG01,qAC:=" + iGateLatitude + "L" + iGateLongitude + "&" + Config.comment + "\n";
+      //String iGateBeaconPacket = Config.callsign + ">APLG01,qAC:=" + iGateLatitude + "L" + iGateLongitude + "&" + Config.comment + "\n";
+      String iGateBeaconPacket = Config.callsign + ">APLG01,qAC:=" + iGateLatitude + "L" + iGateLongitude + "#" + Config.comment + "\n";
       //Serial.println(iGateBeaconPacket);
       espClient.write(iGateBeaconPacket.c_str()); 
       lastTxTime = millis();
@@ -430,34 +443,54 @@ void loop() {
     }
     
     if (espClient.available()) {
-      String aprsisData, aprsisPacket, newLoraMessage, Sender, AddresseAndMessage, Addressee, Message;
+      String aprsisData, aprsisPacket, newLoraPacket, Sender, AddresseeAndMessage, Addressee, ackMessage, ackPacket, receivedMessage, queryAnswer;
       bool validHeardStation = false;
       aprsisData = espClient.readStringUntil('\r'); // or '\n'
       aprsisPacket.concat(aprsisData);
       if (!aprsisPacket.startsWith("#")){
         if (aprsisPacket.indexOf("::")>0) {
-          Serial.println(aprsisPacket);
-          newLoraMessage = processAPRSISPacket(aprsisPacket);
-          Sender = newLoraMessage.substring(0,newLoraMessage.indexOf(">"));
-          AddresseAndMessage = newLoraMessage.substring(newLoraMessage.indexOf("::")+2);
-          Addressee = AddresseAndMessage.substring(0, AddresseAndMessage.indexOf(":"));
+          Sender = aprsisPacket.substring(0,aprsisPacket.indexOf(">"));
+          AddresseeAndMessage = aprsisPacket.substring(aprsisPacket.indexOf("::")+2);
+          Addressee = AddresseeAndMessage.substring(0, AddresseeAndMessage.indexOf(":"));
           Addressee.trim();
-
-
-          // si es para mi no se envia por RF la respuesta a la pregunta de APRS-IS
-
-
-
-
-          Message = AddresseAndMessage.substring(AddresseAndMessage.indexOf(":")+1);
-          deleteNotHeardStation();
-          validHeardStation = checkValidHeardStation(Addressee);
-          if (validHeardStation) {
-            sendNewLoraPacket("APRS", newLoraMessage);
-            display_toggle(true);
-            lastRxTxTime = millis();
-            show_display(firstLine, secondLine, Sender + " -> " + Addressee, Message, 2000);
-          }   
+          if (Addressee == Config.callsign) {             // its for me!
+            if (AddresseeAndMessage.indexOf("{")>0) {     // ack?
+              ackMessage = "ack" + AddresseeAndMessage.substring(AddresseeAndMessage.indexOf("{")+1);
+              ackMessage.trim();
+              delay(4000);
+              Serial.println(ackMessage);
+              for(int i = Sender.length(); i < 9; i++) {
+                Sender += ' ';
+              }
+              ackPacket = Config.callsign + ">APLG01,TCPIP,qAC::" + Sender + ":" + ackMessage + "\n";
+              espClient.write(ackPacket.c_str());
+              receivedMessage = AddresseeAndMessage.substring(AddresseeAndMessage.indexOf(":")+1, AddresseeAndMessage.indexOf("{"));
+            } else {
+              receivedMessage = AddresseeAndMessage.substring(AddresseeAndMessage.indexOf(":")+1);
+            }
+            if (receivedMessage.indexOf("?") == 0) {
+              Serial.println("Received Query APRS-IS : " + aprsisPacket);
+              queryAnswer = processQueryAnswer(receivedMessage, Sender, "APRSIS");
+              Serial.println("---> QUERY Answer : " + queryAnswer.substring(0,queryAnswer.indexOf("\n")));
+              if (!Config.display.always_on) {
+                display_toggle(true);
+              }
+              lastRxTxTime = millis();
+              delay(500);
+              espClient.write(queryAnswer.c_str());
+              show_display("LoRa iGate: " + Config.callsign, secondLine, "Callsign = " + Sender, "Type --> QUERY",  1000);
+            }
+          } else {
+            newLoraPacket = processAPRSISPacket(aprsisPacket);
+            deleteNotHeardStation();
+            validHeardStation = checkValidHeardStation(Addressee);
+            if (validHeardStation) {
+              sendNewLoraPacket("APRS", newLoraPacket);
+              display_toggle(true);
+              lastRxTxTime = millis();
+              show_display(firstLine, secondLine, Sender + " -> " + Addressee, receivedMessage, 2000);
+            }
+          }
         }        
       }
     }
