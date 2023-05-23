@@ -261,7 +261,7 @@ void checkReceivedPacket(String packet) {
   }
 }
 
-String process_aprsisPacket(String aprsisMessage) {
+String processAPRSISPacket(String aprsisMessage) {
   String firstPart, messagePart, newLoraPacket;
   aprsisMessage.trim();
   firstPart = aprsisMessage.substring(0, aprsisMessage.indexOf(","));
@@ -436,11 +436,19 @@ void loop() {
       aprsisPacket.concat(aprsisData);
       if (!aprsisPacket.startsWith("#")){
         if (aprsisPacket.indexOf("::")>0) {
-          newLoraMessage = process_aprsisPacket(aprsisPacket);
+          Serial.println(aprsisPacket);
+          newLoraMessage = processAPRSISPacket(aprsisPacket);
           Sender = newLoraMessage.substring(0,newLoraMessage.indexOf(">"));
           AddresseAndMessage = newLoraMessage.substring(newLoraMessage.indexOf("::")+2);
           Addressee = AddresseAndMessage.substring(0, AddresseAndMessage.indexOf(":"));
           Addressee.trim();
+
+
+          // si es para mi no se envia por RF la respuesta a la pregunta de APRS-IS
+
+
+
+
           Message = AddresseAndMessage.substring(AddresseAndMessage.indexOf(":")+1);
           deleteNotHeardStation();
           validHeardStation = checkValidHeardStation(Addressee);
