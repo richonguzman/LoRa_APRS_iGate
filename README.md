@@ -33,6 +33,7 @@ Versions:
 - 2023.03.01 Tx Packet from APRS-IS to nearby LoRa Stations.
 - 2023.05.12 Tx Packet from APRS-IS to LoRa-RF Correction.
 - 2023.05.19 Saving Last-Heard Stations for validating Tx Responses
+- 2023.05.23 Processing Query's from RF/LoRa or APRS-IS
 __________________________________________
 
 
