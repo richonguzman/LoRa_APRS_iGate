@@ -420,7 +420,7 @@ void loop() {
     if (beacon_update) {
       display_toggle(true);
       Serial.println("---- Sending iGate Beacon ----");
-      String iGateBeaconPacket = Config.callsign + ">APLG01,qAC:=" + iGateLatitude + "L" + iGateLongitude + "#" + Config.comment + "\n";
+      String iGateBeaconPacket = Config.callsign + ">APLG01,qAC:=" + iGateLatitude + "L" + iGateLongitude + "&" + Config.comment + "\n";
       //Serial.println(iGateBeaconPacket);
       espClient.write(iGateBeaconPacket.c_str()); 
       lastTxTime = millis();
