@@ -12,7 +12,7 @@
 #include "igate_config.h"
 #include "display.h"
 
-#define VERSION   "2023.05.20"
+#define VERSION   "2023.05.23"
 
 WiFiClient      espClient;
 String          ConfigurationFilePath = "/igate_conf.json";
@@ -35,8 +35,8 @@ String firstLine, secondLine, thirdLine, fourthLine, iGateLatitude, iGateLongitu
 
 void setup_wifi() {
   int status = WL_IDLE_STATUS;
-  Serial.print("\nConnect to WiFi '"); Serial.print(currentWiFi->ssid); Serial.println("' ...");
-  show_display(" ", "Connect to Wifi:", currentWiFi->ssid + " ...", 0);
+  Serial.print("\nConnecting to WiFi '"); Serial.print(currentWiFi->ssid); Serial.print("' ");
+  show_display(" ", "Connecting to Wifi:", currentWiFi->ssid + " ...", 0);
   WiFi.mode(WIFI_STA);
   WiFi.disconnect();
   delay(100);
@@ -227,16 +227,20 @@ void checkReceivedPacket(String packet) {
             queryMessage = true;
             queryAnswer = processQueryAnswer(receivedMessage, Sender);
             delay(2000);
+            if (!Config.display.always_on) {
+              display_toggle(true);
+            }
+            lastRxTxTime = millis();
             sendNewLoraPacket("APRS", queryAnswer); 
+            show_display("LoRa iGate: " + Config.callsign, secondLine, "Callsign = " + Sender, "Type --> QUERY",  1000);
             Serial.println(queryAnswer);  
-
           } 
         }
       }
       if (!queryMessage) {
         aprsPacket = createAPRSPacket(packet);
         if (!Config.display.always_on) {
-            display_toggle(true);
+          display_toggle(true);
         }
         lastRxTxTime = millis();
         espClient.write(aprsPacket.c_str());
@@ -335,7 +339,8 @@ String create_lng_aprs(double lng) {
 
 void setup() {
   Serial.begin(115200);
-  Serial.println("Starting iGate: " + Config.callsign + "   Version: " + String(VERSION) + "\n");
+  delay(3000);
+  Serial.println("\nStarting iGate: " + Config.callsign + "   Version: " + String(VERSION));
   setup_display();
   setup_wifi();
   btStop();

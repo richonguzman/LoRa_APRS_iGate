@@ -5,9 +5,9 @@
 	"wifi": {
 		"AP": [
 			{	"SSID": "Richon",
-				"Password": "password_WiFi_2",
-				"Latitude": 0.0000000,
-				"Longitude": 0.0000000
+				"Password": "k4fPnmg5qnyf",
+				"Latitude": -33.0337938,
+				"Longitude": -71.5736974
 			},
 			{	"SSID": "WiFi_AP_2",
 				"Password": "password_WiFi_2",
@@ -32,7 +32,7 @@
 		"power": 20
 	},
 	"display": {
-		"always_on": true,
+		"always_on": false,
 		"timeout": 2
 	}
 }
