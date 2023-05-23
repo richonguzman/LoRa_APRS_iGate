@@ -280,7 +280,6 @@ String processAPRSISPacket(String aprsisMessage) {
   messagePart = aprsisMessage.substring(aprsisMessage.indexOf("::")+2);
   newLoraPacket = firstPart + ",TCPIP," + Config.callsign + "::" + messagePart;
   Serial.print("Received from APRS-IS  : " + aprsisMessage);
-  //Serial.print("Reformated Packet     : " + newLoraPacket);
   return newLoraPacket;
 }
 
@@ -421,14 +420,12 @@ void loop() {
     if (beacon_update) {
       display_toggle(true);
       Serial.println("---- Sending iGate Beacon ----");
-      
-      //String iGateBeaconPacket = Config.callsign + ">APLG01,qAC:=" + iGateLatitude + "L" + iGateLongitude + "&" + Config.comment + "\n";
       String iGateBeaconPacket = Config.callsign + ">APLG01,qAC:=" + iGateLatitude + "L" + iGateLongitude + "#" + Config.comment + "\n";
       //Serial.println(iGateBeaconPacket);
       espClient.write(iGateBeaconPacket.c_str()); 
       lastTxTime = millis();
       lastRxTxTime = millis();
-      show_display(firstLine, secondLine, thirdLine, ">SENDING iGate BEACON", 1000);
+      show_display(firstLine, secondLine, thirdLine, "SENDING iGate BEACON", 1000);
       beacon_update = false;
     }
 
