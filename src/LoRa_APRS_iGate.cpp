@@ -260,11 +260,13 @@ void checkReceivedPacket(String packet) {
         deleteNotHeardStation();
         updateLastHeardStation(Sender);
         if (aprsPacket.indexOf("::") >= 10) {
-          show_display("LoRa iGate: " + Config.callsign, secondLine, "Callsign = " + Sender, "Type --> MESSAGE",  1000);
+          show_display(firstLine, secondLine, "Callsign = " + Sender, "Type --> MESSAGE",  1000);
         } else if (aprsPacket.indexOf(":>") >= 10) {
-          show_display("LoRa iGate: " + Config.callsign, secondLine, "Callsign = " + Sender, "Type --> NEW STATUS", 1000);
+          show_display(firstLine, secondLine, "Callsign = " + Sender, "Type --> NEW STATUS", 1000);
+        } else if (aprsPacket.indexOf(":!") >= 10) {
+          show_display(firstLine, secondLine, "Callsign = " + Sender, "Type --> GPS BEACON", 1000);
         } else {
-          show_display("LoRa iGate: " + Config.callsign, secondLine, "Callsign = " + Sender, "Type --> GPS BEACON", 1000);
+          show_display(firstLine, secondLine, "Callsign = " + Sender, "Type --> ??????????", 1000);
         }
       }
     }    
