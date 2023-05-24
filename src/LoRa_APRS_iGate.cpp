@@ -244,7 +244,7 @@ void checkReceivedPacket(String packet) {
             }
             lastRxTxTime = millis();
             sendNewLoraPacket("APRS", queryAnswer); 
-            show_display("LoRa iGate: " + Config.callsign, secondLine, "Callsign = " + Sender, "Type --> QUERY",  1000);
+            show_display(firstLine, secondLine, "Callsign = " + Sender, "Type --> QUERY",  1000);
             Serial.println(queryAnswer);  
           } 
         }
@@ -477,7 +477,7 @@ void loop() {
               lastRxTxTime = millis();
               delay(500);
               espClient.write(queryAnswer.c_str());
-              show_display("LoRa iGate: " + Config.callsign, secondLine, "Callsign = " + Sender, "Type --> QUERY",  1000);
+              show_display(firstLine, secondLine, "Callsign = " + Sender, "Type --> QUERY",  1000);
             }
           } else {
             newLoraPacket = processAPRSISPacket(aprsisPacket);
