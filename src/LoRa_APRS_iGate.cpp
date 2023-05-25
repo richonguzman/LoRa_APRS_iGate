@@ -28,15 +28,15 @@ int             myWiFiAPSize          = Config.wifiAPs.size();
 WiFi_AP         *currentWiFi          = &Config.wifiAPs[myWiFiAPIndex];
 
 std::vector<String> lastHeardStation;
-std::vector<String> lastHeardStation2;
-static uint32_t startUpTime           = millis();
+std::vector<String> lastHeardStation_temp;
+//static uint32_t startUpTime           = millis();
 
 String firstLine, secondLine, thirdLine, fourthLine, iGateLatitude, iGateLongitude;
 
 void setup_wifi() {
   int status = WL_IDLE_STATUS;
   Serial.print("\nConnecting to WiFi '"); Serial.print(currentWiFi->ssid); Serial.print("' ");
-  show_display(" ", "Connecting to Wifi:", currentWiFi->ssid + " ...", 0);
+  show_display("", "Connecting to Wifi:", currentWiFi->ssid + " ...", 0);
   WiFi.mode(WIFI_STA);
   WiFi.disconnect();
   delay(100);
@@ -54,7 +54,7 @@ void setup_wifi() {
       currentWiFi = &Config.wifiAPs[myWiFiAPIndex];
       start = millis();
       Serial.print("\nConnect to WiFi '"); Serial.print(currentWiFi->ssid); Serial.println("' ...");
-      show_display(" ", "Connect to Wifi:", currentWiFi->ssid + " ...", 0);
+      show_display("", "Connect to Wifi:", currentWiFi->ssid + " ...", 0);
       WiFi.begin(currentWiFi->ssid.c_str(), currentWiFi->password.c_str());
     }
   }
@@ -131,14 +131,14 @@ void deleteNotHeardStation() {
     String deltaTimeString = lastHeardStation[i].substring(lastHeardStation[i].indexOf(",")+1);
     uint32_t deltaTime = deltaTimeString.toInt();
     if ((millis() - deltaTime) < minReportingTime) {
-      lastHeardStation2.push_back(lastHeardStation[i]);
+      lastHeardStation_temp.push_back(lastHeardStation[i]);
     }
   }
   lastHeardStation.clear();
-  for (int j=0; j<lastHeardStation2.size(); j++) {
-    lastHeardStation.push_back(lastHeardStation2[j]);
+  for (int j=0; j<lastHeardStation_temp.size(); j++) {
+    lastHeardStation.push_back(lastHeardStation_temp[j]);
   }
-  lastHeardStation2.clear();
+  lastHeardStation_temp.clear();
 }
 
 void updateLastHeardStation(String station) {
@@ -158,7 +158,7 @@ void updateLastHeardStation(String station) {
   for (int k=0; k<lastHeardStation.size(); k++) {
     Serial.println(lastHeardStation[k]);
   }
-  Serial.println(" ");
+  Serial.println("");
 }
 
 void sendNewLoraPacket(String typeOfMessage, String newPacket) {
@@ -172,7 +172,7 @@ void sendNewLoraPacket(String typeOfMessage, String newPacket) {
   LoRa.write(0x01);
   LoRa.write((const uint8_t *)newPacket.c_str(), newPacket.length());
   LoRa.endPacket();
-  Serial.print("---> LoRa Packet Tx    : ");
+  Serial.print("\n---> LoRa Packet Tx    : ");
   Serial.println(newPacket);
 }
 
@@ -211,7 +211,7 @@ String processQueryAnswer(String query, String station, String queryOrigin) {
 
 void checkReceivedPacket(String packet) {
   bool queryMessage = false;
-  String aprsPacket, Sender, AddresseeAndMessage, Addressee, ackMessage, receivedMessage, queryAnswer;
+  String aprsPacket, Sender, AddresseeAndMessage, Addressee, ackMessage, receivedMessage;
   Serial.print("Received Lora Packet   : " + String(packet));
   if ((packet.substring(0, 3) == "\x3c\xff\x01") && (packet.indexOf("TCPIP") == -1) && (packet.indexOf("NOGATE") == -1) && (packet.indexOf("RFONLY") == -1)) {
     Serial.print("   ---> APRS LoRa Packet!");
@@ -237,7 +237,7 @@ void checkReceivedPacket(String packet) {
           }
           if (receivedMessage.indexOf("?") == 0) {
             queryMessage = true;
-            queryAnswer = processQueryAnswer(receivedMessage, Sender, "LoRa");
+            String queryAnswer = processQueryAnswer(receivedMessage, Sender, "LoRa");
             delay(2000);
             if (!Config.display.always_on) {
               display_toggle(true);
@@ -245,7 +245,6 @@ void checkReceivedPacket(String packet) {
             lastRxTxTime = millis();
             sendNewLoraPacket("APRS", queryAnswer); 
             show_display(firstLine, secondLine, "Callsign = " + Sender, "Type --> QUERY",  1000);
-            Serial.println(queryAnswer);  
           } 
         }
       }
@@ -365,9 +364,9 @@ void setup() {
 void loop() {
   String wifiState, aprsisState;
   firstLine = "LoRa iGate: " + Config.callsign;
-  secondLine = " ";
-  thirdLine   = " ";
-  fourthLine  = " ";
+  secondLine = "";
+  thirdLine   = "";
+  fourthLine  = "";
   unsigned long currentWiFiMillis   = millis();
 
   if ((WiFi.status() != WL_CONNECTED) && (currentWiFiMillis - previousWiFiMillis >= 30000)) {
@@ -411,8 +410,8 @@ void loop() {
         display_toggle(false);
       }
     }
-    thirdLine = " ";
-    fourthLine = " ";
+    thirdLine = "";
+    fourthLine = "";
 
     show_display(firstLine, secondLine, thirdLine, fourthLine, 0);
     uint32_t lastTx = millis() - lastTxTime;
@@ -442,7 +441,7 @@ void loop() {
     }
     
     if (espClient.available()) {
-      String aprsisData, aprsisPacket, newLoraPacket, Sender, AddresseeAndMessage, Addressee, ackMessage, ackPacket, receivedMessage, queryAnswer;
+      String aprsisData, aprsisPacket, newLoraPacket, Sender, AddresseeAndMessage, Addressee, receivedMessage;
       bool validHeardStation = false;
       aprsisData = espClient.readStringUntil('\r'); // or '\n'
       aprsisPacket.concat(aprsisData);
@@ -454,14 +453,14 @@ void loop() {
           Addressee.trim();
           if (Addressee == Config.callsign) {             // its for me!
             if (AddresseeAndMessage.indexOf("{")>0) {     // ack?
-              ackMessage = "ack" + AddresseeAndMessage.substring(AddresseeAndMessage.indexOf("{")+1);
+              String ackMessage = "ack" + AddresseeAndMessage.substring(AddresseeAndMessage.indexOf("{")+1);
               ackMessage.trim();
               delay(4000);
               Serial.println(ackMessage);
               for(int i = Sender.length(); i < 9; i++) {
                 Sender += ' ';
               }
-              ackPacket = Config.callsign + ">APLG01,TCPIP,qAC::" + Sender + ":" + ackMessage + "\n";
+              String ackPacket = Config.callsign + ">APLG01,TCPIP,qAC::" + Sender + ":" + ackMessage + "\n";
               espClient.write(ackPacket.c_str());
               receivedMessage = AddresseeAndMessage.substring(AddresseeAndMessage.indexOf(":")+1, AddresseeAndMessage.indexOf("{"));
             } else {
@@ -469,7 +468,7 @@ void loop() {
             }
             if (receivedMessage.indexOf("?") == 0) {
               Serial.println("Received Query APRS-IS : " + aprsisPacket);
-              queryAnswer = processQueryAnswer(receivedMessage, Sender, "APRSIS");
+              String queryAnswer = processQueryAnswer(receivedMessage, Sender, "APRSIS");
               Serial.println("---> QUERY Answer : " + queryAnswer.substring(0,queryAnswer.indexOf("\n")));
               if (!Config.display.always_on) {
                 display_toggle(true);
