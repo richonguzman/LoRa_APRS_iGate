@@ -201,9 +201,9 @@ String processQueryAnswer(String query, String station, String queryOrigin) {
     station += ' ';
   }
   if (queryOrigin == "APRSIS") {
-    queryAnswer = Config.callsign + ">APLG01,TCPIP,qAC::" + station + ":" + processedQuery + "\n";
+    queryAnswer = Config.callsign + ">APLR10,TCPIP,qAC::" + station + ":" + processedQuery + "\n";
   } else if (queryOrigin == "LoRa") {
-    queryAnswer = Config.callsign + ">APLG01,RFONLY::" + station + ":" + processedQuery;
+    queryAnswer = Config.callsign + ">APLR10,RFONLY::" + station + ":" + processedQuery;
   }
   return queryAnswer;
 }
@@ -229,7 +229,7 @@ void checkReceivedPacket(String packet) {
             for(int i = Sender.length(); i < 9; i++) {
               Sender += ' ';
             }
-            sendNewLoraPacket("APRS", Config.callsign + ">APLG01,RFONLY::" + Sender + ":" + ackMessage);
+            sendNewLoraPacket("APRS", Config.callsign + ">APLR10,RFONLY::" + Sender + ":" + ackMessage);
             receivedMessage = AddresseeAndMessage.substring(AddresseeAndMessage.indexOf(":")+1, AddresseeAndMessage.indexOf("{"));
           } else {
             receivedMessage = AddresseeAndMessage.substring(AddresseeAndMessage.indexOf(":")+1);
@@ -420,7 +420,7 @@ void loop() {
     if (beacon_update) {
       display_toggle(true);
       Serial.println("---- Sending iGate Beacon ----");
-      String iGateBeaconPacket = Config.callsign + ">APLG01,qAC:=" + iGateLatitude + "L" + iGateLongitude + "&" + Config.comment + "\n";
+      String iGateBeaconPacket = Config.callsign + ">APLR10,qAC:=" + iGateLatitude + "L" + iGateLongitude + "&" + Config.comment + "\n";
       //Serial.println(iGateBeaconPacket);
       espClient.write(iGateBeaconPacket.c_str()); 
       lastTxTime = millis();
@@ -459,7 +459,7 @@ void loop() {
               for(int i = Sender.length(); i < 9; i++) {
                 Sender += ' ';
               }
-              String ackPacket = Config.callsign + ">APLG01,TCPIP,qAC::" + Sender + ":" + ackMessage + "\n";
+              String ackPacket = Config.callsign + ">APLR10,TCPIP,qAC::" + Sender + ":" + ackMessage + "\n";
               espClient.write(ackPacket.c_str());
               receivedMessage = AddresseeAndMessage.substring(AddresseeAndMessage.indexOf(":")+1, AddresseeAndMessage.indexOf("{"));
             } else {
@@ -490,6 +490,12 @@ void loop() {
           }
         }        
       }
+    }
+    if (defaultStatusAfterBoot) {
+      delay(1000);
+      String startupStatus = Config.callsign + ">APLR10,qAC:>" + defaultStatus + "\n";
+      espClient.write(startupStatus.c_str()); 
+      defaultStatusAfterBoot = false;
     }
   }
 }

@@ -82,16 +82,16 @@ private:
       wifiAPs.push_back(wifiap);
     }
 
-    callsign                    = data["callsign"].as<String>();
-    comment                     = data["comment"].as<String>();
-    beacon_interval             = data["beacon_interval"].as<int>();
+    callsign                      = data["callsign"].as<String>();
+    comment                       = data["comment"].as<String>();
+    beacon_interval               = data["beacon_interval"].as<int>();
     
-    aprs_is.passcode            = data["aprs_is"]["passcode"].as<int>();
-    aprs_is.server              = data["aprs_is"]["server"].as<String>();
-    aprs_is.port                = data["aprs_is"]["port"].as<int>();
-    aprs_is.software_name       = data["aprs_is"]["software_name"].as<String>();
-    aprs_is.software_version    = data["aprs_is"]["software_version"].as<String>();
-    aprs_is.reporting_distance  = data["aprs_is"]["reporting_distance"].as<int>();
+    aprs_is.passcode              = data["aprs_is"]["passcode"].as<int>();
+    aprs_is.server                = data["aprs_is"]["server"].as<String>();
+    aprs_is.port                  = data["aprs_is"]["port"].as<int>();
+    aprs_is.software_name         = data["aprs_is"]["software_name"].as<String>();
+    aprs_is.software_version      = data["aprs_is"]["software_version"].as<String>();
+    aprs_is.reporting_distance    = data["aprs_is"]["reporting_distance"].as<int>();
 		
     loramodule.frequency          = data["lora"]["frequency"].as<long>();
     loramodule.spreading_factor   = data["lora"]["spreading_factor"].as<int>();
@@ -99,10 +99,12 @@ private:
     loramodule.coding_rate4       = data["lora"]["coding_rate4"].as<int>();
     loramodule.power              = data["lora"]["power"].as<int>();
 
-    display.always_on           = data["display"]["always_on"].as<bool>();
-    display.timeout             = data["display"]["timeout"].as<int>();
+    display.always_on             = data["display"]["always_on"].as<bool>();
+    display.timeout               = data["display"]["timeout"].as<int>();
 
     configFile.close();
   }
 };
+bool defaultStatusAfterBoot       = true;
+String defaultStatus              = "https://github.com/richonguzman/LoRa_APRS_iGate";
 #endif
