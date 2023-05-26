@@ -29,7 +29,6 @@ WiFi_AP         *currentWiFi          = &Config.wifiAPs[myWiFiAPIndex];
 
 std::vector<String> lastHeardStation;
 std::vector<String> lastHeardStation_temp;
-//static uint32_t startUpTime           = millis();
 
 String firstLine, secondLine, thirdLine, fourthLine, iGateLatitude, iGateLongitude;
 
