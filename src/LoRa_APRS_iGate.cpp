@@ -12,7 +12,7 @@
 #include "igate_config.h"
 #include "display.h"
 
-#define VERSION   "2023.05.23"
+#define VERSION   "2023.05.26"
 
 WiFiClient      espClient;
 String          ConfigurationFilePath = "/igate_conf.json";
