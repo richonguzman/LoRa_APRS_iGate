@@ -153,9 +153,9 @@ void updateLastHeardStation(String station) {
   }
 
   //////
-  Serial.println("Stations Near (last 30 minutes):");
+  Serial.print("Stations Near (last 30 minutes): ");
   for (int k=0; k<lastHeardStation.size(); k++) {
-    Serial.println(lastHeardStation[k]);
+    Serial.print(lastHeardStation[k].substring(0,lastHeardStation[k].indexOf(","))); Serial.print(" ");
   }
   Serial.println("");
 }
@@ -177,13 +177,13 @@ void sendNewLoraPacket(String typeOfMessage, String newPacket) {
 
 String processQueryAnswer(String query, String station, String queryOrigin) {
   String processedQuery, queryAnswer;
-  if (query.indexOf("?APRS?") == 0 || query.indexOf("?aprs?") == 0 || query.indexOf("?Aprs?") == 0) {
+  if (query=="?APRS?" || query=="?aprs?" || query=="?Aprs?" || query=="H" || query=="h" || query=="Help" || query=="help" || query=="?") {
     processedQuery = "?APRSV ?APRSP ?APRSL ?APRSH ?WHERE callsign";
-  } else if (query.indexOf("?APRSV") == 0 || query.indexOf("?aprsv") == 0 || query.indexOf("?Aprsv") == 0) {
+  } else if (query=="?APRSV" || query=="?aprsv" || query=="?Aprsv") {
     processedQuery = Config.aprs_is.software_name + " " + Config.aprs_is.software_version;
-  } else if (query.indexOf("?APRSP") == 0 || query.indexOf("?aprsp") == 0 || query.indexOf("?Aprsp") == 0) {
+  } else if (query=="?APRSP" || query=="?aprsp" || query=="?Aprsp") {
     processedQuery = "iGate QTH: " + String(currentWiFi->latitude) + " " + String(currentWiFi->longitude);
-  } else if (query.indexOf("?APRSL") == 0 || query.indexOf("?aprsl") == 0 || query.indexOf("?Aprsl") == 0) {
+  } else if (query=="?APRSL" || query=="?aprsl" || query=="?Aprsl") {
     for (int i=0; i<lastHeardStation.size(); i++) {
       processedQuery += lastHeardStation[i].substring(0,lastHeardStation[i].indexOf(",")) + " ";
     }
