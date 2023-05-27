@@ -66,7 +66,7 @@ private:
   void readFile(fs::FS &fs, const char *fileName) {
     StaticJsonDocument<1024> data;
     File configFile = fs.open(fileName, "r");
-    DeserializationError error = deserializeJson(data, configFile);
+    DeserializationError error    = deserializeJson(data, configFile);
     if (error) {
       Serial.println("Failed to read file, using default configuration");
     }
@@ -74,10 +74,10 @@ private:
     JsonArray WiFiArray = data["wifi"]["AP"];
     for (int i = 0; i < WiFiArray.size(); i++) {
       WiFi_AP wifiap;
-      wifiap.ssid        = WiFiArray[i]["SSID"].as<String>();
-      wifiap.password    = WiFiArray[i]["Password"].as<String>();
-      wifiap.latitude    = WiFiArray[i]["Latitude"].as<double>();
-      wifiap.longitude   = WiFiArray[i]["Longitude"].as<double>();
+      wifiap.ssid                 = WiFiArray[i]["SSID"].as<String>();
+      wifiap.password             = WiFiArray[i]["Password"].as<String>();
+      wifiap.latitude             = WiFiArray[i]["Latitude"].as<double>();
+      wifiap.longitude            = WiFiArray[i]["Longitude"].as<double>();
      
       wifiAPs.push_back(wifiap);
     }
