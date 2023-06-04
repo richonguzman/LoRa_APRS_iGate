@@ -14,7 +14,7 @@ void setup_display() {
   if(!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) { 
     	Serial.println(F("SSD1306 allocation failed"));
     	for(;;); // Don't proceed, loop forever
-  	}
+  }
 
   display.clearDisplay();
   display.setTextColor(WHITE);

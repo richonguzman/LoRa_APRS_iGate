@@ -1,31 +1,28 @@
 #include <Arduino.h>
-#include <SPI.h>
 #include <LoRa.h>
 #include <WiFi.h>
-#include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
-#include <Wire.h>
-#include <SPIFFS.h>
 #include <vector>
 
 #include "pins_config.h"
 #include "igate_config.h"
 #include "display.h"
+#include "lora_utils.h"
 
-#define VERSION   "2023.05.26"
+#define VERSION   "2023.06.04"
 
 WiFiClient      espClient;
 String          ConfigurationFilePath = "/igate_conf.json";
 Configuration   Config(ConfigurationFilePath);
 
-uint32_t        lastTxTime            = 0;
-static bool     beacon_update         = true;
-unsigned long   previousWiFiMillis    = 0;
-static uint32_t lastRxTxTime          = millis();
+uint32_t        lastTxTime              = 0;
+static bool     beacon_update           = true;
+unsigned long   previousWiFiMillis      = 0;
+static uint32_t lastRxTxTime            = millis();
 
-static int      myWiFiAPIndex         = 0;
-int             myWiFiAPSize          = Config.wifiAPs.size();
-WiFi_AP         *currentWiFi          = &Config.wifiAPs[myWiFiAPIndex];
+static int      myWiFiAPIndex           = 0;
+int             myWiFiAPSize            = Config.wifiAPs.size();
+WiFi_AP         *currentWiFi            = &Config.wifiAPs[myWiFiAPIndex];
+bool            defaultStatusAfterBoot  = Config.defaultStatusAfterBoot;
 
 std::vector<String> lastHeardStation;
 std::vector<String> lastHeardStation_temp;
@@ -61,7 +58,7 @@ void setup_wifi() {
   Serial.println(WiFi.localIP());
 }
 
-void setup_lora() {
+/*void setup_lora() {
   SPI.begin(LORA_SCK, LORA_MISO, LORA_MOSI, LORA_CS);
   LoRa.setPins(LORA_CS, LORA_RST, LORA_IRQ); 
   if (!LoRa.begin(Config.loramodule.frequency)) {
@@ -74,8 +71,7 @@ void setup_lora() {
   LoRa.setCodingRate4(Config.loramodule.coding_rate4);
   LoRa.enableCrc();
   LoRa.setTxPower(Config.loramodule.power);
-  Serial.println("LoRa init done!\n");
-}
+}*/
 
 void APRS_IS_connect(){
   int count = 0;
@@ -95,7 +91,7 @@ void APRS_IS_connect(){
     Serial.println("Tried: " + String(count) + " FAILED!");
   } else {
     Serial.println("Connected with Server: '" + String(Config.aprs_is.server) + "' (port: " + String(Config.aprs_is.port)+ ")");
-    aprsauth = "user " + Config.callsign + " pass " + Config.aprs_is.passcode + " vers " + Config.aprs_is.software_name + " " + Config.aprs_is.software_version + " filter t/m/" + Config.callsign + "/" + (String)Config.aprs_is.reporting_distance + "\n\r"; 
+    aprsauth = "user " + Config.callsign + " pass " + Config.aprs_is.passcode + " vers " + Config.aprs_is.softwareName + " " + Config.aprs_is.softwareVersion + " filter t/m/" + Config.callsign + "/" + (String)Config.aprs_is.reportingDistance + "\n\r"; 
     espClient.write(aprsauth.c_str());  
     delay(200);
   }
@@ -160,7 +156,7 @@ void updateLastHeardStation(String station) {
   Serial.println("");
 }
 
-void sendNewLoraPacket(String typeOfMessage, String newPacket) {
+/*void sendNewLoraPacket(String typeOfMessage, String newPacket) {
   LoRa.beginPacket();
   LoRa.write('<');
   if (typeOfMessage == "APRS")  {
@@ -173,14 +169,14 @@ void sendNewLoraPacket(String typeOfMessage, String newPacket) {
   LoRa.endPacket();
   Serial.print("\n---> LoRa Packet Tx    : ");
   Serial.println(newPacket);
-}
+}*/
 
 String processQueryAnswer(String query, String station, String queryOrigin) {
   String processedQuery, queryAnswer;
   if (query=="?APRS?" || query=="?aprs?" || query=="?Aprs?" || query=="H" || query=="h" || query=="Help" || query=="help" || query=="?") {
     processedQuery = "?APRSV ?APRSP ?APRSL ?APRSH ?WHERE callsign";
   } else if (query=="?APRSV" || query=="?aprsv" || query=="?Aprsv") {
-    processedQuery = Config.aprs_is.software_name + " " + Config.aprs_is.software_version;
+    processedQuery = Config.aprs_is.softwareName + " " + Config.aprs_is.softwareVersion;
   } else if (query=="?APRSP" || query=="?aprsp" || query=="?Aprsp") {
     processedQuery = "iGate QTH: " + String(currentWiFi->latitude) + " " + String(currentWiFi->longitude);
   } else if (query=="?APRSL" || query=="?aprsl" || query=="?Aprsl") {
@@ -229,7 +225,7 @@ void checkReceivedPacket(String packet) {
             for(int i = Sender.length(); i < 9; i++) {
               Sender += ' ';
             }
-            sendNewLoraPacket("APRS", Config.callsign + ">APLR10,RFONLY::" + Sender + ":" + ackMessage);
+            LoRaUtils::sendNewPacket("APRS", Config.callsign + ">APLR10,RFONLY::" + Sender + ":" + ackMessage);
             receivedMessage = AddresseeAndMessage.substring(AddresseeAndMessage.indexOf(":")+1, AddresseeAndMessage.indexOf("{"));
           } else {
             receivedMessage = AddresseeAndMessage.substring(AddresseeAndMessage.indexOf(":")+1);
@@ -238,18 +234,18 @@ void checkReceivedPacket(String packet) {
             queryMessage = true;
             String queryAnswer = processQueryAnswer(receivedMessage, Sender, "LoRa");
             delay(2000);
-            if (!Config.display.always_on) {
+            if (!Config.display.alwaysOn) {
               display_toggle(true);
             }
             lastRxTxTime = millis();
-            sendNewLoraPacket("APRS", queryAnswer); 
+            LoRaUtils::sendNewPacket("APRS", queryAnswer); 
             show_display(firstLine, secondLine, "Callsign = " + Sender, "Type --> QUERY",  1000);
           } 
         }
       }
       if (!queryMessage) {
         aprsPacket = createAPRSPacket(packet);
-        if (!Config.display.always_on) {
+        if (!Config.display.alwaysOn) {
           display_toggle(true);
         }
         lastRxTxTime = millis();
@@ -355,7 +351,8 @@ void setup() {
   setup_display();
   setup_wifi();
   btStop();
-  setup_lora();
+  LoRaUtils::setup();
+  //setup_lora();
   iGateLatitude = create_lat_aprs(currentWiFi->latitude);
   iGateLongitude = create_lng_aprs(currentWiFi->longitude);
 }
@@ -384,7 +381,7 @@ void loop() {
     wifiState = "OK"; 
   } else {
     wifiState = "--";
-    if (!Config.display.always_on) {
+    if (!Config.display.alwaysOn) {
       display_toggle(true);
     }
     lastRxTxTime = millis();
@@ -393,7 +390,7 @@ void loop() {
     aprsisState = "OK"; 
   } else {
     aprsisState = "--";
-    if (!Config.display.always_on) {
+    if (!Config.display.alwaysOn) {
       display_toggle(true);
     }
     lastRxTxTime = millis();
@@ -404,7 +401,7 @@ void loop() {
 
   while (espClient.connected()) {
     uint32_t lastRxTx = millis() - lastRxTxTime;
-    if (!Config.display.always_on) {
+    if (!Config.display.alwaysOn) {
       if (lastRxTx >= Config.display.timeout*1000) {
         display_toggle(false);
       }
@@ -414,7 +411,7 @@ void loop() {
 
     show_display(firstLine, secondLine, thirdLine, fourthLine, 0);
     uint32_t lastTx = millis() - lastTxTime;
-    if (lastTx >= Config.beacon_interval*60*1000) {
+    if (lastTx >= Config.beaconInterval*60*1000) {
       beacon_update = true;    
     }
     if (beacon_update) {
@@ -469,7 +466,7 @@ void loop() {
               Serial.println("Received Query APRS-IS : " + aprsisPacket);
               String queryAnswer = processQueryAnswer(receivedMessage, Sender, "APRSIS");
               Serial.println("---> QUERY Answer : " + queryAnswer.substring(0,queryAnswer.indexOf("\n")));
-              if (!Config.display.always_on) {
+              if (!Config.display.alwaysOn) {
                 display_toggle(true);
               }
               lastRxTxTime = millis();
@@ -482,7 +479,7 @@ void loop() {
             deleteNotHeardStation();
             validHeardStation = checkValidHeardStation(Addressee);
             if (validHeardStation) {
-              sendNewLoraPacket("APRS", newLoraPacket);
+              LoRaUtils::sendNewPacket("APRS", newLoraPacket);
               display_toggle(true);
               lastRxTxTime = millis();
               show_display(firstLine, secondLine, Sender + " -> " + Addressee, receivedMessage, 2000);
@@ -493,7 +490,7 @@ void loop() {
     }
     if (defaultStatusAfterBoot) {
       delay(1000);
-      String startupStatus = Config.callsign + ">APLR10,qAC:>" + defaultStatus + "\n";
+      String startupStatus = Config.callsign + ">APLR10,qAC:>" + Config.defaultStatus + "\n";
       espClient.write(startupStatus.c_str()); 
       defaultStatusAfterBoot = false;
     }
