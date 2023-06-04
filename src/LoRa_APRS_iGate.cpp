@@ -323,9 +323,10 @@ String create_lng_aprs(double lng) {
 
 void setup() {
   Serial.begin(115200);
-  delay(3000);
-  Serial.println("\nStarting iGate: " + Config.callsign + "   Version: " + String(VERSION));
+  delay(1000);
   setup_display();
+  Serial.println("\nStarting iGate: " + Config.callsign + "   Version: " + String(VERSION));
+  show_display("   LoRa APRS iGate", "    Richonguzman", "    -- CD2RXU --", "     " VERSION, 4000); 
   setup_wifi();
   btStop();
   LoRaUtils::setup();
