@@ -33,6 +33,7 @@
 	},
 	"display": {
 		"alwaysOn": true,
+		"keepLastPacketOnScreen": true,
 		"timeout": 2
 	},
 	"other": {

@@ -7,6 +7,7 @@
 #include "igate_config.h"
 #include "display.h"
 #include "lora_utils.h"
+#include "utils.h"
 
 #define VERSION   "2023.06.04"
 
@@ -214,7 +215,7 @@ void checkReceivedPacket(String packet) {
               }
               lastRxTxTime = millis();
               LoRaUtils::sendNewPacket("APRS", queryAnswer); 
-              show_display(firstLine, secondLine, "Callsign = " + Sender, "Type --> QUERY",  1000);
+              show_display(firstLine, secondLine, "Callsign = " + Sender, "TYPE --> QUERY",  1000);
             } 
           }
         }
@@ -230,13 +231,13 @@ void checkReceivedPacket(String packet) {
         deleteNotHeardStation();
         updateLastHeardStation(Sender);
         if (aprsPacket.indexOf("::") >= 10) {
-          show_display(firstLine, secondLine, "Callsign = " + Sender, "Type --> MESSAGE",  1000);
+          show_display(firstLine, secondLine, "Callsign = " + Sender, "TYPE --> MESSAGE",  1000);
         } else if (aprsPacket.indexOf(":>") >= 10) {
-          show_display(firstLine, secondLine, "Callsign = " + Sender, "Type --> NEW STATUS", 1000);
+          show_display(firstLine, secondLine, "Callsign = " + Sender, "TYPE --> NEW STATUS", 1000);
         } else if (aprsPacket.indexOf(":!") >= 10) {
-          show_display(firstLine, secondLine, "Callsign = " + Sender, "Type --> GPS BEACON", 1000);
+          show_display(firstLine, secondLine, "Callsign = " + Sender, "TYPE --> GPS BEACON", 1000);
         } else {
-          show_display(firstLine, secondLine, "Callsign = " + Sender, "Type --> ??????????", 1000);
+          show_display(firstLine, secondLine, "Callsign = " + Sender, "TYPE --> ??????????", 1000);
         }
       }
     }    
@@ -384,7 +385,10 @@ void loop() {
     thirdLine = "";
     fourthLine = "";
 
-    show_display(firstLine, secondLine, thirdLine, fourthLine, 0);
+    if (!Config.display.keepLastPacketOnScreen) {
+      show_display(firstLine, secondLine, thirdLine, fourthLine, 0);
+    }
+    
     uint32_t lastTx = millis() - lastTxTime;
     if (lastTx >= Config.beaconInterval*60*1000) {
       beacon_update = true;    
@@ -403,6 +407,7 @@ void loop() {
       lastTxTime = millis();
       lastRxTxTime = millis();
       show_display(firstLine, secondLine, thirdLine, "SENDING iGate BEACON", 1000);
+      show_display(firstLine, secondLine, thirdLine, fourthLine, 0);
       beacon_update = false;
     }
 
@@ -452,7 +457,7 @@ void loop() {
               lastRxTxTime = millis();
               delay(500);
               espClient.write(queryAnswer.c_str());
-              show_display(firstLine, secondLine, "Callsign = " + Sender, "Type --> QUERY",  1000);
+              show_display(firstLine, secondLine, "Callsign = " + Sender, "TYPE --> QUERY",  1000);
             }
           } else {
             newLoraPacket = processAPRSISPacket(aprsisPacket);
@@ -462,17 +467,15 @@ void loop() {
               LoRaUtils::sendNewPacket("APRS", newLoraPacket);
               display_toggle(true);
               lastRxTxTime = millis();
-              show_display(firstLine, secondLine, Sender + " -> " + Addressee, receivedMessage, 2000);
+              receivedMessage = AddresseeAndMessage.substring(AddresseeAndMessage.indexOf(":")+1);
+              show_display(firstLine, secondLine, Sender + " -> " + Addressee, receivedMessage, 1000);
             }
           }
         }        
       }
     }
     if (statusAfterBoot) {
-      delay(1000);
-      String startupStatus = Config.callsign + ">APLR10,qAC:>" + Config.defaultStatus;
-      espClient.write((startupStatus + "\n").c_str()); 
-      statusAfterBoot = false;
+      utils::processStatus();
     }
   }
 }
