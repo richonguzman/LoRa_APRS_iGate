@@ -27,6 +27,7 @@ public:
 
 class LoraModule {
 public:
+  bool enableTx;
   long frequency;
   int  spreadingFactor;
   long signalBandwidth;
@@ -43,16 +44,16 @@ public:
 class Configuration {
 public:
 
-  String callsign;  
-  String comment;
-  std::vector<WiFi_AP> wifiAPs;
-  APRS_IS aprs_is;
-  LoraModule loramodule;
-  Display display;
-  int beaconInterval;
-  bool defaultStatusAfterBoot;
-  String defaultStatus;
-
+  String                callsign;  
+  String                comment;
+  int                   beaconInterval;
+  bool                  statusAfterBoot;
+  String                defaultStatus;
+  std::vector<WiFi_AP>  wifiAPs;
+  APRS_IS               aprs_is;
+  LoraModule            loramodule;
+  Display               display;
+  
   Configuration(String &filePath) {
     _filePath = filePath;
     if (!SPIFFS.begin(false)) {
@@ -86,32 +87,28 @@ private:
 
     callsign                      = data["callsign"].as<String>();
     comment                       = data["comment"].as<String>();
+    beaconInterval                = data["other"]["beaconInterval"].as<int>();
+    statusAfterBoot               = data["other"]["statusAfterBoot"].as<bool>();
+    defaultStatus                 = data["other"]["defaultStatus"].as<String>();
         
     aprs_is.passcode              = data["aprs_is"]["passcode"].as<int>();
     aprs_is.server                = data["aprs_is"]["server"].as<String>();
     aprs_is.port                  = data["aprs_is"]["port"].as<int>();
-    aprs_is.softwareName         = data["aprs_is"]["softwareName"].as<String>();
+    aprs_is.softwareName          = data["aprs_is"]["softwareName"].as<String>();
     aprs_is.softwareVersion       = data["aprs_is"]["softwareVersion"].as<String>();
     aprs_is.reportingDistance     = data["aprs_is"]["reportingDistance"].as<int>();
 		
+    loramodule.enableTx           = data["lora"]["enableTx"].as<bool>();
     loramodule.frequency          = data["lora"]["frequency"].as<long>();
     loramodule.spreadingFactor    = data["lora"]["spreadingFactor"].as<int>();
     loramodule.signalBandwidth    = data["lora"]["signalBandwidth"].as<long>();
     loramodule.codingRate4        = data["lora"]["codingRate4"].as<int>();
     loramodule.power              = data["lora"]["power"].as<int>();
 
-    display.alwaysOn             = data["display"]["alwaysOn"].as<bool>();
+    display.alwaysOn              = data["display"]["alwaysOn"].as<bool>();
     display.timeout               = data["display"]["timeout"].as<int>();
-
-    beaconInterval                = data["other"]["beaconInterval"].as<int>();
-    defaultStatusAfterBoot        = data["other"]["defaultStatusAfterBoot"].as<bool>();
-    defaultStatus                 = data["other"]["defaultStatus"].as<String>();
 
     configFile.close();
   }
 };
-
-//bool defaultStatusAfterBoot       = true;
-/*String defaultStatus              = "https://github.com/richonguzman/LoRa_APRS_iGate";
-*/
 #endif

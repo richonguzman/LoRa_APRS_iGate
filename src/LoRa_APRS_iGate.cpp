@@ -14,15 +14,15 @@ WiFiClient      espClient;
 String          ConfigurationFilePath = "/igate_conf.json";
 Configuration   Config(ConfigurationFilePath);
 
-uint32_t        lastTxTime              = 0;
-static bool     beacon_update           = true;
-unsigned long   previousWiFiMillis      = 0;
-static uint32_t lastRxTxTime            = millis();
+uint32_t        lastTxTime          = 0;
+static bool     beacon_update       = true;
+unsigned long   previousWiFiMillis  = 0;
+static uint32_t lastRxTxTime        = millis();
 
-static int      myWiFiAPIndex           = 0;
-int             myWiFiAPSize            = Config.wifiAPs.size();
-WiFi_AP         *currentWiFi            = &Config.wifiAPs[myWiFiAPIndex];
-bool            defaultStatusAfterBoot  = Config.defaultStatusAfterBoot;
+static int      myWiFiAPIndex       = 0;
+int             myWiFiAPSize        = Config.wifiAPs.size();
+WiFi_AP         *currentWiFi        = &Config.wifiAPs[myWiFiAPIndex];
+bool            statusAfterBoot     = Config.statusAfterBoot;
 
 std::vector<String> lastHeardStation;
 std::vector<String> lastHeardStation_temp;
@@ -87,7 +87,11 @@ String createAPRSPacket(String unprocessedPacket) {
   int dotsPosition = unprocessedPacket.indexOf(':');
   callsign_and_path_tracker = unprocessedPacket.substring(3, dotsPosition);
   payload_tracker = unprocessedPacket.substring(dotsPosition);
-  processedPacket = callsign_and_path_tracker + ",qAO," + Config.callsign + payload_tracker + "\n";
+  if (Config.loramodule.enableTx) {
+    processedPacket = callsign_and_path_tracker + ",qAR," + Config.callsign + payload_tracker + "\n";
+  } else {
+    processedPacket = callsign_and_path_tracker + ",qAO," + Config.callsign + payload_tracker + "\n";
+  }
   return processedPacket;
 }
 
@@ -181,36 +185,38 @@ void checkReceivedPacket(String packet) {
   if ((packet.substring(0, 3) == "\x3c\xff\x01") && (packet.indexOf("TCPIP") == -1) && (packet.indexOf("NOGATE") == -1) && (packet.indexOf("RFONLY") == -1)) {
     Serial.print("   ---> APRS LoRa Packet!");
     Sender = packet.substring(3,packet.indexOf(">"));
-    if (Sender != Config.callsign) {   // avoid listening yourself by digirepeating                                
-      if (packet.indexOf("::") > 10) {    // its a Message!
-        AddresseeAndMessage = packet.substring(packet.indexOf("::")+2);  
-        Addressee = AddresseeAndMessage.substring(0,AddresseeAndMessage.indexOf(":"));
-        Addressee.trim();
-        if (Addressee == Config.callsign) {            // its for me!
-          if (AddresseeAndMessage.indexOf("{")>0) {    // ack?
-            ackMessage = "ack" + AddresseeAndMessage.substring(AddresseeAndMessage.indexOf("{")+1);
-            ackMessage.trim();
-            delay(4000);
-            Serial.println(ackMessage);
-            for(int i = Sender.length(); i < 9; i++) {
-              Sender += ' ';
+    if (Sender != Config.callsign) {   // avoid listening yourself by digirepeating
+      if (Config.loramodule.enableTx) {
+        if (packet.indexOf("::") > 10) {    // its a Message!
+          AddresseeAndMessage = packet.substring(packet.indexOf("::")+2);  
+          Addressee = AddresseeAndMessage.substring(0,AddresseeAndMessage.indexOf(":"));
+          Addressee.trim();
+          if (Addressee == Config.callsign) {            // its for me!
+            if (AddresseeAndMessage.indexOf("{")>0) {    // ack?
+              ackMessage = "ack" + AddresseeAndMessage.substring(AddresseeAndMessage.indexOf("{")+1);
+              ackMessage.trim();
+              delay(4000);
+              Serial.println(ackMessage);
+              for(int i = Sender.length(); i < 9; i++) {
+                Sender += ' ';
+              }
+              LoRaUtils::sendNewPacket("APRS", Config.callsign + ">APLR10,RFONLY::" + Sender + ":" + ackMessage);
+              receivedMessage = AddresseeAndMessage.substring(AddresseeAndMessage.indexOf(":")+1, AddresseeAndMessage.indexOf("{"));
+            } else {
+              receivedMessage = AddresseeAndMessage.substring(AddresseeAndMessage.indexOf(":")+1);
             }
-            LoRaUtils::sendNewPacket("APRS", Config.callsign + ">APLR10,RFONLY::" + Sender + ":" + ackMessage);
-            receivedMessage = AddresseeAndMessage.substring(AddresseeAndMessage.indexOf(":")+1, AddresseeAndMessage.indexOf("{"));
-          } else {
-            receivedMessage = AddresseeAndMessage.substring(AddresseeAndMessage.indexOf(":")+1);
+            if (receivedMessage.indexOf("?") == 0) {
+              queryMessage = true;
+              String queryAnswer = processQueryAnswer(receivedMessage, Sender, "LoRa");
+              delay(2000);
+              if (!Config.display.alwaysOn) {
+                display_toggle(true);
+              }
+              lastRxTxTime = millis();
+              LoRaUtils::sendNewPacket("APRS", queryAnswer); 
+              show_display(firstLine, secondLine, "Callsign = " + Sender, "Type --> QUERY",  1000);
+            } 
           }
-          if (receivedMessage.indexOf("?") == 0) {
-            queryMessage = true;
-            String queryAnswer = processQueryAnswer(receivedMessage, Sender, "LoRa");
-            delay(2000);
-            if (!Config.display.alwaysOn) {
-              display_toggle(true);
-            }
-            lastRxTxTime = millis();
-            LoRaUtils::sendNewPacket("APRS", queryAnswer); 
-            show_display(firstLine, secondLine, "Callsign = " + Sender, "Type --> QUERY",  1000);
-          } 
         }
       }
       if (!queryMessage) {
@@ -386,9 +392,14 @@ void loop() {
     if (beacon_update) {
       display_toggle(true);
       Serial.println("---- Sending iGate Beacon ----");
-      String iGateBeaconPacket = Config.callsign + ">APLR10,qAC:=" + iGateLatitude + "L" + iGateLongitude + "&" + Config.comment + "\n";
+      String iGateBeaconPacket = Config.callsign + ">APLR10,";
+      if (Config.loramodule.enableTx) {
+        iGateBeaconPacket += "qAC:=" + iGateLatitude + "L" + iGateLongitude + "a" + Config.comment;
+      } else {
+        iGateBeaconPacket += "qAC:=" + iGateLatitude + "L" + iGateLongitude + "&" + Config.comment;
+      }
       //Serial.println(iGateBeaconPacket);
-      espClient.write(iGateBeaconPacket.c_str()); 
+      espClient.write((iGateBeaconPacket + "\n").c_str()); 
       lastTxTime = millis();
       lastRxTxTime = millis();
       show_display(firstLine, secondLine, thirdLine, "SENDING iGate BEACON", 1000);
@@ -457,11 +468,13 @@ void loop() {
         }        
       }
     }
-    if (defaultStatusAfterBoot) {
+    if (statusAfterBoot) {
+      Serial.println(Config.defaultStatus);
       delay(1000);
-      String startupStatus = Config.callsign + ">APLR10,qAC:>" + Config.defaultStatus + "\n";
-      espClient.write(startupStatus.c_str()); 
-      defaultStatusAfterBoot = false;
+      //String startupStatus = Config.callsign + ">APLR10,qAC:>" + Config.defaultStatus;
+      String startupStatus = Config.callsign + ">APLR10,qAC:>" + "https://github.com/richonguzman/LoRa_APRS_iGate";
+      espClient.write((startupStatus + "\n").c_str()); 
+      statusAfterBoot = false;
     }
   }
 }

@@ -19,11 +19,12 @@
 		"passcode": "23201",
 		"server": "soam.aprs2.net",
 		"port": 14580,
-		"softwareName" : "ESP32_LoRa_iGate",
-		"softwareVersion" : "0.1.1",
-		"reportingDistance" : 30
+		"softwareName": "ESP32_LoRa_iGate",
+		"softwareVersion": "0.1.1",
+		"reportingDistance": 30
 	},
 	"lora": {
+		"enableTx": true,
 		"frequency": 433775000,
 		"spreadingFactor": 12,
 		"signalBandwidth": 125000,
@@ -36,7 +37,7 @@
 	},
 	"other": {
 		"beaconInterval": 15,
-		"defaultStatusAfterBoot": true,
+		"statusAfterBoot": true,
 		"defaultStatus": "https://github.com/richonguzman/LoRa_APRS_iGate"
 	}
 }
