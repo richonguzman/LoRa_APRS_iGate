@@ -15,17 +15,17 @@ __________________________________________
 
 Instrucctions (add your information into the '/data/igate_conf.json'):
 
-1.- Change "callsign" from "NOCALL-10" to your CALLSIGN + SSID
+1.- Change "callsign" from "NOCALL-10" to your CALLSIGN + SSID.
 
-2.- Change "SSID" from "WiFi_AP_1"  to your WIFI-NAME
+2.- Change "wifi">"AP">"SSID" from "WiFi_AP_1"  to your own WIFI-SSID-NAME.
 
-3.- Change "Password" from "password_WiFi_2" to your WIFI-PASSWORD
+3.- Change "wifi">"AP">"Password" from "password_WiFi_2" to your own WIFI-SSID-PASSWORD.
 
-4.- Add the GPS to "Latitude" and "Longitude"  (info from GoogleMaps) of new LoRa iGate
+4.- Add the GPS to "wifi">"AP">"Latitude" and "wifi">"AP">"Longitude"  (info from GoogleMaps) of new LoRa iGate.
 
-5.- Change "passcode" from "XYZVW" to yours (remember that is 5 digits integer)
+5.- Change "aprs_is">"passcode" from "XYZVW" to yours (remember that is 5 digits integer).
 
-6.- Change "lora">"enableTx" to _true_ *ONLY* if you are an valid Ham Operator
+6.- Change "lora">"enableTx" to _true_ ONLY(!) if you are an valid Ham Operator
 
 __________________________________________
 Versions:
