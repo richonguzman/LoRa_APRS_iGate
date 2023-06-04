@@ -58,21 +58,6 @@ void setup_wifi() {
   Serial.println(WiFi.localIP());
 }
 
-/*void setup_lora() {
-  SPI.begin(LORA_SCK, LORA_MISO, LORA_MOSI, LORA_CS);
-  LoRa.setPins(LORA_CS, LORA_RST, LORA_IRQ); 
-  if (!LoRa.begin(Config.loramodule.frequency)) {
-    Serial.println("Starting LoRa failed!");
-    while (true) {
-    }
-  }
-  LoRa.setSpreadingFactor(Config.loramodule.spreading_factor);
-  LoRa.setSignalBandwidth(Config.loramodule.signal_bandwidth);
-  LoRa.setCodingRate4(Config.loramodule.coding_rate4);
-  LoRa.enableCrc();
-  LoRa.setTxPower(Config.loramodule.power);
-}*/
-
 void APRS_IS_connect(){
   int count = 0;
   String aprsauth;
@@ -155,21 +140,6 @@ void updateLastHeardStation(String station) {
   }
   Serial.println("");
 }
-
-/*void sendNewLoraPacket(String typeOfMessage, String newPacket) {
-  LoRa.beginPacket();
-  LoRa.write('<');
-  if (typeOfMessage == "APRS")  {
-    LoRa.write(0xFF);
-  } else if (typeOfMessage == "LoRa") {
-    LoRa.write(0xF8);
-  }
-  LoRa.write(0x01);
-  LoRa.write((const uint8_t *)newPacket.c_str(), newPacket.length());
-  LoRa.endPacket();
-  Serial.print("\n---> LoRa Packet Tx    : ");
-  Serial.println(newPacket);
-}*/
 
 String processQueryAnswer(String query, String station, String queryOrigin) {
   String processedQuery, queryAnswer;
@@ -352,7 +322,6 @@ void setup() {
   setup_wifi();
   btStop();
   LoRaUtils::setup();
-  //setup_lora();
   iGateLatitude = create_lat_aprs(currentWiFi->latitude);
   iGateLongitude = create_lng_aprs(currentWiFi->longitude);
 }
