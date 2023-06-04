@@ -469,10 +469,8 @@ void loop() {
       }
     }
     if (statusAfterBoot) {
-      Serial.println(Config.defaultStatus);
       delay(1000);
-      //String startupStatus = Config.callsign + ">APLR10,qAC:>" + Config.defaultStatus;
-      String startupStatus = Config.callsign + ">APLR10,qAC:>" + "https://github.com/richonguzman/LoRa_APRS_iGate";
+      String startupStatus = Config.callsign + ">APLR10,qAC:>" + Config.defaultStatus;
       espClient.write((startupStatus + "\n").c_str()); 
       statusAfterBoot = false;
     }

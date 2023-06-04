@@ -67,7 +67,7 @@ private:
   String _filePath;
 
   void readFile(fs::FS &fs, const char *fileName) {
-    StaticJsonDocument<1024> data;
+    StaticJsonDocument<1536> data;
     File configFile = fs.open(fileName, "r");
     DeserializationError error    = deserializeJson(data, configFile);
     if (error) {
