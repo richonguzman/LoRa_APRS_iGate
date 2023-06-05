@@ -9,9 +9,14 @@
 #include "lora_utils.h"
 #include "utils.h"
 
+#include <AsyncTCP.h>
+#include <ESPAsyncWebServer.h>
+#include <AsyncElegantOTA.h>
+
 #define VERSION   "2023.06.04"
 
 WiFiClient      espClient;
+AsyncWebServer  server(80);
 String          ConfigurationFilePath = "/igate_conf.json";
 Configuration   Config(ConfigurationFilePath);
 
@@ -39,10 +44,13 @@ void setup_wifi() {
   delay(100);
   unsigned long start = millis();
 
-  if (!Config.network.DHCP) {
+  /*if (Config.network.DHCP) {
     WiFi.setHostname(Config.callsign.c_str());
-    WiFi.config(Config.network.ip, Config.network.gateway, Config.network.subnet, Config.network.dns1, Config.network.dns2);
-  }
+    if (!WiFi.config(Config.network.ip, Config.network.gateway, Config.network.subnet, Config.network.dns1, Config.network.dns2)) {
+      Serial.println("STA Failed to configure");
+    }
+    //WiFi.config(Config.network.ip, Config.network.gateway, Config.network.subnet, Config.network.dns1, Config.network.dns2);
+  }*/
 
   WiFi.begin(currentWiFi->ssid.c_str(), currentWiFi->password.c_str());
   while (WiFi.status() != WL_CONNECTED) {
@@ -335,6 +343,15 @@ void setup() {
   show_display("   LoRa APRS iGate", "    Richonguzman", "    -- CD2RXU --", "     " VERSION, 4000); 
   setup_wifi();
   btStop();
+
+  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
+    request->send(200, "text/plain", "Hi! I am ESP32.");
+  });
+
+  AsyncElegantOTA.begin(&server);    // Start ElegantOTA
+  server.begin();
+  Serial.println("HTTP server started");
+
   LoRaUtils::setup();
   iGateLatitude = create_lat_aprs(currentWiFi->latitude);
   iGateLongitude = create_lng_aprs(currentWiFi->longitude);
