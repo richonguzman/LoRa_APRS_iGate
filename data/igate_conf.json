@@ -15,6 +15,14 @@
 			}
 		]
 	},
+	"network": {
+		"DHCP": false,
+		"ip": "192.168.0.50",
+		"subnet": "255.255.255.0",
+		"gateway": "192.168.0.1",
+		"dns1": "8.8.8.8",
+		"dns2": "8.8.4.4"
+	},
 	"aprs_is": {
 		"passcode": "23201",
 		"server": "soam.aprs2.net",

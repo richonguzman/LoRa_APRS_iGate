@@ -38,6 +38,12 @@ void setup_wifi() {
   WiFi.disconnect();
   delay(100);
   unsigned long start = millis();
+
+  if (!Config.network.DHCP) {
+    WiFi.setHostname(Config.callsign.c_str());
+    WiFi.config(Config.network.ip, Config.network.gateway, Config.network.subnet, Config.network.dns1, Config.network.dns2);
+  }
+
   WiFi.begin(currentWiFi->ssid.c_str(), currentWiFi->password.c_str());
   while (WiFi.status() != WL_CONNECTED) {
     Serial.print('.');

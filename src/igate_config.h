@@ -15,6 +15,16 @@ public:
   double longitude;
 };
 
+class Network {
+public:
+  bool    DHCP;
+  String  ip;
+  String  subnet;
+  String  gateway;
+  String  dns1;
+  String  dns2;
+};
+
 class APRS_IS {
 public:
   int     passcode;
@@ -51,6 +61,7 @@ public:
   bool                  statusAfterBoot;
   String                defaultStatus;
   std::vector<WiFi_AP>  wifiAPs;
+  Network               network;
   APRS_IS               aprs_is;
   LoraModule            loramodule;
   Display               display;
@@ -91,7 +102,14 @@ private:
     beaconInterval                  = data["other"]["beaconInterval"].as<int>();
     statusAfterBoot                 = data["other"]["statusAfterBoot"].as<bool>();
     defaultStatus                   = data["other"]["defaultStatus"].as<String>();
-        
+
+    network.DHCP                    = data["network"]["DHCP"].as<bool>();
+    network.ip                      = data["network"]["ip"].as<String>();
+    network.subnet                  = data["network"]["subnet"].as<String>();
+    network.gateway                 = data["network"]["gateway"].as<String>();
+    network.dns1                    = data["network"]["dns1"].as<String>();
+    network.dns2                    = data["network"]["dns2"].as<String>();
+
     aprs_is.passcode                = data["aprs_is"]["passcode"].as<int>();
     aprs_is.server                  = data["aprs_is"]["server"].as<String>();
     aprs_is.port                    = data["aprs_is"]["port"].as<int>();
