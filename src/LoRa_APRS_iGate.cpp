@@ -13,7 +13,7 @@
 #include <ESPAsyncWebServer.h>
 #include <AsyncElegantOTA.h>
 
-#define VERSION   "2023.06.04"
+#define VERSION   "2023.06.06"
 
 WiFiClient      espClient;
 AsyncWebServer  server(80);
@@ -35,7 +35,7 @@ std::vector<String> lastHeardStation_temp;
 
 String firstLine, secondLine, thirdLine, fourthLine, iGateLatitude, iGateLongitude;
 
-void setup_wifi() {
+/*void setup_wifi() {
   int status = WL_IDLE_STATUS;
   Serial.print("\nConnecting to WiFi '"); Serial.print(currentWiFi->ssid); Serial.print("' ");
   show_display("", "Connecting to Wifi:", currentWiFi->ssid + " ...", 0);
@@ -50,7 +50,7 @@ void setup_wifi() {
       Serial.println("STA Failed to configure");
     }
     //WiFi.config(Config.network.ip, Config.network.gateway, Config.network.subnet, Config.network.dns1, Config.network.dns2);
-  }*/
+  }
 
   WiFi.begin(currentWiFi->ssid.c_str(), currentWiFi->password.c_str());
   while (WiFi.status() != WL_CONNECTED) {
@@ -71,7 +71,7 @@ void setup_wifi() {
   }
   Serial.print("Connected as ");
   Serial.println(WiFi.localIP());
-}
+}*/
 
 void APRS_IS_connect(){
   int count = 0;
