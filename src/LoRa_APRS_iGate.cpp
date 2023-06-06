@@ -246,31 +246,10 @@ void loop() {
     WiFi.reconnect();
     previousWiFiMillis = currentWiFiMillis;
   }
-  
   if (!espClient.connected()) {
     APRS_IS_Utils::connect();
   }
-
-  /*if (WiFi.status() == WL_CONNECTED) {
-    wifiState = "OK"; 
-  } else {
-    wifiState = "--";
-    if (!Config.display.alwaysOn) {
-      display_toggle(true);
-    }
-    lastRxTxTime = millis();
-  }
-  if (espClient.connected()) {
-    aprsisState = "OK"; 
-  } else {
-    aprsisState = "--";
-    if (!Config.display.alwaysOn) {
-      display_toggle(true);
-    }
-    lastRxTxTime = millis();
-  }*/
   secondLine  = APRS_IS_Utils::checkStatus();// "WiFi: " + wifiState + "/ APRS-IS: " + aprsisState;
-  
   show_display(firstLine, secondLine, thirdLine, fourthLine, 0);
 
   while (espClient.connected()) {
@@ -282,7 +261,6 @@ void loop() {
     }
     thirdLine = "";
     fourthLine = "";
-
     if (!Config.display.keepLastPacketOnScreen) {
       show_display(firstLine, secondLine, thirdLine, fourthLine, 0);
     }
