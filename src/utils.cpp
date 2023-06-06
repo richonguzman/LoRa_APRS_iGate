@@ -1,6 +1,5 @@
 #include <WiFi.h>
 #include <Arduino.h>
-//#include <igate_config.h>
 #include "configuration.h"
 #include "utils.h"
 

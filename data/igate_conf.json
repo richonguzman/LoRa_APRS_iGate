@@ -1,6 +1,6 @@
 {
 	"callsign": "CD2RXU-10",
-	"comment": "LoRa_APRS_iGate https://github.com/richonguzman/LoRa_APRS_iGate",
+	"comment": "LoRa_APRS_iGate",
 	"wifi": {
 		"AP": [
 			{	"SSID": "Richon",

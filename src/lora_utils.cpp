@@ -1,5 +1,4 @@
 #include <LoRa.h>
-//#include "igate_config.h"
 #include "configuration.h"
 #include "display.h"
 

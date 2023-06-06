@@ -2,16 +2,13 @@
 #include <LoRa.h>
 #include <WiFi.h>
 #include <vector>
-
 #include "pins_config.h"
-//
-//#include "igate_config.h"
-//
 #include "configuration.h"
 #include "display.h"
 #include "lora_utils.h"
 #include "wifi_utils.h"
 #include "aprs_is_utils.h"
+#include "gps_utils.h"
 #include "utils.h"
 
 /*#include <AsyncTCP.h>
@@ -38,31 +35,7 @@ bool            statusAfterBoot     = Config.statusAfterBoot;
 std::vector<String> lastHeardStation;
 std::vector<String> lastHeardStation_temp;
 
-String firstLine, secondLine, thirdLine, fourthLine, iGateLatitude, iGateLongitude;
-
-/*void APRS_IS_connect(){
-  int count = 0;
-  String aprsauth;
-  Serial.println("Connecting to APRS-IS ...");
-  while (!espClient.connect(Config.aprs_is.server.c_str(), Config.aprs_is.port) && count < 20) {
-    Serial.println("Didn't connect with server...");
-    delay(1000);
-    espClient.stop();
-    espClient.flush();
-    Serial.println("Run client.stop");
-    Serial.println("Trying to connect with Server: " + String(Config.aprs_is.server) + " AprsServerPort: " + String(Config.aprs_is.port));
-    count++;
-    Serial.println("Try: " + String(count));
-  }
-  if (count == 20) {
-    Serial.println("Tried: " + String(count) + " FAILED!");
-  } else {
-    Serial.println("Connected with Server: '" + String(Config.aprs_is.server) + "' (port: " + String(Config.aprs_is.port)+ ")");
-    aprsauth = "user " + Config.callsign + " pass " + Config.aprs_is.passcode + " vers " + Config.aprs_is.softwareName + " " + Config.aprs_is.softwareVersion + " filter t/m/" + Config.callsign + "/" + (String)Config.aprs_is.reportingDistance + "\n\r"; 
-    espClient.write(aprsauth.c_str());  
-    delay(200);
-  }
-}*/
+String firstLine, secondLine, thirdLine, fourthLine, iGateBeaconPacket; //iGateLatitude, iGateLongitude;
 
 String createAPRSPacket(String unprocessedPacket) {
   String callsign_and_path_tracker, payload_tracker, processedPacket;
@@ -237,71 +210,6 @@ String processAPRSISPacket(String aprsisMessage) {
   return newLoraPacket;
 }
 
-String double2string(double n, int ndec) {
-    String r = "";
-    int v = n;
-    r += v;
-    r += '.';
-    int i;
-    for (i=0;i<ndec;i++) {
-        n -= v;
-        n = 10 * abs(n);
-        v = n;
-        r += v;
-    }
-    return r;
-}
-
-String create_lat_aprs(double lat) {
-  String degrees = double2string(lat,6);
-  String north_south, latitude, convDeg3;
-  float convDeg, convDeg2;
-
-  if (abs(degrees.toFloat()) < 10) {
-    latitude += "0";
-  }
-  Serial.println(latitude);
-  if (degrees.indexOf("-") == 0) {
-    north_south = "S";
-    latitude += degrees.substring(1,degrees.indexOf("."));
-  } else {
-    north_south = "N";
-    latitude += degrees.substring(0,degrees.indexOf("."));
-  }
-  convDeg = abs(degrees.toFloat()) - abs(int(degrees.toFloat()));
-  convDeg2 = (convDeg * 60)/100;
-  convDeg3 = String(convDeg2,6);
-  latitude += convDeg3.substring(convDeg3.indexOf(".")+1,convDeg3.indexOf(".")+3) + "." + convDeg3.substring(convDeg3.indexOf(".")+3,convDeg3.indexOf(".")+5);
-  latitude += north_south;
-  return latitude;
-}
-
-String create_lng_aprs(double lng) {
-  String degrees = double2string(lng,6);
-  String east_west, longitude, convDeg3;
-  float convDeg, convDeg2;
-  
-  if (abs(degrees.toFloat()) < 100) {
-    longitude += "0";
-  }
-  if (abs(degrees.toFloat()) < 10) {
-    longitude += "0";
-  }
-  if (degrees.indexOf("-") == 0) {
-    east_west = "W";
-    longitude += degrees.substring(1,degrees.indexOf("."));
-  } else {
-    east_west = "E";
-    longitude += degrees.substring(0,degrees.indexOf("."));
-  }
-  convDeg = abs(degrees.toFloat()) - abs(int(degrees.toFloat()));
-  convDeg2 = (convDeg * 60)/100;
-  convDeg3 = String(convDeg2,6);
-  longitude += convDeg3.substring(convDeg3.indexOf(".")+1,convDeg3.indexOf(".")+3) + "." + convDeg3.substring(convDeg3.indexOf(".")+3,convDeg3.indexOf(".")+5);
-  longitude += east_west;
-  return longitude;
-}
-
 void setup() {
   Serial.begin(115200);
   delay(1000);
@@ -320,8 +228,9 @@ void setup() {
   Serial.println("HTTP server started");*/
 
   LoRaUtils::setup();
-  iGateLatitude = create_lat_aprs(currentWiFi->latitude);
-  iGateLongitude = create_lng_aprs(currentWiFi->longitude);
+  iGateBeaconPacket = GPS_Utils::generateBeacon();
+  //iGateLatitude   = GPS_Utils::processLatitudeAPRS();
+  //iGateLongitude  = GPS_Utils::processLongitudeAPRS();
 }
 
 void loop() {
@@ -387,12 +296,13 @@ void loop() {
     if (beacon_update) {
       display_toggle(true);
       Serial.println("---- Sending iGate Beacon ----");
-      String iGateBeaconPacket = Config.callsign + ">APLR10,";
+      /*String iGateBeaconPacket = Config.callsign + ">APLR10,qAC:=";
       if (Config.loramodule.enableTx) {
-        iGateBeaconPacket += "qAC:=" + iGateLatitude + "L" + iGateLongitude + "a" + Config.comment;
+        iGateBeaconPacket += iGateLatitude + "L" + iGateLongitude + "a";
       } else {
-        iGateBeaconPacket += "qAC:=" + iGateLatitude + "L" + iGateLongitude + "&" + Config.comment;
+        iGateBeaconPacket += iGateLatitude + "L" + iGateLongitude + "&";
       }
+      iGateBeaconPacket += Config.comment;*/
       //Serial.println(iGateBeaconPacket);
       espClient.write((iGateBeaconPacket + "\n").c_str()); 
       lastTxTime = millis();
