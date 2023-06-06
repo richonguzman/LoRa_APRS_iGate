@@ -35,7 +35,7 @@ void sendNewPacket(const String &typeOfMessage, const String &newPacket) {
   LoRa.write(0x01);
   LoRa.write((const uint8_t *)newPacket.c_str(), newPacket.length());
   LoRa.endPacket();
-  Serial.print("\n---> LoRa Packet Tx    : ");
+  Serial.print("---> LoRa Packet Tx    : ");
   Serial.println(newPacket);
 }
 
