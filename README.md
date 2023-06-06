@@ -34,7 +34,8 @@ Versions:
 - 2023.03.01 Tx Packet from APRS-IS to nearby LoRa Stations.
 - 2023.05.12 Tx Packet from APRS-IS to LoRa-RF Correction.
 - 2023.05.19 Saving Last-Heard Stations for validating Tx Responses
-- 2023.05.23 Processing Query's from RF/LoRa or APRS-IS
+- 2023.05.23 Processing Query's from RF/LoRa or APRS-IS (Send "Help" Message to test)
+- 2023.06.06 Full repack of Code and adding _enableTx_ only for Ham Ops
 __________________________________________
 
 
