@@ -1,14 +1,7 @@
 #include "station_utils.h"
 #include <vector>
 #include "configuration.h"
-/*#include <WiFi.h>
-#include "configuration.h"
-#include "display.h"
 
-
-extern WiFiClient     espClient;
-extern int            internalLedPin;
-extern uint32_t       lastRxTxTime;*/
 extern Configuration        Config;
 extern std::vector<String>  lastHeardStation;
 extern std::vector<String>  lastHeardStation_temp;
@@ -16,11 +9,10 @@ extern std::vector<String>  lastHeardStation_temp;
 namespace STATION_Utils {
 
 void deleteNotHeard() {
-  uint32_t minReportingTime = Config.rememberStationTime*60*1000;
   for (int i=0; i<lastHeardStation.size(); i++) {
     String deltaTimeString = lastHeardStation[i].substring(lastHeardStation[i].indexOf(",")+1);
     uint32_t deltaTime = deltaTimeString.toInt();
-    if ((millis() - deltaTime) < minReportingTime) {
+    if ((millis() - deltaTime) < Config.rememberStationTime*60*1000) {
       lastHeardStation_temp.push_back(lastHeardStation[i]);
     }
   }
@@ -54,17 +46,14 @@ void updateLastHeard(String station) {
 
 bool wasHeard(String station) {
   deleteNotHeard();
-  bool validStation = false;
   for (int i=0; i<lastHeardStation.size(); i++) {
     if (lastHeardStation[i].substring(0,lastHeardStation[i].indexOf(",")) == station) {
-      validStation = true;
       Serial.println(" ---> Listened Station");
+      return true;
     } 
   }
-  if (!validStation) {
-    Serial.println("   ---> Station not Heard for last 30 min (Not Tx)\n");
-  }
-  return validStation;
+  Serial.println(" ---> Station not Heard for last 30 min (Not Tx)\n");
+  return false;
 }
 
 }
