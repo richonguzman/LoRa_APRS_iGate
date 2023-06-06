@@ -11,7 +11,7 @@ namespace utils {
 
 void processStatus() {
     delay(1000);
-    String startupStatus = Config.callsign + ">APLR10,qAC:>" + Config.defaultStatus;
+    String startupStatus = Config.callsign + ">APLRG1,qAC:>" + Config.defaultStatus;
     espClient.write((startupStatus + "\n").c_str()); 
     statusAfterBoot = false;
 }

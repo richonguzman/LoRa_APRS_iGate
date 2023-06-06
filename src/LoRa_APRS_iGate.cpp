@@ -39,39 +39,6 @@ std::vector<String> lastHeardStation_temp;
 
 String firstLine, secondLine, thirdLine, fourthLine, iGateBeaconPacket;
 
-/*String processQueryAnswer(String query, String station, String queryOrigin) {
-  String processedQuery, queryAnswer;
-  if (query=="?APRS?" || query=="?aprs?" || query=="?Aprs?" || query=="H" || query=="h" || query=="Help" || query=="help" || query=="?") {
-    processedQuery = "?APRSV ?APRSP ?APRSL ?APRSH ?WHERE callsign";
-  } else if (query=="?APRSV" || query=="?aprsv" || query=="?Aprsv") {
-    processedQuery = Config.aprs_is.softwareName + " " + Config.aprs_is.softwareVersion;
-  } else if (query=="?APRSP" || query=="?aprsp" || query=="?Aprsp") {
-    processedQuery = "iGate QTH: " + String(currentWiFi->latitude) + " " + String(currentWiFi->longitude);
-  } else if (query=="?APRSL" || query=="?aprsl" || query=="?Aprsl") {
-    for (int i=0; i<lastHeardStation.size(); i++) {
-      processedQuery += lastHeardStation[i].substring(0,lastHeardStation[i].indexOf(",")) + " ";
-    }
-    processedQuery.trim();
-  } /*else if (query.indexOf("?APRSH") == 0 || query.indexOf("?aprsv") == 0 || query.indexOf("?Aprsv") == 0) {
-     // sacar callsign despues de ?APRSH
-    Serial.println("escuchaste a X estacion? en las ultimas 24 o 8 horas?");
-    processedQuery = "APRSH";
-  } else if (query.indexOf("?WHERE") == 0) { 
-    // agregar callsign para completar donde esta X callsign
-    Serial.println("estaciones escuchadas directo (ultimos 30 min)");
-    processedQuery = "WHERE";
-  }
-  for(int i = station.length(); i < 9; i++) {
-    station += ' ';
-  }
-  if (queryOrigin == "APRSIS") {
-    queryAnswer = Config.callsign + ">APLR10,TCPIP,qAC::" + station + ":" + processedQuery + "\n";
-  } else if (queryOrigin == "LoRa") {
-    queryAnswer = Config.callsign + ">APLR10,RFONLY::" + station + ":" + processedQuery;
-  }
-  return queryAnswer;
-}*/
-
 void checkReceivedPacket(String packet) {
   bool queryMessage = false;
   String aprsPacket, Sender, AddresseeAndMessage, Addressee, ackMessage, receivedMessage;
@@ -94,7 +61,7 @@ void checkReceivedPacket(String packet) {
               for(int i = Sender.length(); i < 9; i++) {
                 Sender += ' ';
               }
-              LoRaUtils::sendNewPacket("APRS", Config.callsign + ">APLR10,RFONLY::" + Sender + ":" + ackMessage);
+              LoRaUtils::sendNewPacket("APRS", Config.callsign + ">APLRG1,RFONLY::" + Sender + ":" + ackMessage);
               receivedMessage = AddresseeAndMessage.substring(AddresseeAndMessage.indexOf(":")+1, AddresseeAndMessage.indexOf("{"));
             } else {
               receivedMessage = AddresseeAndMessage.substring(AddresseeAndMessage.indexOf(":")+1);
@@ -240,7 +207,7 @@ void loop() {
               for(int i = Sender.length(); i < 9; i++) {
                 Sender += ' ';
               }
-              String ackPacket = Config.callsign + ">APLR10,TCPIP,qAC::" + Sender + ":" + ackMessage + "\n";
+              String ackPacket = Config.callsign + ">APLRG1,TCPIP,qAC::" + Sender + ":" + ackMessage + "\n";
               espClient.write(ackPacket.c_str());
               receivedMessage = AddresseeAndMessage.substring(AddresseeAndMessage.indexOf(":")+1, AddresseeAndMessage.indexOf("{"));
             } else {

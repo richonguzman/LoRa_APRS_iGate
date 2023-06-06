@@ -34,9 +34,9 @@ String process(String query, String station, String queryOrigin) {
     station += ' ';
   }
   if (queryOrigin == "APRSIS") {
-    return Config.callsign + ">APLR10,TCPIP,qAC::" + station + ":" + answer + "\n";
+    return Config.callsign + ">APLRG1,TCPIP,qAC::" + station + ":" + answer + "\n";
   } else { //} if (queryOrigin == "LoRa") {
-    return Config.callsign + ">APLR10,RFONLY::" + station + ":" + answer;
+    return Config.callsign + ">APLRG1,RFONLY::" + station + ":" + answer;
   }
 }
 

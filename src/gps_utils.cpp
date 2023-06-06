@@ -74,7 +74,7 @@ String processLongitudeAPRS() {
 String generateBeacon() {
   String iGateLat = processLatitudeAPRS();
   String iGateLon = processLongitudeAPRS();
-  String beaconPacket = Config.callsign + ">APLR10,qAC:=";
+  String beaconPacket = Config.callsign + ">APLRG1,qAC:=";
   if (Config.loramodule.enableTx) {
     beaconPacket += iGateLat + "L" + iGateLon + "a";
   } else {
