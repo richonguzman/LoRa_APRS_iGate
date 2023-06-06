@@ -3,8 +3,6 @@
 
 extern Configuration  Config;
 extern WiFi_AP        *currentWiFi;
-//extern int            myWiFiAPIndex;
-//extern int            myWiFiAPSize;
 
 namespace GPS_Utils {
 
