@@ -8,4 +8,5 @@ void sendNewPacket(const String &typeOfMessage, const String &newPacket);
 //String receivePacket();
 
 }
+
 #endif

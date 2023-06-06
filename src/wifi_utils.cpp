@@ -1,6 +1,7 @@
 #include <WiFi.h>
 #include "wifi_utils.h"
 #include "configuration.h"
+#include "display.h"
 
 extern Configuration  Config;
 extern WiFi_AP        *currentWiFi;
@@ -15,6 +16,7 @@ void setup() {
   WiFi.disconnect();
   delay(500);
   unsigned long start = millis();
+  show_display("", "Connecting to Wifi:", currentWiFi->ssid + " ...", 0);
   Serial.print("\nConnecting to '"); Serial.print(currentWiFi->ssid); Serial.println("' WiFi ...");
   WiFi.begin(currentWiFi->ssid.c_str(), currentWiFi->password.c_str());
   while (WiFi.status() != WL_CONNECTED) {
@@ -29,6 +31,7 @@ void setup() {
       currentWiFi = &Config.wifiAPs[myWiFiAPIndex];
       start = millis();
       Serial.print("\nConnect to WiFi '"); Serial.print(currentWiFi->ssid); Serial.println("' ...");
+      show_display("", "Connect to Wifi:", currentWiFi->ssid + " ...", 0);
       WiFi.begin(currentWiFi->ssid.c_str(), currentWiFi->password.c_str());
     }
   }

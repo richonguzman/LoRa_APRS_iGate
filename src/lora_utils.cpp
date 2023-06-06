@@ -1,5 +1,6 @@
 #include <LoRa.h>
-#include "igate_config.h"
+//#include "igate_config.h"
+#include "configuration.h"
 #include "display.h"
 
 extern Configuration Config;
@@ -39,7 +40,6 @@ void sendNewPacket(const String &typeOfMessage, const String &newPacket) {
   Serial.println(newPacket);
 }
 
-
 /*String receivePacket() {
   String loraPacket;
   int packetSize = LoRa.parsePacket();  // Listening for LoRa Packets
@@ -52,7 +52,5 @@ void sendNewPacket(const String &typeOfMessage, const String &newPacket) {
 
   return loraPacket;
 }*/
-
-
 
 }

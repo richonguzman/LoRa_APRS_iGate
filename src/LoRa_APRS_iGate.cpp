@@ -4,19 +4,23 @@
 #include <vector>
 
 #include "pins_config.h"
-#include "igate_config.h"
+//
+//#include "igate_config.h"
+//
+#include "configuration.h"
 #include "display.h"
 #include "lora_utils.h"
+#include "wifi_utils.h"
 #include "utils.h"
 
-#include <AsyncTCP.h>
+/*#include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
-#include <AsyncElegantOTA.h>
+#include <AsyncElegantOTA.h>*/
 
 #define VERSION   "2023.06.06"
 
 WiFiClient      espClient;
-AsyncWebServer  server(80);
+//AsyncWebServer  server(80);
 String          ConfigurationFilePath = "/igate_conf.json";
 Configuration   Config(ConfigurationFilePath);
 
@@ -25,7 +29,7 @@ static bool     beacon_update       = true;
 unsigned long   previousWiFiMillis  = 0;
 static uint32_t lastRxTxTime        = millis();
 
-static int      myWiFiAPIndex       = 0;
+int             myWiFiAPIndex       = 0;
 int             myWiFiAPSize        = Config.wifiAPs.size();
 WiFi_AP         *currentWiFi        = &Config.wifiAPs[myWiFiAPIndex];
 bool            statusAfterBoot     = Config.statusAfterBoot;
@@ -34,44 +38,6 @@ std::vector<String> lastHeardStation;
 std::vector<String> lastHeardStation_temp;
 
 String firstLine, secondLine, thirdLine, fourthLine, iGateLatitude, iGateLongitude;
-
-/*void setup_wifi() {
-  int status = WL_IDLE_STATUS;
-  Serial.print("\nConnecting to WiFi '"); Serial.print(currentWiFi->ssid); Serial.print("' ");
-  show_display("", "Connecting to Wifi:", currentWiFi->ssid + " ...", 0);
-  WiFi.mode(WIFI_STA);
-  WiFi.disconnect();
-  delay(100);
-  unsigned long start = millis();
-
-  /*if (Config.network.DHCP) {
-    WiFi.setHostname(Config.callsign.c_str());
-    if (!WiFi.config(Config.network.ip, Config.network.gateway, Config.network.subnet, Config.network.dns1, Config.network.dns2)) {
-      Serial.println("STA Failed to configure");
-    }
-    //WiFi.config(Config.network.ip, Config.network.gateway, Config.network.subnet, Config.network.dns1, Config.network.dns2);
-  }
-
-  WiFi.begin(currentWiFi->ssid.c_str(), currentWiFi->password.c_str());
-  while (WiFi.status() != WL_CONNECTED) {
-    Serial.print('.');
-    delay(1000);
-    if ((millis() - start) > 15000){
-      if(myWiFiAPIndex >= (myWiFiAPSize-1)) {
-        myWiFiAPIndex = 0;
-      } else {
-        myWiFiAPIndex++;
-      }
-      currentWiFi = &Config.wifiAPs[myWiFiAPIndex];
-      start = millis();
-      Serial.print("\nConnect to WiFi '"); Serial.print(currentWiFi->ssid); Serial.println("' ...");
-      show_display("", "Connect to Wifi:", currentWiFi->ssid + " ...", 0);
-      WiFi.begin(currentWiFi->ssid.c_str(), currentWiFi->password.c_str());
-    }
-  }
-  Serial.print("Connected as ");
-  Serial.println(WiFi.localIP());
-}*/
 
 void APRS_IS_connect(){
   int count = 0;
@@ -341,16 +307,17 @@ void setup() {
   setup_display();
   Serial.println("\nStarting iGate: " + Config.callsign + "   Version: " + String(VERSION));
   show_display("   LoRa APRS iGate", "    Richonguzman", "    -- CD2RXU --", "     " VERSION, 4000); 
-  setup_wifi();
+  WIFI_Utils::setup();
+  //setup_wifi();
   btStop();
 
-  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
+  /*server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
     request->send(200, "text/plain", "Hi! I am ESP32.");
   });
 
   AsyncElegantOTA.begin(&server);    // Start ElegantOTA
   server.begin();
-  Serial.println("HTTP server started");
+  Serial.println("HTTP server started");*/
 
   LoRaUtils::setup();
   iGateLatitude = create_lat_aprs(currentWiFi->latitude);
@@ -365,7 +332,7 @@ void loop() {
   fourthLine  = "";
   unsigned long currentWiFiMillis   = millis();
 
-  if ((WiFi.status() != WL_CONNECTED) && (currentWiFiMillis - previousWiFiMillis >= 30000)) {
+  if ((WiFi.status() != WL_CONNECTED) && (currentWiFiMillis - previousWiFiMillis >= currentWiFi->checkInterval*1000)) {
     Serial.print(millis());
     Serial.println("Reconnecting to WiFi...");
     WiFi.disconnect();
