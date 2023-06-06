@@ -11,6 +11,7 @@
 #include "display.h"
 #include "lora_utils.h"
 #include "wifi_utils.h"
+#include "aprs_is_utils.h"
 #include "utils.h"
 
 /*#include <AsyncTCP.h>
@@ -39,7 +40,7 @@ std::vector<String> lastHeardStation_temp;
 
 String firstLine, secondLine, thirdLine, fourthLine, iGateLatitude, iGateLongitude;
 
-void APRS_IS_connect(){
+/*void APRS_IS_connect(){
   int count = 0;
   String aprsauth;
   Serial.println("Connecting to APRS-IS ...");
@@ -61,7 +62,7 @@ void APRS_IS_connect(){
     espClient.write(aprsauth.c_str());  
     delay(200);
   }
-}
+}*/
 
 String createAPRSPacket(String unprocessedPacket) {
   String callsign_and_path_tracker, payload_tracker, processedPacket;
@@ -308,7 +309,6 @@ void setup() {
   Serial.println("\nStarting iGate: " + Config.callsign + "   Version: " + String(VERSION));
   show_display("   LoRa APRS iGate", "    Richonguzman", "    -- CD2RXU --", "     " VERSION, 4000); 
   WIFI_Utils::setup();
-  //setup_wifi();
   btStop();
 
   /*server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
@@ -341,7 +341,7 @@ void loop() {
   }
   
   if (!espClient.connected()) {
-    APRS_IS_connect();
+    APRS_IS_Utils::connect();
   }
 
   if (WiFi.status() == WL_CONNECTED) {
