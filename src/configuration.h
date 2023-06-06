@@ -50,6 +50,7 @@ public:
   String                callsign;  
   String                comment;
   int                   beaconInterval;
+  int                   rememberStationTime;
   bool                  statusAfterBoot;
   String                defaultStatus;
   std::vector<WiFi_AP>  wifiAPs;

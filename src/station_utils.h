@@ -5,7 +5,9 @@
 
 namespace STATION_Utils {
 
-void deleteNotHeardStation();
+void deleteNotHeard();
+void updateLastHeard(String station);
+bool wasHeard(String station);
 
 }
 

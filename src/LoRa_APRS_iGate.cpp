@@ -9,6 +9,7 @@
 #include "wifi_utils.h"
 #include "aprs_is_utils.h"
 #include "gps_utils.h"
+#include "station_utils.h"
 #include "utils.h"
 
 /*#include <AsyncTCP.h>
@@ -48,56 +49,6 @@ String createAPRSPacket(String unprocessedPacket) {
     processedPacket = callsign_and_path_tracker + ",qAO," + Config.callsign + payload_tracker + "\n";
   }
   return processedPacket;
-}
-
-bool checkValidHeardStation(String station) {
-  bool validStation = false;
-  for (int i=0; i<lastHeardStation.size(); i++) {
-    if (lastHeardStation[i].substring(0,lastHeardStation[i].indexOf(",")) == station) {
-      validStation = true;
-      Serial.println(" ---> Listened Station");
-    } 
-  }
-  if (!validStation) {
-    Serial.println("   ---> Station not Heard for last 30 min (Not Tx)\n");
-  }
-  return validStation;
-}
-
-void deleteNotHeardStation() {
-  uint32_t minReportingTime = 30*60*1000; // 30 minutes // from .json and CONFIGURATION?????
-  for (int i=0; i<lastHeardStation.size(); i++) {
-    String deltaTimeString = lastHeardStation[i].substring(lastHeardStation[i].indexOf(",")+1);
-    uint32_t deltaTime = deltaTimeString.toInt();
-    if ((millis() - deltaTime) < minReportingTime) {
-      lastHeardStation_temp.push_back(lastHeardStation[i]);
-    }
-  }
-  lastHeardStation.clear();
-  for (int j=0; j<lastHeardStation_temp.size(); j++) {
-    lastHeardStation.push_back(lastHeardStation_temp[j]);
-  }
-  lastHeardStation_temp.clear();
-}
-
-void updateLastHeardStation(String station) {
-  bool stationHeard = false;
-  for (int i=0; i<lastHeardStation.size(); i++) {
-    if (lastHeardStation[i].substring(0,lastHeardStation[i].indexOf(",")) == station) {
-      lastHeardStation[i] = station + "," + String(millis());
-      stationHeard = true;
-    }
-  }
-  if (!stationHeard) {
-    lastHeardStation.push_back(station + "," + String(millis()));
-  }
-
-  //////
-  Serial.print("Stations Near (last 30 minutes): ");
-  for (int k=0; k<lastHeardStation.size(); k++) {
-    Serial.print(lastHeardStation[k].substring(0,lastHeardStation[k].indexOf(","))); Serial.print(" ");
-  }
-  Serial.println("");
 }
 
 String processQueryAnswer(String query, String station, String queryOrigin) {
@@ -182,8 +133,9 @@ void checkReceivedPacket(String packet) {
         lastRxTxTime = millis();
         espClient.write(aprsPacket.c_str());
         Serial.println("   ---> Uploaded to APRS-IS");
-        deleteNotHeardStation();
-        updateLastHeardStation(Sender);
+        //STATION_Utils::deleteNotHeardStation();
+        //updateLastHeardStation(Sender);
+        STATION_Utils::updateLastHeard(Sender);
         if (aprsPacket.indexOf("::") >= 10) {
           show_display(firstLine, secondLine, "Callsign = " + Sender, "TYPE --> MESSAGE",  1000);
         } else if (aprsPacket.indexOf(":>") >= 10) {
@@ -206,7 +158,6 @@ String processAPRSISPacket(String aprsisMessage) {
   firstPart = aprsisMessage.substring(0, aprsisMessage.indexOf(","));
   messagePart = aprsisMessage.substring(aprsisMessage.indexOf("::")+2);
   newLoraPacket = firstPart + ",TCPIP," + Config.callsign + "::" + messagePart;
-  Serial.print("Received from APRS-IS  : " + aprsisMessage);
   return newLoraPacket;
 }
 
@@ -249,7 +200,7 @@ void loop() {
   if (!espClient.connected()) {
     APRS_IS_Utils::connect();
   }
-  secondLine  = APRS_IS_Utils::checkStatus();// "WiFi: " + wifiState + "/ APRS-IS: " + aprsisState;
+  secondLine  = APRS_IS_Utils::checkStatus();
   show_display(firstLine, secondLine, thirdLine, fourthLine, 0);
 
   while (espClient.connected()) {
@@ -330,10 +281,9 @@ void loop() {
               show_display(firstLine, secondLine, "Callsign = " + Sender, "TYPE --> QUERY",  1000);
             }
           } else {
-            newLoraPacket = processAPRSISPacket(aprsisPacket);
-            deleteNotHeardStation();
-            validHeardStation = checkValidHeardStation(Addressee);
-            if (validHeardStation) {
+            Serial.print("Received from APRS-IS  : " + aprsisPacket);
+            if (STATION_Utils::wasHeard(Addressee)) {
+              newLoraPacket = processAPRSISPacket(aprsisPacket);
               LoRaUtils::sendNewPacket("APRS", newLoraPacket);
               display_toggle(true);
               lastRxTxTime = millis();
