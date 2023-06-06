@@ -188,7 +188,7 @@ void checkReceivedPacket(String packet) {
           show_display(firstLine, secondLine, "Callsign = " + Sender, "TYPE --> MESSAGE",  1000);
         } else if (aprsPacket.indexOf(":>") >= 10) {
           show_display(firstLine, secondLine, "Callsign = " + Sender, "TYPE --> NEW STATUS", 1000);
-        } else if (aprsPacket.indexOf(":!") >= 10) {
+        } else if (aprsPacket.indexOf(":!") >= 10 || aprsPacket.indexOf(":=") >= 10) {
           show_display(firstLine, secondLine, "Callsign = " + Sender, "TYPE --> GPS BEACON", 1000);
         } else {
           show_display(firstLine, secondLine, "Callsign = " + Sender, "TYPE --> ??????????", 1000);
@@ -264,7 +264,7 @@ void loop() {
     if (!Config.display.keepLastPacketOnScreen) {
       show_display(firstLine, secondLine, thirdLine, fourthLine, 0);
     }
-    
+
     uint32_t lastTx = millis() - lastTxTime;
     if (lastTx >= Config.beaconInterval*60*1000) {
       beacon_update = true;    
