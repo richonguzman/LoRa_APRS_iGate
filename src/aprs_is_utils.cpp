@@ -1,10 +1,12 @@
 #include "aprs_is_utils.h"
 #include <WiFi.h>
 #include "configuration.h"
+#include "display.h"
 
 extern Configuration  Config;
 extern WiFiClient     espClient;
 extern int            internalLedPin;
+extern uint32_t       lastRxTxTime;
 
 namespace APRS_IS_Utils {
 
@@ -30,6 +32,29 @@ void connect(){
     espClient.write(aprsauth.c_str());
     delay(200);
   }
+}
+
+String checkStatus() {
+  String wifiState, aprsisState;
+  if (WiFi.status() == WL_CONNECTED) {
+    wifiState = "OK"; 
+  } else {
+    wifiState = "--";
+    if (!Config.display.alwaysOn) {
+      display_toggle(true);
+    }
+    lastRxTxTime = millis();
+  }
+  if (espClient.connected()) {
+    aprsisState = "OK"; 
+  } else {
+    aprsisState = "--";
+    if (!Config.display.alwaysOn) {
+      display_toggle(true);
+    }
+    lastRxTxTime = millis();
+  }
+  return "WiFi: " + wifiState + "/ APRS-IS: " + aprsisState;
 }
 
 /*void processSplitedMessage(String addressee, String message1, String message2) {

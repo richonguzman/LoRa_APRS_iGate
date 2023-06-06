@@ -22,7 +22,7 @@ void setup_display() {
   display.ssd1306_command(SSD1306_SETCONTRAST);
   display.ssd1306_command(1);
   display.display();
-  delay(4000);
+  delay(1000);
 }
 
 void display_toggle(bool toggle) {

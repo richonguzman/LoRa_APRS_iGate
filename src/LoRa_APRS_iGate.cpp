@@ -25,7 +25,7 @@ Configuration   Config(ConfigurationFilePath);
 uint32_t        lastTxTime          = 0;
 static bool     beacon_update       = true;
 unsigned long   previousWiFiMillis  = 0;
-static uint32_t lastRxTxTime        = millis();
+uint32_t lastRxTxTime               = millis();
 
 int             myWiFiAPIndex       = 0;
 int             myWiFiAPSize        = Config.wifiAPs.size();
@@ -35,7 +35,7 @@ bool            statusAfterBoot     = Config.statusAfterBoot;
 std::vector<String> lastHeardStation;
 std::vector<String> lastHeardStation_temp;
 
-String firstLine, secondLine, thirdLine, fourthLine, iGateBeaconPacket; //iGateLatitude, iGateLongitude;
+String firstLine, secondLine, thirdLine, fourthLine, iGateBeaconPacket;
 
 String createAPRSPacket(String unprocessedPacket) {
   String callsign_and_path_tracker, payload_tracker, processedPacket;
@@ -229,8 +229,6 @@ void setup() {
 
   LoRaUtils::setup();
   iGateBeaconPacket = GPS_Utils::generateBeacon();
-  //iGateLatitude   = GPS_Utils::processLatitudeAPRS();
-  //iGateLongitude  = GPS_Utils::processLongitudeAPRS();
 }
 
 void loop() {
@@ -253,7 +251,7 @@ void loop() {
     APRS_IS_Utils::connect();
   }
 
-  if (WiFi.status() == WL_CONNECTED) {
+  /*if (WiFi.status() == WL_CONNECTED) {
     wifiState = "OK"; 
   } else {
     wifiState = "--";
@@ -270,8 +268,8 @@ void loop() {
       display_toggle(true);
     }
     lastRxTxTime = millis();
-  }
-  secondLine  = "WiFi: " + wifiState + "/ APRS-IS: " + aprsisState;
+  }*/
+  secondLine  = APRS_IS_Utils::checkStatus();// "WiFi: " + wifiState + "/ APRS-IS: " + aprsisState;
   
   show_display(firstLine, secondLine, thirdLine, fourthLine, 0);
 
@@ -296,13 +294,6 @@ void loop() {
     if (beacon_update) {
       display_toggle(true);
       Serial.println("---- Sending iGate Beacon ----");
-      /*String iGateBeaconPacket = Config.callsign + ">APLR10,qAC:=";
-      if (Config.loramodule.enableTx) {
-        iGateBeaconPacket += iGateLatitude + "L" + iGateLongitude + "a";
-      } else {
-        iGateBeaconPacket += iGateLatitude + "L" + iGateLongitude + "&";
-      }
-      iGateBeaconPacket += Config.comment;*/
       //Serial.println(iGateBeaconPacket);
       espClient.write((iGateBeaconPacket + "\n").c_str()); 
       lastTxTime = millis();
