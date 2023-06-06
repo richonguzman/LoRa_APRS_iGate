@@ -152,15 +152,6 @@ void checkReceivedPacket(String packet) {
   }
 }
 
-String processAPRSISPacket(String aprsisMessage) {
-  String firstPart, messagePart, newLoraPacket;
-  aprsisMessage.trim();
-  firstPart = aprsisMessage.substring(0, aprsisMessage.indexOf(","));
-  messagePart = aprsisMessage.substring(aprsisMessage.indexOf("::")+2);
-  newLoraPacket = firstPart + ",TCPIP," + Config.callsign + "::" + messagePart;
-  return newLoraPacket;
-}
-
 void setup() {
   Serial.begin(115200);
   delay(1000);
@@ -243,7 +234,7 @@ void loop() {
     }
     
     if (espClient.available()) {
-      String aprsisData, aprsisPacket, newLoraPacket, Sender, AddresseeAndMessage, Addressee, receivedMessage;
+      String aprsisData, aprsisPacket, Sender, AddresseeAndMessage, Addressee, receivedMessage;
       bool validHeardStation = false;
       aprsisData = espClient.readStringUntil('\r'); // or '\n'
       aprsisPacket.concat(aprsisData);
@@ -283,8 +274,7 @@ void loop() {
           } else {
             Serial.print("Received from APRS-IS  : " + aprsisPacket);
             if (STATION_Utils::wasHeard(Addressee)) {
-              newLoraPacket = processAPRSISPacket(aprsisPacket);
-              LoRaUtils::sendNewPacket("APRS", newLoraPacket);
+              LoRaUtils::sendNewPacket("APRS", LoRaUtils::generatePacket(aprsisPacket));
               display_toggle(true);
               lastRxTxTime = millis();
               receivedMessage = AddresseeAndMessage.substring(AddresseeAndMessage.indexOf(":")+1);

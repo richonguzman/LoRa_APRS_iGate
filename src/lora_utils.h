@@ -5,6 +5,7 @@ namespace LoRaUtils {
 
 void setup();
 void sendNewPacket(const String &typeOfMessage, const String &newPacket);
+String generatePacket(String aprsisPacket);
 //String receivePacket();
 
 }

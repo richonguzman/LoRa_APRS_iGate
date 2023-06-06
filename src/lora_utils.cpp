@@ -39,6 +39,14 @@ void sendNewPacket(const String &typeOfMessage, const String &newPacket) {
   Serial.println(newPacket);
 }
 
+String generatePacket(String aprsisPacket) {
+  String firstPart, messagePart;
+  aprsisPacket.trim();
+  firstPart = aprsisPacket.substring(0, aprsisPacket.indexOf(","));
+  messagePart = aprsisPacket.substring(aprsisPacket.indexOf("::")+2);
+  return firstPart + ",TCPIP," + Config.callsign + "::" + messagePart;
+}
+
 /*String receivePacket() {
   String loraPacket;
   int packetSize = LoRa.parsePacket();  // Listening for LoRa Packets
