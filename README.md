@@ -21,7 +21,7 @@ Instrucctions (add your information into the '/data/igate_conf.json'):
 
 3.- Change "wifi">"AP">"Password" from "password_WiFi_2" to your own WIFI-SSID-PASSWORD.
 
-4.- Add GPS to "wifi">"AP">"Latitude" and "wifi">"AP">"Longitude"  (info from GoogleMaps) of new LoRa iGate.
+4.- Add GPS to "wifi">"AP">"Latitude" and "Longitude"  (info from GoogleMaps) of new LoRa iGate.
 
 5.- Change "aprs_is">"passcode" from "XYZVW" to yours (remember that is 5 digits integer).
 
