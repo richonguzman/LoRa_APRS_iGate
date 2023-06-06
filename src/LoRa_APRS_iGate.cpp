@@ -10,6 +10,7 @@
 #include "aprs_is_utils.h"
 #include "gps_utils.h"
 #include "station_utils.h"
+#include "query_utils.h"
 #include "utils.h"
 
 /*#include <AsyncTCP.h>
@@ -38,20 +39,7 @@ std::vector<String> lastHeardStation_temp;
 
 String firstLine, secondLine, thirdLine, fourthLine, iGateBeaconPacket;
 
-String createAPRSPacket(String unprocessedPacket) {
-  String callsign_and_path_tracker, payload_tracker, processedPacket;
-  int dotsPosition = unprocessedPacket.indexOf(':');
-  callsign_and_path_tracker = unprocessedPacket.substring(3, dotsPosition);
-  payload_tracker = unprocessedPacket.substring(dotsPosition);
-  if (Config.loramodule.enableTx) {
-    processedPacket = callsign_and_path_tracker + ",qAR," + Config.callsign + payload_tracker + "\n";
-  } else {
-    processedPacket = callsign_and_path_tracker + ",qAO," + Config.callsign + payload_tracker + "\n";
-  }
-  return processedPacket;
-}
-
-String processQueryAnswer(String query, String station, String queryOrigin) {
+/*String processQueryAnswer(String query, String station, String queryOrigin) {
   String processedQuery, queryAnswer;
   if (query=="?APRS?" || query=="?aprs?" || query=="?Aprs?" || query=="H" || query=="h" || query=="Help" || query=="help" || query=="?") {
     processedQuery = "?APRSV ?APRSP ?APRSL ?APRSH ?WHERE callsign";
@@ -72,7 +60,7 @@ String processQueryAnswer(String query, String station, String queryOrigin) {
     // agregar callsign para completar donde esta X callsign
     Serial.println("estaciones escuchadas directo (ultimos 30 min)");
     processedQuery = "WHERE";
-  }*/
+  }
   for(int i = station.length(); i < 9; i++) {
     station += ' ';
   }
@@ -82,7 +70,7 @@ String processQueryAnswer(String query, String station, String queryOrigin) {
     queryAnswer = Config.callsign + ">APLR10,RFONLY::" + station + ":" + processedQuery;
   }
   return queryAnswer;
-}
+}*/
 
 void checkReceivedPacket(String packet) {
   bool queryMessage = false;
@@ -113,28 +101,27 @@ void checkReceivedPacket(String packet) {
             }
             if (receivedMessage.indexOf("?") == 0) {
               queryMessage = true;
-              String queryAnswer = processQueryAnswer(receivedMessage, Sender, "LoRa");
+              //String queryAnswer = QUERY_Utils::process(receivedMessage, Sender, "LoRa");
               delay(2000);
               if (!Config.display.alwaysOn) {
                 display_toggle(true);
               }
+              LoRaUtils::sendNewPacket("APRS", QUERY_Utils::process(receivedMessage, Sender, "LoRa"));
               lastRxTxTime = millis();
-              LoRaUtils::sendNewPacket("APRS", queryAnswer); 
+              //LoRaUtils::sendNewPacket("APRS", queryAnswer);
               show_display(firstLine, secondLine, "Callsign = " + Sender, "TYPE --> QUERY",  1000);
             } 
           }
         }
       }
       if (!queryMessage) {
-        aprsPacket = createAPRSPacket(packet);
+        aprsPacket = APRS_IS_Utils::createPacket(packet);
         if (!Config.display.alwaysOn) {
           display_toggle(true);
         }
         lastRxTxTime = millis();
         espClient.write(aprsPacket.c_str());
         Serial.println("   ---> Uploaded to APRS-IS");
-        //STATION_Utils::deleteNotHeardStation();
-        //updateLastHeardStation(Sender);
         STATION_Utils::updateLastHeard(Sender);
         if (aprsPacket.indexOf("::") >= 10) {
           show_display(firstLine, secondLine, "Callsign = " + Sender, "TYPE --> MESSAGE",  1000);
@@ -261,7 +248,7 @@ void loop() {
             }
             if (receivedMessage.indexOf("?") == 0) {
               Serial.println("Received Query APRS-IS : " + aprsisPacket);
-              String queryAnswer = processQueryAnswer(receivedMessage, Sender, "APRSIS");
+              String queryAnswer = QUERY_Utils::process(receivedMessage, Sender, "APRSIS");
               Serial.println("---> QUERY Answer : " + queryAnswer.substring(0,queryAnswer.indexOf("\n")));
               if (!Config.display.alwaysOn) {
                 display_toggle(true);

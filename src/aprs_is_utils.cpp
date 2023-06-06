@@ -57,6 +57,14 @@ String checkStatus() {
   return "WiFi: " + wifiState + "/ APRS-IS: " + aprsisState;
 }
 
+String createPacket(String packet) {
+  if (Config.loramodule.enableTx) {
+    return packet.substring(3, packet.indexOf(':')) + ",qAR," + Config.callsign + packet.substring(packet.indexOf(':')) + "\n";
+  } else {
+    return packet.substring(3, packet.indexOf(':')) + ",qAO," + Config.callsign + packet.substring(packet.indexOf(':')) + "\n";
+  }
+}
+
 /*void processSplitedMessage(String addressee, String message1, String message2) {
   espClient.write((Config.callsign + ">APRS,qAC::" + addressee + ":" + message1 + "\n").c_str()); 
   Serial.println("-------> " + message1);
