@@ -7,6 +7,7 @@ extern Configuration  Config;
 extern WiFiClient     espClient;
 extern int            internalLedPin;
 extern uint32_t       lastRxTxTime;
+extern int            stationMode;
 
 namespace APRS_IS_Utils {
 
@@ -58,7 +59,7 @@ String checkStatus() {
 }
 
 String createPacket(String packet) {
-  if (Config.loramodule.enableTx) {
+  if (stationMode > 1) {
     return packet.substring(3, packet.indexOf(':')) + ",qAR," + Config.callsign + packet.substring(packet.indexOf(':')) + "\n";
   } else {
     return packet.substring(3, packet.indexOf(':')) + ",qAO," + Config.callsign + packet.substring(packet.indexOf(':')) + "\n";

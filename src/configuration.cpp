@@ -30,6 +30,7 @@ void Configuration::readFile(fs::FS &fs, const char *fileName) {
     }
 
     callsign                        = data["callsign"].as<String>();
+    stationMode                     = data["stationMode"].as<int>();
     comment                         = data["comment"].as<String>();
     beaconInterval                  = data["other"]["beaconInterval"].as<int>();
     rememberStationTime             = data["other"]["rememberStationTime"].as<int>();
@@ -42,9 +43,9 @@ void Configuration::readFile(fs::FS &fs, const char *fileName) {
     aprs_is.softwareName            = data["aprs_is"]["softwareName"].as<String>();
     aprs_is.softwareVersion         = data["aprs_is"]["softwareVersion"].as<String>();
     aprs_is.reportingDistance       = data["aprs_is"]["reportingDistance"].as<int>();
-    
-    loramodule.enableTx             = data["lora"]["enableTx"].as<bool>();
-    loramodule.frequency            = data["lora"]["frequency"].as<long>();
+
+    loramodule.frequencyTx          = data["lora"]["frequencyTx"].as<long>();
+    loramodule.frequencyRx          = data["lora"]["frequencyRx"].as<long>();
     loramodule.spreadingFactor      = data["lora"]["spreadingFactor"].as<int>();
     loramodule.signalBandwidth      = data["lora"]["signalBandwidth"].as<long>();
     loramodule.codingRate4          = data["lora"]["codingRate4"].as<int>();

@@ -29,25 +29,26 @@ public:
 
 class LoraModule {
 public:
-  bool enableTx;
-  long frequency;
-  int  spreadingFactor;
-  long signalBandwidth;
-  int  codingRate4;
-  int  power;
+  long    frequencyTx;
+  long    frequencyRx;
+  int     spreadingFactor;
+  long    signalBandwidth;
+  int     codingRate4;
+  int     power;
 };
 
 class Display {
 public:
-  bool alwaysOn;
-  bool keepLastPacketOnScreen;
-  int  timeout;
+  bool    alwaysOn;
+  bool    keepLastPacketOnScreen;
+  int     timeout;
 };
 
 class Configuration {
 public:
 
   String                callsign;  
+  int                   stationMode;
   String                comment;
   int                   beaconInterval;
   int                   rememberStationTime;

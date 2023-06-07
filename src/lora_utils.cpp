@@ -4,12 +4,12 @@
 
 extern Configuration Config;
 
-namespace LoRaUtils {
+namespace LoRa_Utils {
 
 void setup() {
   SPI.begin(LORA_SCK, LORA_MISO, LORA_MOSI, LORA_CS);
   LoRa.setPins(LORA_CS, LORA_RST, LORA_IRQ);
-  if (!LoRa.begin(Config.loramodule.frequency)) {
+  if (!LoRa.begin(Config.loramodule.frequencyTx)) {
     Serial.println("Starting LoRa failed!");
     show_display("ERROR", "Starting LoRa failed!");
     while (true) {
@@ -47,8 +47,8 @@ String generatePacket(String aprsisPacket) {
   return firstPart + ",TCPIP," + Config.callsign + "::" + messagePart;
 }
 
-/*String receivePacket() {
-  String loraPacket;
+String receivePacket() {
+  String loraPacket = "";
   int packetSize = LoRa.parsePacket();  // Listening for LoRa Packets
   if (packetSize) {
     while (LoRa.available()) {
@@ -56,8 +56,7 @@ String generatePacket(String aprsisPacket) {
       loraPacket += (char)inChar;
     }
   }
-
   return loraPacket;
-}*/
+}
 
 }

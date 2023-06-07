@@ -5,6 +5,7 @@
 
 namespace utils {
 
+void validateMode(int mode);
 void processStatus();
 
 }

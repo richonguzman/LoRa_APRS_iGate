@@ -3,6 +3,7 @@
 
 extern Configuration  Config;
 extern WiFi_AP        *currentWiFi;
+extern int            stationMode;
 
 namespace GPS_Utils {
 
@@ -75,10 +76,12 @@ String generateBeacon() {
   String iGateLat = processLatitudeAPRS();
   String iGateLon = processLongitudeAPRS();
   String beaconPacket = Config.callsign + ">APLRG1,qAC:=";
-  if (Config.loramodule.enableTx) {
-    beaconPacket += iGateLat + "L" + iGateLon + "a";
-  } else {
+  if (stationMode == 1) {
     beaconPacket += iGateLat + "L" + iGateLon + "&";
+  } else if (stationMode == 2 || stationMode == 5) {
+    beaconPacket += iGateLat + "L" + iGateLon + "a";
+  } else if (stationMode >=3 && stationMode <= 4) {
+    beaconPacket += iGateLat + "L" + iGateLon + "#";
   }
   beaconPacket += Config.comment;
   return beaconPacket;

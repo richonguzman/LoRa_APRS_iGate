@@ -1,5 +1,6 @@
 {
 	"callsign": "CD2RXU-10",
+	"stationMode": 1,
 	"comment": "LoRa_APRS_iGate",
 	"wifi": {
 		"AP": [
@@ -25,8 +26,8 @@
 		"reportingDistance": 30
 	},
 	"lora": {
-		"enableTx": true,
-		"frequency": 433775000,
+		"frequencyTx": 433775000,
+		"frequencyRx": 433775000,
 		"spreadingFactor": 12,
 		"signalBandwidth": 125000,
 		"codingRate4": 5,
