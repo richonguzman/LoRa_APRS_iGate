@@ -75,15 +75,17 @@ String processLongitudeAPRS() {
 String generateBeacon() {
   String iGateLat = processLatitudeAPRS();
   String iGateLon = processLongitudeAPRS();
-  String beaconPacket = Config.callsign + ">APLRG1,qAC:=";
+  String beaconPacket = Config.callsign + ">APLRG1";
   if (stationMode == 1) {
-    beaconPacket += iGateLat + "L" + iGateLon + "&";
+    beaconPacket += ",qAC:=" +iGateLat + "L" + iGateLon + "&";
+    beaconPacket += Config.iGateComment;
   } else if (stationMode == 2 || stationMode == 5) {
-    beaconPacket += iGateLat + "L" + iGateLon + "a";
-  } else if (stationMode >=3 && stationMode <= 4) {
-    beaconPacket += iGateLat + "L" + iGateLon + "#";
+    beaconPacket += ",qAC:=" + iGateLat + "L" + iGateLon + "a";
+    beaconPacket += Config.iGateComment;
+  } else if (stationMode ==3 || stationMode == 4) {
+    beaconPacket += ":=" + iGateLat + "L" + iGateLon + "#";
+    beaconPacket += Config.digirepeaterComment;
   }
-  beaconPacket += Config.comment;
   return beaconPacket;
 }
 

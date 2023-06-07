@@ -102,7 +102,7 @@ void checkReceivedPacket(String packet) {
       }
     }    
   } else {
-    Serial.println("   ---> LoRa Packet Ignored (by first 3 bytes of by TCPIP/NOGATE/RFONLY)\n");
+    Serial.println("   ---> LoRa Packet Ignored (first 3 bytes or TCPIP/NOGATE/RFONLY)\n");
   }
 }
 
@@ -112,7 +112,7 @@ void setup() {
   setup_display();
   Serial.println("\nStarting iGate: " + Config.callsign + "   Version: " + String(VERSION));
   show_display("   LoRa APRS iGate", "    Richonguzman", "    -- CD2RXU --", "     " VERSION, 4000);
-  utils::validateMode(stationMode);
+  WIFI_Utils::validateMode(stationMode);
   iGateBeaconPacket = GPS_Utils::generateBeacon();
   LoRa_Utils::setup();
 
@@ -133,6 +133,20 @@ void setup() {
 void loop() {
   if (stationMode==3 || stationMode==4) {   // DigiRepeater Mode / No backUpMode
     secondLine = "<DigiRepeater Active>";
+    uint32_t lastBeaconTx = millis() - lastTxTime;
+    if (lastBeaconTx >= Config.beaconInterval*60*1000) {
+      beacon_update = true;    
+    }
+    if (beacon_update) {
+      thirdLine = "";
+      show_display(firstLine, secondLine, thirdLine, "SENDING iGate BEACON", 0);
+      fourthLine = "     listening...";
+      Serial.println("---- Sending iGate Beacon ----");
+      //Serial.println(iGateBeaconPacket);
+      //LoRa_Utils::sendNewPacket("APRS",iGateBeaconPacket);
+      lastTxTime = millis();
+      beacon_update = false;
+    }
     show_display(firstLine, secondLine, thirdLine, fourthLine, 0);
     DIGI_Utils::process(LoRa_Utils::receivePacket());
   } else if (stationMode==1 || stationMode==2 ) {                                    // standard iGate Mode (No DigiRepeater)                                          
@@ -157,8 +171,6 @@ void loop() {
           display_toggle(false);
         }
       }
-      thirdLine = "";
-      fourthLine = "";
       if (!Config.display.keepLastPacketOnScreen) {
         show_display(firstLine, secondLine, thirdLine, fourthLine, 0);
       }
@@ -175,6 +187,8 @@ void loop() {
         lastTxTime = millis();
         lastRxTxTime = millis();
         show_display(firstLine, secondLine, thirdLine, "SENDING iGate BEACON", 1000);
+        thirdLine = "";
+        fourthLine = "     listening...";
         show_display(firstLine, secondLine, thirdLine, fourthLine, 0);
         beacon_update = false;
       }

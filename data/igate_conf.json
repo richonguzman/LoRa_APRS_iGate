@@ -1,7 +1,8 @@
 {
 	"callsign": "CD2RXU-10",
-	"stationMode": 1,
-	"comment": "LoRa_APRS_iGate",
+	"stationMode": 3,
+	"iGateComment": "LoRa_APRS_iGate",
+	"digirepeaterComment": "LoRa_APRS_Digirepeater" ,
 	"wifi": {
 		"AP": [
 			{	"SSID": "Richon",
@@ -26,7 +27,7 @@
 		"reportingDistance": 30
 	},
 	"lora": {
-		"frequencyTx": 433775000,
+		"frequencyTx": 433900000,
 		"frequencyRx": 433775000,
 		"spreadingFactor": 12,
 		"signalBandwidth": 125000,

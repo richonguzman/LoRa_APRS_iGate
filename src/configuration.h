@@ -49,7 +49,8 @@ public:
 
   String                callsign;  
   int                   stationMode;
-  String                comment;
+  String                iGateComment;
+  String                digirepeaterComment;
   int                   beaconInterval;
   int                   rememberStationTime;
   bool                  statusAfterBoot;

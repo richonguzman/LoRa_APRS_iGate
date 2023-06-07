@@ -1,8 +1,7 @@
 #include "digi_utils.h"
 #include "configuration.h"
-/*#include <LoRa.h>
+#include "lora_utils.h"
 
-#include "display.h"*/
 
 extern Configuration    Config;
 extern String           thirdLine;
@@ -31,29 +30,27 @@ void typeOfPacket(String packet) {
 void process(String packet) {
     String firstPart, lastPart;
     if (packet != "") {
-        Serial.println("Received Lora Packet   : " + String(packet));
-        if (packet.substring(0, 3) == "\x3c\xff\x01") {
-            if ((packet.indexOf("TCPIP") == -1) && (packet.indexOf("NOGATE") == -1) && (packet.indexOf("RFONLY") == -1) && (packet.indexOf("WIDE1-1") > 10)) {
-                Serial.println("---> APRS LoRa Packet: Tracker --> iGate");
-                typeOfPacket(packet);
-                firstPart = packet.substring(0,packet.indexOf(",")+1);
-                lastPart = packet.substring(packet.indexOf(":"));
-
-                //Serial.println(firstPart);
-                //Serial.println(lastPart);
-                Serial.println(firstPart + Config.callsign + lastPart);
-
-            } else if ((packet.indexOf("TCPIP") == -1) && (packet.indexOf("NOGATE") == -1) && (packet.indexOf("RFONLY") > 10)) {
-                Serial.println("---> APRS LoRa Packet: iGate --> Tracker");
-                typeOfPacket(packet);
-            } else if ((packet.indexOf("TCPIP") > 5) && (packet.indexOf("NOGATE") == -1) && (packet.indexOf("RFONLY") == -1)) {
-                Serial.println("---> APRS LoRa Packet: APRSIS (iGate) --> Tracker");
-                typeOfPacket(packet);
-            } else {
-                Serial.println("Packet ignored because iGate Configuration(.json)");
+        Serial.print("Received Lora Packet   : " + String(packet));
+        if ((packet.substring(0, 3) == "\x3c\xff\x01") && (packet.indexOf("NOGATE") == -1) && (packet.indexOf("WIDE1-1") > 10)) { // confirmar lo de WIDE1-1 !!!
+            Serial.println("   ---> APRS LoRa Packet");
+            typeOfPacket(packet);
+            firstPart = packet.substring(3,packet.indexOf(",")+1);
+            lastPart = packet.substring(packet.indexOf(":"));
+            Serial.println(firstPart + Config.callsign + lastPart);
+            if (stationMode == 3) {
+                delay(8000);// quizas no es necesario esperar tanto?
+                //LoRa_Utils::sendNewPacket("APRS", firstPart + Config.callsign + lastPart);
+                Serial.print("repitiendo/Tx mensaje truncado");
+                LoRa_Utils::sendNewPacket("APRS", firstPart + Config.callsign + lastPart + Config.iGateComment);  // test porque esta truncado
+            } else {    // enviar con != freq
+                delay(8000);
+                Serial.print("repitiendo/Tx mensaje otra frecuencia");
+                LoRa_Utils::changeFreqTx();
+                LoRa_Utils::sendNewPacket("APRS", firstPart + Config.callsign + lastPart + "1");
+                LoRa_Utils::changeFreqRx();
             }
         } else {
-            Serial.println("---> Not APRS Packet (Ignore)\n");
+            Serial.println("   ---> LoRa Packet Ignored (first 3 bytes or NOGATE)\n");
         }
     }
     /*void checkReceivedPacket(String packet) {

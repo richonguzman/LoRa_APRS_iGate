@@ -9,7 +9,7 @@ namespace LoRa_Utils {
 void setup() {
   SPI.begin(LORA_SCK, LORA_MISO, LORA_MOSI, LORA_CS);
   LoRa.setPins(LORA_CS, LORA_RST, LORA_IRQ);
-  if (!LoRa.begin(Config.loramodule.frequencyTx)) {
+  if (!LoRa.begin(Config.loramodule.frequencyRx)) {
     Serial.println("Starting LoRa failed!");
     show_display("ERROR", "Starting LoRa failed!");
     while (true) {
@@ -57,6 +57,30 @@ String receivePacket() {
     }
   }
   return loraPacket;
+}
+
+void changeFreqTx() {
+  if (!LoRa.begin(Config.loramodule.frequencyTx)) {
+    Serial.println("Starting LoRa failed!");
+    show_display("ERROR", "Starting LoRa failed!");
+    while (true) {
+      delay(1000);
+    }
+  } else {
+    Serial.println("cambiando frecuencia Tx = " + String(Config.loramodule.frequencyTx));
+  }
+}
+
+void changeFreqRx() {
+  if (!LoRa.begin(Config.loramodule.frequencyRx)) {
+    Serial.println("Starting LoRa failed!");
+    show_display("ERROR", "Starting LoRa failed!");
+    while (true) {
+      delay(1000);
+    }
+  } else {
+    Serial.println("cambiando frecuencia Rx = " + String(Config.loramodule.frequencyRx));
+  }
 }
 
 }

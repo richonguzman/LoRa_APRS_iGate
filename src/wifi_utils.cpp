@@ -10,7 +10,7 @@ extern int            myWiFiAPSize;
 
 namespace WIFI_Utils {
 
-void setup() {
+void setupWiFi() {
   int status = WL_IDLE_STATUS;
   WiFi.mode(WIFI_STA);
   WiFi.disconnect();
@@ -37,6 +37,25 @@ void setup() {
   }
   Serial.print("Connected as ");
   Serial.println(WiFi.localIP());
+}
+
+void validateMode(int mode) {
+    if (mode == 1 || mode == 2 || mode == 5) {
+        if (mode==1) {
+            Serial.println("stationMode ---> iGate (only Rx)");
+        } else {
+            Serial.println("stationMode ---> iGate (Rx + Tx)");
+        }
+        setupWiFi();
+        btStop();
+    } else if (mode == 3) {
+        Serial.println("stationMode ---> DigiRepeater (Rx freq == Tx freq)");
+    } else if (mode == 4) {
+        Serial.println("stationMode ---> DigiRepeater (Rx freq != Tx freq)");
+    } else { 
+        Serial.println("stationMode ---> NOT VALID, check 'data/igate_conf.json'");
+        while (1);
+    }
 }
 
 }

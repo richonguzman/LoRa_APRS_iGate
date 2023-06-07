@@ -5,7 +5,8 @@
 
 namespace WIFI_Utils {
 
-void setup();
+void setupWiFi();
+void validateMode(int mode);
 
 }
 

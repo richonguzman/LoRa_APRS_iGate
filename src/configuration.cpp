@@ -31,7 +31,8 @@ void Configuration::readFile(fs::FS &fs, const char *fileName) {
 
     callsign                        = data["callsign"].as<String>();
     stationMode                     = data["stationMode"].as<int>();
-    comment                         = data["comment"].as<String>();
+    iGateComment                    = data["iGateComment"].as<String>();
+    digirepeaterComment             = data["digirepeaterComment"].as<String>();
     beaconInterval                  = data["other"]["beaconInterval"].as<int>();
     rememberStationTime             = data["other"]["rememberStationTime"].as<int>();
     statusAfterBoot                 = data["other"]["statusAfterBoot"].as<bool>();
