@@ -40,11 +40,11 @@ void process(String packet) {
             if (stationMode == 3) {
                 delay(8000);// quizas no es necesario esperar tanto?
                 //LoRa_Utils::sendNewPacket("APRS", firstPart + Config.callsign + lastPart);
-                Serial.print("repitiendo/Tx mensaje truncado");
+                Serial.println("repitiendo/Tx mensaje truncado");
                 LoRa_Utils::sendNewPacket("APRS", firstPart + Config.callsign + lastPart + Config.iGateComment);  // test porque esta truncado
             } else {    // enviar con != freq
                 delay(8000);
-                Serial.print("repitiendo/Tx mensaje otra frecuencia");
+                Serial.println("repitiendo/Tx mensaje otra frecuencia");
                 LoRa_Utils::changeFreqTx();
                 LoRa_Utils::sendNewPacket("APRS", firstPart + Config.callsign + lastPart + "1");
                 LoRa_Utils::changeFreqRx();

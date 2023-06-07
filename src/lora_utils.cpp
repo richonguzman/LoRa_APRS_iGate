@@ -67,6 +67,7 @@ void changeFreqTx() {
       delay(1000);
     }
   } else {
+    delay(500); //borrar?
     Serial.println("cambiando frecuencia Tx = " + String(Config.loramodule.frequencyTx));
   }
 }
@@ -79,6 +80,7 @@ void changeFreqRx() {
       delay(1000);
     }
   } else {
+    delay(500); //borrar?
     Serial.println("cambiando frecuencia Rx = " + String(Config.loramodule.frequencyRx));
   }
 }
