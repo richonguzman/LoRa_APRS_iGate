@@ -25,7 +25,7 @@ Instrucctions (add your information into the '/data/igate_conf.json'):
 
 5.- Change "aprs_is">"passcode" from "XYZVW" to yours (remember that is 5 digits integer).
 
-6.- Change "stationMode" value to other than 1 ONLY(!) if you are an valid Ham Operator.
+6.- Change "stationMode" value to other than "1" ONLY(!) if you are an valid Ham Operator.
 
 __________________________________________
 
