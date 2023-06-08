@@ -60,29 +60,15 @@ String receivePacket() {
 }
 
 void changeFreqTx() {
-  if (!LoRa.begin(Config.loramodule.frequencyTx)) {
-    Serial.println("Starting LoRa failed!");
-    show_display("ERROR", "Starting LoRa failed!");
-    while (true) {
-      delay(1000);
-    }
-  } else {
-    delay(500); //borrar?
-    Serial.println("cambiando frecuencia Tx = " + String(Config.loramodule.frequencyTx));
-  }
+  delay(500);
+  LoRa.setFrequency(Config.loramodule.frequencyTx);
+  //Serial.println("changing LoRa Freq to " + String(Config.loramodule.frequencyTx));
 }
 
 void changeFreqRx() {
-  if (!LoRa.begin(Config.loramodule.frequencyRx)) {
-    Serial.println("Starting LoRa failed!");
-    show_display("ERROR", "Starting LoRa failed!");
-    while (true) {
-      delay(1000);
-    }
-  } else {
-    delay(500); //borrar?
-    Serial.println("cambiando frecuencia Rx = " + String(Config.loramodule.frequencyRx));
-  }
+  delay(500);
+  LoRa.setFrequency(Config.loramodule.frequencyRx);
+  //Serial.println("changing LoRa Freq to = " + String(Config.loramodule.frequencyRx));
 }
 
 }

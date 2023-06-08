@@ -131,7 +131,7 @@ void setup() {
 }
 
 void loop() {
-  if (stationMode==3 || stationMode==4) {   // DigiRepeater Mode / No backUpMode
+  if (stationMode==3 || stationMode==4) {   // DigiRepeater (3 RxFreq=TxFreq / 4 RxFreq!=TxFreq )
     secondLine = "<DigiRepeater Active>";
     uint32_t lastBeaconTx = millis() - lastTxTime;
     if (lastBeaconTx >= Config.beaconInterval*60*1000) {
@@ -143,7 +143,7 @@ void loop() {
       fourthLine = "     listening...";
       Serial.println("---- Sending iGate Beacon ----");
       //Serial.println(iGateBeaconPacket);
-      //LoRa_Utils::sendNewPacket("APRS",iGateBeaconPacket);
+      LoRa_Utils::sendNewPacket("APRS",iGateBeaconPacket);
       lastTxTime = millis();
       beacon_update = false;
     }
