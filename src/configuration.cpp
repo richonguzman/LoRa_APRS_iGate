@@ -6,7 +6,7 @@ Configuration::Configuration(const String &filePath) {
       Serial.println("SPIFFS Mount Failed");
       return;
     }
-    readFile(SPIFFS, _filePath.c_str());
+    readFile(SPIFFS, _filePath.c_str()); 
 }
 
 void Configuration::readFile(fs::FS &fs, const char *fileName) {
