@@ -69,7 +69,7 @@ void loop() {
     }*/
   } else if (stationMode==1 || stationMode==2 ) {   // iGate (1 Only Rx / 2 Rx+Tx)
     unsigned long currentWiFiMillis   = millis();
-    if ((WiFi.status() != WL_CONNECTED) && (currentWiFiMillis - previousWiFiMillis >= currentWiFi->checkInterval*1000)) {
+    if ((WiFi.status() != WL_CONNECTED) && (currentWiFiMillis - previousWiFiMillis >= 30*1000)) {
       Serial.print(millis());
       Serial.println("Reconnecting to WiFi...");
       WiFi.disconnect();

@@ -34,7 +34,7 @@ void connect(){
     Serial.println("Tried: " + String(count) + " FAILED!");
   } else {
     Serial.println("Connected!\n(Server: " + String(Config.aprs_is.server) + " / Port: " + String(Config.aprs_is.port) +")");
-    aprsauth = "user " + Config.callsign + " pass " + Config.aprs_is.passcode + " vers " + Config.aprs_is.softwareName + " " + Config.aprs_is.softwareVersion + " filter t/m/" + Config.callsign + "/" + (String)Config.aprs_is.reportingDistance + "\n\r"; 
+    aprsauth = "user " + Config.callsign + " pass " + Config.aprs_is.passcode + " vers CD2RXU_LoRa_iGate 1.2 filter t/m/" + Config.callsign + "/" + (String)Config.aprs_is.reportingDistance + "\n\r"; 
     espClient.write(aprsauth.c_str());
     delay(200);
   }
@@ -80,12 +80,12 @@ void processLoRaPacket(String packet) {
       Serial.print("   ---> APRS LoRa Packet!");
       Sender = packet.substring(3,packet.indexOf(">"));
       if (Sender != Config.callsign) {   // avoid listening yourself by digirepeating
-        if (stationMode > 1) {           // only answer when stationMode > 1 (with Ham Licence)
+        if (stationMode == 2) {
           if (packet.indexOf("::") > 10) {    // its a Message!
             AddresseeAndMessage = packet.substring(packet.indexOf("::")+2);  
             Addressee = AddresseeAndMessage.substring(0,AddresseeAndMessage.indexOf(":"));
             Addressee.trim();
-            if (Addressee == Config.callsign) {               // its for me!                     
+            if (Addressee == Config.callsign) {             // its for me!                     
               if (AddresseeAndMessage.indexOf("{")>0) {     // ack?
                 ackMessage = "ack" + AddresseeAndMessage.substring(AddresseeAndMessage.indexOf("{")+1);
                 ackMessage.trim();
@@ -113,7 +113,7 @@ void processLoRaPacket(String packet) {
           }
         }
         if (!queryMessage) {
-          aprsPacket = APRS_IS_Utils::createPacket(packet);
+          aprsPacket = createPacket(packet);
           if (!Config.display.alwaysOn) {
             display_toggle(true);
           }
@@ -137,14 +137,5 @@ void processLoRaPacket(String packet) {
     }
   }
 }
-
-/*void processSplitedMessage(String addressee, String message1, String message2) {
-  espClient.write((Config.callsign + ">APRS,qAC::" + addressee + ":" + message1 + "\n").c_str()); 
-  Serial.println("-------> " + message1);
-  Serial.println("(waiting for second part)");
-  delay(5000);
-  espClient.write((Config.callsign + ">APRS,qAC::" + addressee + ":" + message2 + "\n").c_str());   
-  Serial.println("-------> " + message2);
-}*/
 
 }

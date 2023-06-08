@@ -14,7 +14,13 @@ public:
   String  password;
   double  latitude;
   double  longitude;
-  int     checkInterval;
+};
+
+class DIGI {
+public:
+  String  comment;
+  double  latitude;
+  double  longitude;
 };
 
 class APRS_IS {
@@ -22,8 +28,6 @@ public:
   String  passcode;
   String  server;
   int     port;
-  String  softwareName;
-  String  softwareVersion;
   int     reportingDistance;
 };
 
@@ -50,12 +54,12 @@ public:
   String                callsign;  
   int                   stationMode;
   String                iGateComment;
-  String                digirepeaterComment;
   int                   beaconInterval;
   int                   rememberStationTime;
   bool                  statusAfterBoot;
   String                defaultStatus;
   std::vector<WiFi_AP>  wifiAPs;
+  DIGI                  digi;
   APRS_IS               aprs_is;
   LoraModule            loramodule;
   Display               display;

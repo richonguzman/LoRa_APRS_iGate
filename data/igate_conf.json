@@ -1,35 +1,36 @@
 {
 	"callsign": "CD2RXU-10",
-	"stationMode": 4,
+	"stationMode": 2,
 	"iGateComment": "LoRa_APRS_iGate",
-	"digirepeaterComment": "LoRa_APRS_Digirepeater" ,
 	"wifi": {
 		"AP": [
-			{	"SSID": "Richon",
-				"Password": "k4fPnmg5qnyf",
-				"Latitude": -33.0338131,
-				"Longitude": -71.5737237
+			{	"ssid": "Richon",
+				"password": "k4fPnmg5qnyf",
+				"latitude": -33.0338131,
+				"longitude": -71.5737237
 			},
-			{	"SSID": "Jimenita",
-				"Password": "mg6wyMhqRnxk",
-				"Latitude": -33.0312492,
-				"Longitude": -71.5796215
+			{	"ssid": "Jimenita",
+				"password": "mg6wyMhqRnxk",
+				"latitude": -33.0312492,
+				"longitude": -71.5796215
 			}
-		],
-		"checkInterval": 30
+		]
+	},
+	"digi": {
+		"comment": "LoRa_APRS_Digirepeater",
+		"latitude": -33.0338131,
+		"longitude": -71.5737237
 	},
 	"aprs_is": {
 		"passcode": "23201",
 		"server": "soam.aprs2.net",
 		"port": 14580,
-		"softwareName": "ESP32_LoRa_iGate",
-		"softwareVersion": "1.2",
 		"reportingDistance": 30
 	},
 	"lora": {
 		"iGateFreq": 433775000,
-		"digirepeaterTxFreq": 433900000,
-		"digirepeaterRxFreq": 433775000,
+		"digirepeaterTxFreq": 433775000,
+		"digirepeaterRxFreq": 433900000,
 		"spreadingFactor": 12,
 		"signalBandwidth": 125000,
 		"codingRate4": 5,

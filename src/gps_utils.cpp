@@ -22,8 +22,8 @@ String double2string(double n, int ndec) {
     return r;
 }
 
-String processLatitudeAPRS() {
-  String degrees = double2string(currentWiFi->latitude,6);
+String processLatitudeAPRS(double lat) {
+  String degrees = double2string(lat,6);
   String north_south, latitude, convDeg3;
   float convDeg, convDeg2;
 
@@ -46,8 +46,8 @@ String processLatitudeAPRS() {
   return latitude;
 }
 
-String processLongitudeAPRS() {
-  String degrees = double2string(currentWiFi->longitude,6);
+String processLongitudeAPRS(double lon) {
+  String degrees = double2string(lon,6);
   String east_west, longitude, convDeg3;
   float convDeg, convDeg2;
   
@@ -73,18 +73,21 @@ String processLongitudeAPRS() {
 }
 
 String generateBeacon() {
-  String iGateLat = processLatitudeAPRS();
-  String iGateLon = processLongitudeAPRS();
-  String beaconPacket = Config.callsign + ">APLRG1";
-  if (stationMode == 1) {
-    beaconPacket += ",qAC:=" +iGateLat + "L" + iGateLon + "&";
+  String stationLatitude, stationLongitude, beaconPacket;
+  if (stationMode==1 || stationMode==2) {
+    stationLatitude = processLatitudeAPRS(currentWiFi->latitude);
+    stationLongitude = processLongitudeAPRS(currentWiFi->longitude);
+    beaconPacket = Config.callsign + ">APLRG1,qAC:=" + stationLatitude + "L" + stationLongitude;
+    if (stationMode == 1) {
+      beaconPacket += "&";
+    } else {
+      beaconPacket += "a";
+    }
     beaconPacket += Config.iGateComment;
-  } else if (stationMode == 2 || stationMode == 5) {
-    beaconPacket += ",qAC:=" + iGateLat + "L" + iGateLon + "a";
-    beaconPacket += Config.iGateComment;
-  } else if (stationMode ==3 || stationMode == 4) {
-    beaconPacket += ":=" + iGateLat + "L" + iGateLon + "#";
-    beaconPacket += Config.digirepeaterComment;
+  } else { //stationMode 3 y 4
+    stationLatitude = processLatitudeAPRS(Config.digi.latitude);
+    stationLongitude = processLongitudeAPRS(Config.digi.longitude);
+    beaconPacket = Config.callsign + ">APLRG1:=" + stationLatitude + "L" + stationLongitude + "#" + Config.digi.comment;
   }
   return beaconPacket;
 }

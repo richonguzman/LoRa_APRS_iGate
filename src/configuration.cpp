@@ -21,11 +21,10 @@ void Configuration::readFile(fs::FS &fs, const char *fileName) {
     JsonArray WiFiArray = data["wifi"]["AP"];
     for (int i = 0; i < WiFiArray.size(); i++) {
       WiFi_AP wifiap;
-      wifiap.ssid                   = WiFiArray[i]["SSID"].as<String>();
-      wifiap.password               = WiFiArray[i]["Password"].as<String>();
-      wifiap.latitude               = WiFiArray[i]["Latitude"].as<double>();
-      wifiap.longitude              = WiFiArray[i]["Longitude"].as<double>();
-      wifiap.checkInterval          = data["wifi"]["checkInterval"].as<int>();
+      wifiap.ssid                   = WiFiArray[i]["ssid"].as<String>();
+      wifiap.password               = WiFiArray[i]["password"].as<String>();
+      wifiap.latitude               = WiFiArray[i]["latitude"].as<double>();
+      wifiap.longitude              = WiFiArray[i]["longitude"].as<double>();
 
       wifiAPs.push_back(wifiap);
     }
@@ -33,17 +32,18 @@ void Configuration::readFile(fs::FS &fs, const char *fileName) {
     callsign                        = data["callsign"].as<String>();
     stationMode                     = data["stationMode"].as<int>();
     iGateComment                    = data["iGateComment"].as<String>();
-    digirepeaterComment             = data["digirepeaterComment"].as<String>();
     beaconInterval                  = data["other"]["beaconInterval"].as<int>();
     rememberStationTime             = data["other"]["rememberStationTime"].as<int>();
     statusAfterBoot                 = data["other"]["statusAfterBoot"].as<bool>();
     defaultStatus                   = data["other"]["defaultStatus"].as<String>();
 
+    digi.comment                    = data["digi"]["comment"].as<String>();
+    digi.latitude                   = data["digi"]["latitude"].as<double>();
+    digi.longitude                  = data["digi"]["longitude"].as<double>();
+
     aprs_is.passcode                = data["aprs_is"]["passcode"].as<String>();
     aprs_is.server                  = data["aprs_is"]["server"].as<String>();
     aprs_is.port                    = data["aprs_is"]["port"].as<int>();
-    aprs_is.softwareName            = data["aprs_is"]["softwareName"].as<String>();
-    aprs_is.softwareVersion         = data["aprs_is"]["softwareVersion"].as<String>();
     aprs_is.reportingDistance       = data["aprs_is"]["reportingDistance"].as<int>();
 
     loramodule.iGateFreq            = data["lora"]["iGateFreq"].as<long>();
