@@ -10,7 +10,7 @@ __________________________________________
 Achievements:
 - Rx LoRa packets (up to 100kms away) and upload to APRS-IS servers.
 - Tx LoRa packets from APRS-IS feed.
-- Digirepeater Modes.
+- iGate and Digirepeater Modes.
 __________________________________________
 
 Instrucctions (add your information into the '/data/igate_conf.json'):
@@ -29,7 +29,8 @@ Instrucctions (add your information into the '/data/igate_conf.json'):
 
 __________________________________________
 
-Digirepeater Modes:
+iGate / Digirepeater "stationMode":
+
 1.- iGate (only Rx).
 
 2.- iGate (Tx and Rx) HAM LICENSE REQUIRED!
@@ -46,10 +47,10 @@ Versions:
 - 2023.02.17 Receiving Feed from APRS-IS.
 - 2023.03.01 Tx Packet from APRS-IS to nearby LoRa Stations.
 - 2023.05.12 Tx Packet from APRS-IS to LoRa-RF Correction.
-- 2023.05.19 Saving Last-Heard Stations for validating Tx Responses
-- 2023.05.23 Processing Query's from RF/LoRa or APRS-IS (Send "Help" Message to test)
-- 2023.06.06 Full repack of Code and adding _enableTx_ only for Ham Ops
-- 2023.06.08 Adding Digirepeater Funtions
+- 2023.05.19 Saving Last-Heard Stations for validating Tx Responses.
+- 2023.05.23 Processing Query's from RF/LoRa or APRS-IS (Send "Help" Message to test).
+- 2023.06.06 Full repack of Code and adding _enableTx_ only for Ham Ops.
+- 2023.06.08 Adding Digirepeater Functions.
 __________________________________________
 
 
