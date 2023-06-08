@@ -6,7 +6,7 @@
 namespace DIGI_Utils {
 
 void typeOfPacket(String packet);
-void process(String packet);
+void processPacket(String packet);
 
 }
 

@@ -66,6 +66,14 @@ String createPacket(String packet) {
   }
 }
 
+void processLoRaPacket(String packet) {
+
+
+
+
+  
+}
+
 /*void processSplitedMessage(String addressee, String message1, String message2) {
   espClient.write((Config.callsign + ">APRS,qAC::" + addressee + ":" + message1 + "\n").c_str()); 
   Serial.println("-------> " + message1);

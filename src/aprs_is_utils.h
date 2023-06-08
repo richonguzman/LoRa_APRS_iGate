@@ -8,6 +8,7 @@ namespace APRS_IS_Utils {
 void connect();
 String checkStatus();
 String createPacket(String unprocessedPacket);
+void processLoRaPacket(String packet);
 //void processSplitedMessage(String addressee, String message1, String message2);
 
 }

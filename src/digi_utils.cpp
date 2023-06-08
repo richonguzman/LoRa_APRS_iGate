@@ -27,7 +27,7 @@ void typeOfPacket(String packet) {
     }
 }
 
-void process(String packet) {
+void processPacket(String packet) {
     String firstPart, lastPart;
     if (packet != "") {
         Serial.print("Received Lora Packet   : " + String(packet));
