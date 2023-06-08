@@ -36,8 +36,7 @@
 	},
 	"display": {
 		"alwaysOn": true,
-		"keepLastPacketOnScreen": true,
-		"timeout": 2
+		"timeout": 4
 	},
 	"other": {
 		"beaconInterval": 15,

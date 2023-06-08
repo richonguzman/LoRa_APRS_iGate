@@ -6,6 +6,9 @@
 namespace utils {
 
 void processStatus();
+void setupDiplay();
+void checkBeaconInterval();
+void checkDisplayInterval();
 
 }
 

@@ -53,7 +53,6 @@ void Configuration::readFile(fs::FS &fs, const char *fileName) {
     loramodule.power                = data["lora"]["power"].as<int>();
 
     display.alwaysOn                = data["display"]["alwaysOn"].as<bool>();
-    display.keepLastPacketOnScreen  = data["display"]["keepLastPacketOnScreen"].as<bool>();
     display.timeout                 = data["display"]["timeout"].as<int>();
 
     configFile.close();

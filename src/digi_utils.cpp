@@ -1,12 +1,14 @@
-#include "digi_utils.h"
 #include "configuration.h"
 #include "lora_utils.h"
+#include "digi_utils.h"
+#include "display.h"
 
 
 extern Configuration    Config;
 extern String           thirdLine;
 extern String           fourthLine;
 extern int              stationMode;
+extern uint32_t         lastScreenOn;
 
 namespace DIGI_Utils {
 
@@ -45,6 +47,8 @@ void processPacket(String packet) {
             if (stationMode == 4) {
                 LoRa_Utils::changeFreqRx();
             }
+            display_toggle(true);
+            lastScreenOn = millis();
         } else {
             Serial.println("   ---> LoRa Packet Ignored (first 3 bytes or NOGATE)\n");
         }

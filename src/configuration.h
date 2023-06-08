@@ -40,7 +40,6 @@ public:
 class Display {
 public:
   bool    alwaysOn;
-  bool    keepLastPacketOnScreen;
   int     timeout;
 };
 
