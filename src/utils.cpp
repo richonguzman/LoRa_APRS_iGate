@@ -22,8 +22,16 @@ extern String           iGateBeaconPacket;
 namespace utils {
 
 void processStatus() {
-    delay(1000);
-    espClient.write((Config.callsign + ">APLRG1,qAC:>" + Config.defaultStatus + "\n").c_str()); 
+    String status = Config.callsign + ">APLRG1";
+    if (stationMode==1 || stationMode==2) {
+        delay(1000);
+        status += ",qAC:>" + Config.defaultStatus;
+        espClient.write((status + "\n").c_str()); 
+    } else {
+        delay(5000);
+        status += ":>" + Config.defaultStatus;
+        LoRa_Utils::sendNewPacket("APRS", status);
+    }
     statusAfterBoot = false;
 }
 

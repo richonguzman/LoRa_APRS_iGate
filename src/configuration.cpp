@@ -1,12 +1,13 @@
 #include "configuration.h"
+#include "display.h"
 
-Configuration::Configuration(const String &filePath) {
-    _filePath = filePath;
+Configuration::Configuration() {
+    _filePath = "/igate_conf.json";
     if (!SPIFFS.begin(false)) {
       Serial.println("SPIFFS Mount Failed");
       return;
     }
-    readFile(SPIFFS, _filePath.c_str()); 
+    readFile(SPIFFS, _filePath.c_str());
 }
 
 void Configuration::readFile(fs::FS &fs, const char *fileName) {
@@ -60,7 +61,8 @@ void Configuration::readFile(fs::FS &fs, const char *fileName) {
 
 void Configuration::validateConfigFile(String currentBeaconCallsign) {
   if (currentBeaconCallsign == "NOCALL-10") {
-    Serial.println("Change Callsign in /data/wx_report_config.json");
+    Serial.println("Change Callsign in /data/igate_conf.json");
+    show_display("ERROR", "Change your settings", "'igate_conf.json'", "--> File System image", 0);
     while (true) {
       delay(1000);
     }

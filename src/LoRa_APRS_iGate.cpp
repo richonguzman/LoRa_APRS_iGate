@@ -17,12 +17,11 @@
 #include <ESPAsyncWebServer.h>
 #include <AsyncElegantOTA.h>*/
 
-#define VERSION   "2023.06.07"
+#define VERSION   "2023.06.08"
 
+Configuration   Config;
 WiFiClient      espClient;
 //AsyncWebServer  server(80);
-String          ConfigurationFilePath = "/igate_conf.json";
-Configuration   Config(ConfigurationFilePath);
 
 int             myWiFiAPIndex       = 0;
 int             myWiFiAPSize        = Config.wifiAPs.size();
@@ -63,6 +62,9 @@ void loop() {
     utils::checkBeaconInterval();
     show_display(firstLine, secondLine, thirdLine, fourthLine, 0);
     DIGI_Utils::processPacket(LoRa_Utils::receivePacket());
+    if (statusAfterBoot) {
+      utils::processStatus();
+    }
   } else if (stationMode==1 || stationMode==2 ) {   // iGate (1 Only Rx / 2 Rx+Tx)
     unsigned long currentWiFiMillis   = millis();
     if ((WiFi.status() != WL_CONNECTED) && (currentWiFiMillis - previousWiFiMillis >= currentWiFi->checkInterval*1000)) {
@@ -143,6 +145,7 @@ void loop() {
     }
   } else {
     Serial.println(stationMode); 
+    // stationMode = 5
     // this mode is only for when iGate loses Wifi and transforms into Digirepeater
   }
 }

@@ -60,11 +60,10 @@ public:
   Display               display;
   
 
-  Configuration(const String &filePath);
+  Configuration();
   void validateConfigFile(String currentBeaconCallsign);
 
 private:
-  Configuration() {}; // Hide default constructor
   void readFile(fs::FS &fs, const char *fileName) ;
   String _filePath;
 };

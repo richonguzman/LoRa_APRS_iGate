@@ -1,16 +1,17 @@
-# Richonguzman / CD2RXU LoRa APRS iGate
+# Richonguzman / CD2RXU LoRa APRS iGate/Digirepeater
 # Firmware for Tx and Rx !!!
 
-LoRa APRS iGATE for:
-- LILYGO ESP32 LoRa v2-1-1.6
+LoRa APRS iGATE/Digirepeater for:
+- LILYGO ESP32 LoRa32 v2-1-1.6
 - ESP32 Wroom Dev +  SX1278 LoRa Module for a DIY Version
 
 __________________________________________
 
 Achievements:
-- listening to LoRa packets the same as messages for Stations/Callsing in near 80Kms.
-- transmiting messages listened from APRS-IS to LoRa
-
+- Rx LoRa packets and upload to APRS-IS servers
+- Be able to listen for 80kms or more Stations/Callsing.
+- Tx LoRa packets from APRS-IS feed.
+- Digirepeater Modes.
 __________________________________________
 
 Instrucctions (add your information into the '/data/igate_conf.json'):
@@ -25,7 +26,16 @@ Instrucctions (add your information into the '/data/igate_conf.json'):
 
 5.- Change "aprs_is">"passcode" from "XYZVW" to yours (remember that is 5 digits integer).
 
-6.- Change "lora">"enableTx" to _"true"_ ONLY(!) if you are an valid Ham Operator
+6.- Change "stationMode" value to other than 1 ONLY(!) if you are an valid Ham Operator.
+
+__________________________________________
+
+Digirepeater Modes:
+1.- iGate (only Rx).
+2.- iGate (Tx and Rx) HAM LICENSE REQUIRED!
+3.- Digirepeater (Rx Freq = Tx Freq) HAM LICENSE REQUIRED!
+4.- Digirepeater (Rx Freq != Tx Freq) HAM LICENSE REQUIRED! 
+5.- iGate changes to Digirepeater when it looses APRS-IS+WiFi connection (on development).
 
 __________________________________________
 Versions:
@@ -36,6 +46,7 @@ Versions:
 - 2023.05.19 Saving Last-Heard Stations for validating Tx Responses
 - 2023.05.23 Processing Query's from RF/LoRa or APRS-IS (Send "Help" Message to test)
 - 2023.06.06 Full repack of Code and adding _enableTx_ only for Ham Ops
+- 2023.06.08 Adding Digirepeater Funtions
 __________________________________________
 
 
