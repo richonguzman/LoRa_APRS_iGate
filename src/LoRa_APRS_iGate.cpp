@@ -131,7 +131,7 @@ void setup() {
 }
 
 void loop() {
-  if (stationMode==3 || stationMode==4) {   // DigiRepeater (3 RxFreq=TxFreq / 4 RxFreq!=TxFreq )
+  if (stationMode==3 || stationMode==4) {           // DigiRepeater (3 RxFreq=TxFreq / 4 RxFreq!=TxFreq)
     secondLine = "<DigiRepeater Active>";
     uint32_t lastBeaconTx = millis() - lastTxTime;
     if (lastBeaconTx >= Config.beaconInterval*60*1000) {
@@ -149,7 +149,7 @@ void loop() {
     }
     show_display(firstLine, secondLine, thirdLine, fourthLine, 0);
     DIGI_Utils::process(LoRa_Utils::receivePacket());
-  } else if (stationMode==1 || stationMode==2 ) {                                    // standard iGate Mode (No DigiRepeater)                                          
+  } else if (stationMode==1 || stationMode==2 ) {   // iGate (1 Only Rx / 2 Rx+Tx)
     unsigned long currentWiFiMillis   = millis();
     if ((WiFi.status() != WL_CONNECTED) && (currentWiFiMillis - previousWiFiMillis >= currentWiFi->checkInterval*1000)) {
       Serial.print(millis());
