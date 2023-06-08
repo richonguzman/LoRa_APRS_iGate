@@ -8,8 +8,7 @@ LoRa APRS iGATE/Digirepeater for:
 __________________________________________
 
 Achievements:
-- Rx LoRa packets and upload to APRS-IS servers
-- Be able to listen for 80kms or more Stations/Callsing.
+- Rx LoRa packets (up to 100kms away) and upload to APRS-IS servers.
 - Tx LoRa packets from APRS-IS feed.
 - Digirepeater Modes.
 __________________________________________
@@ -32,9 +31,13 @@ __________________________________________
 
 Digirepeater Modes:
 1.- iGate (only Rx).
+
 2.- iGate (Tx and Rx) HAM LICENSE REQUIRED!
+
 3.- Digirepeater (Rx Freq = Tx Freq) HAM LICENSE REQUIRED!
+
 4.- Digirepeater (Rx Freq != Tx Freq) HAM LICENSE REQUIRED! 
+
 5.- iGate changes to Digirepeater when it looses APRS-IS+WiFi connection (on development).
 
 __________________________________________
