@@ -1,10 +1,10 @@
-#include "aprs_is_utils.h"
 #include <WiFi.h>
 #include "configuration.h"
-#include "display.h"
-#include "lora_utils.h"
-#include "query_utils.h"
+#include "aprs_is_utils.h"
 #include "station_utils.h"
+#include "query_utils.h"
+#include "lora_utils.h"
+#include "display.h"
 
 extern Configuration  Config;
 extern WiFiClient     espClient;

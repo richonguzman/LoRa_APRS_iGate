@@ -1,5 +1,5 @@
-#include "query_utils.h"
 #include "configuration.h"
+#include "query_utils.h"
 
 extern Configuration        Config;
 extern WiFi_AP              *currentWiFi;

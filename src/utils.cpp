@@ -1,5 +1,4 @@
 #include <WiFi.h>
-#include <Arduino.h>
 #include "configuration.h"
 #include "wifi_utils.h"
 #include "lora_utils.h"

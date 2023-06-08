@@ -3,7 +3,6 @@
 #include "digi_utils.h"
 #include "display.h"
 
-
 extern Configuration    Config;
 extern String           thirdLine;
 extern String           fourthLine;

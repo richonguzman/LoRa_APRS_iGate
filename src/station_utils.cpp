@@ -1,6 +1,6 @@
 #include "station_utils.h"
-#include <vector>
 #include "configuration.h"
+#include <vector>
 
 extern Configuration        Config;
 extern std::vector<String>  lastHeardStation;

@@ -1,6 +1,7 @@
 #ifndef DISPLAY_H_
 #define DISPLAY_H_
 
+#include <Arduino.h>
 
 #define SCREEN_WIDTH    128     // OLED display width, in pixels
 #define SCREEN_HEIGHT   32      // OLED display height, in pixels

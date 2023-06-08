@@ -1,11 +1,11 @@
 #ifndef CONFIGURATION_H_
 #define CONFIGURATION_H_
 
+#include <ArduinoJson.h>
 #include <Arduino.h>
 #include <SPIFFS.h>
-#include <FS.h>
-#include <ArduinoJson.h>
 #include <vector>
+#include <FS.h>
 
 
 class WiFi_AP {

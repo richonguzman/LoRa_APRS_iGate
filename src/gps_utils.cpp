@@ -1,5 +1,5 @@
-#include "gps_utils.h"
 #include "configuration.h"
+#include "gps_utils.h"
 
 extern Configuration  Config;
 extern WiFi_AP        *currentWiFi;
