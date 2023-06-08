@@ -64,9 +64,6 @@ void loop() {
     utils::checkBeaconInterval();
     show_display(firstLine, secondLine, thirdLine, fourthLine, 0);
     DIGI_Utils::processPacket(LoRa_Utils::receivePacket());
-    /*if (statusAfterBoot) {
-      utils::processStatus();
-    }*/
   } else if (stationMode==1 || stationMode==2 ) {   // iGate (1 Only Rx / 2 Rx+Tx)
     unsigned long currentWiFiMillis   = millis();
     if ((WiFi.status() != WL_CONNECTED) && (currentWiFiMillis - previousWiFiMillis >= 30*1000)) {
@@ -141,9 +138,6 @@ void loop() {
           }        
         }
       }
-      /*if (statusAfterBoot) {
-        utils::processStatus();
-      }*/
     }
   }
 }
