@@ -46,8 +46,9 @@ void Configuration::readFile(fs::FS &fs, const char *fileName) {
     aprs_is.softwareVersion         = data["aprs_is"]["softwareVersion"].as<String>();
     aprs_is.reportingDistance       = data["aprs_is"]["reportingDistance"].as<int>();
 
-    loramodule.frequencyTx          = data["lora"]["frequencyTx"].as<long>();
-    loramodule.frequencyRx          = data["lora"]["frequencyRx"].as<long>();
+    loramodule.iGateFreq            = data["lora"]["iGateFreq"].as<long>();
+    loramodule.digirepeaterTxFreq   = data["lora"]["digirepeaterTxFreq"].as<long>();
+    loramodule.digirepeaterRxFreq   = data["lora"]["digirepeaterRxFreq"].as<long>();
     loramodule.spreadingFactor      = data["lora"]["spreadingFactor"].as<int>();
     loramodule.signalBandwidth      = data["lora"]["signalBandwidth"].as<long>();
     loramodule.codingRate4          = data["lora"]["codingRate4"].as<int>();

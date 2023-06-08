@@ -1,6 +1,6 @@
 {
 	"callsign": "CD2RXU-10",
-	"stationMode": 2,
+	"stationMode": 4,
 	"iGateComment": "LoRa_APRS_iGate",
 	"digirepeaterComment": "LoRa_APRS_Digirepeater" ,
 	"wifi": {
@@ -27,8 +27,9 @@
 		"reportingDistance": 30
 	},
 	"lora": {
-		"frequencyTx": 433900000,
-		"frequencyRx": 433775000,
+		"iGateFreq": 433775000,
+		"digirepeaterTxFreq": 433900000,
+		"digirepeaterRxFreq": 433775000,
 		"spreadingFactor": 12,
 		"signalBandwidth": 125000,
 		"codingRate4": 5,

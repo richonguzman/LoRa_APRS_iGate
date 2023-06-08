@@ -2,14 +2,21 @@
 #include "configuration.h"
 #include "display.h"
 
-extern Configuration Config;
+extern Configuration  Config;
+extern int            stationMode;
 
 namespace LoRa_Utils {
 
 void setup() {
   SPI.begin(LORA_SCK, LORA_MISO, LORA_MOSI, LORA_CS);
   LoRa.setPins(LORA_CS, LORA_RST, LORA_IRQ);
-  if (!LoRa.begin(Config.loramodule.frequencyRx)) {
+  long freq;
+  if (stationMode == 1 || stationMode == 2) {
+    freq = Config.loramodule.iGateFreq;
+  } else {
+    freq = Config.loramodule.digirepeaterTxFreq;
+  }
+  if (!LoRa.begin(freq)) {
     Serial.println("Starting LoRa failed!");
     show_display("ERROR", "Starting LoRa failed!");
     while (true) {
@@ -61,14 +68,12 @@ String receivePacket() {
 
 void changeFreqTx() {
   delay(500);
-  LoRa.setFrequency(Config.loramodule.frequencyTx);
-  //Serial.println("changing LoRa Freq to " + String(Config.loramodule.frequencyTx));
+  LoRa.setFrequency(Config.loramodule.digirepeaterTxFreq);
 }
 
 void changeFreqRx() {
   delay(500);
-  LoRa.setFrequency(Config.loramodule.frequencyRx);
-  //Serial.println("changing LoRa Freq to = " + String(Config.loramodule.frequencyRx));
+  LoRa.setFrequency(Config.loramodule.digirepeaterRxFreq);
 }
 
 }

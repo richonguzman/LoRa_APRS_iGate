@@ -7,10 +7,11 @@ extern Configuration  Config;
 extern WiFi_AP        *currentWiFi;
 extern int            myWiFiAPIndex;
 extern int            myWiFiAPSize;
+extern int            stationMode;
 
 namespace WIFI_Utils {
 
-void setupWiFi() {
+void startWiFi() {
   int status = WL_IDLE_STATUS;
   WiFi.mode(WIFI_STA);
   WiFi.disconnect();
@@ -39,21 +40,26 @@ void setupWiFi() {
   Serial.println(WiFi.localIP());
 }
 
-void validateMode(int mode) {
-    if (mode == 1 || mode == 2 || mode == 5) {
-        if (mode==1) {
+void setup() {
+    if (stationMode == 1 || stationMode == 2) {
+        if (stationMode==1) {
             Serial.println("stationMode ---> iGate (only Rx)");
         } else {
             Serial.println("stationMode ---> iGate (Rx + Tx)");
         }
-        setupWiFi();
+        startWiFi();
         btStop();
-    } else if (mode == 3) {
-        Serial.println("stationMode ---> DigiRepeater (Rx freq == Tx freq)");
-    } else if (mode == 4) {
-        Serial.println("stationMode ---> DigiRepeater (Rx freq != Tx freq)");
+    } else if (stationMode == 3 || stationMode == 4) {
+        if (stationMode == 3) {
+            Serial.println("stationMode ---> DigiRepeater (Rx freq == Tx freq)");
+        } else {
+            Serial.println("stationMode ---> DigiRepeater (Rx freq != Tx freq)");
+        }
+        WiFi.mode(WIFI_OFF);
+        btStop();
     } else { 
-        Serial.println("stationMode ---> NOT VALID, check 'data/igate_conf.json'");
+        Serial.println("stationMode ---> NOT VALID, check '/data/igate_conf.json'");
+        show_display("stationMode Not Valid", "change it on : /data/", "igate_conf.json", 0);
         while (1);
     }
 }

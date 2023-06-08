@@ -45,9 +45,11 @@ void setup() {
   utils::setupDiplay();
   Serial.println("\nStarting iGate: " + Config.callsign + "   Version: " + String(VERSION));
   show_display("   LoRa APRS iGate", "    Richonguzman", "    -- CD2RXU --", "     " VERSION, 4000);
-  WIFI_Utils::validateMode(stationMode);
-  iGateBeaconPacket = GPS_Utils::generateBeacon();
+  WIFI_Utils::setup();
   LoRa_Utils::setup();
+  utils::validateDigiFreqs();
+  iGateBeaconPacket = GPS_Utils::generateBeacon();
+
   /*server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
     request->send(200, "text/plain", "Hi! I am ESP32.");
   });
@@ -62,9 +64,9 @@ void loop() {
     utils::checkBeaconInterval();
     show_display(firstLine, secondLine, thirdLine, fourthLine, 0);
     DIGI_Utils::processPacket(LoRa_Utils::receivePacket());
-    if (statusAfterBoot) {
+    /*if (statusAfterBoot) {
       utils::processStatus();
-    }
+    }*/
   } else if (stationMode==1 || stationMode==2 ) {   // iGate (1 Only Rx / 2 Rx+Tx)
     unsigned long currentWiFiMillis   = millis();
     if ((WiFi.status() != WL_CONNECTED) && (currentWiFiMillis - previousWiFiMillis >= currentWiFi->checkInterval*1000)) {
@@ -139,13 +141,9 @@ void loop() {
           }        
         }
       }
-      if (statusAfterBoot) {
+      /*if (statusAfterBoot) {
         utils::processStatus();
-      }
+      }*/
     }
-  } else {
-    Serial.println(stationMode); 
-    // stationMode = 5
-    // this mode is only for when iGate loses Wifi and transforms into Digirepeater
   }
 }

@@ -37,7 +37,7 @@ void processPacket(String packet) {
             typeOfPacket(packet);
             firstPart = packet.substring(3,packet.indexOf(",")+1);
             lastPart = packet.substring(packet.indexOf(":"));
-            Serial.println(firstPart + Config.callsign + lastPart);
+            Serial.println(firstPart + Config.callsign + "*" + lastPart);
             delay(500);
             if (stationMode == 4) {     // Digirepeating with Freq Rx !=  Tx
                 LoRa_Utils::changeFreqTx();

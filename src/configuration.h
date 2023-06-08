@@ -29,8 +29,9 @@ public:
 
 class LoraModule {
 public:
-  long    frequencyTx;
-  long    frequencyRx;
+  long    iGateFreq;
+  long    digirepeaterTxFreq;
+  long    digirepeaterRxFreq;
   int     spreadingFactor;
   long    signalBandwidth;
   int     codingRate4;
