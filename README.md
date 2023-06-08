@@ -53,8 +53,5 @@ Versions:
 - 2023.06.08 Adding Digirepeater Functions.
 __________________________________________
 
-
-Enjoy!!!
-
 # Hope You Enjoy this, 73 !!  CD2RXU , Valparaiso, Chile
 
