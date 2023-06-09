@@ -5,6 +5,7 @@ extern Configuration        Config;
 extern WiFi_AP              *currentWiFi;
 extern std::vector<String>  lastHeardStation;
 extern std::vector<String>  lastHeardStation_temp;
+extern String               versionDate;
 
 namespace QUERY_Utils {
 
@@ -13,14 +14,18 @@ String process(String query, String station, String queryOrigin) {
   if (query=="?APRS?" || query=="?aprs?" || query=="?Aprs?" || query=="H" || query=="h" || query=="Help" || query=="help" || query=="?") {
     answer = "?APRSV ?APRSP ?APRSL ?APRSH ?WHERE callsign";
   } else if (query=="?APRSV" || query=="?aprsv" || query=="?Aprsv") {
-    answer = "CD2RXU_LoRa_iGate 1.2";
+    answer = "CD2RXU_LoRa_iGate 1.2 v" + versionDate;
   } else if (query=="?APRSP" || query=="?aprsp" || query=="?Aprsp") {
     answer = "iGate QTH: " + String(currentWiFi->latitude,2) + " " + String(currentWiFi->longitude,2);
   } else if (query=="?APRSL" || query=="?aprsl" || query=="?Aprsl") {
-    for (int i=0; i<lastHeardStation.size(); i++) {
-      answer += lastHeardStation[i].substring(0,lastHeardStation[i].indexOf(",")) + " ";
+    if (lastHeardStation.size() == 0) {
+      answer = "No Station Listened in the last " + String(Config.rememberStationTime) + "min.";
+    } else {
+      for (int i=0; i<lastHeardStation.size(); i++) {
+        answer += lastHeardStation[i].substring(0,lastHeardStation[i].indexOf(",")) + " ";
+      }
+      answer.trim();
     }
-    answer.trim();
   } else if (query.indexOf("?APRSH") == 0 || query.indexOf("?aprsv") == 0 || query.indexOf("?Aprsv") == 0) {
      // sacar callsign despues de ?APRSH
     Serial.println("escuchaste a X estacion? en las ultimas 24 o 8 horas?");

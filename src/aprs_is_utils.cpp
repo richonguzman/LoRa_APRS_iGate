@@ -126,16 +126,6 @@ void processLoRaPacket(String packet) {
           STATION_Utils::updateLastHeard(Sender);
           utils::typeOfPacket(aprsPacket);
           show_display(firstLine, secondLine, thirdLine, fourthLine, 0);
-          /*if (aprsPacket.indexOf("::") >= 10) {
-            show_display(firstLine, secondLine, "Callsign = " + Sender, "TYPE ----> MESSAGE",  1000);
-          } else if (aprsPacket.indexOf(":>") >= 10) {
-            show_display(firstLine, secondLine, "Callsign = " + Sender, "TYPE ----> NEW STATUS", 1000);
-          } else if (aprsPacket.indexOf(":!") >= 10 || aprsPacket.indexOf(":=") >= 10) {
-            show_display(firstLine, secondLine, "Callsign = " + Sender, "TYPE ----> GPS BEACON", 1000);
-          } else {
-            show_display(firstLine, secondLine, "Callsign = " + Sender, "TYPE ----> ??????????", 1000);
-          }*/
-
         }
       }    
     } else {

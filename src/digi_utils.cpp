@@ -5,29 +5,10 @@
 #include "utils.h"
 
 extern Configuration    Config;
-//extern String           thirdLine;
-//extern String           fourthLine;
 extern int              stationMode;
 extern uint32_t         lastScreenOn;
 
 namespace DIGI_Utils {
-
-/*void typeOfPacket(String packet) {
-    String Sender = packet.substring(3,packet.indexOf(">"));
-    if (packet.indexOf("::") >= 10) {
-        thirdLine = "Callsign = " + Sender;
-        fourthLine = "TYPE ----> MESSAGE";
-    } else if (packet.indexOf(":>") >= 10) {
-        thirdLine = "Callsign = " + Sender;
-        fourthLine = "TYPE ----> NEW STATUS";
-    } else if (packet.indexOf(":!") >= 10 || packet.indexOf(":=") >= 10) {
-        thirdLine = "Callsign = " + Sender;
-        fourthLine = "TYPE ----> GPS BEACON";
-    } else {
-        thirdLine = "Callsign = " + Sender;
-        fourthLine = "TYPE ----> ??????????";
-    }
-}*/
 
 void processPacket(String packet) {
     String firstPart, lastPart, loraPacket;
@@ -44,13 +25,13 @@ void processPacket(String packet) {
                 LoRa_Utils::sendNewPacket("APRS", loraPacket);
                 display_toggle(true);
                 lastScreenOn = millis();
-            } else { // stationMode = 4
+            } else {
                 utils::typeOfPacket(packet);
                 firstPart = packet.substring(3,packet.indexOf(",")+1);
                 lastPart = packet.substring(packet.indexOf(",")+1);
                 loraPacket = firstPart + Config.callsign + lastPart;  // se agrega "*"" ???
                 delay(500);
-                if (stationMode == 4) {     // Digirepeating with Freq Rx !=  Tx
+                if (stationMode == 4) {
                     LoRa_Utils::changeFreqTx();
                 }
                 LoRa_Utils::sendNewPacket("APRS", loraPacket);

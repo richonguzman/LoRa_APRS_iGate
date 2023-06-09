@@ -56,7 +56,7 @@ String generatePacket(String aprsisPacket) {
 
 String receivePacket() {
   String loraPacket = "";
-  int packetSize = LoRa.parsePacket();  // Listening for LoRa Packets
+  int packetSize = LoRa.parsePacket();
   if (packetSize) {
     while (LoRa.available()) {
       int inChar = LoRa.read();

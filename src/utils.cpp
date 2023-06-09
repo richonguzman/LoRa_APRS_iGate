@@ -7,6 +7,7 @@
 
 extern WiFiClient       espClient;
 extern Configuration    Config;
+extern String           versionDate;
 extern bool             statusAfterBoot;
 extern String           firstLine;
 extern String           secondLine;
@@ -42,6 +43,8 @@ void processStatus() {
 
 void setupDiplay() {
     setup_display();
+    Serial.println("\nStarting iGate: " + Config.callsign + "   Version: " + versionDate);
+    show_display("   LoRa APRS iGate", "    Richonguzman", "    -- CD2RXU --", "     " + versionDate, 4000);
     firstLine   = "LoRa iGate: " + Config.callsign;
     if (stationMode==3 || stationMode==4) {
         secondLine = "<DigiRepeater Active>";
@@ -69,7 +72,7 @@ void checkBeaconInterval() {
         } else if (stationMode==3 || stationMode==4) {
             show_display(firstLine, secondLine, thirdLine, "SENDING iGate BEACON", 0);
             fourthLine = "     listening...";
-            if (stationMode == 4) {     // Digirepeating with Freq Rx !=  Tx
+            if (stationMode == 4) {
                 LoRa_Utils::changeFreqTx();
             }
             LoRa_Utils::sendNewPacket("APRS",iGateBeaconPacket);
@@ -106,7 +109,11 @@ void validateDigiFreqs() {
 }
 
 void typeOfPacket(String packet) {
-    thirdLine = "Callsign = " + packet.substring(3,packet.indexOf(">"));
+    if (stationMode==1 || stationMode==2) {
+        thirdLine = "Callsign = " + packet.substring(0,packet.indexOf(">"));
+    } else {
+        thirdLine = "Callsign = " + packet.substring(3,packet.indexOf(">"));
+    }
     if (packet.indexOf("::") >= 10) {
         fourthLine = "TYPE ----> MESSAGE";
     } else if (packet.indexOf(":>") >= 10) {
