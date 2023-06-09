@@ -66,8 +66,7 @@ void loop() {
       APRS_IS_Utils::connect();
     }
     secondLine  = APRS_IS_Utils::checkStatus();
-    show_display(firstLine, secondLine, thirdLine, fourthLine, 0);
-    
+    show_display(firstLine, secondLine, thirdLine, fourthLine, 0);    
     while (espClient.connected()) {
       utils::checkDisplayInterval();
       utils::checkBeaconInterval();
