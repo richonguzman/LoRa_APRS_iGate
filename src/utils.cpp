@@ -24,12 +24,12 @@ void processStatus() {
     String status = Config.callsign + ">APLRG1";
     if (stationMode==1 || stationMode==2) {
         delay(1000);
-        status += ",qAC:>" + Config.defaultStatus;
+        status += ",qAC:>https://github.com/richonguzman/LoRa_APRS_iGate";
         espClient.write((status + "\n").c_str()); 
     } else {
         delay(5000);
-        status += ":>" + Config.defaultStatus;
-        if (stationMode == 4) {     // Digirepeating with Freq Rx !=  Tx
+        status += ":>https://github.com/richonguzman/LoRa_APRS_iGate";
+        if (stationMode == 4) {
             LoRa_Utils::changeFreqTx();
         }
         LoRa_Utils::sendNewPacket("APRS", status);

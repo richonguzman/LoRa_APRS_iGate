@@ -32,22 +32,33 @@ void processPacket(String packet) {
     String firstPart, lastPart, loraPacket;
     if (packet != "") {
         Serial.print("Received Lora Packet   : " + String(packet));
-        if ((packet.substring(0, 3) == "\x3c\xff\x01") && (packet.indexOf("NOGATE") == -1) && (packet.indexOf("WIDE1-1") > 10)) { // confirmar lo de WIDE1-1 !!!
+        if ((packet.substring(0, 3) == "\x3c\xff\x01") && (packet.indexOf("NOGATE") == -1)) {
             Serial.println("   ---> APRS LoRa Packet");
-            typeOfPacket(packet);
-            firstPart = packet.substring(3,packet.indexOf(",")+1);
-            lastPart = packet.substring(packet.indexOf(":"));
-            loraPacket = firstPart + Config.callsign + "*" + lastPart;
-            delay(500);
-            if (stationMode == 4) {     // Digirepeating with Freq Rx !=  Tx
-                LoRa_Utils::changeFreqTx();
+            if ((stationMode==3) && (packet.indexOf("WIDE1-1") > 10)) {
+                typeOfPacket(packet);
+                firstPart = packet.substring(3,packet.indexOf(",")+1);
+                lastPart = packet.substring(packet.indexOf(":"));
+                loraPacket = firstPart + Config.callsign + "*" + lastPart;
+                delay(500);
+                LoRa_Utils::sendNewPacket("APRS", loraPacket);
+                display_toggle(true);
+                lastScreenOn = millis();
+            } else { // stationMode = 4
+                typeOfPacket(packet);
+                firstPart = packet.substring(3,packet.indexOf(",")+1);
+                lastPart = packet.substring(packet.indexOf(",")+1);
+                loraPacket = firstPart + Config.callsign + lastPart;  // se agrega "*"" ???
+                delay(500);
+                if (stationMode == 4) {     // Digirepeating with Freq Rx !=  Tx
+                    LoRa_Utils::changeFreqTx();
+                }
+                LoRa_Utils::sendNewPacket("APRS", loraPacket);
+                if (stationMode == 4) {
+                    LoRa_Utils::changeFreqRx();
+                }
+                display_toggle(true);
+                lastScreenOn = millis();
             }
-            LoRa_Utils::sendNewPacket("APRS", loraPacket);
-            if (stationMode == 4) {
-                LoRa_Utils::changeFreqRx();
-            }
-            display_toggle(true);
-            lastScreenOn = millis();
         } else {
             Serial.println("   ---> LoRa Packet Ignored (first 3 bytes or NOGATE)\n");
         }

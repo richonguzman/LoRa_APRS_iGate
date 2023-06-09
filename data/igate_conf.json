@@ -42,8 +42,6 @@
 	},
 	"other": {
 		"beaconInterval": 15,
-		"rememberStationTime": 30,
-		"statusAfterBoot": true,
-		"defaultStatus": "https://github.com/richonguzman/LoRa_APRS_iGate"
+		"rememberStationTime": 30
 	}
 }

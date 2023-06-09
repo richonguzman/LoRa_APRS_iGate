@@ -26,7 +26,7 @@ WiFiClient      espClient;
 int             myWiFiAPIndex       = 0;
 int             myWiFiAPSize        = Config.wifiAPs.size();
 WiFi_AP         *currentWiFi        = &Config.wifiAPs[myWiFiAPIndex];
-bool            statusAfterBoot     = Config.statusAfterBoot;
+bool            statusAfterBoot     = true;
 int             stationMode         = Config.stationMode;
 
 bool            beacon_update       = true;

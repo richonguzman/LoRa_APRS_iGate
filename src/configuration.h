@@ -56,8 +56,6 @@ public:
   String                iGateComment;
   int                   beaconInterval;
   int                   rememberStationTime;
-  bool                  statusAfterBoot;
-  String                defaultStatus;
   std::vector<WiFi_AP>  wifiAPs;
   DIGI                  digi;
   APRS_IS               aprs_is;
