@@ -5,6 +5,7 @@
 
 namespace WIFI_Utils {
 
+void checkWiFi();
 void startWiFi();
 void setup();
 

@@ -10,6 +10,7 @@ void setupDiplay();
 void checkBeaconInterval();
 void checkDisplayInterval();
 void validateDigiFreqs();
+void typeOfPacket(String packet);
 
 }
 

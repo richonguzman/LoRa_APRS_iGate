@@ -105,4 +105,17 @@ void validateDigiFreqs() {
     }
 }
 
+void typeOfPacket(String packet) {
+    thirdLine = "Callsign = " + packet.substring(3,packet.indexOf(">"));
+    if (packet.indexOf("::") >= 10) {
+        fourthLine = "TYPE ----> MESSAGE";
+    } else if (packet.indexOf(":>") >= 10) {
+        fourthLine = "TYPE ----> NEW STATUS";
+    } else if (packet.indexOf(":!") >= 10 || packet.indexOf(":=") >= 10) {
+        fourthLine = "TYPE ----> GPS BEACON";
+    } else {
+        fourthLine = "TYPE ----> ??????????";
+    }
+}
+
 }

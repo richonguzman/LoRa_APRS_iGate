@@ -8,8 +8,19 @@ extern WiFi_AP        *currentWiFi;
 extern int            myWiFiAPIndex;
 extern int            myWiFiAPSize;
 extern int            stationMode;
+extern uint32_t       previousWiFiMillis;
 
 namespace WIFI_Utils {
+
+void checkWiFi() {
+  if ((WiFi.status() != WL_CONNECTED) && ((millis() - previousWiFiMillis) >= 30*1000)) {
+    Serial.print(millis());
+    Serial.println("Reconnecting to WiFi...");
+    WiFi.disconnect();
+    WiFi.reconnect();
+    previousWiFiMillis = millis();
+  }
+}
 
 void startWiFi() {
   int status = WL_IDLE_STATUS;

@@ -5,6 +5,7 @@
 #include "query_utils.h"
 #include "lora_utils.h"
 #include "display.h"
+#include "utils.h"
 
 extern Configuration  Config;
 extern WiFiClient     espClient;
@@ -13,6 +14,8 @@ extern uint32_t       lastScreenOn;
 extern int            stationMode;
 extern String         firstLine;
 extern String         secondLine;
+extern String         thirdLine;
+extern String         fourthLine;
 
 namespace APRS_IS_Utils {
 
@@ -107,7 +110,7 @@ void processLoRaPacket(String packet) {
                 }
                 LoRa_Utils::sendNewPacket("APRS", QUERY_Utils::process(receivedMessage, Sender, "LoRa"));
                 lastScreenOn = millis();
-                show_display(firstLine, secondLine, "Callsign = " + Sender, "TYPE --> QUERY",  1000);
+                show_display(firstLine, secondLine, "Callsign = " + Sender, "TYPE --> QUERY",  0);
               }
             }
           }
@@ -121,7 +124,9 @@ void processLoRaPacket(String packet) {
           espClient.write(aprsPacket.c_str());
           Serial.println("   ---> Uploaded to APRS-IS");
           STATION_Utils::updateLastHeard(Sender);
-          if (aprsPacket.indexOf("::") >= 10) {
+          utils::typeOfPacket(aprsPacket);
+          show_display(firstLine, secondLine, thirdLine, fourthLine, 0);
+          /*if (aprsPacket.indexOf("::") >= 10) {
             show_display(firstLine, secondLine, "Callsign = " + Sender, "TYPE ----> MESSAGE",  1000);
           } else if (aprsPacket.indexOf(":>") >= 10) {
             show_display(firstLine, secondLine, "Callsign = " + Sender, "TYPE ----> NEW STATUS", 1000);
@@ -129,12 +134,66 @@ void processLoRaPacket(String packet) {
             show_display(firstLine, secondLine, "Callsign = " + Sender, "TYPE ----> GPS BEACON", 1000);
           } else {
             show_display(firstLine, secondLine, "Callsign = " + Sender, "TYPE ----> ??????????", 1000);
-          }
+          }*/
+
         }
       }    
     } else {
       Serial.println("   ---> LoRa Packet Ignored (first 3 bytes or TCPIP/NOGATE/RFONLY)\n");
     }
+  }
+}
+
+void processAPRSISPacket(String packet) {
+  String Sender, AddresseeAndMessage, Addressee, receivedMessage;
+  if (!packet.startsWith("#")){
+    if (packet.indexOf("::")>0) {
+      Sender = packet.substring(0,packet.indexOf(">"));
+      AddresseeAndMessage = packet.substring(packet.indexOf("::")+2);
+      Addressee = AddresseeAndMessage.substring(0, AddresseeAndMessage.indexOf(":"));
+      Addressee.trim();
+      if (Addressee == Config.callsign) {             // its for me!
+        if (AddresseeAndMessage.indexOf("{")>0) {     // ack?
+          String ackMessage = "ack" + AddresseeAndMessage.substring(AddresseeAndMessage.indexOf("{")+1);
+          ackMessage.trim();
+          delay(4000);
+          Serial.println(ackMessage);
+          for(int i = Sender.length(); i < 9; i++) {
+            Sender += ' ';
+          }
+          String ackPacket = Config.callsign + ">APLRG1,TCPIP,qAC::" + Sender + ":" + ackMessage + "\n";
+          espClient.write(ackPacket.c_str());
+          receivedMessage = AddresseeAndMessage.substring(AddresseeAndMessage.indexOf(":")+1, AddresseeAndMessage.indexOf("{"));
+        } else {
+          receivedMessage = AddresseeAndMessage.substring(AddresseeAndMessage.indexOf(":")+1);
+        }
+        if (receivedMessage.indexOf("?") == 0) {
+          Serial.println("Received Query APRS-IS : " + packet);
+          String queryAnswer = QUERY_Utils::process(receivedMessage, Sender, "APRSIS");
+          Serial.println("---> QUERY Answer : " + queryAnswer.substring(0,queryAnswer.indexOf("\n")));
+          if (!Config.display.alwaysOn) {
+            display_toggle(true);
+          }
+          lastScreenOn = millis();
+          delay(500);
+          espClient.write(queryAnswer.c_str());
+          show_display(firstLine, secondLine, "Callsign = " + Sender, "TYPE --> QUERY",  1000);
+        }
+      } else {
+        Serial.print("Received from APRS-IS  : " + packet);
+        if (stationMode == 1) {
+          Serial.println("   ---> Cant Tx without Ham Lincence");
+        } else if (stationMode > 1) {
+          if (STATION_Utils::wasHeard(Addressee)) {
+            LoRa_Utils::sendNewPacket("APRS", LoRa_Utils::generatePacket(packet));
+            display_toggle(true);
+            lastScreenOn = millis();
+            receivedMessage = AddresseeAndMessage.substring(AddresseeAndMessage.indexOf(":")+1);
+            show_display(firstLine, secondLine, Sender + " -> " + Addressee, receivedMessage, 0);
+          }
+        }
+      }
+    }        
   }
 }
 

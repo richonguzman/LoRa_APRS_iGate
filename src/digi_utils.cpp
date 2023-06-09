@@ -2,16 +2,17 @@
 #include "lora_utils.h"
 #include "digi_utils.h"
 #include "display.h"
+#include "utils.h"
 
 extern Configuration    Config;
-extern String           thirdLine;
-extern String           fourthLine;
+//extern String           thirdLine;
+//extern String           fourthLine;
 extern int              stationMode;
 extern uint32_t         lastScreenOn;
 
 namespace DIGI_Utils {
 
-void typeOfPacket(String packet) {
+/*void typeOfPacket(String packet) {
     String Sender = packet.substring(3,packet.indexOf(">"));
     if (packet.indexOf("::") >= 10) {
         thirdLine = "Callsign = " + Sender;
@@ -26,7 +27,7 @@ void typeOfPacket(String packet) {
         thirdLine = "Callsign = " + Sender;
         fourthLine = "TYPE ----> ??????????";
     }
-}
+}*/
 
 void processPacket(String packet) {
     String firstPart, lastPart, loraPacket;
@@ -35,7 +36,7 @@ void processPacket(String packet) {
         if ((packet.substring(0, 3) == "\x3c\xff\x01") && (packet.indexOf("NOGATE") == -1)) {
             Serial.println("   ---> APRS LoRa Packet");
             if ((stationMode==3) && (packet.indexOf("WIDE1-1") > 10)) {
-                typeOfPacket(packet);
+                utils::typeOfPacket(packet);
                 firstPart = packet.substring(3,packet.indexOf(",")+1);
                 lastPart = packet.substring(packet.indexOf(":"));
                 loraPacket = firstPart + Config.callsign + "*" + lastPart;
@@ -44,7 +45,7 @@ void processPacket(String packet) {
                 display_toggle(true);
                 lastScreenOn = millis();
             } else { // stationMode = 4
-                typeOfPacket(packet);
+                utils::typeOfPacket(packet);
                 firstPart = packet.substring(3,packet.indexOf(",")+1);
                 lastPart = packet.substring(packet.indexOf(",")+1);
                 loraPacket = firstPart + Config.callsign + lastPart;  // se agrega "*"" ???

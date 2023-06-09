@@ -9,6 +9,7 @@ void connect();
 String checkStatus();
 String createPacket(String unprocessedPacket);
 void processLoRaPacket(String packet);
+void processAPRSISPacket(String packet);
 
 }
 

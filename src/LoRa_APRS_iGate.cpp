@@ -31,7 +31,7 @@ int             stationMode         = Config.stationMode;
 
 bool            beacon_update       = true;
 uint32_t        lastBeaconTx        = 0;
-unsigned long   previousWiFiMillis  = 0;
+uint32_t        previousWiFiMillis  = 0;
 uint32_t        lastScreenOn        = millis();
 
 std::vector<String> lastHeardStation;
@@ -65,14 +65,15 @@ void loop() {
     show_display(firstLine, secondLine, thirdLine, fourthLine, 0);
     DIGI_Utils::processPacket(LoRa_Utils::receivePacket());
   } else if (stationMode==1 || stationMode==2 ) {   // iGate (1 Only Rx / 2 Rx+Tx)
-    unsigned long currentWiFiMillis   = millis();
-    if ((WiFi.status() != WL_CONNECTED) && (currentWiFiMillis - previousWiFiMillis >= 30*1000)) {
+    /*unsigned long currentWiFiMillis   = millis();
+      if ((WiFi.status() != WL_CONNECTED) && (millis() - previousWiFiMillis >= 30*1000)) {
       Serial.print(millis());
       Serial.println("Reconnecting to WiFi...");
       WiFi.disconnect();
       WiFi.reconnect();
-      previousWiFiMillis = currentWiFiMillis;
-    }
+      previousWiFiMillis = millis();
+    }*/
+    WIFI_Utils::checkWiFi();
     if (!espClient.connected()) {
       APRS_IS_Utils::connect();
     }
@@ -84,11 +85,12 @@ void loop() {
       utils::checkBeaconInterval();
       APRS_IS_Utils::processLoRaPacket(LoRa_Utils::receivePacket());            
       if (espClient.available()) {
-        String aprsisData, aprsisPacket, Sender, AddresseeAndMessage, Addressee, receivedMessage;
-        bool validHeardStation = false;
+        String aprsisData, aprsisPacket;//, Sender, AddresseeAndMessage, Addressee, receivedMessage;
+        //bool validHeardStation = false;
         aprsisData = espClient.readStringUntil('\r'); // or '\n'
         aprsisPacket.concat(aprsisData);
-        if (!aprsisPacket.startsWith("#")){
+        APRS_IS_Utils::processAPRSISPacket(aprsisPacket);
+        /*if (!aprsisPacket.startsWith("#")){
           if (aprsisPacket.indexOf("::")>0) {
             Sender = aprsisPacket.substring(0,aprsisPacket.indexOf(">"));
             AddresseeAndMessage = aprsisPacket.substring(aprsisPacket.indexOf("::")+2);
@@ -136,7 +138,7 @@ void loop() {
               }
             }
           }        
-        }
+        }*/
       }
     }
   }
