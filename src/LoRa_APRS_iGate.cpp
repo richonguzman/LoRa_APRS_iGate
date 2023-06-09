@@ -85,10 +85,11 @@ void loop() {
       utils::checkBeaconInterval();
       APRS_IS_Utils::processLoRaPacket(LoRa_Utils::receivePacket());            
       if (espClient.available()) {
-        String aprsisData, aprsisPacket;//, Sender, AddresseeAndMessage, Addressee, receivedMessage;
-        //bool validHeardStation = false;
+        String aprsisPacket;//aprsisData, ;//, Sender, AddresseeAndMessage, Addressee, receivedMessage;
+        /*bool validHeardStation = false;
         aprsisData = espClient.readStringUntil('\r'); // or '\n'
-        aprsisPacket.concat(aprsisData);
+        aprsisPacket.concat(aprsisData);*/
+        aprsisPacket.concat(espClient.readStringUntil('\r'));
         APRS_IS_Utils::processAPRSISPacket(aprsisPacket);
         /*if (!aprsisPacket.startsWith("#")){
           if (aprsisPacket.indexOf("::")>0) {
