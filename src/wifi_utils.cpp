@@ -33,9 +33,10 @@ void startWiFi() {
   Serial.print("\nConnecting to '"); Serial.print(currentWiFi->ssid); Serial.println("' WiFi ...");
   WiFi.begin(currentWiFi->ssid.c_str(), currentWiFi->password.c_str());
   while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
     digitalWrite(greenLed,HIGH);
     Serial.print('.');
-    delay(1000);
+    delay(500);
     digitalWrite(greenLed,LOW);
     if ((millis() - start) > 15000){
       if(myWiFiAPIndex >= (myWiFiAPSize-1)) {
@@ -47,6 +48,7 @@ void startWiFi() {
       start = millis();
       Serial.print("\nConnect to WiFi '"); Serial.print(currentWiFi->ssid); Serial.println("' ...");
       show_display("", "Connect to Wifi:", currentWiFi->ssid + " ...", 0);
+      WiFi.disconnect();
       WiFi.begin(currentWiFi->ssid.c_str(), currentWiFi->password.c_str());
     }
   }

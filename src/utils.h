@@ -7,6 +7,7 @@ namespace utils {
 
 void processStatus();
 void setupDiplay();
+String getLocalIP();
 void checkBeaconInterval();
 void checkDisplayInterval();
 void validateDigiFreqs();

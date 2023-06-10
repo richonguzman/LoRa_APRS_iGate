@@ -38,6 +38,8 @@ std::vector<String> lastHeardStation_temp;
 
 String firstLine, secondLine, thirdLine, fourthLine, iGateBeaconPacket;
 
+// agregar automatic restart cada X horas?
+
 void setup() {
   Serial.begin(115200);
   pinMode(greenLed, OUTPUT);

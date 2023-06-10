@@ -58,6 +58,10 @@ void setupDiplay() {
     fourthLine  = "     listening...";
 }
 
+String getLocalIP() {
+    return "IP : " + String(WiFi.localIP()[0]) + "." + String(WiFi.localIP()[1]) + "." + String(WiFi.localIP()[2]) + "." + String(WiFi.localIP()[3]);
+}
+
 void checkBeaconInterval() {
     uint32_t lastTx = millis() - lastBeaconTx;
     if (lastTx >= Config.beaconInterval*60*1000) {
@@ -65,7 +69,7 @@ void checkBeaconInterval() {
     }
     if (beacon_update) {
         display_toggle(true);
-        thirdLine = "";
+        thirdLine = getLocalIP();
         Serial.println("---- Sending iGate Beacon ----");
         if (stationMode==1 || stationMode==2) {
             show_display(firstLine, secondLine, thirdLine, "SENDING iGate BEACON", 1000);
