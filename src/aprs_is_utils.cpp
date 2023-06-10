@@ -171,16 +171,12 @@ void processAPRSISPacket(String packet) {
         }
       } else {
         Serial.print("Received from APRS-IS  : " + packet);
-        if (stationMode == 1) {
-          Serial.println("   ---> Cant Tx without Ham Lincence");
-        } else if (stationMode > 1) {
-          if (STATION_Utils::wasHeard(Addressee)) {
-            LoRa_Utils::sendNewPacket("APRS", LoRa_Utils::generatePacket(packet));
-            display_toggle(true);
-            lastScreenOn = millis();
-            receivedMessage = AddresseeAndMessage.substring(AddresseeAndMessage.indexOf(":")+1);
-            show_display(firstLine, secondLine, Sender + " -> " + Addressee, receivedMessage, 0);
-          }
+        if (stationMode == 2 && STATION_Utils::wasHeard(Addressee)) {
+          LoRa_Utils::sendNewPacket("APRS", LoRa_Utils::generatePacket(packet));
+          display_toggle(true);
+          lastScreenOn = millis();
+          utils::typeOfPacket(packet);
+          show_display(firstLine, secondLine, Sender + " -> " + Addressee, fourthLine, 0);
         }
       }
     }        

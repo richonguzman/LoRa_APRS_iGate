@@ -1,5 +1,6 @@
 #include <LoRa.h>
 #include "configuration.h"
+#include "pins_config.h"
 #include "display.h"
 
 extern Configuration  Config;
@@ -32,6 +33,7 @@ void setup() {
 }
 
 void sendNewPacket(const String &typeOfMessage, const String &newPacket) {
+  digitalWrite(greenLed,HIGH);
   LoRa.beginPacket();
   LoRa.write('<');
   if (typeOfMessage == "APRS")  {
@@ -42,6 +44,7 @@ void sendNewPacket(const String &typeOfMessage, const String &newPacket) {
   LoRa.write(0x01);
   LoRa.write((const uint8_t *)newPacket.c_str(), newPacket.length());
   LoRa.endPacket();
+  digitalWrite(greenLed,LOW);
   Serial.print("---> LoRa Packet Tx    : ");
   Serial.println(newPacket);
 }

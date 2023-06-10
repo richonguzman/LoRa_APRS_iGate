@@ -1,5 +1,6 @@
 #include <WiFi.h>
 #include "configuration.h"
+#include "pins_config.h"
 #include "wifi_utils.h"
 #include "lora_utils.h"
 #include "display.h"
@@ -43,8 +44,10 @@ void processStatus() {
 
 void setupDiplay() {
     setup_display();
+    digitalWrite(greenLed,HIGH);
     Serial.println("\nStarting iGate: " + Config.callsign + "   Version: " + versionDate);
     show_display("   LoRa APRS iGate", "    Richonguzman", "    -- CD2RXU --", "     " + versionDate, 4000);
+    digitalWrite(greenLed,LOW);
     firstLine   = "LoRa iGate: " + Config.callsign;
     if (stationMode==3 || stationMode==4) {
         secondLine = "<DigiRepeater Active>";

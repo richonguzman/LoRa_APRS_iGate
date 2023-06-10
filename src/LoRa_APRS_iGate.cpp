@@ -21,7 +21,7 @@ Configuration   Config;
 WiFiClient      espClient;
 //AsyncWebServer  server(80);
 
-String          versionDate         = "2023.06.08";
+String          versionDate         = "2023.06.09";
 int             myWiFiAPIndex       = 0;
 int             myWiFiAPSize        = Config.wifiAPs.size();
 WiFi_AP         *currentWiFi        = &Config.wifiAPs[myWiFiAPIndex];
@@ -40,6 +40,7 @@ String firstLine, secondLine, thirdLine, fourthLine, iGateBeaconPacket;
 
 void setup() {
   Serial.begin(115200);
+  pinMode(greenLed, OUTPUT);
   delay(1000);
   utils::setupDiplay();
   WIFI_Utils::setup();
@@ -51,7 +52,7 @@ void setup() {
   });
   AsyncElegantOTA.begin(&server);    // Start ElegantOTA
   server.begin();
-  Serial.println("HTTP server started");*/  
+  Serial.println("HTTP server started");*/
 }
 
 void loop() {

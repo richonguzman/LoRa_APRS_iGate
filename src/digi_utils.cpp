@@ -11,25 +11,22 @@ extern uint32_t         lastScreenOn;
 namespace DIGI_Utils {
 
 void processPacket(String packet) {
-    String firstPart, lastPart, loraPacket;
+    String loraPacket;
     if (packet != "") {
         Serial.print("Received Lora Packet   : " + String(packet));
         if ((packet.substring(0, 3) == "\x3c\xff\x01") && (packet.indexOf("NOGATE") == -1)) {
             Serial.println("   ---> APRS LoRa Packet");
             if ((stationMode==3) && (packet.indexOf("WIDE1-1") > 10)) {
                 utils::typeOfPacket(packet);
-                firstPart = packet.substring(3,packet.indexOf(",")+1);
-                lastPart = packet.substring(packet.indexOf(":"));
-                loraPacket = firstPart + Config.callsign + "*" + lastPart;
+                loraPacket = packet.substring(3);
+                loraPacket.replace("WIDE1-1", Config.callsign + "*");
                 delay(500);
                 LoRa_Utils::sendNewPacket("APRS", loraPacket);
                 display_toggle(true);
                 lastScreenOn = millis();
-            } else {
+            } else if (stationMode ==4){
                 utils::typeOfPacket(packet);
-                firstPart = packet.substring(3,packet.indexOf(",")+1);
-                lastPart = packet.substring(packet.indexOf(",")+1);
-                loraPacket = firstPart + Config.callsign + lastPart;  // se agrega "*"" ???
+                loraPacket = packet.substring(3,packet.indexOf(",")+1) + Config.callsign + "*" + packet.substring(packet.indexOf(",")+1);
                 delay(500);
                 if (stationMode == 4) {
                     LoRa_Utils::changeFreqTx();

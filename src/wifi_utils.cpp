@@ -1,5 +1,6 @@
 #include <WiFi.h>
 #include "configuration.h"
+#include "pins_config.h"
 #include "wifi_utils.h"
 #include "display.h"
 
@@ -32,8 +33,10 @@ void startWiFi() {
   Serial.print("\nConnecting to '"); Serial.print(currentWiFi->ssid); Serial.println("' WiFi ...");
   WiFi.begin(currentWiFi->ssid.c_str(), currentWiFi->password.c_str());
   while (WiFi.status() != WL_CONNECTED) {
+    digitalWrite(greenLed,HIGH);
     Serial.print('.');
     delay(1000);
+    digitalWrite(greenLed,LOW);
     if ((millis() - start) > 15000){
       if(myWiFiAPIndex >= (myWiFiAPSize-1)) {
         myWiFiAPIndex = 0;
@@ -47,6 +50,7 @@ void startWiFi() {
       WiFi.begin(currentWiFi->ssid.c_str(), currentWiFi->password.c_str());
     }
   }
+  digitalWrite(greenLed,LOW);
   Serial.print("Connected as ");
   Serial.println(WiFi.localIP());
 }
