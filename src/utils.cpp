@@ -60,7 +60,7 @@ void setupDiplay() {
     } else {
         secondLine  = "";
     }    
-    thirdLine   = "  LoRa Module Ready";
+    thirdLine   = "";
     fourthLine  = "     listening...";
 }
 
@@ -75,10 +75,11 @@ void checkBeaconInterval() {
     }
     if (beacon_update) {
         display_toggle(true);
-        thirdLine = getLocalIP();
+        //thirdLine = getLocalIP();
         Serial.println("---- Sending iGate Beacon ----");
         if (stationMode==1 || stationMode==2) {
             show_display(firstLine, secondLine, thirdLine, "SENDING iGate BEACON", 1000);
+            thirdLine = getLocalIP();
             fourthLine = "     listening...";
             espClient.write((iGateBeaconPacket + "\n").c_str());
             show_display(firstLine, secondLine, thirdLine, fourthLine, 0);
