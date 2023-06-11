@@ -142,7 +142,7 @@ void typeOfPacket(String packet) {
 void startOTAServer() {
     if (stationMode==1 || stationMode==2) {
         server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
-        request->send(200, "text/plain", "Hi, this is your (Richonguzman/CD2RXU) LoRa iGate.\nIf you want tu update your firmware please go to: http://" + getLocalIP().substring(getLocalIP().indexOf(":")+1) + "/update");
+        request->send(200, "text/plain", "Hi, this is your (Richonguzman/CD2RXU) LoRa iGate.\nIf you want tu update your firmware please go to: http://" + getLocalIP().substring(getLocalIP().indexOf(":")+2) + "/update");
         });
         AsyncElegantOTA.begin(&server);
         server.begin();
