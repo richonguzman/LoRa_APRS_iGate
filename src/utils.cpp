@@ -1,3 +1,6 @@
+#include <ESPAsyncWebServer.h>
+#include <AsyncElegantOTA.h>
+#include <AsyncTCP.h>
 #include <WiFi.h>
 #include "configuration.h"
 #include "pins_config.h"
@@ -5,9 +8,7 @@
 #include "lora_utils.h"
 #include "display.h"
 #include "utils.h"
-#include <AsyncTCP.h>
-#include <ESPAsyncWebServer.h>
-#include <AsyncElegantOTA.h>
+
 
 AsyncWebServer  server(80);
 
