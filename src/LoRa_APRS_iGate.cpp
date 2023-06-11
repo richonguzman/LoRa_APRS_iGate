@@ -13,15 +13,11 @@
 #include "gps_utils.h"
 #include "display.h"
 #include "utils.h"
-/*#include <AsyncTCP.h>
-#include <ESPAsyncWebServer.h>
-#include <AsyncElegantOTA.h>*/
 
 Configuration   Config;
 WiFiClient      espClient;
-//AsyncWebServer  server(80);
 
-String          versionDate         = "2023.06.09";
+String          versionDate         = "2023.06.10";
 int             myWiFiAPIndex       = 0;
 int             myWiFiAPSize        = Config.wifiAPs.size();
 WiFi_AP         *currentWiFi        = &Config.wifiAPs[myWiFiAPIndex];
@@ -49,12 +45,7 @@ void setup() {
   LoRa_Utils::setup();
   utils::validateDigiFreqs();
   iGateBeaconPacket = GPS_Utils::generateBeacon();
-  /*server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
-    request->send(200, "text/plain", "Hi! I am ESP32.");
-  });
-  AsyncElegantOTA.begin(&server);    // Start ElegantOTA
-  server.begin();
-  Serial.println("HTTP server started");*/
+  utils::startOTAServer();
 }
 
 void loop() {

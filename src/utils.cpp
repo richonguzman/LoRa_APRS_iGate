@@ -5,6 +5,11 @@
 #include "lora_utils.h"
 #include "display.h"
 #include "utils.h"
+#include <AsyncTCP.h>
+#include <ESPAsyncWebServer.h>
+#include <AsyncElegantOTA.h>
+
+AsyncWebServer  server(80);
 
 extern WiFiClient       espClient;
 extern Configuration    Config;
@@ -129,6 +134,17 @@ void typeOfPacket(String packet) {
         fourthLine = "TYPE ----> GPS BEACON";
     } else {
         fourthLine = "TYPE ----> ??????????";
+    }
+}
+
+void startOTAServer() {
+    if (stationMode==1 || stationMode==2) {
+        server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
+        request->send(200, "text/plain", "Hi This is your Richonguzman / CD2RXU LoRa iGate.\nIf you want tu update your firmware please go to:  {iGate-IP-Adress}/update");
+        });
+        AsyncElegantOTA.begin(&server);
+        server.begin();
+        Serial.println("HTTP server started (OTA Firmware Updates)!\n");
     }
 }
 
