@@ -1,3 +1,5 @@
+#include <ArduinoJson.h>
+#include <SPIFFS.h>
 #include "configuration.h"
 #include "display.h"
 

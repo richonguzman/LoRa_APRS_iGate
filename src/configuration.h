@@ -1,9 +1,7 @@
 #ifndef CONFIGURATION_H_
 #define CONFIGURATION_H_
 
-#include <ArduinoJson.h>
 #include <Arduino.h>
-#include <SPIFFS.h>
 #include <vector>
 #include <FS.h>
 

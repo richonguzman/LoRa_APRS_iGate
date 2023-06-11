@@ -26,7 +26,11 @@ void processPacket(String packet) {
                 lastScreenOn = millis();
             } else if (stationMode ==4){
                 utils::typeOfPacket(packet);
-                loraPacket = packet.substring(3,packet.indexOf(",")+1) + Config.callsign + "*" + packet.substring(packet.indexOf(","));
+                if (packet.indexOf("WIDE1-1") == -1) {
+                    loraPacket = packet.substring(3,packet.indexOf(":")) + "," + Config.callsign + "*" + packet.indexOf(":");
+                } else {
+                    loraPacket = packet.substring(3,packet.indexOf(",")+1) + Config.callsign + "*" + packet.substring(packet.indexOf(","));
+                }
                 delay(500);
                 if (stationMode == 4) {
                     LoRa_Utils::changeFreqTx();

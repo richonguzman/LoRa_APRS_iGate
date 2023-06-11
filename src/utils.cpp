@@ -1,6 +1,7 @@
 #include <ESPAsyncWebServer.h>
 #include <AsyncElegantOTA.h>
 #include <AsyncTCP.h>
+#include <SPIFFS.h>
 #include <WiFi.h>
 #include "configuration.h"
 #include "pins_config.h"
