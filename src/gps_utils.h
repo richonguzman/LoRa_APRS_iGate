@@ -9,6 +9,10 @@ String double2string(double n, int ndec);
 String processLatitudeAPRS();
 String processLongitudeAPRS();
 String generateBeacon();
+double calculateDistanceCourse(double latitude, double longitude);
+String decodeEncodedGPS(String packet);
+String getReceivedGPS(String packet);
+String getDistance(String packet);
 
 }
 

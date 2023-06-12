@@ -46,6 +46,13 @@ public:
   int     timeout;
 };
 
+class SYSLOG {
+public:
+  bool    active;
+  String  server;
+  int     port;
+};
+
 class Configuration {
 public:
 
@@ -59,6 +66,7 @@ public:
   APRS_IS               aprs_is;
   LoraModule            loramodule;
   Display               display;
+  SYSLOG                syslog;
   
 
   Configuration();

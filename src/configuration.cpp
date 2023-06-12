@@ -57,6 +57,10 @@ void Configuration::readFile(fs::FS &fs, const char *fileName) {
     display.alwaysOn                = data["display"]["alwaysOn"].as<bool>();
     display.timeout                 = data["display"]["timeout"].as<int>();
 
+    syslog.active                   = data["syslog"]["active"].as<bool>();
+    syslog.server                   = data["syslog"]["server"].as<String>();
+    syslog.port                     = data["syslog"]["port"].as<int>();
+    
     configFile.close();
 }
 

@@ -1,6 +1,7 @@
 #include <LoRa.h>
 #include "configuration.h"
 #include "pins_config.h"
+#include "syslog_utils.h"
 #include "display.h"
 
 extern Configuration  Config;
@@ -64,6 +65,9 @@ String receivePacket() {
     while (LoRa.available()) {
       int inChar = LoRa.read();
       loraPacket += (char)inChar;
+    }
+    if (Config.syslog.active && (stationMode==1 || stationMode==2)) {
+      SYSLOG_Utils::processPacket(loraPacket, LoRa.packetRssi(), LoRa.packetSnr(), LoRa.packetFrequencyError());
     }
   }
   return loraPacket;

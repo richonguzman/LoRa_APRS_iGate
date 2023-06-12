@@ -1,5 +1,5 @@
 {
-	"callsign": "CD2RXU-10",
+	"callsign": "CD2RXU-11",
 	"stationMode": 2,
 	"iGateComment": "LoRa_APRS_iGate",
 	"wifi": {
@@ -39,6 +39,11 @@
 	"display": {
 		"alwaysOn": true,
 		"timeout": 4
+	},
+	"syslog": {
+		"active": true,
+		"server": "0.0.0.0",
+		"port": 514
 	},
 	"other": {
 		"beaconInterval": 15,
