@@ -27,7 +27,7 @@ extern bool             beacon_update;
 extern int              stationMode;
 extern String           iGateBeaconPacket;
 
-namespace utils {
+namespace Utils {
 
 void processStatus() {
     String status = Config.callsign + ">APLRG1";

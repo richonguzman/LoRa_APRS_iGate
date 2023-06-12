@@ -17,7 +17,7 @@ void processPacket(String packet) {
         if ((packet.substring(0, 3) == "\x3c\xff\x01") && (packet.indexOf("NOGATE") == -1)) {
             Serial.println("   ---> APRS LoRa Packet");
             if ((stationMode==3) && (packet.indexOf("WIDE1-1") > 10)) {
-                utils::typeOfPacket(packet);
+                Utils::typeOfPacket(packet);
                 loraPacket = packet.substring(3);
                 loraPacket.replace("WIDE1-1", Config.callsign + "*");
                 delay(500);
@@ -25,7 +25,7 @@ void processPacket(String packet) {
                 display_toggle(true);
                 lastScreenOn = millis();
             } else if (stationMode ==4){
-                utils::typeOfPacket(packet);
+                Utils::typeOfPacket(packet);
                 if (packet.indexOf("WIDE1-1") == -1) {
                     loraPacket = packet.substring(3,packet.indexOf(":")) + "," + Config.callsign + "*" + packet.indexOf(":");
                 } else {

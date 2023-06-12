@@ -5,6 +5,7 @@
 #include "configuration.h"
 #include "aprs_is_utils.h"
 #include "station_utils.h"
+#include "syslog_utils.h"
 #include "pins_config.h"
 #include "query_utils.h"
 #include "lora_utils.h"
@@ -12,12 +13,16 @@
 #include "digi_utils.h"
 #include "gps_utils.h"
 #include "display.h"
+#include "logger.h"
 #include "utils.h"
 
 Configuration   Config;
 WiFiClient      espClient;
 
-String          versionDate         = "2023.06.11";
+logging::Logger logger;
+
+
+String          versionDate         = "2023.06.12";
 int             myWiFiAPIndex       = 0;
 int             myWiFiAPSize        = Config.wifiAPs.size();
 WiFi_AP         *currentWiFi        = &Config.wifiAPs[myWiFiAPIndex];
@@ -40,12 +45,13 @@ void setup() {
   Serial.begin(115200);
   pinMode(greenLed, OUTPUT);
   delay(1000);
-  utils::setupDiplay();
+  Utils::setupDiplay();
   WIFI_Utils::setup();
   LoRa_Utils::setup();
-  utils::validateDigiFreqs();
+  Utils::validateDigiFreqs();
   iGateBeaconPacket = GPS_Utils::generateBeacon();
-  utils::startOTAServer();
+  Utils::startOTAServer();
+  SYSLOG_Utils::setup();
 }
 
 void loop() {
@@ -57,8 +63,8 @@ void loop() {
     secondLine  = APRS_IS_Utils::checkStatus();
     show_display(firstLine, secondLine, thirdLine, fourthLine, 0);    
     while (espClient.connected()) {
-      utils::checkDisplayInterval();
-      utils::checkBeaconInterval();
+      Utils::checkDisplayInterval();
+      Utils::checkBeaconInterval();
       APRS_IS_Utils::processLoRaPacket(LoRa_Utils::receivePacket());            
       if (espClient.available()) {
         String aprsisPacket;
@@ -67,8 +73,8 @@ void loop() {
       }
     }
   } else if (stationMode==3 || stationMode==4) {    // DigiRepeater (3 RxFreq=TxFreq / 4 RxFreq!=TxFreq)
-    utils::checkDisplayInterval();
-    utils::checkBeaconInterval();
+    Utils::checkDisplayInterval();
+    Utils::checkBeaconInterval();
     show_display(firstLine, secondLine, thirdLine, fourthLine, 0);
     DIGI_Utils::processPacket(LoRa_Utils::receivePacket());
   }

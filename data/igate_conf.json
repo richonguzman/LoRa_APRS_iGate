@@ -42,7 +42,7 @@
 	},
 	"syslog": {
 		"active": true,
-		"server": "0.0.0.0",
+		"server": "192.168.20.10",
 		"port": 514
 	},
 	"other": {

@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 
-namespace utils {
+namespace Utils {
 
 void processStatus();
 void setupDiplay();

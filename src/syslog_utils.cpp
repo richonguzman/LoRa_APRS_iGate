@@ -1,5 +1,10 @@
+#include "configuration.h"
 #include "syslog_utils.h"
 #include "gps_utils.h"
+#include "logger.h"
+
+extern Configuration    Config;
+extern logging::Logger  logger;
 
 namespace SYSLOG_Utils {
 
@@ -13,8 +18,14 @@ void processPacket(String packet, int rssi, float snr, int freqError) {
         syslogPacket += " _ / ";
     }
     syslogPacket += String(rssi) + "dBm / " + String(snr) + "dB / " + String(freqError) + "Hz / ";
-    // Callsign / Time / Destination / Path / RSSI / SNR / FreqError /gpsLat / gpsLon / Distance
-    Serial.println(syslogPacket + GPS_Utils::getDistance(packet));
+    logger.log(logging::LoggerLevel::LOGGER_LEVEL_INFO, "Main", (syslogPacket + GPS_Utils::getDistance(packet)).c_str());
+}
+
+void setup() {
+    if (Config.syslog.active) {
+        logger.setSyslogServer(Config.syslog.server, Config.syslog.port, "ESP32 LoRa APRS iGate");
+        Serial.println("Syslog Server (" + Config.syslog.server + ") connected!\n");
+    }
 }
 
 }
