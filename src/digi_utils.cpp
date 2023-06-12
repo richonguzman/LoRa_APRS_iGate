@@ -27,7 +27,7 @@ void processPacket(String packet) {
             } else if (stationMode ==4){
                 Utils::typeOfPacket(packet);
                 if (packet.indexOf("WIDE1-1") == -1) {
-                    loraPacket = packet.substring(3,packet.indexOf(":")) + "," + Config.callsign + "*" + packet.indexOf(":");
+                    loraPacket = packet.substring(3,packet.indexOf(":")) + "," + Config.callsign + "*" + packet.substring(packet.indexOf(":"));
                 } else {
                     loraPacket = packet.substring(3,packet.indexOf(",")+1) + Config.callsign + "*" + packet.substring(packet.indexOf(","));
                 }
