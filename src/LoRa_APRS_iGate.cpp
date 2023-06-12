@@ -49,12 +49,7 @@ void setup() {
 }
 
 void loop() {
-  if (stationMode==3 || stationMode==4) {           // DigiRepeater (3 RxFreq=TxFreq / 4 RxFreq!=TxFreq)
-    utils::checkDisplayInterval();
-    utils::checkBeaconInterval();
-    show_display(firstLine, secondLine, thirdLine, fourthLine, 0);
-    DIGI_Utils::processPacket(LoRa_Utils::receivePacket());
-  } else if (stationMode==1 || stationMode==2 ) {   // iGate (1 Only Rx / 2 Rx+Tx)
+  if (stationMode==1 || stationMode==2 ) {          // iGate (1 Only Rx / 2 Rx+Tx)
     WIFI_Utils::checkWiFi();
     if (!espClient.connected()) {
       APRS_IS_Utils::connect();
@@ -71,5 +66,10 @@ void loop() {
         APRS_IS_Utils::processAPRSISPacket(aprsisPacket);
       }
     }
+  } else if (stationMode==3 || stationMode==4) {    // DigiRepeater (3 RxFreq=TxFreq / 4 RxFreq!=TxFreq)
+    utils::checkDisplayInterval();
+    utils::checkBeaconInterval();
+    show_display(firstLine, secondLine, thirdLine, fourthLine, 0);
+    DIGI_Utils::processPacket(LoRa_Utils::receivePacket());
   }
 }
