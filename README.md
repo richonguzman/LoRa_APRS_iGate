@@ -85,6 +85,6 @@ Versions:
 - 2023.06.12 Syslog added.
 __________________________________________
 
-# Hope You Enjoy this, 73 !!  CD2RXU , Valparaiso, Chile
+Special Thanks to the help in testing and developing to Manfred (DC2MH) and much more Ham Licence Ops all over the world.
 
-Special Thanks to the help in testing and developing to Manfred (DC2MH)
+# Hope You Enjoy this, 73 !!  CD2RXU , Valparaiso, Chile
