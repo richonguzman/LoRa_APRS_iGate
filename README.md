@@ -44,9 +44,11 @@ b) Choose _stationMode_:
     IgateComment and DigirepeaterComment will be sent to APRS-IS or via RF, depending on your stationmode
 
 c) WiFi section: 
+
     adjust SSID and Password to you WiFi, add the GPS to "Latitude" and "Longitude" (info from GoogleMaps) of your new LoRa iGate. (If stationMode 3 or 4 selected, add also GPS info to Digirepeater Section).
 
 d) APRS_IS section: 
+
     change "passcode" from "VWXYZ" to yours (remember that is 5 digits integer) and choose a server close to your location (see https://www.aprs2.net/)
 
 e) LORA section:
