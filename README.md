@@ -10,10 +10,11 @@ In all configurations the display shows the current stationMode, heard packets a
 But under the hood is much more:
 
 - Sending events to remote syslog server.
-- OTA update capability.
+- OTA update capability (for Firmware and Filesystem).
 - RX first, TX will only be done if there is no traffic on the frequency.
 - automatic update of the Lora symbol at APRS-IS, black "L" for pure RX, red "L" for TX capability and green "L" for digipeater.
 - support for multiple WLAN with corresponding coordinates.
+- Syslog capability.
 
 and more will come:
 - Web-UI
@@ -31,7 +32,7 @@ Instructions (add your information into the '/data/igate_conf.json'):
 
 a) Change "callsign" from "NOCALL-10" to your CALLSIGN + SSID.
 
-b) Choose *stationMode*:
+b) Choose _stationMode_:
 
     1 = RX iGate, black "L" as symbol
 
@@ -43,7 +44,7 @@ b) Choose *stationMode*:
 
     IgateComment and DigirepeaterComment will be sent to APRS-IS or via RF, depending on your stationmode
 
-c) WiFi section, adjust SSID and Password to you WiFi, add the GPS to "Latitude" and "Longitude" (info from GoogleMaps) of your new LoRa iGate. (if Mode 3 or 4 Selected, add also GPS info to Digirepeater Section).
+c) WiFi section: adjust SSID and Password to you WiFi, add the GPS to "Latitude" and "Longitude" (info from GoogleMaps) of your new LoRa iGate. (If stationMode 3 or 4 selected, add also GPS info to Digirepeater Section).
 
 d) APRS_IS section, change "passcode" from "VWXYZ" to yours (remember that is 5 digits integer) and choose a server close to your location (see https://www.aprs2.net/)
 
@@ -57,9 +58,9 @@ e) LORA section,
     
     adjust power to your need, valid values are from 1 to 20
 
-f) section other
+f) Syslog section:
     
-    adjust beaconInterval to a suitable value. A normal value is 45 mintes, it is recommended not to go below 30min.
+    adjust server, port to a suitable value.
 
 __________________________________________
 
