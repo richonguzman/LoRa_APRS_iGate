@@ -23,9 +23,9 @@ String          versionDate         = "2023.06.13";
 int             myWiFiAPIndex       = 0;
 int             myWiFiAPSize        = Config.wifiAPs.size();
 WiFi_AP         *currentWiFi        = &Config.wifiAPs[myWiFiAPIndex];
-bool            statusAfterBoot     = true;
-int             stationMode         = Config.stationMode;
 
+int             stationMode         = Config.stationMode;
+bool            statusAfterBoot     = true;
 bool            beacon_update       = true;
 uint32_t        lastBeaconTx        = 0;
 uint32_t        previousWiFiMillis  = 0;
