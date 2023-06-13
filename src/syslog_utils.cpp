@@ -22,6 +22,8 @@ void processPacket(String packet, int rssi, float snr, int freqError) {
 }
 
 void setup() {
+
+    // ver hostname "ESP32 LoRa APRS iGate" ?
     if (Config.syslog.active) {
         logger.setSyslogServer(Config.syslog.server, Config.syslog.port, "ESP32 LoRa APRS iGate");
         Serial.println("Syslog Server (" + Config.syslog.server + ") connected!\n");
