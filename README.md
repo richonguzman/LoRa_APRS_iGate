@@ -29,13 +29,13 @@ __________________________________________
 
 Instructions (add your information into the '/data/igate_conf.json'):
 
-a) Change "callsign" from "NOCALL-10" to your CALLSIGN + SSID
+a) Change "callsign" from "NOCALL-10" to your CALLSIGN + SSID.
 
-b) Choose stationmode
+b) Choose *stationMode*:
 
     1 = RX iGate, black "L" as symbol
 
-    2 = TX iGate, red "L" as symbol, HAM only. RX will be sent to APRS-IS, Messages will be sent via Lora. Same frequency for RX and TX. By using this feature you have comply with the regulations of your country.
+    2 = Rx + TX iGate, red "L" as symbol, HAM only. RX will be sent to APRS-IS, Messages will be sent via Lora. Same frequency for RX and TX. By using this feature you have comply with the regulations of your country.
 
     3 = Digipeater simplex, green "L" as symbol, HAM only. Received packets containing WIDEx-x in path will be digipeated on the same frequency. By using this feature you have comply with the regulations of your country.
 
@@ -43,9 +43,9 @@ b) Choose stationmode
 
     IgateComment and DigirepeaterComment will be sent to APRS-IS or via RF, depending on your stationmode
 
-c) WiFi section, adjust SSID and Password to you WiFi, add the GPS to "Latitude" and "Longitude" (info from GoogleMaps) of your new LoRa iGate
+c) WiFi section, adjust SSID and Password to you WiFi, add the GPS to "Latitude" and "Longitude" (info from GoogleMaps) of your new LoRa iGate. (if Mode 3 or 4 Selected, add also GPS info to Digirepeater Section).
 
-d) APRS_IS section, change "passcode" from "XYZVW" to yours (remember that is 5 digits integer) and choose a server close to your location (see https://www.aprs2.net/)
+d) APRS_IS section, change "passcode" from "VWXYZ" to yours (remember that is 5 digits integer) and choose a server close to your location (see https://www.aprs2.net/)
 
 e) LORA section, 
 
@@ -60,48 +60,13 @@ e) LORA section,
 f) section other
     
     adjust beaconInterval to a suitable value. A normal value is 45 mintes, it is recommended not to go below 30min.
+
 __________________________________________
 
-LoRa APRS iGATE/Digirepeater for:
+LoRa APRS iGATE/Digirepeater working on this boards:
 - LILYGO ESP32 LoRa32 v2-1-1.6
 - ESP32 Wroom Dev +  SX1278 LoRa Module for a DIY Version
-
-__________________________________________
-
-Achievements:
-- Rx LoRa packets (up to 100kms away) and upload to APRS-IS servers.
-- Tx LoRa packets from APRS-IS feed.
-- iGate and Digirepeater Modes.
-__________________________________________
-
-Instrucctions (add your information into the '/data/igate_conf.json'):
-
-1.- Change "callsign" from "NOCALL-10" to your CALLSIGN + SSID.
-
-2.- Change "wifi">"AP">"SSID" from "WiFi_AP_1"  to your own WIFI-SSID-NAME.
-
-3.- Change "wifi">"AP">"Password" from "password_WiFi_2" to your own WIFI-SSID-PASSWORD.
-
-4.- Add GPS to "wifi">"AP">"Latitude" and "Longitude"  (info from GoogleMaps) of new LoRa iGate.
-
-5.- Change "aprs_is">"passcode" from "XYZVW" to yours (remember that is 5 digits integer).
-
-6.- Change "stationMode" value to other than "1" ONLY(!) if you are an valid Ham Operator.
-
-__________________________________________
-
-iGate / Digirepeater "stationMode":
-
-1.- iGate (only Rx).
-
-2.- iGate (Tx and Rx) HAM LICENSE REQUIRED!
-
-3.- Digirepeater (Rx Freq = Tx Freq) HAM LICENSE REQUIRED!
-
-4.- Digirepeater (Rx Freq != Tx Freq) HAM LICENSE REQUIRED! 
-
-5.- iGate changes to Digirepeater when it looses APRS-IS+WiFi connection (on development).
-
+- HELTEC_WIFI_LORA_32_V2 (add "#define OLED_RESET 16" on "pins_config.h")
 __________________________________________
 Versions:
 - 2023.02.10 First Beta (receiving LoRa Beacon/Packets and uploading to APRS-IS).
@@ -112,6 +77,8 @@ Versions:
 - 2023.05.23 Processing Query's from RF/LoRa or APRS-IS (Send "Help" Message to test).
 - 2023.06.06 Full repack of Code and adding _enableTx_ only for Ham Ops.
 - 2023.06.08 Adding Digirepeater Functions.
+- 2023.06.10 OTA for Firmware and Filesystem.
+- 2023.06.12 Syslog added.
 __________________________________________
 
 # Hope You Enjoy this, 73 !!  CD2RXU , Valparaiso, Chile
