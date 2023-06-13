@@ -2,30 +2,29 @@
 
 This next generation LoRa iGate can work as:
 - pure RX-iGate, 
-- TX-iGate and distribute messages and weather forecasts to heard trackers, and 
+- Rx+Tx-iGate and distribute messages and weather forecasts to heard trackers, and 
 - Digipeater in simplex or split-frequency environment.
 
 In all configurations the display shows the current stationMode, heard packets and events the iGate is currently performing.
 
 But under the hood is much more:
 
-- Sending events to remote syslog server
-- OTA update capability
-- RX first, TX will only be done if there is no traffic on the frequency
-- automatic update of the Lora symbol at APRS-IS, black "L" for pure RX, red "L" for TX capability and green "L" for digipeater
-- support for multiple WLAN with corresponding coordinates
+- Sending events to remote syslog server.
+- OTA update capability.
+- RX first, TX will only be done if there is no traffic on the frequency.
+- automatic update of the Lora symbol at APRS-IS, black "L" for pure RX, red "L" for TX capability and green "L" for digipeater.
+- support for multiple WLAN with corresponding coordinates.
 
+and more will come:
+- Web-UI
+- support for BME280 sensors, sending to APRS-IS
+- ...
 
-
-and more will come
-
-Web-UI
-support for BME280 sensors, sending to APRS-IS
-...
-
+__________________________________________
 
 See also the software for LoRa Tracker https://github.com/richonguzman/LoRa_APRS_Tracker
 
+__________________________________________
 
 
 Instructions (add your information into the '/data/igate_conf.json'):
