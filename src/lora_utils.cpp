@@ -46,6 +46,7 @@ void sendNewPacket(const String &typeOfMessage, const String &newPacket) {
   LoRa.write((const uint8_t *)newPacket.c_str(), newPacket.length());
   LoRa.endPacket();
   digitalWrite(greenLed,LOW);
+  SYSLOG_Utils::log("LoRa Tx", newPacket,0,0,0);
   Serial.print("---> LoRa Packet Tx    : ");
   Serial.println(newPacket);
 }
@@ -67,7 +68,7 @@ String receivePacket() {
       loraPacket += (char)inChar;
     }
     if (Config.syslog.active && (stationMode==1 || stationMode==2)) {
-      SYSLOG_Utils::processPacket(loraPacket, LoRa.packetRssi(), LoRa.packetSnr(), LoRa.packetFrequencyError());
+      SYSLOG_Utils::log("LoRa Rx", loraPacket, LoRa.packetRssi(), LoRa.packetSnr(), LoRa.packetFrequencyError());
     }
   }
   return loraPacket;

@@ -5,7 +5,7 @@
 
 namespace SYSLOG_Utils {
 
-void processPacket(String packet, int rssi, float snr, int freqError) ;
+void log(String type ,String packet, int rssi, float snr, int freqError);
 void setup();
 
 }

@@ -13,16 +13,13 @@
 #include "digi_utils.h"
 #include "gps_utils.h"
 #include "display.h"
-#include "logger.h"
 #include "utils.h"
 
 Configuration   Config;
 WiFiClient      espClient;
 
-logging::Logger logger;
 
-
-String          versionDate         = "2023.06.12";
+String          versionDate         = "2023.06.13";
 int             myWiFiAPIndex       = 0;
 int             myWiFiAPSize        = Config.wifiAPs.size();
 WiFi_AP         *currentWiFi        = &Config.wifiAPs[myWiFiAPIndex];
@@ -38,8 +35,6 @@ std::vector<String> lastHeardStation;
 std::vector<String> lastHeardStation_temp;
 
 String firstLine, secondLine, thirdLine, fourthLine, iGateBeaconPacket;
-
-// agregar automatic restart cada X horas?
 
 void setup() {
   Serial.begin(115200);

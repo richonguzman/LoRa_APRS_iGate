@@ -4,6 +4,7 @@
 #include <SPIFFS.h>
 #include <WiFi.h>
 #include "configuration.h"
+#include "syslog_utils.h"
 #include "pins_config.h"
 #include "wifi_utils.h"
 #include "lora_utils.h"
@@ -34,7 +35,8 @@ void processStatus() {
     if (stationMode==1 || stationMode==2) {
         delay(1000);
         status += ",qAC:>https://github.com/richonguzman/LoRa_APRS_iGate";
-        espClient.write((status + "\n").c_str()); 
+        espClient.write((status + "\n").c_str());
+        SYSLOG_Utils::log("APRSIS Tx", status,0,0,0);
     } else {
         delay(5000);
         status += ":>https://github.com/richonguzman/LoRa_APRS_iGate";
