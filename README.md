@@ -14,7 +14,6 @@ But under the hood is much more:
 - RX first, TX will only be done if there is no traffic on the frequency.
 - automatic update of the Lora symbol at APRS-IS, black "L" for pure RX, red "L" for TX capability and green "L" for digipeater.
 - support for multiple WLAN with corresponding coordinates.
-- Syslog capability.
 
 and more will come:
 - Web-UI
@@ -30,7 +29,7 @@ __________________________________________
 
 Instructions (add your information into the '/data/igate_conf.json'):
 
-a) Change "callsign" from "NOCALL-10" to your CALLSIGN + SSID.
+a) Change _callsign_ from "NOCALL-10" to your CALLSIGN + SSID.
 
 b) Choose _stationMode_:
 
@@ -44,11 +43,13 @@ b) Choose _stationMode_:
 
     IgateComment and DigirepeaterComment will be sent to APRS-IS or via RF, depending on your stationmode
 
-c) WiFi section: adjust SSID and Password to you WiFi, add the GPS to "Latitude" and "Longitude" (info from GoogleMaps) of your new LoRa iGate. (If stationMode 3 or 4 selected, add also GPS info to Digirepeater Section).
+c) WiFi section: 
+    adjust SSID and Password to you WiFi, add the GPS to "Latitude" and "Longitude" (info from GoogleMaps) of your new LoRa iGate. (If stationMode 3 or 4 selected, add also GPS info to Digirepeater Section).
 
-d) APRS_IS section, change "passcode" from "VWXYZ" to yours (remember that is 5 digits integer) and choose a server close to your location (see https://www.aprs2.net/)
+d) APRS_IS section: 
+    change "passcode" from "VWXYZ" to yours (remember that is 5 digits integer) and choose a server close to your location (see https://www.aprs2.net/)
 
-e) LORA section, 
+e) LORA section:
 
     adjust TX frequency and RX frequency matching your stationmode and country. Remember,
 
