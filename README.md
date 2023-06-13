@@ -87,3 +87,4 @@ __________________________________________
 
 # Hope You Enjoy this, 73 !!  CD2RXU , Valparaiso, Chile
 
+Special Thanks to the help in testing and developing to Manfred (DC2MH)
