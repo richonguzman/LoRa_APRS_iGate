@@ -63,7 +63,7 @@ e) LORA section:
 
 f) Syslog section:
     
-    adjust server, port to a suitable value.
+    adjust server and port to a suitable value.
 
 __________________________________________
 
@@ -85,6 +85,6 @@ Versions:
 - 2023.06.12 Syslog added.
 __________________________________________
 
-Special Thanks to the help in testing and developing to Manfred (DC2MH) and much more Ham Licence Ops all over the world.
+Special Thanks to the help in testing and developing to Manfred (DC2MH) , for showing me the "way of good coding" to Tihomir (CA3TSK) and much more Ham Licence Ops all over the world.
 
 # Hope You Enjoy this, 73 !!  CD2RXU , Valparaiso, Chile
