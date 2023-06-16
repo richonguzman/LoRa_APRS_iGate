@@ -22,6 +22,10 @@ extern String           firstLine;
 extern String           secondLine;
 extern String           thirdLine;
 extern String           fourthLine;
+extern String           fifthLine;
+extern String           sixthLine;
+extern String           seventhLine;
+extern String           eigthLine;
 extern uint32_t         lastBeaconTx;
 extern uint32_t         lastScreenOn;
 extern bool             beacon_update;
@@ -51,24 +55,24 @@ void processStatus() {
     statusAfterBoot = false;
 }
 
+String getLocalIP() {
+    return "IP : " + String(WiFi.localIP()[0]) + "." + String(WiFi.localIP()[1]) + "." + String(WiFi.localIP()[2]) + "." + String(WiFi.localIP()[3]);
+}
+
 void setupDiplay() {
     setup_display();
     digitalWrite(greenLed,HIGH);
     Serial.println("\nStarting iGate: " + Config.callsign + "   Version: " + versionDate);
-    show_display("   LoRa APRS iGate", "    Richonguzman", "    -- CD2RXU --", "     " + versionDate, 4000);
+    show_display("", "   LoRa APRS iGate", "", "    Richonguzman", "", "    -- CD2RXU --", "", "     " + versionDate, 4000);
     digitalWrite(greenLed,LOW);
     firstLine   = "LoRa iGate: " + Config.callsign;
     if (stationMode==3 || stationMode==4) {
         secondLine = "<DigiRepeater Active>";
     } else {
         secondLine  = "";
-    }    
-    thirdLine   = "";
-    fourthLine  = "     listening...";
-}
-
-String getLocalIP() {
-    return "IP : " + String(WiFi.localIP()[0]) + "." + String(WiFi.localIP()[1]) + "." + String(WiFi.localIP()[2]) + "." + String(WiFi.localIP()[3]);
+    }   
+    seventhLine = "";
+    eigthLine  = "     listening...";
 }
 
 void checkBeaconInterval() {
@@ -78,17 +82,18 @@ void checkBeaconInterval() {
     }
     if (beacon_update) {
         display_toggle(true);
-        //thirdLine = getLocalIP();
         Serial.println("---- Sending iGate Beacon ----");
         if (stationMode==1 || stationMode==2) {
-            show_display(firstLine, secondLine, thirdLine, "SENDING iGate BEACON", 1000);
             thirdLine = getLocalIP();
-            fourthLine = "     listening...";
+            seventhLine = "";
+            show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, "SENDING iGate BEACON", 1000);         
+            eigthLine = "     listening...";
             espClient.write((iGateBeaconPacket + "\n").c_str());
-            show_display(firstLine, secondLine, thirdLine, fourthLine, 0);
+            show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, eigthLine, 0);
         } else if (stationMode==3 || stationMode==4) {
-            show_display(firstLine, secondLine, thirdLine, "SENDING iGate BEACON", 0);
-            fourthLine = "     listening...";
+            seventhLine = "";
+            show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, "SENDING iGate BEACON", 0);
+            eigthLine = "     listening...";
             if (stationMode == 4) {
                 LoRa_Utils::changeFreqTx();
             }
@@ -127,18 +132,18 @@ void validateDigiFreqs() {
 
 void typeOfPacket(String packet) {
     if (stationMode==1 || stationMode==2) {
-        thirdLine = "Callsign = " + packet.substring(0,packet.indexOf(">"));
+        seventhLine = "Callsign = " + packet.substring(0,packet.indexOf(">"));
     } else {
-        thirdLine = "Callsign = " + packet.substring(3,packet.indexOf(">"));
+        seventhLine = "Callsign = " + packet.substring(3,packet.indexOf(">"));
     }
     if (packet.indexOf("::") >= 10) {
-        fourthLine = "TYPE ----> MESSAGE";
+        eigthLine = "TYPE ----> MESSAGE";
     } else if (packet.indexOf(":>") >= 10) {
-        fourthLine = "TYPE ----> NEW STATUS";
+        eigthLine = "TYPE ----> NEW STATUS";
     } else if (packet.indexOf(":!") >= 10 || packet.indexOf(":=") >= 10) {
-        fourthLine = "TYPE ----> GPS BEACON";
+        eigthLine = "TYPE ----> GPS BEACON";
     } else {
-        fourthLine = "TYPE ----> ??????????";
+        eigthLine = "TYPE ----> ??????????";
     }
 }
 

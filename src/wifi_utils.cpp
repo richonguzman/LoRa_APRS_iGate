@@ -29,7 +29,7 @@ void startWiFi() {
   WiFi.disconnect();
   delay(500);
   unsigned long start = millis();
-  show_display("", "Connecting to Wifi:", currentWiFi->ssid + " ...", 0);
+  show_display("", "", "Connecting to Wifi:", "", currentWiFi->ssid + " ...", 0);
   Serial.print("\nConnecting to '"); Serial.print(currentWiFi->ssid); Serial.println("' WiFi ...");
   WiFi.begin(currentWiFi->ssid.c_str(), currentWiFi->password.c_str());
   while (WiFi.status() != WL_CONNECTED) {
@@ -48,7 +48,7 @@ void startWiFi() {
       currentWiFi = &Config.wifiAPs[myWiFiAPIndex];
       start = millis();
       Serial.print("\nConnecting to WiFi '"); Serial.print(currentWiFi->ssid); Serial.println("' ...");
-      show_display("", "Connecting to Wifi:", currentWiFi->ssid + " ...", 0);
+      show_display("", "", "Connecting to Wifi:", "", currentWiFi->ssid + " ...", 0);
       WiFi.disconnect();
       WiFi.begin(currentWiFi->ssid.c_str(), currentWiFi->password.c_str());
     }
@@ -56,7 +56,7 @@ void startWiFi() {
   digitalWrite(greenLed,LOW);
   Serial.print("Connected as ");
   Serial.println(WiFi.localIP());
-  show_display("", "     Connected!", "    ( " + currentWiFi->ssid + " )", 1000);
+  show_display("", "", "     Connected!!", 1000);
 }
 
 void setup() {
@@ -78,7 +78,7 @@ void setup() {
         btStop();
     } else { 
         Serial.println("stationMode ---> NOT VALID, check '/data/igate_conf.json'");
-        show_display("stationMode Not Valid", "change it on : /data/", "igate_conf.json", 0);
+        show_display("------- ERROR -------", "stationMode Not Valid", "change it on : /data/", "igate_conf.json", 0);
         while (1);
     }
 }

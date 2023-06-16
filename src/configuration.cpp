@@ -67,7 +67,7 @@ void Configuration::readFile(fs::FS &fs, const char *fileName) {
 void Configuration::validateConfigFile(String currentBeaconCallsign) {
   if (currentBeaconCallsign == "NOCALL-10") {
     Serial.println("Change Callsign in /data/igate_conf.json");
-    show_display("ERROR", "Change your settings", "'igate_conf.json'", "--> File System image", 0);
+    show_display("------- ERROR -------", "Change your settings", "on 'igate_conf.json'", "--> File System image", 0);
     while (true) {
       delay(1000);
     }

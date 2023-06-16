@@ -16,6 +16,10 @@ extern String         firstLine;
 extern String         secondLine;
 extern String         thirdLine;
 extern String         fourthLine;
+extern String         fifthLine;
+extern String         sixthLine;
+extern String         seventhLine;
+extern String         eigthLine;
 
 namespace APRS_IS_Utils {
 
@@ -43,7 +47,7 @@ void connect(){
   }
 }
 
-String checkStatus() {
+void checkStatus() {
   String wifiState, aprsisState;
   if (WiFi.status() == WL_CONNECTED) {
     wifiState = "OK"; 
@@ -63,7 +67,7 @@ String checkStatus() {
     }
     lastScreenOn = millis();
   }
-  return "WiFi: " + wifiState + "/ APRS-IS: " + aprsisState;
+  secondLine = "WiFi: " + wifiState + "/ APRS-IS: " + aprsisState;
 }
 
 String createPacket(String packet) {
@@ -110,7 +114,7 @@ void processLoRaPacket(String packet) {
                 }
                 LoRa_Utils::sendNewPacket("APRS", QUERY_Utils::process(receivedMessage, Sender, "LoRa"));
                 lastScreenOn = millis();
-                show_display(firstLine, secondLine, "Callsign = " + Sender, "TYPE --> QUERY",  0);
+                show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "Callsign = " + Sender, "TYPE --> QUERY",  0);
               }
             }
           }
@@ -125,7 +129,7 @@ void processLoRaPacket(String packet) {
           Serial.println("   ---> Uploaded to APRS-IS");
           STATION_Utils::updateLastHeard(Sender);
           Utils::typeOfPacket(aprsPacket);
-          show_display(firstLine, secondLine, thirdLine, fourthLine, 0);
+          show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, eigthLine, 0);
         }
       }    
     } else {
@@ -167,7 +171,7 @@ void processAPRSISPacket(String packet) {
           lastScreenOn = millis();
           delay(500);
           espClient.write(queryAnswer.c_str());
-          show_display(firstLine, secondLine, "Callsign = " + Sender, "TYPE --> QUERY",  1000);
+          show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "Callsign = " + Sender, "TYPE --> QUERY",  1000);
         }
       } else {
         Serial.print("Received from APRS-IS  : " + packet);
@@ -176,7 +180,7 @@ void processAPRSISPacket(String packet) {
           display_toggle(true);
           lastScreenOn = millis();
           Utils::typeOfPacket(packet);
-          show_display(firstLine, secondLine, Sender + " -> " + Addressee, fourthLine, 0);
+          show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, Sender + " -> " + Addressee, eigthLine, 0);
         }
       }
     }        

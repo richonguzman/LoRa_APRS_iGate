@@ -19,7 +19,7 @@ Configuration   Config;
 WiFiClient      espClient;
 
 
-String          versionDate         = "2023.06.13";
+String          versionDate         = "2023.06.16";
 int             myWiFiAPIndex       = 0;
 int             myWiFiAPSize        = Config.wifiAPs.size();
 WiFi_AP         *currentWiFi        = &Config.wifiAPs[myWiFiAPIndex];
@@ -34,7 +34,7 @@ uint32_t        lastScreenOn        = millis();
 std::vector<String> lastHeardStation;
 std::vector<String> lastHeardStation_temp;
 
-String firstLine, secondLine, thirdLine, fourthLine, iGateBeaconPacket;
+String firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, eigthLine, iGateBeaconPacket;
 
 void setup() {
   Serial.begin(115200);
@@ -55,8 +55,8 @@ void loop() {
     if (!espClient.connected()) {
       APRS_IS_Utils::connect();
     }
-    secondLine  = APRS_IS_Utils::checkStatus();
-    show_display(firstLine, secondLine, thirdLine, fourthLine, 0);    
+    APRS_IS_Utils::checkStatus();
+    show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, eigthLine, 0);    
     while (espClient.connected()) {
       Utils::checkDisplayInterval();
       Utils::checkBeaconInterval();
