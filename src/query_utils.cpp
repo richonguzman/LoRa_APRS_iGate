@@ -11,7 +11,7 @@ namespace QUERY_Utils {
 
 String process(String query, String station, String queryOrigin) {
   String answer;
-  if (query=="?APRS?" || query=="?aprs?" || query=="?Aprs?" || query=="H" || query=="h" || query=="Help" || query=="help" || query=="?") {
+  if (query=="?APRS?" || query=="?aprs?" || query=="?Aprs?" || query=="H" || query=="h" || query=="HELP" || query=="Help" || query=="help" || query=="?") {
     answer = "?APRSV ?APRSP ?APRSL ?APRSH ?WHERE callsign";
   } else if (query=="?APRSV" || query=="?aprsv" || query=="?Aprsv") {
     answer = "CD2RXU_LoRa_iGate 1.2 v" + versionDate;

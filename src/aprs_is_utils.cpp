@@ -171,7 +171,8 @@ void processAPRSISPacket(String packet) {
           lastScreenOn = millis();
           delay(500);
           espClient.write(queryAnswer.c_str());
-          show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "Callsign = " + Sender, "TYPE --> QUERY",  1000);
+          seventhLine = "Callsign = " + Sender;
+          eigthLine = "TYPE --> QUERY";
         }
       } else {
         Serial.print("Received from APRS-IS  : " + packet);
@@ -180,7 +181,7 @@ void processAPRSISPacket(String packet) {
           display_toggle(true);
           lastScreenOn = millis();
           Utils::typeOfPacket(packet);
-          show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, Sender + " -> " + Addressee, eigthLine, 0);
+          seventhLine = Sender + " -> " + Addressee;
         }
       }
     }        
