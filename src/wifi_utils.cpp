@@ -56,7 +56,7 @@ void startWiFi() {
   digitalWrite(greenLed,LOW);
   Serial.print("Connected as ");
   Serial.println(WiFi.localIP());
-  show_display("", "", "     Connected!!", "" , " loading programs...", 1000);
+  show_display("", "", "     Connected!!", "" , "     loading ...", 1000);
 }
 
 void setup() {

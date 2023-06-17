@@ -11,7 +11,6 @@
 #include "lora_utils.h"
 #include "wifi_utils.h"
 #include "digi_utils.h"
-#include "time_utils.h"
 #include "gps_utils.h"
 #include "display.h"
 #include "utils.h"
@@ -20,7 +19,7 @@ Configuration   Config;
 WiFiClient      espClient;
 
 
-String          versionDate         = "2023.06.16";
+String          versionDate         = "2023.06.17";
 int             myWiFiAPIndex       = 0;
 int             myWiFiAPSize        = Config.wifiAPs.size();
 WiFi_AP         *currentWiFi        = &Config.wifiAPs[myWiFiAPIndex];
@@ -43,7 +42,6 @@ void setup() {
   delay(1000);
   Utils::setupDiplay();
   WIFI_Utils::setup();
-  TIME_Utils::setup();
   LoRa_Utils::setup();
   Utils::validateDigiFreqs();
   iGateBeaconPacket = GPS_Utils::generateBeacon();
@@ -60,7 +58,6 @@ void loop() {
     APRS_IS_Utils::checkStatus();
     show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, eigthLine, 0);    
     while (espClient.connected()) {
-      TIME_Utils::getDateTime();
       Utils::checkDisplayInterval();
       Utils::checkBeaconInterval();
       APRS_IS_Utils::processLoRaPacket(LoRa_Utils::receivePacket());            

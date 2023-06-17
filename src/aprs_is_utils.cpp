@@ -128,7 +128,7 @@ void processLoRaPacket(String packet) {
           espClient.write(aprsPacket.c_str());
           Serial.println("   ---> Uploaded to APRS-IS");
           STATION_Utils::updateLastHeard(Sender);
-          Utils::typeOfPacket(aprsPacket);
+          Utils::typeOfPacket(aprsPacket, "LoRa-APRS");
           show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, eigthLine, 0);
         }
       }    
@@ -180,8 +180,8 @@ void processAPRSISPacket(String packet) {
           LoRa_Utils::sendNewPacket("APRS", LoRa_Utils::generatePacket(packet));
           display_toggle(true);
           lastScreenOn = millis();
-          Utils::typeOfPacket(packet);
-          seventhLine = Sender + " -> " + Addressee;
+          Utils::typeOfPacket(packet, "APRS-LoRa");
+          show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, eigthLine, 0);
         }
       }
     }        
