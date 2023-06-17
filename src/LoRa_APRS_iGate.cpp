@@ -12,6 +12,7 @@
 #include "wifi_utils.h"
 #include "digi_utils.h"
 #include "gps_utils.h"
+#include "bme_utils.h"
 #include "display.h"
 #include "utils.h"
 
@@ -47,6 +48,7 @@ void setup() {
   iGateBeaconPacket = GPS_Utils::generateBeacon();
   Utils::startOTAServer();
   SYSLOG_Utils::setup();
+  BME_Utils::setup();
 }
 
 void loop() {

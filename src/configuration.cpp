@@ -60,6 +60,8 @@ void Configuration::readFile(fs::FS &fs, const char *fileName) {
     syslog.active                   = data["syslog"]["active"].as<bool>();
     syslog.server                   = data["syslog"]["server"].as<String>();
     syslog.port                     = data["syslog"]["port"].as<int>();
+
+    bme.active                      = data["bme"]["active"].as<bool>();
     
     configFile.close();
 }

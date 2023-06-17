@@ -4,10 +4,12 @@
 #include <SPIFFS.h>
 #include <WiFi.h>
 #include "configuration.h"
+#include "station_utils.h"
 #include "syslog_utils.h"
 #include "pins_config.h"
 #include "wifi_utils.h"
 #include "lora_utils.h"
+#include "bme_utils.h"
 #include "display.h"
 #include "utils.h"
 
@@ -86,17 +88,21 @@ void checkBeaconInterval() {
         Serial.println("---- Sending iGate Beacon ----");
         if (stationMode==1 || stationMode==2) {
             thirdLine = getLocalIP();
+            STATION_Utils::deleteNotHeard();
             if (lastHeardStation.size() < 10) {
                 fifthLine = "Stations (30min) =  " + String(lastHeardStation.size());
             } else {
                 fifthLine = "Stations (30min) = " + String(lastHeardStation.size());
             }
-            //fifthLine = "";
             sixthLine = "";
             seventhLine = "";
             show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, "SENDING iGate BEACON", 1000);         
             eigthLine = "     listening...";
-            espClient.write((iGateBeaconPacket + "\n").c_str());
+            if (Config.bme.active) {
+                espClient.write((iGateBeaconPacket.substring(0,iGateBeaconPacket.indexOf(":=")+20) + "_" + BME_Utils::readDataSensor() + iGateBeaconPacket.substring(iGateBeaconPacket.indexOf(":=")+21) + " + WX" + "\n").c_str());
+            } else {
+                espClient.write((iGateBeaconPacket + "\n").c_str());
+            }
             show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, eigthLine, 0);
         } else if (stationMode==3 || stationMode==4) {
             fifthLine = "";
@@ -115,10 +121,11 @@ void checkBeaconInterval() {
         lastBeaconTx = millis();
         lastScreenOn = millis();
         beacon_update = false;
+        
     }
-    if (statusAfterBoot) {
+    /*if (statusAfterBoot) {
         processStatus();
-    }
+    }*/
 }
 
 void checkDisplayInterval() {
@@ -186,7 +193,7 @@ void startOTAServer() {
         });
         AsyncElegantOTA.begin(&server);
         server.begin();
-        Serial.println("HTTP server started (OTA Firmware Updates)!\n");
+        Serial.println("init : OTA Server     ...     done!");
     }
 }
 

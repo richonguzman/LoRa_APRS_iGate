@@ -48,5 +48,8 @@
 	"other": {
 		"beaconInterval": 5,
 		"rememberStationTime": 30
+	},
+	"bme": {
+		"active": true
 	}
 }

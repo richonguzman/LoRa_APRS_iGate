@@ -52,6 +52,11 @@ public:
   int     port;
 };
 
+class BME {
+public:
+  bool    active;
+};
+
 class Configuration {
 public:
 
@@ -66,6 +71,7 @@ public:
   LoraModule            loramodule;
   Display               display;
   SYSLOG                syslog;
+  BME                   bme;
   
 
   Configuration();
