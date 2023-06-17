@@ -41,12 +41,12 @@
 		"timeout": 4
 	},
 	"syslog": {
-		"active": true,
+		"active": false,
 		"server": "192.168.20.10",
 		"port": 514
 	},
 	"other": {
-		"beaconInterval": 5,
+		"beaconInterval": 15,
 		"rememberStationTime": 30
 	},
 	"bme": {

@@ -26,7 +26,7 @@ namespace APRS_IS_Utils {
 void connect(){
   int count = 0;
   String aprsauth;
-  Serial.print("Connecting to APRS-IS ...    ");
+  Serial.print("Connecting to APRS-IS ...     ");
   while (!espClient.connect(Config.aprs_is.server.c_str(), Config.aprs_is.port) && count < 20) {
     Serial.println("Didn't connect with server...");
     delay(1000);
