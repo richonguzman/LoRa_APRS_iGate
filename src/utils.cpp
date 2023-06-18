@@ -27,7 +27,6 @@ extern String               fourthLine;
 extern String               fifthLine;
 extern String               sixthLine;
 extern String               seventhLine;
-extern String               eigthLine;
 extern uint32_t             lastBeaconTx;
 extern uint32_t             lastScreenOn;
 extern bool                 beacon_update;
@@ -66,16 +65,16 @@ void setupDiplay() {
     setup_display();
     digitalWrite(greenLed,HIGH);
     Serial.println("\nStarting iGate: " + Config.callsign + "   Version: " + versionDate);
-    show_display("", "   LoRa APRS iGate", "", "    Richonguzman", "", "    -- CD2RXU --", "", "     " + versionDate, 4000);
+    show_display(" LoRa APRS", "      ( iGate )", "", "     Richonguzman", "     -- CD2RXU --", "", "     " + versionDate, 4000);
     digitalWrite(greenLed,LOW);
-    firstLine   = "LoRa iGate: " + Config.callsign;
+    firstLine   = Config.callsign;
     if (stationMode==3 || stationMode==4) {
         secondLine = "<DigiRepeater Active>";
     } else {
         secondLine  = "";
     }
-    seventhLine = "";
-    eigthLine  = "     listening...";
+    sixthLine = "";
+    seventhLine = "     listening...";
 }
 
 void checkBeaconInterval() {
@@ -89,27 +88,27 @@ void checkBeaconInterval() {
         if (stationMode==1 || stationMode==2) {
             thirdLine = getLocalIP();
             STATION_Utils::deleteNotHeard();
+            fourthLine = "Stations (" + String(Config.rememberStationTime) + "min) = ";
             if (lastHeardStation.size() < 10) {
-                fifthLine = "Stations (30min) =  " + String(lastHeardStation.size());
-            } else {
-                fifthLine = "Stations (30min) = " + String(lastHeardStation.size());
+                fourthLine += " ";
             }
+            fourthLine += String(lastHeardStation.size());
+            fifthLine = "";
             sixthLine = "";
-            seventhLine = "";
-            show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, "SENDING iGate BEACON", 1000);         
-            eigthLine = "     listening...";
+            show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING iGate BEACON", 1000);         
+            seventhLine = "     listening...";
             if (Config.bme.active) {
                 espClient.write((iGateBeaconPacket.substring(0,iGateBeaconPacket.indexOf(":=")+20) + "_" + BME_Utils::readDataSensor() + iGateBeaconPacket.substring(iGateBeaconPacket.indexOf(":=")+21) + " + WX" + "\n").c_str());
             } else {
                 espClient.write((iGateBeaconPacket + "\n").c_str());
             }
-            show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, eigthLine, 0);
+            show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
         } else if (stationMode==3 || stationMode==4) {
+            fourthLine = "";
             fifthLine = "";
             sixthLine = "";
-            seventhLine = "";
-            show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, "SENDING iGate BEACON", 0);
-            eigthLine = "     listening...";
+            show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING iGate BEACON", 0);
+            seventhLine = "     listening...";
             if (stationMode == 4) {
                 LoRa_Utils::changeFreqTx();
             }
@@ -151,9 +150,9 @@ void typeOfPacket(String packet, String packetType) {
     String sender;
     if (stationMode==1 || stationMode==2) {
         if (packetType == "LoRa-APRS") {
-            sixthLine = "LoRa Rx ----> APRS-IS";
+            fifthLine = "LoRa Rx ----> APRS-IS";
         } else if (packetType == "APRS-LoRa") {
-            sixthLine = "APRS-IS ----> LoRa Tx";
+            fifthLine = "APRS-IS ----> LoRa Tx";
         }
         sender = packet.substring(0,packet.indexOf(">"));
     } else {
@@ -173,16 +172,16 @@ void typeOfPacket(String packet, String packetType) {
         } else {
             seventhLine = sender + "> MESSAGE";
         }
-        eigthLine = "RSSI: 38dBm SNR: 6dBm";
+        seventhLine = "RSSI: 38dBm SNR: 6dBm";
     } else if (packet.indexOf(":>") >= 10) {
-        seventhLine = sender + "> NEW STATUS";
-        eigthLine = "RSSI: 38dBm SNR: 6dBm";
+        sixthLine = sender + "> NEW STATUS";
+        seventhLine = "RSSI: 38dBm SNR: 6dBm";
     } else if (packet.indexOf(":!") >= 10 || packet.indexOf(":=") >= 10) {
-        seventhLine = sender + "> GPS BEACON";
-        eigthLine = "RSSI:38dBm  D: 25.6km";
+        sixthLine = sender + "> GPS BEACON";
+        seventhLine = "RSSI:38dBm  D: 25.6km";
     } else {
-        seventhLine = sender + "> ??????????";
-        eigthLine = "RSSI: 38dBm SNR: 6dBm";
+        sixthLine = sender + "> ??????????";
+        seventhLine = "RSSI: 38dBm SNR: 6dBm";
     }
 }
 

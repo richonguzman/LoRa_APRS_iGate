@@ -35,7 +35,7 @@ uint32_t        lastScreenOn        = millis();
 std::vector<String> lastHeardStation;
 std::vector<String> lastHeardStation_temp;
 
-String firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, eigthLine, iGateBeaconPacket;
+String firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, iGateBeaconPacket;
 
 void setup() {
   Serial.begin(115200);
@@ -58,7 +58,7 @@ void loop() {
       APRS_IS_Utils::connect();
     }
     APRS_IS_Utils::checkStatus();
-    show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, eigthLine, 0);    
+    show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);    
     while (espClient.connected()) {
       Utils::checkDisplayInterval();
       Utils::checkBeaconInterval();

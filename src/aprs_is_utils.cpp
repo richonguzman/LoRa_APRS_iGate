@@ -19,7 +19,7 @@ extern String         fourthLine;
 extern String         fifthLine;
 extern String         sixthLine;
 extern String         seventhLine;
-extern String         eigthLine;
+
 
 namespace APRS_IS_Utils {
 
@@ -114,7 +114,7 @@ void processLoRaPacket(String packet) {
                 }
                 LoRa_Utils::sendNewPacket("APRS", QUERY_Utils::process(receivedMessage, Sender, "LoRa"));
                 lastScreenOn = millis();
-                show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "Callsign = " + Sender, "TYPE --> QUERY",  0);
+                show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, "Callsign = " + Sender, "TYPE --> QUERY",  0);
               }
             }
           }
@@ -129,7 +129,7 @@ void processLoRaPacket(String packet) {
           Serial.println("   ---> Uploaded to APRS-IS");
           STATION_Utils::updateLastHeard(Sender);
           Utils::typeOfPacket(aprsPacket, "LoRa-APRS");
-          show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, eigthLine, 0);
+          show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
         }
       }    
     } else {
@@ -171,8 +171,8 @@ void processAPRSISPacket(String packet) {
           lastScreenOn = millis();
           delay(500);
           espClient.write(queryAnswer.c_str());
-          seventhLine = "Callsign = " + Sender;
-          eigthLine = "TYPE --> QUERY";
+          sixthLine = "Callsign = " + Sender;
+          seventhLine = "TYPE --> QUERY";
         }
       } else {
         Serial.print("Received from APRS-IS  : " + packet);
@@ -181,7 +181,7 @@ void processAPRSISPacket(String packet) {
           display_toggle(true);
           lastScreenOn = millis();
           Utils::typeOfPacket(packet, "APRS-LoRa");
-          show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, eigthLine, 0);
+          show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
         }
       }
     }        

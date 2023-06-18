@@ -5,7 +5,7 @@
 extern Configuration        Config;
 extern std::vector<String>  lastHeardStation;
 extern std::vector<String>  lastHeardStation_temp;
-extern String               fifthLine;
+extern String               fourthLine;
 
 namespace STATION_Utils {
 
@@ -37,17 +37,18 @@ void updateLastHeard(String station) {
     lastHeardStation.push_back(station + "," + String(millis()));
   }
 
+  fourthLine = "Stations (" + String(Config.rememberStationTime) + "min) = ";
+  if (lastHeardStation.size() < 10) {
+    fourthLine += " ";
+  }
+  fourthLine += String(lastHeardStation.size());
+
   //////
   Serial.print("Stations Near (last 30 minutes): ");
   for (int k=0; k<lastHeardStation.size(); k++) {
     Serial.print(lastHeardStation[k].substring(0,lastHeardStation[k].indexOf(","))); Serial.print(" ");
   }
   Serial.println("");
-  if (lastHeardStation.size() < 10) {
-    fifthLine = "Stations (30min) =  " + String(lastHeardStation.size());
-  } else {
-    fifthLine = "Stations (30min) = " + String(lastHeardStation.size());
-  }
 }
 
 bool wasHeard(String station) {

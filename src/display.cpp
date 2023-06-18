@@ -137,47 +137,22 @@ void show_display(String line1, String line2, String line3, String line4, String
 void show_display(String line1, String line2, String line3, String line4, String line5, String line6, String line7, int wait) {
   display.clearDisplay();
   display.setTextColor(WHITE);
-  display.setTextSize(1);
+  display.setTextSize(2);
   display.setCursor(0, 0);
   display.println(line1);
-  display.setCursor(0, 8);
-  display.println(line2);
-  display.setCursor(0, 16);
-  display.println(line3);
-  display.setCursor(0, 24);
-  display.println(line4);
-  display.setCursor(0, 32);
-  display.println(line5);
-  display.setCursor(0, 40);
-  display.println(line6);
-  display.setCursor(0, 48);
-  display.println(line7);
-  display.ssd1306_command(SSD1306_SETCONTRAST);
-  display.ssd1306_command(1);
-  display.display();
-  delay(wait);
-}
-
-void show_display(String line1, String line2, String line3, String line4, String line5, String line6, String line7, String line8, int wait) {
-  display.clearDisplay();
-  display.setTextColor(WHITE);
   display.setTextSize(1);
-  display.setCursor(0, 0);
-  display.println(line1);
-  display.setCursor(0, 8);
-  display.println(line2);
   display.setCursor(0, 16);
-  display.println(line3);
+  display.println(line2);
   display.setCursor(0, 24);
-  display.println(line4);
+  display.println(line3);
   display.setCursor(0, 32);
-  display.println(line5);
+  display.println(line4);
   display.setCursor(0, 40);
-  display.println(line6);
+  display.println(line5);
   display.setCursor(0, 48);
-  display.println(line7);
+  display.println(line6);
   display.setCursor(0, 56);
-  display.println(line8);
+  display.println(line7);
   display.ssd1306_command(SSD1306_SETCONTRAST);
   display.ssd1306_command(1);
   display.display();
