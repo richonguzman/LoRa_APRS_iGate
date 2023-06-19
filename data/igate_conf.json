@@ -29,8 +29,8 @@
 	},
 	"lora": {
 		"iGateFreq": 433775000,
-		"digirepeaterTxFreq": 433900000,
-		"digirepeaterRxFreq": 433775000,
+		"digirepeaterTxFreq": 433775000,
+		"digirepeaterRxFreq": 433900000,
 		"spreadingFactor": 12,
 		"signalBandwidth": 125000,
 		"codingRate4": 5,

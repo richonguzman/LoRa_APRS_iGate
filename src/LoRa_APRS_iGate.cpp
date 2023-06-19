@@ -72,7 +72,7 @@ void loop() {
   } else if (stationMode==3 || stationMode==4) {    // DigiRepeater (3 RxFreq=TxFreq / 4 RxFreq!=TxFreq)
     Utils::checkDisplayInterval();
     Utils::checkBeaconInterval();
-    show_display(firstLine, secondLine, thirdLine, fourthLine, 0);
+    show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
     DIGI_Utils::processPacket(LoRa_Utils::receivePacket());
   }
 }

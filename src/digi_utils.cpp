@@ -1,4 +1,5 @@
 #include "configuration.h"
+#include "station_utils.h"
 #include "lora_utils.h"
 #include "digi_utils.h"
 #include "display.h"
@@ -16,8 +17,10 @@ void processPacket(String packet) {
         Serial.print("Received Lora Packet   : " + String(packet));
         if ((packet.substring(0, 3) == "\x3c\xff\x01") && (packet.indexOf("NOGATE") == -1)) {
             Serial.println("   ---> APRS LoRa Packet");
+            String sender = packet.substring(3,packet.indexOf(">"));
+            STATION_Utils::updateLastHeard(sender);
+            Utils::typeOfPacket(packet, "Digi");
             if ((stationMode==3) && (packet.indexOf("WIDE1-1") > 10)) {
-                Utils::typeOfPacket(packet, "Digi");
                 loraPacket = packet.substring(3);
                 loraPacket.replace("WIDE1-1", Config.callsign + "*");
                 delay(500);
@@ -25,7 +28,6 @@ void processPacket(String packet) {
                 display_toggle(true);
                 lastScreenOn = millis();
             } else if (stationMode ==4){
-                Utils::typeOfPacket(packet, "Digi");
                 if (packet.indexOf("WIDE1-1") == -1) {
                     loraPacket = packet.substring(3,packet.indexOf(":")) + "," + Config.callsign + "*" + packet.substring(packet.indexOf(":"));
                 } else {

@@ -3,7 +3,8 @@
 #include "gps_utils.h"
 #include "display.h"
 
-extern Configuration Config;
+extern Configuration  Config;
+extern String         fifthLine;
 
 namespace BME_Utils {
 
@@ -94,17 +95,20 @@ String readDataSensor() {
   float newTemp   = bme.readTemperature();
   float newHum    = bme.readHumidity();
   float newPress  = (bme.readPressure() / 100.0F);
+  
   //float bat       = analogRead(battery);
   //bme.readAltitude(SEALEVELPRESSURE_HPA)
   
   if (isnan(newTemp) || isnan(newHum) || isnan(newPress)) {
     Serial.println("BME280 Module data failed");
     wx = ".../...g...t...r...p...P...h..b.....";
+    fifthLine = "";
     return wx;
   } else {
     tempStr = generateTempString((newTemp * 1.8) + 32);
     humStr  = generateHumString(newHum);
     presStr = generatePresString(newPress);
+    fifthLine = "BME-> " + String(int(newTemp))+"C " + humStr + "% " + presStr.substring(0,4) + "hPa";
     wx = ".../...g...t" + tempStr + "r...p...P...h" + humStr + "b" + presStr;
     return wx;
   }
