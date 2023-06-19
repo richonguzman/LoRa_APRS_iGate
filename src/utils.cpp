@@ -136,9 +136,9 @@ void checkBeaconInterval() {
         beacon_update = false;
         
     }
-    /*if (statusAfterBoot) {
+    if (statusAfterBoot) {
         processStatus();
-    }*/
+    }
 }
 
 void checkDisplayInterval() {
@@ -181,10 +181,9 @@ void typeOfPacket(String packet, String packetType) {
             String addresseeAndMessage = packet.substring(packet.indexOf("::")+2);
             String addressee = addresseeAndMessage.substring(0, addresseeAndMessage.indexOf(":"));
             addressee.trim();
-            seventhLine = sender + " > " + addressee;
-            Serial.println("mensaje desde " + seventhLine);
+            sixthLine = sender + " > " + addressee;
         } else {
-            seventhLine = sender + "> MESSAGE";
+            sixthLine = sender + "> MESSAGE";
         }
         seventhLine = "RSSI: 38dBm SNR: 6dBm";
     } else if (packet.indexOf(":>") >= 10) {

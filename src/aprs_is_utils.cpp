@@ -171,8 +171,13 @@ void processAPRSISPacket(String packet) {
           lastScreenOn = millis();
           delay(500);
           espClient.write(queryAnswer.c_str());
-          sixthLine = "Callsign = " + Sender;
-          seventhLine = "TYPE --> QUERY";
+          fifthLine = "APRS-IS ----> APRS-IS";
+          sixthLine = Config.callsign;
+          for (int j=sixthLine.length();j<9;j++) {
+            sixthLine += " ";
+          }
+          sixthLine += "> " + Sender;
+          seventhLine = "QUERY = " + receivedMessage;
         }
       } else {
         Serial.print("Received from APRS-IS  : " + packet);
@@ -181,9 +186,9 @@ void processAPRSISPacket(String packet) {
           display_toggle(true);
           lastScreenOn = millis();
           Utils::typeOfPacket(packet, "APRS-LoRa");
-          show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
         }
       }
+      show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
     }        
   }
 }

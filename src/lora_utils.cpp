@@ -30,7 +30,7 @@ void setup() {
   LoRa.setCodingRate4(Config.loramodule.codingRate4);
   LoRa.enableCrc();
   LoRa.setTxPower(Config.loramodule.power);
-  Serial.println("init : LoRa Module    ...     done!");
+  Serial.print("init : LoRa Module    ...     done!");
 }
 
 void sendNewPacket(const String &typeOfMessage, const String &newPacket) {
