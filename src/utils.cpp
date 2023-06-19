@@ -9,6 +9,7 @@
 #include "pins_config.h"
 #include "wifi_utils.h"
 #include "lora_utils.h"
+#include "gps_utils.h"
 #include "bme_utils.h"
 #include "display.h"
 #include "utils.h"
@@ -33,6 +34,10 @@ extern bool                 beacon_update;
 extern int                  stationMode;
 extern String               iGateBeaconPacket;
 extern std::vector<String>  lastHeardStation;
+extern int                  rssi;
+extern float                snr;
+extern int                  freqError;
+extern String               distance;
 
 namespace Utils {
 
@@ -185,16 +190,23 @@ void typeOfPacket(String packet, String packetType) {
         } else {
             sixthLine = sender + "> MESSAGE";
         }
-        seventhLine = "RSSI: 38dBm SNR: 6dBm";
+        seventhLine = "RSSI:" + String(rssi) + "dBm SNR: " + String(snr) + "dBm";
     } else if (packet.indexOf(":>") >= 10) {
         sixthLine = sender + "> NEW STATUS";
-        seventhLine = "RSSI: 38dBm SNR: 6dBm";
+        seventhLine = "RSSI:" + String(rssi) + "dBm SNR: " + String(snr) + "dBm";
     } else if (packet.indexOf(":!") >= 10 || packet.indexOf(":=") >= 10) {
         sixthLine = sender + "> GPS BEACON";
-        seventhLine = "RSSI:38dBm  D: 25.6km";
+        GPS_Utils::getDistance(packet);
+        seventhLine = "RSSI:" + String(rssi) + "dBm ";
+        if (distance.indexOf(".") == 2) {
+            seventhLine += " ";
+        } else if (distance.indexOf(".") == 1) {
+            seventhLine += "  ";
+        }
+        seventhLine += "D:" + distance + "km";
     } else {
         sixthLine = sender + "> ??????????";
-        seventhLine = "RSSI: 38dBm SNR: 6dBm";
+        seventhLine = "RSSI:" + String(rssi) + "dBm SNR: " + String(snr) + "dBm";
     }
 }
 

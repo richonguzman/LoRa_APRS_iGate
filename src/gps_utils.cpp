@@ -5,6 +5,7 @@
 extern Configuration  Config;
 extern WiFi_AP        *currentWiFi;
 extern int            stationMode;
+String                distance;
 
 namespace GPS_Utils {
 
@@ -113,8 +114,8 @@ String decodeEncodedGPS(String packet) {
   int X3 = int(encodedLongtitude[2]);
   int X4 = int(encodedLongtitude[3]);
   float decodedLongitude = -180.0 + ((((X1-33) * pow(91,3)) + ((X2-33) * pow(91,2)) + ((X3-33) * 91) + X4-33) / 190463.0);
-  
-  return String(decodedLatitude) + "N / " + String(decodedLongitude) + "E / " + String(calculateDistanceTo(decodedLatitude, decodedLongitude)) + "km";
+  distance = String(calculateDistanceTo(decodedLatitude, decodedLongitude),1);
+  return String(decodedLatitude) + "N / " + String(decodedLongitude) + "E / " + distance + "km";
 }
 
 String getReceivedGPS(String packet) {
@@ -145,7 +146,8 @@ String getReceivedGPS(String packet) {
   if (LngSign == "W") {
     convertedLongitude = -convertedLongitude;
   }
-  return String(convertedLatitude) + "N / " + String(convertedLongitude) + "E / " + String(calculateDistanceTo(convertedLatitude, convertedLongitude)) + "km";
+  distance = String(calculateDistanceTo(convertedLatitude, convertedLongitude),1);
+  return String(convertedLatitude) + "N / " + String(convertedLongitude) + "E / " + distance + "km";
 }
 
 String getDistance(String packet) {
