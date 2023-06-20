@@ -1,28 +1,28 @@
 {
-	"callsign": "CD2RXU-10",
-	"stationMode": 2,
+	"callsign": "NOCALL-10",
+	"stationMode": 1,
 	"iGateComment": "LoRa_APRS_iGate",
 	"wifi": {
 		"AP": [
-			{	"ssid": "Richon",
-				"password": "k4fPnmg5qnyf",
-				"latitude": -33.0337313,
-				"longitude": -71.5737261
+			{	"ssid": "WIFI_1",
+				"password": "password_1",
+				"latitude": 0.0000000,
+				"longitude": 0.0000000
 			},
-			{	"ssid": "Jimenita",
-				"password": "mg6wyMhqRnxk",
-				"latitude": -33.0312492,
-				"longitude": -71.5796215
+			{	"ssid": "WIFI_2",
+				"password": "password_2",
+				"latitude": 0.0000000,
+				"longitude": 0.0000000
 			}
 		]
 	},
 	"digi": {
 		"comment": "LoRa_APRS_Digirepeater",
-		"latitude": -33.0338131,
-		"longitude": -71.5737237
+		"latitude": 0.0000000,
+		"longitude": 0.0000000
 	},
 	"aprs_is": {
-		"passcode": "23201",
+		"passcode": "VWXYZ",
 		"server": "soam.aprs2.net",
 		"port": 14580,
 		"reportingDistance": 30
@@ -43,7 +43,7 @@
 	},
 	"syslog": {
 		"active": false,
-		"server": "192.168.20.10",
+		"server": "192.168.0.100",
 		"port": 514
 	},
 	"other": {
