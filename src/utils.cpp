@@ -197,11 +197,14 @@ void typeOfPacket(String packet, String packetType) {
     } else if (packet.indexOf(":!") >= 10 || packet.indexOf(":=") >= 10) {
         sixthLine = sender + "> GPS BEACON";
         GPS_Utils::getDistance(packet);
-        seventhLine = "RSSI:" + String(rssi) + "dBm ";
-        if (distance.indexOf(".") == 2) {
+        seventhLine = "RSSI:" + String(rssi) + "dBm";
+        if (rssi <= -100) {
             seventhLine += " ";
-        } else if (distance.indexOf(".") == 1) {
+        } else {
             seventhLine += "  ";
+        }
+        if (distance.indexOf(".") == 1) {
+            seventhLine += " ";
         }
         seventhLine += "D:" + distance + "km";
     } else {
