@@ -14,12 +14,12 @@ But under the hood is much more:
 - Sending events to remote syslog server.
 - OTA update capability (for Firmware and Filesystem).
 - RX first, TX will only be done if there is no traffic on the frequency.
-- automatic update of the Lora symbol at APRS-IS, black "L" for pure RX, red "L" for TX capability and green "L" for digipeater.
+- automatic update of the Lora symbol at APRS-IS, black "L" for pure RX, red "L" for TX capability, green star "L" for digipeater and blue round "L" for WX iGate.
 - support for multiple WLAN with corresponding coordinates.
+- support for BME280 sensors, sending to WX data to APRS-IS.
 
 and more will come:
 - Web-UI
-- support for BME280 sensors, sending to APRS-IS
 - ...
 
 __________________________________________
@@ -65,7 +65,11 @@ e) LORA section:
 
 f) Syslog section:
     
-    adjust server and port to a suitable value.
+    adjust server and port to a suitable value if needed.
+
+g) BME section:
+
+    adjust to "active" if BME280 sensor connected through I2C pins
 
 __________________________________________
 
