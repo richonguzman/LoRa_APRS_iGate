@@ -26,7 +26,7 @@ String process(String query, String station, String queryOrigin) {
       }
       answer.trim();
     }
-  } else if (query.indexOf("?APRSH") == 0 || query.indexOf("?aprsv") == 0 || query.indexOf("?Aprsv") == 0) {
+  } else if (query.indexOf("?APRSH") == 0 || query.indexOf("?aprsh") == 0 || query.indexOf("?Aprsh") == 0) {
      // sacar callsign despues de ?APRSH
     Serial.println("escuchaste a X estacion? en las ultimas 24 o 8 horas?");
     answer = "APRSH on development 73!";
