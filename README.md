@@ -1,5 +1,7 @@
 # Richonguzman / CD2RXU LoRa APRS iGate/Digirepeater
 
+## If you have the 2023.06.12 or 13 firmware you can update the firmware to 2023.06.19 with <a href="https://heltec.org/project/wifi-lora-32/" target="_blank">this</a> file over OTA (without needing Filesystem update or connecting with VSCODE)
+
 This next generation LoRa iGate can work as:
 - pure RX-iGate, 
 - Rx+Tx-iGate and distribute messages and weather forecasts to heard trackers, and 
