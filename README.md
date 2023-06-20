@@ -69,8 +69,8 @@ __________________________________________
 
 LoRa APRS iGATE/Digirepeater working on this boards:
 - LILYGO ESP32 LoRa32 v2-1-1.6
-- ESP32 Wroom Dev +  SX1278 LoRa Module for a DIY Version
-- HELTEC_WIFI_LORA_32_V2 (add "#define OLED_RESET 16" on "pins_config.h")
+- ESP32 Wroom +  SX1278 LoRa Module for a DIY Version.
+- HELTEC_WIFI_LORA_32_V2 (check "pins_config.h" and "display.cpp" for aditional configuration).
 __________________________________________
 Versions:
 - 2023.02.10 First Beta (receiving LoRa Beacon/Packets and uploading to APRS-IS).
@@ -81,8 +81,11 @@ Versions:
 - 2023.05.23 Processing Query's from RF/LoRa or APRS-IS (Send "Help" Message to test).
 - 2023.06.06 Full repack of Code and adding _enableTx_ only for Ham Ops.
 - 2023.06.08 Adding Digirepeater Functions.
-- 2023.06.10 OTA for Firmware and Filesystem.
+- 2023.06.10 OTA update support for Firmware and Filesystem.
 - 2023.06.12 Syslog added.
+- 2023.06.17 Support for BME280 Module (Temperature, Humidity, Pressure) added.
+- 2023.06.18 Info on Oled Screen mayor update, added RSSI and Distance to Listened Station.
+- 2023.06.19 Failsafe mods to configuration to ensure correct OTA updates.
 __________________________________________
 
 Special Thanks to the help in testing and developing to Manfred (DC2MH) , for showing me the "way of good coding" to Tihomir (CA3TSK) and much more Ham Licence Ops all over the world.

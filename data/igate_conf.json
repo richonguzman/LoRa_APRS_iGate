@@ -51,6 +51,6 @@
 		"rememberStationTime": 30
 	},
 	"bme": {
-		"active": true
+		"active": false
 	}
 }

@@ -10,8 +10,8 @@
 #define LORA_RST    23      // GPIO14   - SX1276 RST
 #define LORA_IRQ    26      // GPIO26   - SX1276 IRQ ---->DIO0
 
-#define OLED_SDA    21
-#define OLED_SCL    22
+#define OLED_SDA    21      // change to "4" in Heltec WiFi Lora 32 V2
+#define OLED_SCL    22      // change to "15" in Heltec WiFi Lora 32 V2 
 
 #define greenLed    25      // Green Led
 
