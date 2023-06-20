@@ -1,13 +1,13 @@
 {
-	"callsign": "CD2RXU-11",
+	"callsign": "CD2RXU-10",
 	"stationMode": 2,
 	"iGateComment": "LoRa_APRS_iGate",
 	"wifi": {
 		"AP": [
 			{	"ssid": "Richon",
 				"password": "k4fPnmg5qnyf",
-				"latitude": -33.0468601,
-				"longitude": -71.6270988
+				"latitude": -33.0337313,
+				"longitude": -71.5737261
 			},
 			{	"ssid": "Jimenita",
 				"password": "mg6wyMhqRnxk",
@@ -38,7 +38,8 @@
 	},
 	"display": {
 		"alwaysOn": true,
-		"timeout": 4
+		"timeout": 4,
+		"turn180" : false
 	},
 	"syslog": {
 		"active": false,

@@ -43,6 +43,7 @@ class Display {
 public:
   bool    alwaysOn;
   int     timeout;
+  bool    turn180;
 };
 
 class SYSLOG {
