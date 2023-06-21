@@ -66,7 +66,7 @@ String getLocalIP() {
     return "IP :  " + String(WiFi.localIP()[0]) + "." + String(WiFi.localIP()[1]) + "." + String(WiFi.localIP()[2]) + "." + String(WiFi.localIP()[3]);
 }
 
-void setupDiplay() {
+void setupDisplay() {
     setup_display();
     digitalWrite(greenLed,HIGH);
     Serial.println("\nStarting iGate: " + Config.callsign + "   Version: " + versionDate);

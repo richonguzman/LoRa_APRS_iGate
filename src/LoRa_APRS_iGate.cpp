@@ -41,7 +41,7 @@ void setup() {
   Serial.begin(115200);
   pinMode(greenLed, OUTPUT);
   delay(1000);
-  Utils::setupDiplay();
+  Utils::setupDisplay();
   WIFI_Utils::setup();
   LoRa_Utils::setup();
   Utils::validateDigiFreqs();

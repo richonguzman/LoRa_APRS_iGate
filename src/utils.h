@@ -7,7 +7,7 @@ namespace Utils {
 
 void processStatus();
 String getLocalIP();
-void setupDiplay();
+void setupDisplay();
 void activeStations();
 void checkBeaconInterval();
 void checkDisplayInterval();
