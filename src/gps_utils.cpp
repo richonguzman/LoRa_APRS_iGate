@@ -10,12 +10,14 @@ String                distance;
 namespace GPS_Utils {
 
 String double2string(double n, int ndec) {
-    String r = "";
+   String r = "";
+    if (n>-1 && n<0) {
+      r = "-";
+    }   
     int v = n;
     r += v;
     r += '.';
-    int i;
-    for (i=0;i<ndec;i++) {
+    for (int i=0;i<ndec;i++) {
         n -= v;
         n = 10 * abs(n);
         v = n;
