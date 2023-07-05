@@ -207,6 +207,9 @@ void typeOfPacket(String packet, String packetType) {
             seventhLine += " ";
         }
         seventhLine += "D:" + distance + "km";
+    } else if (packet.indexOf(":T#") >= 10 && packet.indexOf(":=/") == -1) {
+        sixthLine = sender + "> TELEMETRY";
+        seventhLine = "RSSI:" + String(rssi) + "dBm SNR: " + String(snr) + "dBm";
     } else {
         sixthLine = sender + "> ??????????";
         seventhLine = "RSSI:" + String(rssi) + "dBm SNR: " + String(snr) + "dBm";
