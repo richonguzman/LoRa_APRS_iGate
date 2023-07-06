@@ -99,6 +99,14 @@ void checkBeaconInterval() {
         Serial.println("---- Sending iGate Beacon ----");
         STATION_Utils::deleteNotHeard();
         activeStations();
+        if (Config.bme.active) {
+            beaconPacket = iGateBeaconPacket.substring(0,iGateBeaconPacket.indexOf(":=")+20) + "_" + BME_Utils::readDataSensor() + iGateBeaconPacket.substring(iGateBeaconPacket.indexOf(":=")+21) + " + WX";
+        } else {
+            beaconPacket = iGateBeaconPacket;
+        }
+        if (Config.sendBatteryVoltage) {
+            beaconPacket += " (Batt=" + String(BATTERY_Utils::checkVoltages(),2) + "V)";
+        }
         if (stationMode==1 || stationMode==2) {
             thirdLine = getLocalIP();
             if (!Config.bme.active) {
@@ -107,14 +115,6 @@ void checkBeaconInterval() {
             sixthLine = "";
             show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING iGate BEACON", 1000);         
             seventhLine = "     listening...";
-            if (Config.bme.active) {
-                beaconPacket = iGateBeaconPacket.substring(0,iGateBeaconPacket.indexOf(":=")+20) + "_" + BME_Utils::readDataSensor() + iGateBeaconPacket.substring(iGateBeaconPacket.indexOf(":=")+21) + " + WX";
-            } else {
-                beaconPacket = iGateBeaconPacket;
-            }
-            if (Config.sendBatteryVoltage) {
-                beaconPacket += " (Batt=" + String(BATTERY_Utils::checkVoltages(),2) + "V)";
-            }
             espClient.write((beaconPacket + "\n").c_str());
             show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
         } else if (stationMode==3 || stationMode==4) {
@@ -132,14 +132,6 @@ void checkBeaconInterval() {
             seventhLine = "     listening...";
             if (stationMode == 4) {
                 LoRa_Utils::changeFreqTx();
-            }
-            if (Config.bme.active) {
-                beaconPacket = iGateBeaconPacket.substring(0,iGateBeaconPacket.indexOf(":=")+20) + "_" + BME_Utils::readDataSensor() + iGateBeaconPacket.substring(iGateBeaconPacket.indexOf(":=")+21) + " + WX";
-            } else {
-                beaconPacket = iGateBeaconPacket;
-            }
-            if (Config.sendBatteryVoltage) {
-                beaconPacket += " (Batt=" + String(BATTERY_Utils::checkVoltages(),2) + "V)";
             }
             LoRa_Utils::sendNewPacket("APRS", beaconPacket);
             if (stationMode == 4) {
