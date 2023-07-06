@@ -66,6 +66,7 @@ public:
   String                iGateComment;
   int                   beaconInterval;
   int                   rememberStationTime;
+  bool                  sendBatteryVoltage;
   std::vector<WiFi_AP>  wifiAPs;
   DIGI                  digi;
   APRS_IS               aprs_is;

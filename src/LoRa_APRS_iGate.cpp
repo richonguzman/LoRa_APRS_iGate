@@ -20,14 +20,14 @@ Configuration   Config;
 WiFiClient      espClient;
 
 
-String          versionDate         = "2023.07.05";
+String          versionDate         = "2023.07.06";
 int             myWiFiAPIndex       = 0;
 int             myWiFiAPSize        = Config.wifiAPs.size();
 WiFi_AP         *currentWiFi        = &Config.wifiAPs[myWiFiAPIndex];
 
 int             stationMode         = Config.stationMode;
 bool            statusAfterBoot     = true;
-bool            beacon_update       = true;
+bool            beaconUpdate       = true;
 uint32_t        lastBeaconTx        = 0;
 uint32_t        previousWiFiMillis  = 0;
 uint32_t        lastScreenOn        = millis();

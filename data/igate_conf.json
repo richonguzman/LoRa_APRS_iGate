@@ -48,7 +48,8 @@
 	},
 	"other": {
 		"beaconInterval": 15,
-		"rememberStationTime": 30
+		"rememberStationTime": 30,
+		"sendBatteryVoltage": false
 	},
 	"bme": {
 		"active": false

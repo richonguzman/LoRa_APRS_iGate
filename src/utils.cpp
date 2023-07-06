@@ -5,6 +5,7 @@
 #include <WiFi.h>
 #include "configuration.h"
 #include "station_utils.h"
+#include "battery_utils.h"
 #include "syslog_utils.h"
 #include "pins_config.h"
 #include "wifi_utils.h"
@@ -30,7 +31,7 @@ extern String               sixthLine;
 extern String               seventhLine;
 extern uint32_t             lastBeaconTx;
 extern uint32_t             lastScreenOn;
-extern bool                 beacon_update;
+extern bool                 beaconUpdate;
 extern int                  stationMode;
 extern String               iGateBeaconPacket;
 extern std::vector<String>  lastHeardStation;
@@ -89,10 +90,11 @@ void activeStations() {
 
 void checkBeaconInterval() {
     uint32_t lastTx = millis() - lastBeaconTx;
+    String beaconPacket;
     if (lastTx >= Config.beaconInterval*60*1000) {
-        beacon_update = true;    
+        beaconUpdate = true;    
     }
-    if (beacon_update) {
+    if (beaconUpdate) {
         display_toggle(true);
         Serial.println("---- Sending iGate Beacon ----");
         STATION_Utils::deleteNotHeard();
@@ -106,10 +108,14 @@ void checkBeaconInterval() {
             show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING iGate BEACON", 1000);         
             seventhLine = "     listening...";
             if (Config.bme.active) {
-                espClient.write((iGateBeaconPacket.substring(0,iGateBeaconPacket.indexOf(":=")+20) + "_" + BME_Utils::readDataSensor() + iGateBeaconPacket.substring(iGateBeaconPacket.indexOf(":=")+21) + " + WX" + "\n").c_str());
+                beaconPacket = iGateBeaconPacket.substring(0,iGateBeaconPacket.indexOf(":=")+20) + "_" + BME_Utils::readDataSensor() + iGateBeaconPacket.substring(iGateBeaconPacket.indexOf(":=")+21) + " + WX";
             } else {
-                espClient.write((iGateBeaconPacket + "\n").c_str());
+                beaconPacket = iGateBeaconPacket;
             }
+            if (Config.sendBatteryVoltage) {
+                beaconPacket += " (Batt=" + String(BATTERY_Utils::checkVoltages(),2) + "V)";
+            }
+            espClient.write((beaconPacket + "\n").c_str());
             show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
         } else if (stationMode==3 || stationMode==4) {
             String Rx = String(Config.loramodule.digirepeaterRxFreq);
@@ -128,17 +134,21 @@ void checkBeaconInterval() {
                 LoRa_Utils::changeFreqTx();
             }
             if (Config.bme.active) {
-                LoRa_Utils::sendNewPacket("APRS",iGateBeaconPacket.substring(0,iGateBeaconPacket.indexOf(":=")+20) + "_" + BME_Utils::readDataSensor() + iGateBeaconPacket.substring(iGateBeaconPacket.indexOf(":=")+21) + " + WX");
+                beaconPacket = iGateBeaconPacket.substring(0,iGateBeaconPacket.indexOf(":=")+20) + "_" + BME_Utils::readDataSensor() + iGateBeaconPacket.substring(iGateBeaconPacket.indexOf(":=")+21) + " + WX";
             } else {
-                LoRa_Utils::sendNewPacket("APRS",iGateBeaconPacket);
+                beaconPacket = iGateBeaconPacket;
             }
+            if (Config.sendBatteryVoltage) {
+                beaconPacket += " (Batt=" + String(BATTERY_Utils::checkVoltages(),2) + "V)";
+            }
+            LoRa_Utils::sendNewPacket("APRS", beaconPacket);
             if (stationMode == 4) {
                 LoRa_Utils::changeFreqRx();
             }           
         }
         lastBeaconTx = millis();
         lastScreenOn = millis();
-        beacon_update = false;
+        beaconUpdate = false;
         
     }
     if (statusAfterBoot) {

@@ -5,7 +5,7 @@
 
 namespace BATTERY_Utils {
 
-String checkVoltages();
+float checkVoltages();
 
 }
 
