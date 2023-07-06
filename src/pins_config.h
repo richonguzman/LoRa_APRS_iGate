@@ -15,6 +15,8 @@
 
 #define greenLed    25      // Green Led
 
+#define batteryPin  35
+
 /* (Same pins for LILYGO LoRa32 and ESP32 Wroom Dev )
 SX1278-------------------> ESP32 ttgo-lora32-v21 and ESP32 WROOM Dev
 GND                         GND

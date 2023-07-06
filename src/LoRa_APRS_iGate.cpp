@@ -32,6 +32,8 @@ uint32_t        lastBeaconTx        = 0;
 uint32_t        previousWiFiMillis  = 0;
 uint32_t        lastScreenOn        = millis();
 
+String          batteryVoltage;
+
 std::vector<String> lastHeardStation;
 std::vector<String> lastHeardStation_temp;
 
@@ -39,6 +41,7 @@ String firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seven
 
 void setup() {
   Serial.begin(115200);
+  pinMode(batteryPin, INPUT);
   pinMode(greenLed, OUTPUT);
   delay(1000);
   Utils::setupDisplay();
