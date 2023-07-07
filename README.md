@@ -1,6 +1,6 @@
 # Richonguzman / CD2RXU LoRa APRS iGate/Digirepeater
 
-## If you have the 2023.06.12 or 13 firmware you can update to 2023.06.19 with <a href="https://github.com/richonguzman/LoRa_APRS_iGate/blob/main/firmware/LoRa_APRS_iGate_Richonguzman-2023-07-06.bin" target="_blank">this</a> file over OTA (without needing Filesystem update or connecting with VSCODE)
+## If you have the 2023.06.12 firmware (or later) you can update newer <a href="https://github.com/richonguzman/LoRa_APRS_iGate/tree/main/firmware" target="_blank">in here</a> , look for newest an upload over OTA (without needing VSCODE)
 
 This next generation LoRa iGate can work as:
 - pure RX-iGate, 
