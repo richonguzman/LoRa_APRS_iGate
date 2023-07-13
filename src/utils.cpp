@@ -39,6 +39,7 @@ extern int                  rssi;
 extern float                snr;
 extern int                  freqError;
 extern String               distance;
+extern String               versionDate;
 
 namespace Utils {
 
@@ -46,12 +47,12 @@ void processStatus() {
     String status = Config.callsign + ">APLRG1";
     if (stationMode==1 || stationMode==2) {
         delay(1000);
-        status += ",qAC:>https://github.com/richonguzman/LoRa_APRS_iGate";
+        status += ",qAC:>https://github.com/richonguzman/LoRa_APRS_iGate " + versionDate ;
         espClient.write((status + "\n").c_str());
         SYSLOG_Utils::log("APRSIS Tx", status,0,0,0);
     } else {
         delay(5000);
-        status += ":>https://github.com/richonguzman/LoRa_APRS_iGate";
+        status += ":>https://github.com/richonguzman/LoRa_APRS_iGate " + versionDate;
         if (stationMode == 4) {
             LoRa_Utils::changeFreqTx();
         }
