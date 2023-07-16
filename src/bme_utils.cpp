@@ -3,10 +3,12 @@
 #include "gps_utils.h"
 #include "display.h"
 
+#define SEALEVELPRESSURE_HPA (1013.25) 
+
 extern Configuration  Config;
 extern String         fifthLine;
 
-//#define SEALEVELPRESSURE_HPA (1013.25)
+
 
 namespace BME_Utils {
 
@@ -98,8 +100,7 @@ String readDataSensor() {
   float newHum    = bme.readHumidity();
   float newPress  = (bme.readPressure() / 100.0F);
   
-  //float bat       = analogRead(battery);
-  //bme.readAltitude(SEALEVELPRESSURE_HPA)
+  //bme.readAltitude(SEALEVELPRESSURE_HPA) // this is for approximate Altitude Calculation.
   
   if (isnan(newTemp) || isnan(newHum) || isnan(newPress)) {
     Serial.println("BME280 Module data failed");
