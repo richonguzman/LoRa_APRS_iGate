@@ -23,7 +23,7 @@
 	},
 	"aprs_is": {
 		"passcode": "VWXYZ",
-		"server": "soam.aprs2.net",
+		"server": "euro.aprs2.net",
 		"port": 14580,
 		"reportingDistance": 30
 	},

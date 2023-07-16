@@ -6,6 +6,8 @@
 extern Configuration  Config;
 extern String         fifthLine;
 
+//#define SEALEVELPRESSURE_HPA (1013.25)
+
 namespace BME_Utils {
 
 Adafruit_BME280   bme;

@@ -16,9 +16,9 @@
 #include "display.h"
 #include "utils.h"
 
+
 Configuration   Config;
 WiFiClient      espClient;
-
 
 String          versionDate         = "2023.07.12";
 int             myWiFiAPIndex       = 0;

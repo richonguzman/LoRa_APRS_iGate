@@ -91,7 +91,8 @@ Versions:
 - 2023.06.12 Syslog added.
 - 2023.06.17 Support for BME280 Module (Temperature, Humidity, Pressure) added.
 - 2023.06.18 Info on Oled Screen mayor update, added RSSI and Distance to Listened Station.
-- 2023.07.05 Adding monitor info of Battery connected
+- 2023.07.05 Adding monitor info of Battery connected.
+
 __________________________________________
 
 Special Thanks to the help in testing and developing to Manfred (DC2MH) , for showing me the "way of good coding" to Tihomir (CA3TSK) and much more Ham Licence Ops all over the world.
