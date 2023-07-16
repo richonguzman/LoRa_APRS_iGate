@@ -115,6 +115,9 @@ void checkBeaconInterval() {
             }
             sixthLine = "";
             show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING iGate BEACON", 1000);         
+            if (Config.sendBatteryVoltage) { 
+                sixthLine = "    " + beaconPacket;
+            }
             seventhLine = "     listening...";
             espClient.write((beaconPacket + "\n").c_str());
             show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
@@ -130,6 +133,9 @@ void checkBeaconInterval() {
             fifthLine = "";
             sixthLine = "";
             show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING iGate BEACON", 0);
+            if (Config.sendBatteryVoltage) { 
+                sixthLine = "    " + beaconPacket;
+            }
             seventhLine = "     listening...";
             if (stationMode == 4) {
                 LoRa_Utils::changeFreqTx();
