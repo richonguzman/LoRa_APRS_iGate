@@ -92,6 +92,7 @@ Versions:
 - 2023.06.17 Support for BME280 Module (Temperature, Humidity, Pressure) added.
 - 2023.06.18 Info on Oled Screen mayor update, added RSSI and Distance to Listened Station.
 - 2023.07.05 Adding monitor info of Battery connected.
+- 2023.07.16 Small OTA, BME module update.
 
 __________________________________________
 
