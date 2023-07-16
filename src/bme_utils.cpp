@@ -9,7 +9,6 @@ extern Configuration  Config;
 extern String         fifthLine;
 
 
-
 namespace BME_Utils {
 
 Adafruit_BME280   bme;
