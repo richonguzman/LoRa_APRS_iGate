@@ -116,7 +116,7 @@ void checkBeaconInterval() {
             sixthLine = "";
             show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING iGate BEACON", 1000);         
             if (Config.sendBatteryVoltage) { 
-                sixthLine = "    " + beaconPacket;
+                sixthLine = "     (Batt=" + String(BATTERY_Utils::checkVoltages(),2) + "V)";
             }
             seventhLine = "     listening...";
             espClient.write((beaconPacket + "\n").c_str());
@@ -134,7 +134,7 @@ void checkBeaconInterval() {
             sixthLine = "";
             show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING iGate BEACON", 0);
             if (Config.sendBatteryVoltage) { 
-                sixthLine = "    " + beaconPacket;
+                sixthLine = "     (Batt=" + String(BATTERY_Utils::checkVoltages(),2) + "V)";
             }
             seventhLine = "     listening...";
             if (stationMode == 4) {
