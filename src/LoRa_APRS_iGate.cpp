@@ -86,7 +86,7 @@ void loop() {
       WiFiConnect = true;
     }
     if (WiFiConnect) {
-      Serial.println("\n\n###############\ncomenzando nueva revision WiFi\n###############");
+      Serial.println("\n\n###############\nRevision WiFi\n###############");
       WIFI_Utils::startWiFi2();
       lastWiFiCheck = millis();
       WiFiConnect = false;
