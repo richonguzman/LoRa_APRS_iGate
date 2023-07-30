@@ -49,5 +49,19 @@ void processPacket(String packet) {
         }
     }
 }
+void loop() {
+    if (lastStationModeState == 0) {
+        iGateBeaconPacket = GPS_Utils::generateBeacon();
+        lastStationModeState = 1;
+        String Tx = String(Config.loramodule.digirepeaterTxFreq);
+        secondLine = "Rx:" + String(Tx.substring(0,3)) + "." + String(Tx.substring(3,6));
+        secondLine += " Tx:" + String(Tx.substring(0,3)) + "." + String(Tx.substring(3,6));
+        thirdLine = "<<   DigiRepeater  >>";
+    }
+    Utils::checkDisplayInterval();
+    Utils::checkBeaconInterval();
+    show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
+    DIGI_Utils::processPacket(LoRa_Utils::receivePacket());
+}
 
 }
