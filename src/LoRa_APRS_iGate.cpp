@@ -86,32 +86,27 @@ void loop() {
       WiFiConnect = true;
     }
     if (WiFiConnect) {
-      Serial.println("\n\n###############\ncomenzando nueva revision\n###############");
+      Serial.println("\n\n###############\ncomenzando nueva revision WiFi\n###############");
       WIFI_Utils::startWiFi2();
       lastWiFiCheck = millis();
       WiFiConnect = false;
     }
 
     if (WiFi.status() == WL_CONNECTED) {  // Modo iGate
-      Serial.println("conectado");
+      Serial.println("conectado a Wifi");
+      
+      // probar si pierde wifi que pasa...
+
+      // cuanto tiene wifi , tratar de conectarse a APRS IS
+      // si lo logra --> igate
+      // si no --------> digirepeater
+
+
     } else {                              // Modo DigiRepeater
       Utils::checkDisplayInterval();
       Utils::checkBeaconInterval();
       show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
       DIGI_Utils::processPacket(LoRa_Utils::receivePacket());
     }
-
-    /* si wifi
-      si aprs --> igate
-      else --> digi/exit
-    else--> be digi    
-    */
-
-    /*if (!espClient.connected()) {
-      APRS_IS_Utils::connect();
-
-      //  if aprsis ok --> be igate
-      //  else --> be digirepeater
-    }*/
   }
 }
