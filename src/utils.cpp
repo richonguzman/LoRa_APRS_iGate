@@ -78,9 +78,6 @@ void setupDisplay() {
     show_display(" LoRa APRS", "      ( iGate )", "", "     Richonguzman", "     -- CD2RXU --", "", "      " + versionDate, 4000);
     digitalWrite(greenLed,LOW);
     firstLine   = Config.callsign;
-    /*if (stationMode==3 || stationMode==4) {
-        thirdLine = "<<   DigiRepeater  >>";
-    }*/
     seventhLine = "     listening...";
 }
 
@@ -95,7 +92,7 @@ void activeStations() {
 void checkBeaconInterval() {
     uint32_t lastTx = millis() - lastBeaconTx;
     String beaconPacket;
-    if (lastTx >= Config.beaconInterval*12*1000) { // 60!!!
+    if (lastTx >= Config.beaconInterval*60*1000) {
         beaconUpdate = true;    
     }
     if (beaconUpdate) {
@@ -177,7 +174,7 @@ void checkBeaconInterval() {
         beaconUpdate = false;
     }
     if (statusAfterBoot) {
-        //processStatus();
+        processStatus();
     }
 }
 
@@ -192,12 +189,12 @@ void checkDisplayInterval() {
 
 void checkWiFiInterval() {
     uint32_t WiFiCheck = millis() - lastWiFiCheck;
-    if (WiFi.status() != WL_CONNECTED && WiFiCheck >= Config.lastWiFiCheck*4*1000) { //60!!!
+    if (WiFi.status() != WL_CONNECTED && WiFiCheck >= Config.lastWiFiCheck*60*1000) {
       WiFiConnect = true;
     }
     if (WiFiConnect) {
       Serial.println("\nConnecting to WiFi ...");
-      WIFI_Utils::startWiFi2();
+      WIFI_Utils::startWiFi();
       lastWiFiCheck = millis();
       WiFiConnect = false;
     }
@@ -265,7 +262,7 @@ void typeOfPacket(String packet, String packetType) {
 }
 
 void startOTAServer() {
-    if (stationMode==1 || stationMode==2) {
+    if (stationMode==1 || stationMode==2 || (stationMode==5 && WiFi.status() == WL_CONNECTED)) {
         server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
         request->send(200, "text/plain", "Hi " + Config.callsign + ", \n\nthis is your (Richonguzman/CD2RXU) LoRa iGate , version " + versionDate + ".\n\nTo update your firmware or filesystem go to: http://" + getLocalIP().substring(getLocalIP().indexOf(":")+3) + "/update\n\n\n73!");
         });

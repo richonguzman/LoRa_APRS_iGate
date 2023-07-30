@@ -24,42 +24,6 @@ void checkWiFi() {
 }
 
 void startWiFi() {
-  int status = WL_IDLE_STATUS;
-  WiFi.mode(WIFI_STA);
-  WiFi.disconnect();
-  delay(500);
-  unsigned long start = millis();
-  show_display("", "", "Connecting to Wifi:", "", currentWiFi->ssid + " ...", 0);
-  Serial.print("\nConnecting to WiFi '"); Serial.print(currentWiFi->ssid); Serial.println("' ...");
-  WiFi.begin(currentWiFi->ssid.c_str(), currentWiFi->password.c_str());
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    digitalWrite(greenLed,HIGH);
-    Serial.print('.');
-    delay(500);
-    digitalWrite(greenLed,LOW);
-    if ((millis() - start) > 15000){
-      delay(1000);
-      if(myWiFiAPIndex >= (myWiFiAPSize-1)) {
-        myWiFiAPIndex = 0;
-      } else {
-        myWiFiAPIndex++;
-      }
-      currentWiFi = &Config.wifiAPs[myWiFiAPIndex];
-      start = millis();
-      Serial.print("\nConnecting to WiFi '"); Serial.print(currentWiFi->ssid); Serial.println("' ...");
-      show_display("", "", "Connecting to Wifi:", "", currentWiFi->ssid + " ...", 0);
-      WiFi.disconnect();
-      WiFi.begin(currentWiFi->ssid.c_str(), currentWiFi->password.c_str());
-    }
-  }
-  digitalWrite(greenLed,LOW);
-  Serial.print("Connected as ");
-  Serial.println(WiFi.localIP());
-  show_display("", "", "     Connected!!", "" , "     loading ...", 1000);
-}
-
-void startWiFi2() {
   int wifiCounter = 0;
   int status = WL_IDLE_STATUS;
   WiFi.mode(WIFI_STA);
@@ -79,7 +43,9 @@ void startWiFi2() {
       delay(1000);
       if(myWiFiAPIndex >= (myWiFiAPSize-1)) {
         myWiFiAPIndex = 0;
-        wifiCounter++;
+        if (stationMode==5) {
+          wifiCounter++;
+        }
       } else {
         myWiFiAPIndex++;
       }
@@ -91,14 +57,14 @@ void startWiFi2() {
       WiFi.begin(currentWiFi->ssid.c_str(), currentWiFi->password.c_str());
     }
   }
+  digitalWrite(greenLed,LOW);
   if (WiFi.status() == WL_CONNECTED) {
-    digitalWrite(greenLed,LOW);
-    Serial.print("Connected as ");
-    Serial.println(WiFi.localIP());
-    show_display("", "", "     Connected!!", "" , "     loading ...", 1000);
-  } else {
-    Serial.println("\nNot connected to WiFi! (DigiRepeater Mode)");
-    show_display("", "", " WiFi Not Connected!", "  DigiRepeater MODE" , "     loading ...", 2000);
+      Serial.print("Connected as ");
+      Serial.println(WiFi.localIP());
+      show_display("", "", "     Connected!!", "" , "     loading ...", 1000);
+  } else if (WiFi.status() != WL_CONNECTED && stationMode==5) {
+      Serial.println("\nNot connected to WiFi! (DigiRepeater Mode)");
+      show_display("", "", " WiFi Not Connected!", "  DigiRepeater MODE" , "     loading ...", 2000);
   }
 }
 

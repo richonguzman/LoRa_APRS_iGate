@@ -81,9 +81,9 @@ void loop() {
     Utils::checkBeaconInterval();
     show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
     DIGI_Utils::processPacket(LoRa_Utils::receivePacket());
-  } else if (stationMode==5) {
+  } else if (stationMode==5) {                      // iGate when WiFi and APRS available , DigiRepeater when not (RxFreq=TxFreq)
     Utils::checkWiFiInterval();
-    if (WiFi.status() == WL_CONNECTED) {  // Modo iGate
+    if (WiFi.status() == WL_CONNECTED) {  // iGate Mode
       thirdLine = Utils::getLocalIP();
       if (!espClient.connected()) {
         APRS_IS_Utils::connect();
@@ -91,6 +91,7 @@ void loop() {
       if (lastStationModeState == 1) {
         iGateBeaconPacket = GPS_Utils::generateBeacon();
         lastStationModeState = 0;
+        Utils::startOTAServer();
       }
       APRS_IS_Utils::checkStatus();
       show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);    
@@ -104,7 +105,7 @@ void loop() {
           APRS_IS_Utils::processAPRSISPacket(aprsisPacket);
         }
       }
-    } else {                              // Modo DigiRepeater
+    } else {                              // DigiRepeater Mode
       if (lastStationModeState == 0) {
         iGateBeaconPacket = GPS_Utils::generateBeacon();
         lastStationModeState = 1;
