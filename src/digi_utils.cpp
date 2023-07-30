@@ -20,7 +20,7 @@ void processPacket(String packet) {
             String sender = packet.substring(3,packet.indexOf(">"));
             STATION_Utils::updateLastHeard(sender);
             Utils::typeOfPacket(packet, "Digi");
-            if ((stationMode==3) && (packet.indexOf("WIDE1-1") > 10)) {
+            if ((stationMode==3 || stationMode==5) && (packet.indexOf("WIDE1-1") > 10)) {
                 loraPacket = packet.substring(3);
                 loraPacket.replace("WIDE1-1", Config.callsign + "*");
                 delay(500);

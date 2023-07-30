@@ -137,21 +137,36 @@ void checkBeaconInterval() {
                 sixthLine = "     (Batt=" + String(BATTERY_Utils::checkVoltages(),2) + "V)";
             }
             seventhLine = "     listening...";
-            if (stationMode == 4) {
+            if (stationMode==4) {
                 LoRa_Utils::changeFreqTx();
             }
             LoRa_Utils::sendNewPacket("APRS", beaconPacket);
-            if (stationMode == 4) {
+            if (stationMode==4) {
                 LoRa_Utils::changeFreqRx();
-            }           
+            }
+        } else if (stationMode==5) {
+            if (WiFi.status() != WL_CONNECTED) {
+                String Tx = String(Config.loramodule.digirepeaterTxFreq);
+                secondLine = "Rx:" + String(Tx.substring(0,3)) + "." + String(Tx.substring(3,6));
+                secondLine += " Tx:" + String(Tx.substring(0,3)) + "." + String(Tx.substring(3,6));
+                fifthLine = "";
+                sixthLine = "";
+                show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING iGate BEACON", 0);
+                if (Config.sendBatteryVoltage) { 
+                    sixthLine = "     (Batt=" + String(BATTERY_Utils::checkVoltages(),2) + "V)";
+                }
+                seventhLine = "     listening...";
+                LoRa_Utils::sendNewPacket("APRS", beaconPacket);
+            } else {
+                Serial.println("enviando beacon por APRS WIFI");
+            }
         }
         lastBeaconTx = millis();
         lastScreenOn = millis();
         beaconUpdate = false;
-        
     }
     if (statusAfterBoot) {
-        processStatus();
+        //processStatus();
     }
 }
 
