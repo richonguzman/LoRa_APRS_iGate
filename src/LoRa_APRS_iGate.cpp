@@ -20,20 +20,21 @@
 Configuration   Config;
 WiFiClient      espClient;
 
-String          versionDate         = "2023.07.30";
-int             myWiFiAPIndex       = 0;
-int             myWiFiAPSize        = Config.wifiAPs.size();
-WiFi_AP         *currentWiFi        = &Config.wifiAPs[myWiFiAPIndex];
+String          versionDate           = "2023.07.30";
+int             myWiFiAPIndex         = 0;
+int             myWiFiAPSize          = Config.wifiAPs.size();
+WiFi_AP         *currentWiFi          = &Config.wifiAPs[myWiFiAPIndex];
 
-int             stationMode         = Config.stationMode;
-bool            statusAfterBoot     = true;
-bool            beaconUpdate        = true;
-uint32_t        lastBeaconTx        = 0;
-uint32_t        previousWiFiMillis  = 0;
-uint32_t        lastScreenOn        = millis();
+int             stationMode           = Config.stationMode;
+bool            statusAfterBoot       = true;
+bool            beaconUpdate          = true;
+uint32_t        lastBeaconTx          = 0;
+uint32_t        previousWiFiMillis    = 0;
+uint32_t        lastScreenOn          = millis();
 
-uint32_t        lastWiFiCheck       = 0;
-bool            WiFiConnect         = true;
+uint32_t        lastWiFiCheck         = 0;
+bool            WiFiConnect           = true;
+int             lastStationModeState  = 1;
 
 String          batteryVoltage;
 
@@ -82,7 +83,7 @@ void loop() {
     DIGI_Utils::processPacket(LoRa_Utils::receivePacket());
   } else if (stationMode==5) {
     uint32_t WiFiCheck = millis() - lastWiFiCheck;
-    if (WiFi.status() != WL_CONNECTED && WiFiCheck >= Config.lastWiFiCheck*33*1000) {
+    if (WiFi.status() != WL_CONNECTED && WiFiCheck >= Config.lastWiFiCheck*4*1000) {
       WiFiConnect = true;
     }
     if (WiFiConnect) {
@@ -91,17 +92,33 @@ void loop() {
       lastWiFiCheck = millis();
       WiFiConnect = false;
     }
-
     if (WiFi.status() == WL_CONNECTED) {  // Modo iGate
-      Serial.println("conectado a Wifi: " + currentWiFi->ssid);
-      // probar si pierde wifi que pasa...
-
-      // cuanto tiene wifi , tratar de conectarse a APRS IS
-      // si lo logra --> igate
-      // si no --------> digirepeater
-
-
+      thirdLine = Utils::getLocalIP();
+      if (!espClient.connected()) {
+        APRS_IS_Utils::connect();
+      }
+      if (lastStationModeState == 1) {
+        iGateBeaconPacket = GPS_Utils::generateBeacon();
+        lastStationModeState = 0;
+      }
+      APRS_IS_Utils::checkStatus();
+      show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);    
+      while (espClient.connected()) {
+        Utils::checkDisplayInterval();
+        Utils::checkBeaconInterval();
+        APRS_IS_Utils::processLoRaPacket(LoRa_Utils::receivePacket());            
+        if (espClient.available()) {
+          String aprsisPacket;
+          aprsisPacket.concat(espClient.readStringUntil('\r'));
+          APRS_IS_Utils::processAPRSISPacket(aprsisPacket);
+        }
+      }
     } else {                              // Modo DigiRepeater
+      if (lastStationModeState == 0) {
+        iGateBeaconPacket = GPS_Utils::generateBeacon();
+        lastStationModeState = 1;
+        thirdLine = "<<   DigiRepeater  >>";
+      }
       Utils::checkDisplayInterval();
       Utils::checkBeaconInterval();
       show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);

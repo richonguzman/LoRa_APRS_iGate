@@ -5,7 +5,7 @@
     "wifi": {
         "AP": [
             {   "ssid": "Richon",
-                "password": "k4fPnmg5qny",
+                "password": "k4fPnmg5qnyf",
                 "latitude": -33.0337313,
                 "longitude": -71.5737261
             },
@@ -22,7 +22,7 @@
 		"longitude": -71.1202063
 	},
 	"aprs_is": {
-		"passcode": "23201",
+		"passcode": "23202",
 		"server": "euro.aprs2.net",
 		"port": 14580,
 		"reportingDistance": 30

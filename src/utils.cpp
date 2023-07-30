@@ -6,6 +6,7 @@
 #include "configuration.h"
 #include "station_utils.h"
 #include "battery_utils.h"
+#include "aprs_is_utils.h"
 #include "syslog_utils.h"
 #include "pins_config.h"
 #include "wifi_utils.h"
@@ -75,9 +76,9 @@ void setupDisplay() {
     show_display(" LoRa APRS", "      ( iGate )", "", "     Richonguzman", "     -- CD2RXU --", "", "      " + versionDate, 4000);
     digitalWrite(greenLed,LOW);
     firstLine   = Config.callsign;
-    if (stationMode==3 || stationMode==4) {
+    /*if (stationMode==3 || stationMode==4) {
         thirdLine = "<<   DigiRepeater  >>";
-    }
+    }*/
     seventhLine = "     listening...";
 }
 
@@ -92,7 +93,7 @@ void activeStations() {
 void checkBeaconInterval() {
     uint32_t lastTx = millis() - lastBeaconTx;
     String beaconPacket;
-    if (lastTx >= Config.beaconInterval*60*1000) {
+    if (lastTx >= Config.beaconInterval*12*1000) { // 60!!!
         beaconUpdate = true;    
     }
     if (beaconUpdate) {
@@ -130,6 +131,7 @@ void checkBeaconInterval() {
                 secondLine = "Rx:" + String(Rx.substring(0,3)) + "." + String(Rx.substring(3,6));
             }
             secondLine += " Tx:" + String(Tx.substring(0,3)) + "." + String(Tx.substring(3,6));
+            thirdLine = "<<   DigiRepeater  >>";
             fifthLine = "";
             sixthLine = "";
             show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING iGate BEACON", 0);
@@ -145,10 +147,25 @@ void checkBeaconInterval() {
                 LoRa_Utils::changeFreqRx();
             }
         } else if (stationMode==5) {
-            if (WiFi.status() != WL_CONNECTED) {
+            if (WiFi.status() == WL_CONNECTED && espClient.connected()) {
+                APRS_IS_Utils::checkStatus();
+                thirdLine = getLocalIP();
+                if (!Config.bme.active) {
+                    fifthLine = "";
+                }
+                sixthLine = "";
+                show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING iGate BEACON", 1000);         
+                if (Config.sendBatteryVoltage) { 
+                    sixthLine = "     (Batt=" + String(BATTERY_Utils::checkVoltages(),2) + "V)";
+                }
+                seventhLine = "     listening...";
+                espClient.write((beaconPacket + "\n").c_str());
+                show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
+            } else {
                 String Tx = String(Config.loramodule.digirepeaterTxFreq);
                 secondLine = "Rx:" + String(Tx.substring(0,3)) + "." + String(Tx.substring(3,6));
                 secondLine += " Tx:" + String(Tx.substring(0,3)) + "." + String(Tx.substring(3,6));
+                thirdLine = "<<   DigiRepeater  >>";
                 fifthLine = "";
                 sixthLine = "";
                 show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING iGate BEACON", 0);
@@ -157,8 +174,6 @@ void checkBeaconInterval() {
                 }
                 seventhLine = "     listening...";
                 LoRa_Utils::sendNewPacket("APRS", beaconPacket);
-            } else {
-                Serial.println("enviando beacon por APRS WIFI");
             }
         }
         lastBeaconTx = millis();
