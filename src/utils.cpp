@@ -41,6 +41,8 @@ extern float                snr;
 extern int                  freqError;
 extern String               distance;
 extern String               versionDate;
+extern uint32_t             lastWiFiCheck;
+extern bool                 WiFiConnect;
 
 namespace Utils {
 
@@ -147,13 +149,13 @@ void checkBeaconInterval() {
                 LoRa_Utils::changeFreqRx();
             }
         } else if (stationMode==5) {
+            if (!Config.bme.active) {
+                fifthLine = "";
+            }
+            sixthLine = "";
             if (WiFi.status() == WL_CONNECTED && espClient.connected()) {
                 APRS_IS_Utils::checkStatus();
                 thirdLine = getLocalIP();
-                if (!Config.bme.active) {
-                    fifthLine = "";
-                }
-                sixthLine = "";
                 show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING iGate BEACON", 1000);         
                 if (Config.sendBatteryVoltage) { 
                     sixthLine = "     (Batt=" + String(BATTERY_Utils::checkVoltages(),2) + "V)";
@@ -162,12 +164,6 @@ void checkBeaconInterval() {
                 espClient.write((beaconPacket + "\n").c_str());
                 show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
             } else {
-                String Tx = String(Config.loramodule.digirepeaterTxFreq);
-                secondLine = "Rx:" + String(Tx.substring(0,3)) + "." + String(Tx.substring(3,6));
-                secondLine += " Tx:" + String(Tx.substring(0,3)) + "." + String(Tx.substring(3,6));
-                thirdLine = "<<   DigiRepeater  >>";
-                fifthLine = "";
-                sixthLine = "";
                 show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING iGate BEACON", 0);
                 if (Config.sendBatteryVoltage) { 
                     sixthLine = "     (Batt=" + String(BATTERY_Utils::checkVoltages(),2) + "V)";
@@ -194,6 +190,19 @@ void checkDisplayInterval() {
     }
 }
 
+void checkWiFiInterval() {
+    uint32_t WiFiCheck = millis() - lastWiFiCheck;
+    if (WiFi.status() != WL_CONNECTED && WiFiCheck >= Config.lastWiFiCheck*4*1000) { //60!!!
+      WiFiConnect = true;
+    }
+    if (WiFiConnect) {
+      Serial.println("\nConnecting to WiFi ...");
+      WIFI_Utils::startWiFi2();
+      lastWiFiCheck = millis();
+      WiFiConnect = false;
+    }
+}
+
 void validateDigiFreqs() {
     if (stationMode == 4) {
         if (abs(Config.loramodule.digirepeaterTxFreq - Config.loramodule.digirepeaterRxFreq) < 125000) {
@@ -206,7 +215,7 @@ void validateDigiFreqs() {
 
 void typeOfPacket(String packet, String packetType) {
     String sender;
-    if (stationMode==1 || stationMode==2) {
+    if (stationMode==1 || stationMode==2 || (stationMode==5 && WiFi.status() == WL_CONNECTED)) {
         if (packetType == "LoRa-APRS") {
             fifthLine = "LoRa Rx ----> APRS-IS";
         } else if (packetType == "APRS-LoRa") {

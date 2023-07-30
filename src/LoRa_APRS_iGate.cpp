@@ -82,16 +82,7 @@ void loop() {
     show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
     DIGI_Utils::processPacket(LoRa_Utils::receivePacket());
   } else if (stationMode==5) {
-    uint32_t WiFiCheck = millis() - lastWiFiCheck;
-    if (WiFi.status() != WL_CONNECTED && WiFiCheck >= Config.lastWiFiCheck*4*1000) {
-      WiFiConnect = true;
-    }
-    if (WiFiConnect) {
-      Serial.println("\n\n###############\nRevision WiFi\n###############");
-      WIFI_Utils::startWiFi2();
-      lastWiFiCheck = millis();
-      WiFiConnect = false;
-    }
+    Utils::checkWiFiInterval();
     if (WiFi.status() == WL_CONNECTED) {  // Modo iGate
       thirdLine = Utils::getLocalIP();
       if (!espClient.connected()) {
@@ -117,6 +108,9 @@ void loop() {
       if (lastStationModeState == 0) {
         iGateBeaconPacket = GPS_Utils::generateBeacon();
         lastStationModeState = 1;
+        String Tx = String(Config.loramodule.digirepeaterTxFreq);
+        secondLine = "Rx:" + String(Tx.substring(0,3)) + "." + String(Tx.substring(3,6));
+        secondLine += " Tx:" + String(Tx.substring(0,3)) + "." + String(Tx.substring(3,6));
         thirdLine = "<<   DigiRepeater  >>";
       }
       Utils::checkDisplayInterval();

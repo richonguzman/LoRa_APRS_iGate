@@ -97,7 +97,7 @@ void startWiFi2() {
     Serial.println(WiFi.localIP());
     show_display("", "", "     Connected!!", "" , "     loading ...", 1000);
   } else {
-    Serial.println("\nNot connected to WiFi! (starting DigiRepeater Mode)");
+    Serial.println("\nNot connected to WiFi! (DigiRepeater Mode)");
     show_display("", "", " WiFi Not Connected!", "  DigiRepeater MODE" , "     loading ...", 2000);
   }
 }
