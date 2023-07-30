@@ -93,8 +93,7 @@ void loop() {
     }
 
     if (WiFi.status() == WL_CONNECTED) {  // Modo iGate
-      Serial.println("conectado a Wifi");
-      
+      Serial.println("conectado a Wifi: " + currentWiFi->ssid);
       // probar si pierde wifi que pasa...
 
       // cuanto tiene wifi , tratar de conectarse a APRS IS

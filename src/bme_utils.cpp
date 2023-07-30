@@ -25,7 +25,7 @@ void setup() {
       Serial.println("init : BME280 Module  ...     done!");
     }
   } else {
-    Serial.println("(BME not 'active' in 'igate_config.json')");
+    Serial.println("(BME not 'active' in 'igate_conf.json')");
   }
 }
 
