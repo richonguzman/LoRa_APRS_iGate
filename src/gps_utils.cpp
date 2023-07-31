@@ -90,9 +90,14 @@ String generateBeacon() {
       beaconPacket += "a";
     }
     beaconPacket += Config.iGateComment;
-  } else { //stationMode 3 y 4
-    stationLatitude = processLatitudeAPRS(Config.digi.latitude);
-    stationLongitude = processLongitudeAPRS(Config.digi.longitude);
+  } else { //stationMode 3, 4 and 5
+    if (stationMode==5) {
+      stationLatitude = processLatitudeAPRS(currentWiFi->latitude);
+      stationLongitude = processLongitudeAPRS(currentWiFi->longitude);
+    } else {
+      stationLatitude = processLatitudeAPRS(Config.digi.latitude);
+      stationLongitude = processLongitudeAPRS(Config.digi.longitude);
+    }
     beaconPacket = Config.callsign + ">APLRG1:=" + stationLatitude + "L" + stationLongitude + "#" + Config.digi.comment;
   }
   return beaconPacket;

@@ -1,29 +1,29 @@
 {
-	"callsign": "CD2RXU-11",
-    "stationMode": 5,
+	"callsign": "CD2RXU-10",
+    "stationMode": 2,
     "iGateComment": "LoRa_APRS_iGate",
     "wifi": {
         "AP": [
             {   "ssid": "Richon",
                 "password": "k4fPnmg5qnyf",
-                "latitude": -32.9543284,
-                "longitude": -71.1202063
+                "latitude": -33.0337313,
+                "longitude": -71.5737261
             },
-			{	"ssid": "iPhone Richon",
-				"password": "1234poto5678",
-				"latitude": -32.9543284,
-				"longitude": -71.1202063
-			}
+            {   "ssid": "Jimenita",
+                "password": "mg6wyMhqRnxk",
+                "latitude": -33.0312492,
+                "longitude": -71.5796215
+            }
 		]
 	},
 	"digi": {
 		"comment": "LoRa_APRS_Digirepeater",
-		"latitude": -32.9543284,
-		"longitude": -71.1202063
+		"latitude": -33.0338131,
+		"longitude": -71.5737237
 	},
 	"aprs_is": {
 		"passcode": "23201",
-		"server": "euro.aprs2.net",
+		"server": "soam.aprs2.net",
 		"port": 14580,
 		"reportingDistance": 30
 	},
@@ -37,7 +37,7 @@
 		"power": 20
 	},
 	"display": {
-		"alwaysOn": true,
+		"alwaysOn": false,
 		"timeout": 4,
 		"turn180" : false
 	},
@@ -49,8 +49,7 @@
 	"other": {
 		"beaconInterval": 15,
 		"rememberStationTime": 30,
-		"sendBatteryVoltage": false,
-		"lastWiFiCheck": 15
+		"sendBatteryVoltage": false
 	},
 	"bme": {
 		"active": false

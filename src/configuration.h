@@ -67,7 +67,6 @@ public:
   int                   beaconInterval;
   int                   rememberStationTime;
   bool                  sendBatteryVoltage;
-  int                   lastWiFiCheck;
   std::vector<WiFi_AP>  wifiAPs;
   DIGI                  digi;
   APRS_IS               aprs_is;

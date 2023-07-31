@@ -20,7 +20,7 @@
 Configuration   Config;
 WiFiClient      espClient;
 
-String          versionDate           = "2023.07.30";
+String          versionDate           = "2023.07.31";
 int             myWiFiAPIndex         = 0;
 int             myWiFiAPSize          = Config.wifiAPs.size();
 WiFi_AP         *currentWiFi          = &Config.wifiAPs[myWiFiAPIndex];
@@ -64,23 +64,9 @@ void loop() {
     if (!espClient.connected()) {
       APRS_IS_Utils::connect();
     }
-    APRS_IS_Utils::checkStatus();
-    show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);    
-    while (espClient.connected()) {
-      Utils::checkDisplayInterval();
-      Utils::checkBeaconInterval();
-      APRS_IS_Utils::processLoRaPacket(LoRa_Utils::receivePacket());            
-      if (espClient.available()) {
-        String aprsisPacket;
-        aprsisPacket.concat(espClient.readStringUntil('\r'));
-        APRS_IS_Utils::processAPRSISPacket(aprsisPacket);
-      }
-    }
+    APRS_IS_Utils::loop();
   } else if (stationMode==3 || stationMode==4) {    // DigiRepeater (3 RxFreq=TxFreq / 4 RxFreq!=TxFreq)
-    Utils::checkDisplayInterval();
-    Utils::checkBeaconInterval();
-    show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
-    DIGI_Utils::processPacket(LoRa_Utils::receivePacket());
+    DIGI_Utils::loop();
   } else if (stationMode==5) {                      // iGate when WiFi and APRS available , DigiRepeater when not (RxFreq=TxFreq)
     Utils::checkWiFiInterval();
     if (WiFi.status() == WL_CONNECTED) {  // iGate Mode
@@ -93,31 +79,9 @@ void loop() {
         lastStationModeState = 0;
         Utils::startOTAServer();
       }
-      APRS_IS_Utils::checkStatus();
-      show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);    
-      while (espClient.connected()) {
-        Utils::checkDisplayInterval();
-        Utils::checkBeaconInterval();
-        APRS_IS_Utils::processLoRaPacket(LoRa_Utils::receivePacket());            
-        if (espClient.available()) {
-          String aprsisPacket;
-          aprsisPacket.concat(espClient.readStringUntil('\r'));
-          APRS_IS_Utils::processAPRSISPacket(aprsisPacket);
-        }
-      }
+      APRS_IS_Utils::loop();
     } else {                              // DigiRepeater Mode
-      if (lastStationModeState == 0) {
-        iGateBeaconPacket = GPS_Utils::generateBeacon();
-        lastStationModeState = 1;
-        String Tx = String(Config.loramodule.digirepeaterTxFreq);
-        secondLine = "Rx:" + String(Tx.substring(0,3)) + "." + String(Tx.substring(3,6));
-        secondLine += " Tx:" + String(Tx.substring(0,3)) + "." + String(Tx.substring(3,6));
-        thirdLine = "<<   DigiRepeater  >>";
-      }
-      Utils::checkDisplayInterval();
-      Utils::checkBeaconInterval();
-      show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
-      DIGI_Utils::processPacket(LoRa_Utils::receivePacket());
+      DIGI_Utils::loop();
     }
   }
 }

@@ -48,7 +48,7 @@ namespace Utils {
 
 void processStatus() {
     String status = Config.callsign + ">APLRG1";
-    if (stationMode==1 || stationMode==2) {
+    if (stationMode==1 || stationMode==2 || (stationMode==5 && WiFi.status() == WL_CONNECTED)) {
         delay(1000);
         status += ",qAC:>https://github.com/richonguzman/LoRa_APRS_iGate " + versionDate ;
         espClient.write((status + "\n").c_str());
@@ -189,7 +189,7 @@ void checkDisplayInterval() {
 
 void checkWiFiInterval() {
     uint32_t WiFiCheck = millis() - lastWiFiCheck;
-    if (WiFi.status() != WL_CONNECTED && WiFiCheck >= Config.lastWiFiCheck*60*1000) {
+    if (WiFi.status() != WL_CONNECTED && WiFiCheck >= 15*60*1000) {
       WiFiConnect = true;
     }
     if (WiFiConnect) {

@@ -2,12 +2,22 @@
 #include "station_utils.h"
 #include "lora_utils.h"
 #include "digi_utils.h"
+#include "gps_utils.h"
 #include "display.h"
 #include "utils.h"
 
 extern Configuration    Config;
 extern int              stationMode;
 extern uint32_t         lastScreenOn;
+extern int              lastStationModeState;
+extern String           iGateBeaconPacket;
+extern String           firstLine;
+extern String           secondLine;
+extern String           thirdLine;
+extern String           fourthLine;
+extern String           fifthLine;
+extern String           sixthLine;
+extern String           seventhLine;
 
 namespace DIGI_Utils {
 
@@ -49,8 +59,9 @@ void processPacket(String packet) {
         }
     }
 }
+
 void loop() {
-    if (lastStationModeState == 0) {
+    if (lastStationModeState==0 && stationMode==5) {
         iGateBeaconPacket = GPS_Utils::generateBeacon();
         lastStationModeState = 1;
         String Tx = String(Config.loramodule.digirepeaterTxFreq);

@@ -193,4 +193,19 @@ void processAPRSISPacket(String packet) {
   }
 }
 
+void loop() {
+  checkStatus();
+  show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);    
+  while (espClient.connected()) {
+    Utils::checkDisplayInterval();
+    Utils::checkBeaconInterval();
+    processLoRaPacket(LoRa_Utils::receivePacket());            
+    if (espClient.available()) {
+      String aprsisPacket;
+      aprsisPacket.concat(espClient.readStringUntil('\r'));
+      processAPRSISPacket(aprsisPacket);
+    }
+  }
+}
+
 }
