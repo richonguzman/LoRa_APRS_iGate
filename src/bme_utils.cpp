@@ -3,7 +3,9 @@
 #include "gps_utils.h"
 #include "display.h"
 
-#define SEALEVELPRESSURE_HPA (1013.25) 
+#define SEALEVELPRESSURE_HPA (1013.25)
+#define HEIGHT_CORRECTION 0             // in meters
+#define CORRECTION_FACTOR (8.2296)      // for meters
 
 extern Configuration  Config;
 extern String         fifthLine;
@@ -109,7 +111,7 @@ String readDataSensor() {
   } else {
     tempStr = generateTempString((newTemp * 1.8) + 32);
     humStr  = generateHumString(newHum);
-    presStr = generatePresString(newPress);
+    presStr = generatePresString(newPress + (HEIGHT_CORRECTION/CORRECTION_FACTOR));
     fifthLine = "BME-> " + String(int(newTemp))+"C " + humStr + "% " + presStr.substring(0,4) + "hPa";
     wx = ".../...g...t" + tempStr + "r...p...P...h" + humStr + "b" + presStr;
     return wx;
