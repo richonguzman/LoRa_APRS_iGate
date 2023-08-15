@@ -160,10 +160,14 @@ String getReceivedGPS(String packet) {
 }
 
 String getDistance(String packet) {
-  if (packet.indexOf(":!/") > 10) {
-    return decodeEncodedGPS(packet);
-  } else if (packet.indexOf(":=") > 10 || packet.indexOf(":!") > 10) {
-    return getReceivedGPS(packet);
+  int gpsIndexEx = packet.indexOf(":!");
+  int gpsIndexEq = packet.indexOf(":=");
+  if (gpsIndexEx > 10 || gpsIndexEq > 10) {
+    if ((gpsIndexEx + 15 == packet.indexOf("G")) || (gpsIndexEx + 15 == packet.indexOf("Q")) || (gpsIndexEq + 15 == packet.indexOf("G")) || (gpsIndexEq + 15 == packet.indexOf("Q"))) {
+      return decodeEncodedGPS(packet);
+    } else {
+      return getReceivedGPS(packet);
+    }
   } else {
     return " _ / _ / _ ";
   }
