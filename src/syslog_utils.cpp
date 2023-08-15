@@ -22,11 +22,11 @@ void log(String type, String packet, int rssi, float snr, int freqError) {
             if (packet.indexOf("::") > 10) {
                 syslogPacket += type + " - MESSAGE - " + packet.substring(3,packet.indexOf(">")) + " ---> " + packet.substring(packet.indexOf("::")+2);
             } else if (packet.indexOf(":!") > 10 || packet.indexOf(":=") > 10) {
-                syslogPacket += type + " - GPS - " + packet.substring(3,packet.indexOf(">")) + " / " + packet.substring(packet.indexOf(">")+1,packet.indexOf(",")) + " / ";
+                syslogPacket += type + " - GPS - " + packet.substring(3,packet.indexOf(">")) + " / ";
                 if (packet.indexOf("WIDE1-1") > 10) {
-                    syslogPacket += "WIDE1-1 / ";
+                    syslogPacket += packet.substring(packet.indexOf(">")+1,packet.indexOf(",")) + " / WIDE1-1 / ";
                 } else {
-                    syslogPacket += "_ / ";
+                    syslogPacket += packet.substring(packet.indexOf(">")+1,packet.indexOf(":")) + " / _ / ";
                 }
                 syslogPacket += String(rssi) + "dBm / " + String(snr) + "dB / " + String(freqError) + "Hz / " +  GPS_Utils::getDistance(packet);
             } else {
