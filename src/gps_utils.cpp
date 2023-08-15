@@ -108,7 +108,7 @@ double calculateDistanceTo(double latitude, double longitude) {
 }
 
 String decodeEncodedGPS(String packet) {
-  String GPSPacket = packet.substring(packet.indexOf(":!/")+3);
+  String GPSPacket = packet.substring(packet.indexOf(":!")+3);
   String encodedLatitude    = GPSPacket.substring(0,4);
   String encodedLongtitude  = GPSPacket.substring(4,8);
 
@@ -160,10 +160,15 @@ String getReceivedGPS(String packet) {
 }
 
 String getDistance(String packet) {
-  int gpsIndexEx = packet.indexOf(":!");
-  int gpsIndexEq = packet.indexOf(":=");
-  if (gpsIndexEx > 10 || gpsIndexEq > 10) {
-    if ((gpsIndexEx + 15 == packet.indexOf("G")) || (gpsIndexEx + 15 == packet.indexOf("Q")) || (gpsIndexEq + 15 == packet.indexOf("G")) || (gpsIndexEq + 15 == packet.indexOf("Q"))) {
+  int encodedBytePosition = 0;
+  if (packet.indexOf(":!") > 10) {
+    encodedBytePosition = packet.indexOf(":!") + 14;
+  }
+  if (packet.indexOf(":=") > 10) {
+    encodedBytePosition = packet.indexOf(":=") + 14;
+  }
+  if (encodedBytePosition != 0) {
+    if (String(packet[encodedBytePosition]) == "G" || String(packet[encodedBytePosition]) == "Q") {
       return decodeEncodedGPS(packet);
     } else {
       return getReceivedGPS(packet);
