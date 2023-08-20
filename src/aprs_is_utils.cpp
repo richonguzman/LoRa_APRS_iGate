@@ -181,7 +181,7 @@ void processAPRSISPacket(String packet) {
         }
       } else {
         Serial.print("Received from APRS-IS  : " + packet);
-        if (stationMode == 2 && STATION_Utils::wasHeard(Addressee)) {
+        if ((stationMode==2 || stationMode==5) && STATION_Utils::wasHeard(Addressee)) {
           LoRa_Utils::sendNewPacket("APRS", LoRa_Utils::generatePacket(packet));
           display_toggle(true);
           lastScreenOn = millis();
