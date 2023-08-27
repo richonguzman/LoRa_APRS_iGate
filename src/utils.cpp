@@ -16,6 +16,10 @@
 #include "display.h"
 #include "utils.h"
 
+//
+#include "web_utils.h"
+//
+
 
 AsyncWebServer  server(80);
 
@@ -44,10 +48,7 @@ extern String               versionDate;
 extern uint32_t             lastWiFiCheck;
 extern bool                 WiFiConnect;
 
-//
-const char* htmlPage1 = "<html><body><h1>Page 1</h1></body></html>";
-const char* htmlPage2 = "<html><body><h1>Page 2</h1></body></html>";
-//
+
 
 namespace Utils {
 
@@ -273,11 +274,16 @@ void startOTAServer() {
         });
 
         server.on("/test1", HTTP_GET, [](AsyncWebServerRequest *request) {
-            request->send(200, "text/plain", htmlPage1 );
+            request->send(200, "text/html", htmlPage1);
         });
 
         server.on("/test2", HTTP_GET, [](AsyncWebServerRequest *request) {
-            request->send(200, "text/plain", htmlPage2 );
+            String dynamicContent = String(htmlPage3);
+            dynamicContent.replace("%VCALLSIGN%", Config.callsign);
+
+
+
+            request->send(200, "text/html", dynamicContent);
         });
 
         AsyncElegantOTA.begin(&server);
