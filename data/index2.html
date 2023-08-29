@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>TTGO-T-Beam-LoRa-APRS <!--VERSION--></title>
+    <link rel="stylesheet" href="style.css" type="text/css">
+    <script src="js.js" type="text/javascript"></script>
+    <link rel="icon" href="data:,">
+</head>
+<body>
+<div class="container">
+    <header>
+        <div id="logo"></div>
+    </header>
+    <section>
+        <div class="grid-container full">
+            <h2 class="u-full-width">WiFi Settings</h2>
+        </div>
+        <article>
+            <form action="/save_wifi_cfg" method="post">
+                <div class="grid-container full">
+                    <div>
+                        <label for="wifi_en">Enable Wifi</label>
+                        <select id="wifi_en" name="wifi_en">
+                            <option value="1">1: Wifi may be off if bluetooth client is connected in between 60s on boot (recommended, see below)</option>
+                            <option value="2">2: Wifi on (during hardware limitation, bluetooth will be disabled on LORA32_21 devices)</option>
+                            <option value="0">0: Wifi off (see below for hints and caveats)</option>
+                        </select>
+                    </div>
+                </div>
+				<div class="grid-container full">
+					<h5 class="u-full-width">AP settings</h5>
+				</div>
+                <div class="grid-container halves">
+                    <div>
+                        <label for="ap_password">AUTO AP Password</label>
+                        <input type="password" name="ap_password" id="ap_password" placeholder="AUTO AP Password" title="AUTO AP Password, 8 characters minimum">
+                    </div>
+                    <div>
+                        <label for="wifi_pwrAP">TXPWR as AP</label>
+                        <select id="wifi_pwrAP" name="wifi_pwrAP">
+                            <option value="8">Min (2dBm, 2mW, suggested)</option>
+                            <option value="44">Low (11dBm, 12mW)</option>
+                            <option value="60">Mid (15dBm, 32mW)</option>
+                            <option value="72">High (18dBm, 63mW)</option>
+                            <option value="80">Max (20dBm, 100mW)</option>
+                        </select>
+                    </div>
+                </div>
+				<div class="grid-container full">
+					<h5 class="u-full-width">STA settings</h5>
+				</div>
+                <div class="grid-container full">
+                    <div id="wifi_list">
+                        <label for="wifi_ssid">Network</label>
+                        <input type="button" value="Scan WiFi" id="scan_wifi_btn" onclick="scanWifi();">
+                    </div>
+                </div>
+                <div class="grid-container thirds">
+                    <div>
+                        <label for="wifi_ssid">WiFi SSID</label>
+                        <input type="text" name="wifi_ssid" placeholder="Your Wifi SSID" title="Your Wifi SSID" id="wifi_ssid">
+                    </div>
+                    <div>
+                        <label for="wifi_password">WiFi Password</label>
+                        <input type="password" name="wifi_password" id="wifi_password" placeholder="Your WiFi Password" title="Your WiFi Password, 8 characters minimum">
+                    </div>
+                    <div>
+                        <label for="wifi_pwrSTA">TXPWR as STA</label>
+                        <select id="wifi_pwrSTA" name="wifi_pwrSTA">
+                            <option value="80">Max (20dBm, 100mW, suggested)</option>
+                            <option value="8">Min (2dBm, 2mW)</option>
+                            <option value="44">Low (11dBm, 12mW)</option>
+                            <option value="60">Mid (15dBm, 32mW)</option>
+                            <option value="72">High (18dBm, 63mW)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="grid-container halves">
+                    <div>
+                        <label for="ntp_server">NTP Server</label>
+                        <input type="text" name="ntp_server" id="ntp_server" placeholder="pool.ntp.org" title="NTP Server name or IP Address. I.e. pool.ntp.org. If your igate is in the HAMNET, use ntp.hc.r1.ampr.org.">
+                    </div>
+                    <div>
+                        <label for="syslog_server">Syslog Server</label>
+                        <input type="text" name="syslog_server" id="syslog_server" placeholder="" title="Syslog Server name or IP Address. Leave empty to switch off. If unsure, you may use the broadcast address 255.255.255.255. Syslog needs do be compiled in (it's by default now)">
+                    </div>
+                </div>
+                <div class="grid-container thirds">
+                    <div>
+                        <label for="wifi_failAP">Allow failback to Mode AP</label>
+                        <input name="wifi_failAP" id="wifi_failAP" type="checkbox" value="1" title="
+If a remoteAP is configured or uptime <3min (grace time for him to be able to reach Webinterface for change config):
+  If wifi-client is connected:
+    If wifi_do_fallback_mode is enabled, we'll keep his connection alive.
+    else: we'll disconnect the wifi-client and search for a remoteAP
+  else: search for a remoteAP
+else:
+   selfAP will stay on and connections are not interrupted.
+
+Disable this for igates, where you don't need your tracker to be a hotspot; or if your phone (which knows your tracker's AP SSID) should not mis-interprete the tracker as Wifi-Hotspot with Internet-Access.
+You like to enable, if you use your tracker portable and it should automatically be wifi client to your home network, and be AP if you are outside, and should not search for a remoteAP.">
+                    </div>
+                    <div>
+                        <label for="tncsrvr_en">Enable TNC-Server</label>
+                        <input name="tncsrvr_en" id="tncsrvr_en" type="checkbox" value="1" title="Enable TNC-Server (KISS over TCP) on port tcp 8001. If your device in open networks like HAMNET, enable it only when needed and consider firewalling.">
+                    </div>
+                    <div>
+                        <label for="gpssrv_en">Enable GPS-Server</label>
+                        <input name="gpssrv_en" id="gpssrv_en" type="checkbox" value="1" title="Enable GPS-Server (NMEA on port tcp 10110. If your device in open networks like HAMNET, enable it only when needed and consider firewalling.">
+                    </div>
+                </div>
+                <div class="grid-container full">
+                    <input class="button-primary" type="submit" value="Save (reboot needed after changes in this section)">
+                </div>
+            </form>
+        </article>
+    </section>
+    <section>
+        <article>
+          <div class="grid-container full">
+            <h2 class="u-full-width">APRS Settings</h2>
+          </div>
+            <form action="/save_aprs_cfg" method="post">
+                <div class="grid-container full">
+                    <h5 class="u-full-width">Transmission Settings</h5>
+                </div>
+                <div class="grid-container halves">
+                    <div>
+                        <label for="lora_freq">Main Frequency [MHz]</label>
+                        <input name="lora_freq" id="lora_freq" type="number" min="433.0000" max="928.0000" step="0.0001" title="LoRa center frequency between 433.0001 and 928.0000. I.e. 433.775">
+                    </div>
+                    <div>
+                        <label for="lora_speed">Speed</label>
+                        <select id="lora_speed" name="lora_speed">
+                            <option value="300">BW 125khz CR 4:5 SF 12 (Slow Standard, 300bps)</option>
+                            <option value="240">BW 125khz CR 4:6 SF 12 (244bps)</option>
+                            <option value="210">BW 125khz CR 4:7 SF 12 (209bps)</option>
+                            <option value="180">BW 125khz CR 4:8 SF 12 (183bps)</option>
+                            <option value="610">BW 125khz CR 4:8 SF 10 (610bps)</option>
+                            <option value="1200">BW 125khz CR 4:7 SF 9 (Fast Standard, 1200bps)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="lora_tx_en">Enable LoRa transmitter</label>
+                        <input name="lora_tx_en" id="lora_tx_en" type="checkbox" value="1" title="Allow TX on LoRa. Disable this if you like to prevent TX under all circumstances (i.e. if your tracker is behind an rx-amplifier). If this checkbox keeps off after trying to enable, you might check if your configured CALLSIGN-SSID is correct (see explanation there).">
+                    </div>
+                    <div>
+                        <label for="lora_rx_en">Enable LoRa receiver</label>
+                        <input name="lora_rx_en" id="lora_rx_en" type="checkbox" value="1" title="Allow RX on LoRa. Disable this if you need to save power consumption; LoRa chip will be only powered on during TX. Only honored if lora_digipeating_mode == 0 and no bluetooth client is connected on boot">
+                    </div>
+                    <div>
+                        <label for="txPower">TX power [dBm]</label>
+                        <input name="txPower" id="txPower" type="number" min="0" max="23" title="LoRa TX Power. Range 0 to 23dBm">
+                    </div>
+                    <div>
+                        <label for="lora_cradapt">Automatic CodeRate adaption on TX</label>
+                        <input name="lora_cradapt" id="lora_cradapt" type="checkbox" value="1" title="Enable automatic CR adaption. Has only influence on TX (RX can decode every CR). Use this only if you are not a WIDE1 or WIDE2 digi (here you like to send always with higher speed). Still testing, if it behaves good to our network. Currently works only for SF12 modes, because for SF 10 and lower the code for programming CR+SF+BW-combination has not been written yet">
+                    </div>
+                    <div>
+                        <label for="aprs_blist">Filter src-calls or calls in digipath on receiption</label>
+                        <input type="text" name="aprs_blist" id="aprs_blist" title="Filter out specified source calls or calls in digipath on receiption -> no repeating, no igate, not visible via kiss. They don't exist ;). List calls  separated by ',': DL1AAA,DL1BBB'. This filters out DL1AAA without SSID AND with SSID. If you specify DL1AAA-1, only DL1AAA-1 is filtered out. If you specify DL1AAA-0 (special case), then only packets from DL1AAA are filtered out.">
+                    </div>
+                </div>
+                <div class="grid-container halves">
+                    <div>
+                        <label for="lora_rssi2p">Add SNR and RSSI to path. '*': only if heard direct (recommended for many usecases). '~': not recommended; better let user decide with Q-addressing</label>
+                        <select id="lora_rssi2p" name="lora_rssi2p">
+                          <option value="0">off</option>
+                          <option value="1">To RF duing digipeating (~)</option>
+                          <option value="2">To KISS</option>
+                          <option value="4">To APRSIS (~)</option>
+                          <option value="3">To RF and KISS (~)</option>
+                          <option value="5">To RF and APRSIS (~)</option>
+                          <option value="6">To KISS and APRSIS (~)</option>
+                          <option value="7">To RF and KISS and APRSIS (~)</option>
+                          <option value="8">To RF*</option>
+                          <option value="16">To KISS*</option>
+                          <option value="32">To APRSIS*</option>
+                          <option value="34">To APRSIS* and KISS (recommended with aprsdroid for or digis)</option>
+                          <option value="48">To APRSIS* and KISS* (recommended for digis)</option>
+                          <option value="42">To APRSIS* and RF* and KISS (recommended digis while testing)</option>
+                          <option value="56">To APRSIS* and RF* and KISS* (also a good setting!)</option>
+                          <option value="35">To APRSIS* and RF and KISS (~)</option>
+                          <option value="49">To APRSIS* and RF and KISS* (~)</option>
+                          <option value="57">!Too much options. GUI needs redisign!</option>
+                          <option value="9">!I.e. To RF* and RF would not make any sense!<option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="snraprsis">SNR/RSSI-encoding on kiss: compatible to APRS-IS?</label>
+                        <input name="snraprsis" id="snraprsis" type="checkbox" value=1 title="Add snr+rssi at last digipeater, without digipeated flag. Use this for APRS-IS connections. If you have connected a digipeater software to kiss, this option has to be switched off">
+                        <div>
+                            More info for SNR/RSSI path encoding see documentation section below
+                        </div>
+                    </div>
+                </div>
+                <div class="grid-container full">
+                    <h5 class="u-full-width">Station Settings</h5>
+                </div>
+                <div class="grid-container quarters">
+                    <div>
+                        <label for="aprs_callsign">Callsign and SSID *</label>
+                        <input class="u-full-width" type="text" minlength="3" maxlength="9" name="aprs_callsign" placeholder="NOCALL-1" id="aprs_callsign" title="your callsign with SSID. SSID is optional and should be in the range of -1 to -15". SSIDs like "-L4" are ok for aprs-is, but should not be sent on RF; thus LoRa TX will be disabled.">
+                    </div>
+                    <div>
+                        <label for="aprs_relay_path">Relay Path</label>
+                        <input class="u-full-width" type="text" minlength="0" name="aprs_relay_path" id="aprs_relay_path" title="APRS path, use the shortest as possible, WIDE1-1 or WIDE2-1. If you really need a fill-in-digi, choose WIDE1-1,WIDE2-1. RFONLY or NOGATE must not be set in front of WIDEn-m. WIDE2-1,WIDE1-1 is not valid. The path with value '1' enables dest-path-digi-notation (like DL9SAU>APRS-1:..) instead of Path ..,WIDE1-1:... If you are a transmitting igate, please leave empty (or set it to Q. See below). About the SNR/RSSI-Path feature: You may request to add SNR/RSSI by adding 'Q' to your path (i.e. 'WIDE1-1,Q'; for transmitting igates (and balloons, aircrafts, ..), only 'Q' is recommended). Then only the first digi (or igate) adds SNR/RSSI to the path. If you add 'QQ' instead of 'Q' to your path (i.e. 'WIDE1-1,QQ'). Then every digi and igate adds SNR/RSSI to the path (useful for analyzing RF net quality). Use with care; resulting longer path consumes a bit more airtime.">
+                    </div>
+                    <div>
+                        <label for="aprs_s_table">Symbol Table</label>
+                        <input class="u-full-width" type="text" minlength="1" maxlength="1" name="aprs_s_table" id="aprs_s_table" title="use primary / or secondary table \ ">
+                    </div>
+                    <div>
+                        <label for="aprs_symbol">Symbol</label>
+                        <input class="u-full-width" type="text" minlength="1" maxlength="1" name="aprs_symbol" id="aprs_symbol" title="select an icon, for example: [ - jogger, Y - jacht, > - car, b - bike">
+                    </div>
+                    <div>
+                        <label for="aprs_objnam">ObjectName (optional)</label>
+                        <input class="u-full-width" type="text" minlength="0" maxlength="9" name="aprs_objnam" id="aprs_objnam" title="This is optional; most users will leave this empty. If you set this to DL1AAA-L4 because like to see your gateway as DL1AAA-L4 on the map (and also like to send on RF), we'll send our position as type APRS Object (instead of a normal aprs position), with the configured Callsign you configured above.">
+                    </div>
+                    <div>
+                        <label for="aprs_alt_r">Altitude ratio [%]</label>
+                        <input name="aprs_alt_r" id="aprs_alt_r" type="number" min="0" max="100" title="Altitude ratio every n'th packet.. Use 100 for every packet, 0 for no altitude, or any number in between. Recommended: 10 (altitude every tenth's frame). If you use compression ('Send Course/Speed along with Altitude switched off') for reducing airtime (-> then n% altitude-encoding packets are sent, and 100-n% course/speed-encoded packets), you may choose 50 for ballons, where speed/dir and altitude are of equal interrest; if you choose 10, then 90 % of your transmissions encode speed/direction. Cave: if you set it to 100 and switch next option 'Always send CSE/SPD and ALT' to off, then only altitude packets are sen; if you switch the next option on, then altitude is always sent and this configured Altitude ratio is ignored. If you configure 0, altitude is never sent (-> only compressed speed). If ratio is < 100 and gps altitude is not refreshed, only encoded speed is sent." placeholder="10">
+                    </div>
+                    <div>
+                        <label for="aprs_CSandA">Always send CSE/SPD and ALT</label>
+                        <input name="aprs_CSandA" id="aprs_CSandA" type="checkbox" value="1" title="If set to on, course/speed and altitude are always sent both in one (larger) packet. If gps signal for course/speed is valid, cse/spd will be encoded in the compressed part and altitude is added as /A=...... in the message-part (this actually overwrites altitude ratio = 100 setting in most cases). If set off, either compressed cse/spd OR compressed altitude packets are sent, according to the 'Altitude ratio' setting.">
+                    </div>
+                    <div>
+                        <label for="show_cmt">Show Comment</label>
+                        <input name="show_cmt" id="show_cmt" type="checkbox" value="1" title=" show comment text">
+                    </div>
+                    <div>
+                        <label for="aprs_comm_rt">Ratelimit adding comment text</label>
+                        <input name="aprs_comm_rt" id="aprs_comm_rt" type="checkbox" value="1" title="If enabled, comment text is sent only every tenth's transmission. Saves airtime.">
+                    </div>
+                    <div>
+                        <label for="aprs_comment">Comment</label>
+                        <input class="u-full-width" type="text" minlength="0" maxlength="64" name="aprs_comment" id="aprs_comment" title=" personal comment">
+                    </div>
+                    <div>
+                        <label for="aprs_batt">Show Battery</label>
+                        <input name="aprs_batt" id="aprs_batt" type="checkbox" value="1" title=" show battery voltage after personal comment">
+                    </div>
+                    <div>
+                        *) requires reboot only if connection to aprs-is enabled
+                    </div>
+                </div>
+                <div class="grid-container full">
+                    <h5 class="u-full-width">Telemetry Settings</h5>
+                </div>
+                <div class="grid-container thirds">
+                    <div>
+                        <label for="tnc_tel">Enable Self Telemetry</label>
+                        <input name="tnc_tel" id="tnc_tel" type="checkbox" value="1" title="send self telemetry data">
+                    </div>
+                    <div>
+                        <label for="tnc_tel_rf">Allow TX on RF</label>
+                        <select id="tnc_tel_rf" name="tnc_tel_rf" title="LoRa is too slow for telemetry. Only on secondary qrg, TX is acceptable: if speed is >= 1200 (comparable to 1k2 AFSK APRS on 2m). We will not add a digipeater to the packet header. TX on main qrg is disabled; there are very few useful reasons, i.e. balloon missions. Read the comment in the source code; you need to hack and recompile.">
+                            <option value="0">no (good!)</option>
+                            <option value="2">on secondary qrg (acceptable)</option>
+                            <option value="1">on main qrg (bad)</option>
+                            <option value="3">on both frequencies (even worse)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="tnc_tel_int">Self Telemetry Interval [s]</label>
+                        <input name="tnc_tel_int" id="tnc_tel_int" type="number" min="600" title="time between sending telemetry if Enable Self Telemetry option is selected. 3600 is recommended. Min 600.">
+                    </div>
+                    <div>
+                        <label for="tnc_tel_mic">Self Telemetry Sequence</label>
+                        <select id="tnc_tel_mic" name="tnc_tel_mic" title="self telemetry sequence type (only 'numeric' sequences and 'time based numeric sequences' are supported by aprs.fi and aprsdirect.de). Time based secuence needs a proper system time (GPS or NTP); else it fails back to 'MIC'. Sequence overflow: Type 'time based, alphanumeric' uses digits and letters 0-9,A-Z,a-z and has a resolution of 23s in two months; 'numeric timebased' has only digits and has resolotuin of 10min in one week. Type 'Numeric' (except for numeric time based): Caution: sequence number is stored to flash; flash has a limited number of writes before it becomes defect.">
+                            <option value="-2">Time based, numeric encoding</option>
+                            <option value="-1">Time based, alphanumeric encoding</option>
+                            <option value="0">Numeric</option>
+                            <option value="1">MIC</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="tnc_tel_path">Self Telemetry Relay Path</label>
+                        <input class="u-full-width" type="text" minlength="0" name="tnc_tel_path" id="tnc_tel_path" title="APRS path for self telemetry, use the shortest as possible (empty path is recommended; for aprs-is connection, no path is necessary). Or use WIDE2-1. Path is not honored on RF transmission.">
+                    </div>
+                </div>
+                <div class="grid-container full">
+                    <h5 class="u-full-width">Fixed Beaconing Settings</h5>
+                </div>
+                <div class="grid-container thirds">
+                    <div>
+                        <label for="aprs_fixed_beac">Fixed Beacon</label>
+                        <input name="aprs_fixed_beac" id="aprs_fixed_beac" type="checkbox" value="1" title="enable fixed beacon when GPS is disabled or no fix">
+                    </div>
+                    <div>
+                        <label for="aprs_fb_interv">Fixed Beacon Interval [s]</label>
+                        <input name="aprs_fb_interv" id="aprs_fb_interv" type="number" min="120" title="time between sending a beacon if Fixed Beacon option is selected. 1800 or 3600 is recommended for users; 900 or 1800 for digis. Min 120. This beacon value is also used if GPS is lost when smart-beacooning. If it is >= sb_max_intervall, this value is used.">
+                    </div>
+                </div>
+                <div class="grid-container thirds">
+                    <div>
+                        <label for="aprs_lat_p">Latitude</label>
+                        <input type="text" minlength="0" name="aprs_lat_p" id="aprs_lat_p" title="latitude for fixed beacon, APRS format for example: 5215.00N (this is ddmm.mmN). 'dd.nnnnN', '-dd.nnnn', 'dd mm[.nnn]' and 'dd mm ss' and 'dd mm' ss&quot;' and 'dd-mm[.nn]N' are also supported. If position is south, you can prefix '-' instead of writing 'S' behind the coordinate. '-nnS' does not make sense. If you like to add a locator, add it here and leave longitude field blank. APRS spec defindes a special notation for null-position: 0000.00N 00000.00W (W, not E). If GPS is enabled and a valid position has been received, that one will be used instead of the configured one, until the next system reboot">
+                    </div>
+                    <div>
+                        <label for="aprs_lon_p">Longitude</label>
+                        <input type="text" minlength="0" name="aprs_lon_p" id="aprs_lon_p" title="longtitude for fixed beacon, APRS format for example 02050.59Ei (this is ddd.mmE). 'ddd.nnnnE', '-ddd.nnnn',  'ddd mm[.nnn]' and 'ddd mm ss' and 'ddd mm' ss&quot;' and 'ddd-mm[.nn]E' are also supported. If position is west, you can prefix '-' instead of writing 'W' behind the coordinate. '-nnW' does not make sense.. If you like to add a locator, add it to the latitude field and leave this field blank. APRS spec defindes a special notation for null-position: 0000.00N 00000.00W (W, not E). If GPS is enabled and a valid position has been received, that one will be used instead of the configured one, until the next system reboot">
+                    </div>
+                    <div>
+                        <label for="aprs_llfgps">Use lat/lon of current GPS position</label>
+                        <input name="aprs_llfgps" id="aprs_llfgps" type="checkbox" value="1" title="Use lat/lon of current GPS position. Overwrites Latitude / Longitude settings above. Requires valid GPS position.">
+                    </div>
+                </div>
+                <div class="grid-container full">
+                    <h5 class="u-full-width">Position format and precision / ambiguity</h5>
+                </div>
+                <div class="grid-container full">
+                    <div>
+                        <label for="pos_amb">Position precision *</label>
+                        <select id="pos_amb" name="pos_amb" title="Position precision / Ambiguity
+I.   High precision: default is compressed (sends cse/speed or altitude without overhead; position is more acurate than uncompressed position, and needs only 8 bytes for lat/lon (but the price is, that the position is not human readable) and it's resolution is 29.17cm for latitude distances, and up to 58.34cm for longitude. Be aware that course has a resolution of only 4 degrees, and height resolution is non-linear (1.002^cs), and could not be negative.
+     Uncompressed (APRS default notation) is not very precise: >18.52m (APRS Notation 1234.56N/01234.56E == 12-34.56N 012-34.56E).
+  Uncompressed can be enhanced with the DAO extension in Text message part: !W..!: 1.852m or !w..!: 20.35cm to 22.39cm. DAO W is better human readable; DAO w is base91-encoded (-> precision loss for the decimals 3+4 by factor 1.10); good for manually positioning your digipeager antenna or fox hunting equipment on the map - but keep in mind that your GPS does not have this great precision anyway.
+     Uncompressed (with / without DAO): If GPS signal is lost and you was not moving and last coordinates have not changed, DAO variant will still be used if configured.
+II:  Ambiguiti 1/10' -> >185.2m), 1' -> > 1.852km, 10' -> >18.12km, 1 deg == 60'-> >111.12km. Works for both modes, compressed and uncompressed.
+III: Values above are referring to latitude; distance between two latitudes is always equal; distance between two longitudes becomes smaller towards the north / south poles of the earth (at 0 deg, even high values  align to 0.0m). At aequator, lat/lon relation is 1:1. At 60 deg N or S it's about factor 2).
+     Keep in mind: While this is is good for high precision, it's worse for ambiguity.
+     Compressed positions have a 2 times lesser precision on the longitude, which leads to factor 1:2 at aequator, and an 1:1 ratio at abt. 60 deg N or S); this is comparable how maidenhead grid locators are defined.">
+                            <option value="0">Compressed (default) == >25.17cm</option>
+                            <option value="-1">Uncompressed == >18.52m.</option>
+                            <option value="-2">Uncompressed, with DAO W == >1.852m</option>
+                            <option value="-3">Uncompressed, with DAO w == >20.35cm</option>
+                            <option value="1">Ambiguity 1/10' == 185.2m</option>
+                            <option value="2">Ambiguity 1' == >1.852km</option>
+                            <option value="3">Ambiguity 10' == >18.12km</option>
+                            <option value="4">Ambiguity 1 deg == 60' == >111.12km</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="grid-container full">
+                    <h5 class="u-full-width">Smart Beaconing Settings</h5>
+                </div>
+                <div class="grid-container quarters">
+                    <div>
+                        <label for="sb_min_interv">Min interval [s]</label>
+                        <input class="u-full-width" name="sb_min_interv" id="sb_min_interv" type="number" min="10" title="Minimal time for Smart Beaconing. 60 is recommended. Min 10.">
+                    </div>
+                    <div>
+                        <label for="sb_max_interv">Max interval [s]</label>
+                        <input class="u-full-width" name="sb_max_interv" id="sb_max_interv" type="number" min="90" title="Maximal time for Smart Beaconing. 1800 is recommended. Min 90.">
+                    </div>
+                    <div>
+                        <label for="sb_min_speed">Min speed [km/h]</label>
+                        <input class="u-full-width" name="sb_min_speed" id="sb_min_speed" type="number" min="0" title="Minimal speed for Smart Beaconing. Min 0.">
+                    </div>
+                    <div>
+                        <label for="sb_max_speed">Max speed [km/h]</label>
+                        <input class="u-full-width" name="sb_max_speed" id="sb_max_speed" type="number" min="1" title="Maximal speed for Smart Beaconing. Min 1.">
+                    </div>
+                </div>
+                <div class="grid-container thirds">
+                    <div>
+                        <label for="sb_angle">Course change [degrees]</label>
+                        <input name="sb_angle" id="sb_angle" type="number" min="5" max="360" title="Angle of course change to speed up beacon transmission. Recommended value: 28. Range 0 to 360.">
+                    </div>
+                    <div>
+                        <label for="sb_turn_slope">Turn Slope [degrees]</label>
+                        <input name="sb_turn_slope" id="sb_turn_slope" type="number" min="5" max="255" title="Smart beaconing turn slope. Use 7 for pedestrian, 11 for low/mid speed and 26 for high speed. Recommended value: 26. Range 5 to 255.">
+                    </div>
+                    <div>
+                        <label for="sb_turn_time">Turn Time [seconds]</label>
+                        <input name="sb_turn_time" id="sb_turn_time" type="number" min="5", title="Smart beaconing turn time. Wait at least this amount of seconds for next beacon. Recommended value: 30. Min 5.">
+                    </div>
+                </div>
+                <div class="grid-container quarters">
+                    <div>
+                        <label for="gps_enabled">GPS enabled *</label>
+                        <input name="gps_enabled" id="gps_enabled" type="checkbox" value="1" title="enable or disable GPS">
+                    </div>
+                    <div>
+                        <label for="kiss_myloc_ok">Accept own positions via KISS</label>
+                        <input name="kiss_myloc_ok" id="kiss_myloc_ok" type="checkbox" value="1" title="If set to true, we'll stop sending own position beacons if we heard a position from our call via kiss. Uncheck this, if you like to filter out those positions and keep sending it by this device.">
+                    </div>
+                    <div>
+                        <label for="gps_sleep_ok">Allow GPS sleep while own positions received via KISS</label>
+                        <input name="gps_sleep_ok" id="gps_sleep_ok" type="checkbox" value="1" title="If we have a kiss client like aprsdroid, or a digipeater software, which sends own positions (with same call as ours), we pause sending own positions (neither fixed nor smart beaconing). Uncheck, if you have a display attached and still like to see your current GPS position. This option is only honored if configuration 'Accept own positions via KISS' enabled. Why? If your filter out own positions from and this device sends on it's own, it needs gps running ;)">
+                    </div>
+                    <div>
+                            *) requires reboot only if you change enable/disable GPS
+                    </div>
+                </div>
+                <div class="grid-container full">
+                    <h6 class="u-full-width">Additional settings for secondary frequency:<br/>EXPERIMENTAL - USE WITH CARE!</h6>
+                </div>
+                <div class="grid-container halves">
+                    <div>
+                        <label for="lora_freq_x">Secondary Frequency [MHz]</label>
+                        (for cross-repeating or listening transmissions from igates)</label>
+                        <input name="lora_freq_x" id="lora_freq_x" type="number" min="0.0000" max="928.0000" step="0.0001" title="LoRa center frequency - must be different from main frequency and between 433.0001 and 928.0000 or 0 if not needed. I.e. 433.900">
+                    </div>
+                    <div>
+                        <label for="txPower_x">TX power on secondary frequency [dBm]</label>
+                        <input name="txPower_x" id="txPower_x" type="number" min="0" max="23" title="LoRa TX Power on secondary frequency. Range 0 to 23dBm">
+                    </div>
+                </div>
+                <div class="grid-container full">
+                    <div>
+                        <label for="lora_speed_x">Speed on secondary frequency</label>
+                        <select id="lora_speed_x" name="lora_speed_x">
+                            <option value="1200">BW 125khz CR 4:7 SF 9 (Fast Standard. default; use high speeds on the secondary frequency)</option>
+                            <option value="610">BW 125khz CR 4:8 SF 10 (610bps)</option>
+                            <option value="300">BW 125khz CR 4:5 SF 12 (300bps)</option>
+                            <option value="240">BW 125khz CR 4:6 SF 12 (244bps)</option>
+                            <option value="210">BW 125khz CR 4:7 SF 12 (209bps)</option>
+                            <option value="180">BW 125khz CR 4:8 SF 12 (183bps)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="grid-container halves">
+                    <div>
+                        <label for="rx_qrg">RX on frequencies</label>
+                        (Only honored, if we are NOT configured as WIDE1 or WIDE2 digi. If set to both frequencies: Ratio depends on how many packets are received on each qrg in a 10min window; we stay 20s on one qrg.)
+                        <select id="rx_qrg" name="rx_qrg">
+                          <option value="1">RX on main frequency</option>
+                          <option value="2">RX on secondary frequency</option>
+                          <option value="3">RX on both frequencies</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="lora_freq_rx_curr">Current RX Frequency:</label>
+                        <input name="lora_freq_rx_curr" id="lora_freq_rx_curr" type="number" readonly title="Nothing to enter here">
+                    </div>
+                </div>
+                <div class="grid-container full">
+                    <h6 class="u-full-width">Additional settings for mode repater:<br/>EXPERIMENTAL - USE WITH CARE!</h6>
+                </div>
+                <div class="grid-container full">
+                    <div>
+                        <label for="lora_dig_mode">LoRa Repater Mode</label>
+                        <select id="lora_dig_mode" name="lora_dig_mode">
+                            <option value="0">off. This device does not do any repeating decision.</option>
+                            <option value="1">Repeat if own call is addressed (recommended for normal users). default.</option>
+                            <option value="2">Act as WIDE1 (fill-in) digi</option>
+                            <option value="3">Act as a simple WIDE2 digi (consider to instead attach a real aprs-digipeater software via KISS)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="grid-container halves">
+                    <div>
+                        <label for="lora_dig_x_m">Digipeat heard stations from MAIN frequency to which frequencies</label>
+                        (If LoRa Repeater Mode has not been set to off)
+                        <select class="u-full-width" id="lora_dig_x_m" name="lora_dig_x_m">
+                            <option value="0">Repeat only to main frequency (default)</option>
+                            <option value="1">Repeat to both frequencies</option>
+                            <option value="2">Repeat only to cross-digi frequency</option>
+                        </select>
+                    </div>
+                    <div>
+                      <label for="tx_qrg_bc">TX our beacon from this device or from-kiss to frequencies</label>
+                      (Only honored, if we are configured as WIDE1 or WIDE2 digi)
+                      <select class="u-full-width" id="tx_qrg_bc" name="tx_qrg_bc">
+                        <option value="1">TX on main frequency</option>
+                        <option value="2">TX on secondary frequency</option>
+                        <option value="3">TX on both frequencies</option>
+                        <option value="5">(TX on both frequencies as USER - not recommended, needed in SP)</option>
+                        <option value="0">Don't send our beacon on RF (but only to kiss and to APRS-IS)</option>
+                      </select>
+                    </div>
+                </div>
+                <div class="grid-container full">
+                    <h5 class="u-full-width">APRS-IS settings</h5>
+            <h6 class="u-full-width">changes in the foollowing section need a reboot to ensure correct login into APRS-IS</h6>
+                </div>
+                <div class="grid-container halves">
+                  <div>
+                    <label for="aprsis_en">Enable APRS-IS connection</label>
+                    <input name="aprsis_en" id="aprsis_en" type="checkbox" value="1" title="If we are configured as WIFI client, connect to the APRS-IS net">
+                  </div>
+                  <div>
+                    <label for="aprsis_srv_h">Server Name</label>
+                    <input type="text" name="aprsis_srv_h" id="aprsis_srv_h" placeholder="euro.aprs2.net" title="Server name or IP Address. I.e. euro.aprs2.net. If your igate is in the HAMNET, use aprs.hc.r1.ampr.org">
+                  </div>
+                  <div>
+                    <label for="aprsis_srv_p">TCP Port</label>
+                    <input type="number" name="aprsis_srv_p" id="aprsis_srv_p" placeholder="14580" min="1" max="65535" title="TCP Port, i.e. 14580">
+                  </div>
+                  <div>
+                    <label for="aprsis_call">Callsign (optional)</label>
+                    <input type="text" name="aprsis_call" id="aprsis_call" minlength="3" maxlength="9" title="Use this callsign for the APRS-IS connection. If not configured, your default callsign is used." placeholder="may be left blank">
+                  </div>
+                  <div>
+                    <label for="aprsis_pw">Password (required)</label>
+                    <input type="password" name="aprsis_pw" id="aprsis_pw" title="Your password for the APRS-IS connection.">
+                  </div>
+                  <div>
+                    <label for="aprsis_fltr">Filter (optional)</label>
+                    <input type="text" name="aprsis_fltr" id="aprsis_fltr" title="Request server-site filter (may be left empty). See http://www.aprs-is.net/javAPRSFilter.aspx ; Example: 't/mqs/YOURCALL/50' -> Gate only messages, query and status messages to RF, from a circle of 50km around your last known position. w, o and i may be of interest, but some people on 2m APRS or APRS-IS may send those packets much too frequently. Please trace the effect! Perhaps in combination with '-e/DB0FRI-10'. In our case, the digi positioning beacon from DB0FRI-10 (which is also an igate nearby, APRS-IS path qAI,DB0FRI-10) came from APRS-IS to us and we gated his beacon, encoded as third-party-trafffic, back to RF (which makes no sense: 1. His direct RF beacon is much better heard than ours -> all RF users heard it. 2. We needless consumed airtime). -> Using -e/IGATE1/IGATE2/.. , everything heard (and sent to APRS-IS) by our neighbor igates like DB0FRI-10 will not be re-gated by us. Please also check, if '-d/..' instead of (or additional to) '-e/..' is more suitiable in your environment; you may also consider -/b/.. ." placeholder="may be left blank">
+                  </div>
+                  <div>
+                    <label for="tx_aprsis_sm">Send status-message to APRS-IS</label>
+                    <input name="tx_aprsis_sm" id="tx_aprsis_sm" type="checkbox" value="1" title="Send APRS-status-message about new tcp connectioni, -attepts or your requested shutdown/reboot to APRS-IS. This helps you to trace reboots and unexpected loss of wifi- or internet-access.">
+                  </div>
+                  <div>
+                    <label for="tx_aprsis_bc">Allow send our beacon to APRS-IS</label>
+                    <input name="tx_aprsis_bc" id="tx_aprsis_bc" type="checkbox" value="1" title="Allow sending our beacon from this device or from KISS to APRS-IS. You may like to disable this i.e. if you are a portable hotspot together with your tracker, but others already gate your own packets to APRS-IS -> you'll see at APRS-IS who heard you.">
+                  </div>
+                  <div>
+                    <label for="aprsis_2rf">Gate APRS-IS traffic to frequencies</label>
+                    (Will be '3rd-party encoded'. Be careful - do not flood our slow main frequency! Use filters..)
+                    <select id="aprsis_2rf" name="aprsis_2rf">
+                      <option value="0">Don't gate APRS-IS to RF (default)</option>
+                      <option value="1">Gate to main frequency</option>
+                      <option value="2">Gate to secondary frequency</option>
+                      <option value="3">Gate to both frequencies</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label for"aprsis_status">Connection status</label>
+                    <input type="text" name="aprsis_status" id="aprsis_status" readonly title="Connection status. Nothing to enter here">
+                  </div>
+                </div>
+                <div class="grid-container full">
+                    <div>
+                        <input class="button-primary u-full-width" type="submit" value="Save" title="save settings, remember reboot tracker after save">
+                    </div>
+                </div>
+            </form>
+        </article>
+    </section>
+    <section>
+        <article>
+            <form action="/save_device_cfg" method="post">
+            <div class="grid-container full">
+                <h2 class="u-full-width">Device Settings</h2>
+            </div>
+            <div class="grid-container quarters">
+                <div>
+                    <label for="oled_enabled">OLED Display enabled</label>
+                    <input name="oled_enabled" id="oled_enabled" type="checkbox" value="1" title="Enables or disables OLED">
+                </div>
+                <div>
+                    <label for="bt_enabled">Bluetooth enabled</label>
+                    <input name="bt_enabled" id="bt_enabled" type="checkbox" value="1" title="enable or disable bluetooth">
+                </div>
+<!--
+                <div>
+                    <label for="logserial_en">Serial Logging</label>
+                    <input name="logserial_en" id="logserial_en" type="checkbox" value="0" title="Enable or disable verbose logging on usb-serial port. If disabled, KISS-receive and KISS-send is disabled on usb-serial.">
+                </div>
+-->
+                <div>
+                    <label for="usbser_proto">USB-Serial protocol</label>
+                    <select id="usbser_proto" name="usbser_proto">
+                      <option value="0">1. KISS (default)</option>
+                      <option value="1">2. Serial logging</option>
+                      <option value="2">3. Trace packets from LoRa (TNC-trace-format)</option>
+                      <option value="4">4. NMEA GPS data</option>
+                      <option value="3">5. 2) and 3)</option>
+                      <option value="5">6. 4) and 2)</option>
+                      <option value="6">7. 4) and 3)</option>
+                      <option value="7">8. 4) and 2) and 3)</option>
+                      <option value="128">8. No KISS, no logging, no tnc-trace, no NMEA.</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="led_enable">LED signaling</label>
+                    <input name="led_enable" id="led_enable" type="checkbox" value="1" title="enable or disable LED (not implemented)" DISABLED>
+                </div>
+            </div>
+            <div class="grid-container quarters">
+                <div>
+                    <label for="cpufreq">Adjust CPU frequency (MHz)</label>
+                    <input name="cpufreq" id="cpufreq" type="number" min="0" max="250" title="Reduce CPU freq for power consumption (up to 20 % less). Use with extreme care! Tested with value 80. 0 means: no change to power-on-state." placeholder="0">
+                </div>
+                <div>
+                    <label for="reboot_intrvl">Reboot every n hours</label>
+                    <input name="reboot_intrvl" id="reboot_intrvl" type="number" min="0" max="1193" title="Do a periodical reboot every n hous. 0 = disable. Range 0 to 1193" placeholder="0">
+                </div>
+                <div>
+                    <label for="shutdown_act">Auto power off</label>
+                    <input name="shutdown_act" id="shutdown_act" type="checkbox" value="1" title="activate auto shutdown after usb plug off (not for T-BEAM 0.7). The power off the device will be switched off. Default: 'yes' (power off). Consider if you need to switch it to 'no' (keep power on), i.e. if you are an additionaly battery-connected igate, or if you have a not reliable power source.">
+                </div>
+                <div>
+                    <label for="shutdown_dt">Auto power off delay [s]</label>
+                    <input name="shutdown_dt" id="shutdown_dt" type="number" min="3" max="3600" title="auto shutdown delay in seconds. Range 3 to 3600.">
+                </div>
+            </div>
+            <div class="grid-container thirds">
+                <div>
+                    <label for="sh_rxtime">Display show RX time [s]</label>
+                    <input name="sh_rxtime" id="sh_rxtime" type="number" min="0" max="45" title="show RX packet for seconds, refresh rate for OLED. Range 0 to 45.">
+                </div>
+                <div>
+                    <label for="sh_oledtime">Display timeout [s]</label>
+                    <input name="sh_oledtime" id="sh_oledtime" type="number" min="0" max="60" title="Turn OFF OLED after X seconds. Set 0 to disable (constantly active OLED has a refresh rate of 1s. Range 0 to 60.">
+                </div>
+                <div>
+                  <label for="units">Units</label>
+                  <select id="units" name="units">
+                    <option value="65">km/h, m (metric)</option>
+                    <option value="66">m/s, m (metric)</option>
+                    <option value="132">mph, ft (imperial)</option>
+                    <option value="136">kn, ft (aero)</option>
+                    <option value="72">kn, m (nautic)</option>
+                  </select>
+                </div>
+            </div>
+            <div class="grid-container thirds">
+                <div>
+                  <label for="oledl3l4fmt">OLED Line3 and Line4 Format</label>
+                  <select id="oledl3l4fmt" name="oledl3l4fmt" title="A: (default): Original format, L3: Lat/Lon; L4: speed, course, altitude. Lat/Lon in APRS format. Good for learning how aprs works.
+Bx: Left side: L3: course, altitude. L4: speed. Right side: see below:
+B1: Lat/Lon in classic format, good for non-technicals. Lat/Lon on right side.
+B2: Lat/Lon in nautical notation. Lat/Lon Lat/Lon on right side.
+Cx: Right side: L3: speed. L4: course, altitude. Left side: see below:
+C1: Lat/Lon in classic format, good for non-technicals. Lat/Lon on left side.
+C2: Lat/Lon in nautical notation. Lat/Lon on left side.
+
+About Lat/Lon notations: Acuracy depends on speed, gps signal quality and choosen format; B2 and C2 has room for precision up to 0.1'.
+APRS-style is 1234.56N 01234.56E.
+Beginners style is 012°34.56'.
+Nautical style is 12-34,567N 012-34.567E.
+See also the option beneath about showing maidenhead grid locator.">
+                    <option value="0">A:  Lat/Lon in APRS-notation</option>
+                    <option value="1">B1: Lat/Lon in classic notation</option>
+                    <option value="2">B2: Lat/Lon in nautical notation</option>
+                    <option value="3">C1: Lat/Lon in classic notation, left side</option>
+                    <option value="4">C2: Lat/Lon in nautical notation, left side</option>
+                  </select>
+                </div>
+		<div>
+                  <label for="oledlocator">Maidenhead Locator</label>
+                  <select id="oledlocator" name="oledlocator" title="Show Maidenhead grid locator: always (instead of Lat/Lon), never, alternating. Alternating:
+                          0: Never
+                          1: Always
+                          2: Maidenhead 10s, Lat/Lon 50s
+                          3: Maidenhead 20s, Lat/Lon 100s
+                          4: Maidenhead 20s, Lat/Lon 20s
+                          While showing maidenhead grid locator, free space is left at one side of line3 or line4 (depending on your 'Oled Line3 and Line4 Format' settings), so other values like measurement of temp/humidity/pressure or statistics, etc. may be displayed.">
+                    <option value="0">Off (only Lat/Lon)</option>
+                    <option value="1">On (never Lat/Lon)</option>
+                    <option value="2">Loc 10s, Lat/Lon 50s</option>
+                    <option value="3">Loc 20s, Lat/Lon 100s</option>
+                    <option value="4">Loc 20s, Lat/Lon 20s</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="oled_loc_amb">Locator precision</label>
+                  <select id="oled_loc_amb" name="oled_loc_amb" title="Maidenhead grid locator resolution on your display.
+The longer the string is, the harder it's to read. That's why we toggle between the length of 10 and the length of 8,
+depending on your speed and your configured position precision.
+If you prefer the max. displayed length of 6, choose the first entry.
+  RR99XX (default)
+  RR99XX99
+  RR99XX99xx
+For RR99XX99xx99, we do not have enough space on the display.
+Length of 6 has a precision (for lattitude) with 2.5nm; longitude: 5nm on aequator (and abt 2nm at 60deg N or S).
+Background:
+RR99 has a range of 18*10 degrees in latitude and 18*10*2 degress in longitude and has a resolution of 1 deg (60min == 60nm == 111.12km ) in lat and 2 deg (120min in lon).
+Length of 4 (RR99) would have a resolution 25nm in lat (46.3km). It does not make sense to have this ambiguity being displayed.
+RR99XX is 180deg / 24 = 2.5min = 2.5nm (= 4.63km) in lat (and 5min = 5nm  (= 9.26km in lon at 0 deg north).
+RR99XX99 divides the values above by 10, as you might have expected: 463m in lat, 926m in lon. Good to read, good resolution if you are moving.
+RR99XX99xx has a resolution of 0.010416 nm (== 19.3m) in latitude; standard aprs resolution is 0.01nm (18.52m) -> Matches quite good - for latitude.
+			                             In longgitude, maidenhead's resolution is 0.02083 nm (385.83m at aequator).
+Hard readable lengths / too long for our display:
+  RR99XX99xx99 has half the resolution than the one above. -> 1.93m in lat. It matches quite good to the Position precision 'uncompressed with DAO (!W..!)' extension (which has a resolutuion of 1.852m in lat and lon).
+  RR99XX99xx99xx is unreadable and would give us a resolution of 0.000434' (8.043cm) in lat. So precise is no GPS, and your antenna is probably longer than that locator.">
+                    <option value="0">RR99XX (default)</option>
+                    <option value="-1">RR99XX99</option>
+                    <option value="-2">RR99XX99xx</option>
+                  </select>
+                </div>
+            </div>
+            <div class="grid-container full">
+                <div>
+                    <input class="button-primary u-full-width" type="submit" value="Save" title="save settings, remember reboot tracker after save">
+                </div>
+            </div>
+            </form>
+        </article>
+    </section>
+    <section>
+        <div class="grid-container full">
+            <h2 class="u-full-width">Device Info</h2>
+        </div>
+        <div class="grid-container halves">
+            <div>
+              <label for="UptimeMinutes">Uptime of Device [min]</label>
+              <input type="text" name="UptimeMinutes" id="UptimeMinutes" readonly title="uptime device in minutes">
+            </div>
+            <div>
+              <label for="curPos">Current Position</label>
+              <input type="text" name="curPos" id="curPos" readonly title="Current Position of device [P if fixed mode; p, if gps is invalid and used as temporary preset]">
+            </div>
+            <div>
+              <label for="OledLine5">Satellite & Batt Info</label>
+              <input type="text" name="OledLine5" id="OledLine5" readonly title="Satellite (#Sats/HDOP) [more sats are good, lowest HDOP is best. Should be < 8], and Batt Info [B means Battery; P means external pwr. Positive current is battery-charge-current, while prefixed with 'B', and battery voltage shown.]">
+            </div>
+        </div>
+        <div class="grid-container halves">
+            <div>
+              <label for="OledLine1">OledLine1</label>
+              <input type="text" name="OledLine1" id="OledLine1" readonly title="OledLine1">
+            </div>
+            <div>
+              <label for="OledLine2">OledLine2</label>
+              <input type="text" name="OledLine2" id="OledLine2" readonly title="OledLine2">
+            </div>
+        </div>
+        <div class="grid-container halves">
+            <div>
+              <label for="OledLine3">OledLine3</label>
+              <input type="text" name="OledLine3" id="OledLine3" readonly title="OledLine3">
+            </div>
+            <div>
+              <label for="OledLine4">OledLine4</label>
+              <input type="text" name="OledLine4" id="OledLine4" readonly title="OledLine4">
+            </div>
+        </div>
+    </section>
+    <section>
+        <div class="grid-container full">
+            <h2 class="u-full-width">Received</h2>
+        </div>
+        <article style="overflow-x:auto;">
+            <table>
+                <thead>
+                <tr>
+                    <th>Time (UTC)</th>
+                    <th>Frame</th>
+                    <th>RSSI</th>
+                    <th>SNR</th>
+                </tr>
+                </thead>
+                <tbody id="receivedFrames">
+
+                </tbody>
+            </table>
+        </article>
+    </section>
+    <section>
+        <div class="grid-container full">
+            <h2 class="u-full-width">Actions</h2>
+            <h6 class="u-full-width">NEW: reboot after changes above only necessary, where explicitly stated</h6>
+        </div>
+        <article>
+            <div class="grid-container quarters">
+                <form action="/shutdown" method="post" onsubmit="return confirmAction('shutdown');">
+                    <div>
+                        <input class="button-primary" type="submit" value="Shutdown">
+                    </div>
+                </form>
+                <form action="/reboot" method="post" onsubmit="return confirmAction('reboot');">
+                    <div>
+                        <input class="button-primary" type="submit" value="Reboot">
+                    </div>
+                </form>
+                <form action="/restore" method="post" onsubmit="return confirmAction('do factory reset');">
+                    <div>
+                        <input class="button-primary" type="submit" value="Factory reset">
+                    </div>
+                </form>
+                <form action="/beacon" method="post" onsubmit="return confirmAction('send beacon');">
+                    <div>
+                        <input class="button-primary" type="submit" value="Send Beacon">
+                    </div>
+                </form>
+            </div>
+        </article>
+    </section>
+    <section>
+        <div class="grid-container full">
+            <h2 class="u-full-width">Update</h2>
+        </div>
+        <article>
+            <div class="grid-container full">
+                <h5 class="u-full-width">View configuration</h5>
+            </div>
+            <div class="grid-container full">
+                Click <a href="/cfg">here</a> to view (backup) your current settings.
+            </div>
+            <div class="grid-container full">
+                Click <a href="/wificfg">here</a> to view your configured wifi settings.
+            </div>
+            <div class="grid-container full">
+                <h5 class="u-full-width">Firmware update</h5>
+            </div>
+            <div class="grid-container full">
+                <form action="/update" method="post" enctype="multipart/form-data" id="upload_form" onsubmit="updateFileUpload(event)">
+                    <div>
+                        <label id="file-input" for="file">Choose firmware_file.bin ...</label>
+                        <div><progress id="file-progress" max="100"></progress></div>
+                        <input type="file" name="update" id="file" onchange="onFileChange(this)">
+                        <input class="button-primary" type="submit" value="Update firmware">
+                    </div>
+                </form>
+            </div>
+            <div class="grid-container full">
+                <h5 class="u-full-width">Save configuration</h5>
+            </div>
+            <div class="grid-container full">
+                Save configuration to tracker's filesystem (/preferences.cfg)
+                <form action="/save2fs" method="post">
+                    <div>
+                        <input class="button-primary" type="submit" value="save2fs">
+                    </div>
+                </form>
+            </div>
+            <div class="grid-container full">
+                <h5 class="u-full-width">Save configuration</h5>
+            </div>
+            <div class="grid-container full">
+                Save Wifi configuration to tracker's filesystem (/wifi.cfg)
+                <form action="/savewifi2fs" method="post">
+                    <div>
+                        <input class="button-primary" type="submit" value="savewifi2fs">
+                    </div>
+                </form>
+            </div>
+        </article>
+    </section>
+    <section>
+        <div class="grid-container full">
+            <h2 class="u-full-width">Documentation</h2>
+        </div>
+        <article>
+            <div class="grid-container full">
+              <h5 class="u-full-width">Tooltip</h5>
+            </div>
+            <div>If you navigate your mouse over an input field / button, you see a detailed description what it does / which values are expected.</div>
+            <div class="grid-container full">
+              <h5 class="u-full-width">Info for SNR/RSSI path encoding</h5>
+            </div>
+            <div>If enabled, add SNR and RSSI in path on receiption, prefixed with 'Q'. Examples:<br/>
+                 SNR  23 RSSI  -73 -> Q2373<br/>
+                 SNR -03 RSSI -104 -> QA3K4<br/>
+                 SNR -13 RSSI -114 -> QB3L4<br/>
+                 Still testing, if it behaves good to our network.<br/>
+                 Use with care; resulting longer path consumes a bit more airtime.
+            </div>
+            <div class="grid-container full">
+              <h5 class="u-full-width">TTGO T-Beam <b>middle</b> hardware-button<br>(User key functions):</h5>
+            </div>
+            <div>
+               <h6 class="u-full-width">short press</h6>
+               If OLED is enabled and OLED is OFF:<br/>
+               <ul>
+                 <li>a short press will wake it up and show current data (as long as your configured "Display Timeout")</li>
+               </ul>
+               If OLED is disabled or OLED is ON:<br>
+               <ul>
+                    <li>with GPS-FIX immediate sending of a frame with the position from the GPS</li>
+                    <li>without GPS-FIX, immediate sending of the frame with the position saved in the configuration</li>
+               </ul>
+               <h6 class="u-full-width">long press</h6>
+               <ul>
+                   <li>toggle on or off WiFi and WebServer</li>
+                   <li><b>Cave</b>: if you long-press during boot, your <b>settings are purged!</b></li>
+               </ul>
+            </div>
+            <div class="grid-container full">
+               <h5 class="u-full-width">TTGO T-Beam left/right hardware-buttons:</h5>
+            </div>
+            <div>
+               <ul><li>Left button (nearby USB-port): if long-pressed, your device will powered off (press 7s), or is switched on again (2s).</li></ul>
+               <ul><li>Right button (lateral): short-press reboots your device (restarts the CPU).</li></ul>
+            </div>
+            <div>
+            </div>
+            <div class="grid-container full">
+              <h5 class="u-full-width">Tips for reducing power (Usage as tracker only):</h5>
+            </div>
+            <div>
+               WiFi OFF<br/>
+               <ul>
+                 <li>be aware, that aprs-is connection depends on the Webserver and will stop working).</li>
+                 <li>select option 0 to disable WiFi & APRS-IS</li>
+                 <li>select option 1 to disable WiFi if a bluetooth client is connected in between 60s on boot (recommended for portables, and for LORA32_21 devices)</li>
+               </ul>
+               LoRa Receiver OFF:<br>
+               <ul>
+                    <li>reduces power consumption, if you just use the device as a tracker</li>
+               </ul>
+               Fixed Beacon off:<br>
+               <ul>
+                    <li>Smart Beaconing is activated, if there is no fixed beacon</li>
+               </ul>
+            </div>
+            <div class="grid-container full">
+              <h5 class="u-full-width">Config in Filesystem:</h5>
+            </div>
+            <div>
+               General<br>
+               <ul>
+                 <li>There could be two files: wifi.cfg and preferences.cfg. You find in the directory "data" of this sources-tree. </li>
+                 <li>Each file should not exceed 2560 bytes.</li>
+                 <li>To upload both files to SPIFFS of your board, you have to do this via Upload File System image in PlatformIO!</li>
+                 <li>To find the 'Upload File System image' click the PlatformIO symbol (the little alien) on the left side, choose your configuration, click on 'Platform' and search for 'Upload File System image'. If you use platformio-cli, upload the filesystem as described below.</li>
+               </ul>
+               data/wifi.cfg<br>
+               <ul>
+                 <li>wifi.cfg can to be created manually, following the json structure in the example. The names of the variables (aka keys) must not be altered</li>
+                 <li>The preferred way is to upgrade the firmware to the newest version, make sure, that the wifi credentials are set correctly and then kilck the SAVEWIFI2FS Button.</li>
+                 <li>The content, what will be saved, can be viewed above.</li>
+                 <li>wifi.cfg in the directory data contains SSID and password of up to 10 AP and a password for the local accesspoint</li>
+                 <li>The password must not be shorter that 8 byte. The json structure must not be changed</li>
+                 <li>if something is wrong or the file is missing, the complete file will be ignored. If credentials are available in flash, they will be used.</li>
+                 <li>An alternative to upload wifi.cfg to your board is via Upload File System image in PlatformIO!</li>
+                 <li>To find the 'Upload File System image' click the PlatformIO symbol (the little alien) on the left side, choose your configuration, click on 'Platform' and search for 'Upload File System image'. If you use platformio-cli, upload the filesystem as described below.</li>
+               </ul>
+               which WiFi is selected?<br/>
+               <ul>
+                 <li>An AP entry containing the keyword "prio":1 defines the entry which is taken as first to connect before following the configured order</li>
+                 <li>if there is nothing prioritized, then the configured order is followed. If credentials are available in flash, they will be used first.</li>
+                 <li>if no connection to a configured AP could be established, a local accesspoint with the SSID "call AP" will be created. After connected to, this Webserver will be reachable with the IP Address 192.168.4.1. The password for the selfAP can be preconfigured with the key "ap_password" in this file</li>
+               </ul>
+               data/preferences.cfg<br>
+               <ul>
+                 <li>preferences.cfg can be created by the system, if you kilck to "SAVE2FS" in the Update section of the site.
+                 <li>if you want to changes items of the preferences, you have to start with the data shown in the configuration view of this WebSite. Be sure to deleted everything before the "{". Again the keys must not be altered. The file then has to be placed into the data directory on your system using the name preferences.cfg.
+               </ul>
+               which config is selected?<br/>
+               <ul>
+                 <li>during startup it will be checked, if there is a prevously used config stored in the system. Normally that is the config, you enter via the webserver. This will be used, if available.</li>
+                 <li>If the previously stored config is not available (i.e., after a complete system erase or a factory reset), it will be checked, if a correct file data/preferences.cfg is availabe. If yes, it will be used. If not, the system comes up with the default values.</li>
+               </ul>
+               Factory reset<br/>
+               <ul>
+                 <li>if factory reset is selected (either via the right button or the webserver), the system will start up with the config saved in data/preferences.cfg. So if you are in the field, make sure, that you have a working setup stored there and be carefull when overwriting.</li>
+                 <li>If you really need a fresh system with the compiled default configuration, you have to delete the file data/preferences.cfg on the board, before you do a factory reset.</li>
+               </ul>
+               Platform.IO CLI<br>
+               <ul>
+                 <li>if your computer is a raspberry PI3 or if you do not want/need the overhead of the Platfrom.IO GUI, you can use the CLI</li>
+                 <li>you can find it <a href="https://docs.platformio.org/en/latest/core/installation/methods/installer-script.html">here</a></li>
+                 <li>usefull commands, if the board is connected to the PI via USB:</li>
+                 <li>Clean all of project compilation: ~/.platformio/penv/bin/pio run  -e [board identifier] -t cleanall  --upload-port /dev/[port]</li>
+                 <li>Erase Flash: ~/.platformio/penv/bin/pio run  -e [board identifier] -t erase  --upload-port /dev/[port]</li>
+                 <li>Build Filesystem: ~/.platformio/penv/bin/pio run  -e [board identifier] -t buildfs  --upload-port /dev/[port]</li>
+                 <li>Upload Filesystem: ~/.platformio/penv/bin/pio run  -e [board identifier] -t uploadfs --upload-port /dev/[port]</li>
+                 <li>Compile and Upload Firmware: ~/.platformio/penv/bin/pio run  -e [board identifier] -t upload  --upload-port /dev/[port]</li>
+                 <li>start serial monitor: ~/.platformio/penv/bin/pio device monitor -p /dev/[port] -b 115200</li>
+                 <li>all the commands above executed in that order, will completely erase the board, compile and upload the filesystem, compile and upload the current firmware, reboot the board and start the serial monitor</li>
+                 <li>if a precompiled fw should be uploaded, without compilation, use the nobuild switch:<br/>
+                 ~/.platformio/penv/bin/pio run  -e ttgo-t-beam-v1.0-development -t nobuild -t upload  --upload-port /dev/ttyACM0</li>
+               </ul>
+            </div>
+        </article>
+        <article>
+            <div class="grid-container full">
+              <h5 class="u-full-width">Hardware notices</h5>
+            </div>
+            <div>
+               <h6 class="u-full-width">TTGO LoRa32 V2.1 (aka T3 V1.6.1)</h6>
+               Hardware limitation: if bluetooth is enabled and BT-client is connected, WIFI (-> Web-Server) does not work anymore.<br/>
+               You'll see the red LED while booting turned on for 60s as indicatior for waiting for BT-clients.
+               Hack: firmware compiled with -e ttgo-lora32-v2.1 and bluetooth configuration variable is set to enabled, now listens on boot up to one minute for your bluetooth device to connect.<br/>
+               If a bluetooth device connects, it does not start the Web-Server. Else, it closes SerialBT port and starts the Web-Server on LORA32_21 devices.<br>
+               See also: new feature for switching WIFI off (i.e. if you use the device as portable tracker), if you don't need it: Webserver eats abt 80mA..<br>
+               How to switch the Webserver on again, please read the long-press button (GPS) section.
+            </div>
+        </article>
+    </section>
+</div>
+<footer>
+    <center><b>Contributors in order of appearance:</b><br> OE1ACM, OE3CJB, SQ9MDD, SQ5RWU, DJ1AN, M0IGA, SQ5WPR, DO2JMG, SP6VWX, SQ2WB, IU2FRL, DO3BOX, DL9SAU, DL3EL</center>
+    <center><b>Latest stable version:</b> <a href=https://github.com/SQ9MDD/TTGO-T-Beam-LoRa-APRS>https://github.com/SQ9MDD/TTGO-T-Beam-LoRa-APRS</a></center>
+    <center><b>This version runs the DL9SAU/DL3EL fork:</b> <a href=https://github.com/DL9SAU/TTGO-T-Beam-LoRa-APRS>https://github.com/DL9SAU/TTGO-T-Beam-LoRa-APRS</a></center>
+    <center><b>Licensed under:</b> CC BY-NC-SA</center>
+    <center><!--VERSION--></center>
+</footer>
+</body>
+</html>

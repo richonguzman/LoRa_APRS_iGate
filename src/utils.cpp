@@ -16,11 +16,6 @@
 #include "display.h"
 #include "utils.h"
 
-//
-#include "web_utils.h"
-//
-
-
 AsyncWebServer  server(80);
 
 extern WiFiClient           espClient;
@@ -274,16 +269,11 @@ void startOTAServer() {
         });
 
         server.on("/test1", HTTP_GET, [](AsyncWebServerRequest *request) {
-            request->send(200, "text/html", htmlPage1);
+            request->send(SPIFFS, "/index.html", "text/html");
         });
 
         server.on("/test2", HTTP_GET, [](AsyncWebServerRequest *request) {
-            String dynamicContent = String(htmlPage3);
-            dynamicContent.replace("%VCALLSIGN%", Config.callsign);
-
-
-
-            request->send(200, "text/html", dynamicContent);
+            request->send(SPIFFS, "/index2.html", "text/html");
         });
 
         AsyncElegantOTA.begin(&server);
