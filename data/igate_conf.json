@@ -1,13 +1,13 @@
 {
-	"callsign": "CD2RXU-11",
-    "stationMode": 2,
+	"callsign": "NOCALL-10",
+    "stationMode": 1,
     "iGateComment": "LoRa_APRS_iGate",
     "wifi": {
         "AP": [
-            {   "ssid": "Richon",
-                "password": "k4fPnmg5qnyf",
-                "latitude": -32.8805195,
-                "longitude": -71.4282433
+            {   "ssid": "Wifi_1",
+                "password": "wifi_1_password",
+                "latitude": 0.0000000,
+                "longitude": 0.0000000
             },
             {   "ssid": "Wifi_2",
                 "password": "wifi_2_password",
@@ -22,8 +22,8 @@
 		"longitude": 0.0000000
 	},
 	"aprs_is": {
-		"passcode": "23201",
-		"server": "soam.aprs2.net",
+		"passcode": "VWXYZ",
+		"server": "euro.aprs2.net",
 		"port": 14580,
 		"reportingDistance": 30
 	},
@@ -50,8 +50,8 @@
 		"active": false
 	},
 	"ota": {
-		"username":"richon",
-		"password": "totoro"
+		"username":"",
+		"password": ""
 	},
 	"other": {
 		"beaconInterval": 15,

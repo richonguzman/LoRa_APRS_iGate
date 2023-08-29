@@ -262,7 +262,7 @@ void typeOfPacket(String packet, String packetType) {
     }
 }
 
-void startOTAServer() {
+void startServer() {
     if (stationMode==1 || stationMode==2 || (stationMode==5 && WiFi.status() == WL_CONNECTED)) {
         server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
             request->send(200, "text/plain", "Hi " + Config.callsign + ", \n\nthis is your (Richonguzman/CD2RXU) LoRa iGate , version " + versionDate + ".\n\nTo update your firmware or filesystem go to: http://" + getLocalIP().substring(getLocalIP().indexOf(":")+3) + "/update\n\n\n73!");
@@ -274,6 +274,10 @@ void startOTAServer() {
 
         server.on("/test2", HTTP_GET, [](AsyncWebServerRequest *request) {
             request->send(LittleFS, "/index2.html", "text/html");
+        });
+
+        server.on("/testx", HTTP_GET, [](AsyncWebServerRequest *request) {
+            request->send(LittleFS, "/testx.html", "text/html");//"application/json");
         });
 
         if (Config.ota.username != ""  && Config.ota.password != "") {

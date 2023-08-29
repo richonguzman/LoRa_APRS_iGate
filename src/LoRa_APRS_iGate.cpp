@@ -20,7 +20,7 @@
 Configuration   Config;
 WiFiClient      espClient;
 
-String          versionDate           = "2023.08.27";
+String          versionDate           = "2023.08.29";
 int             myWiFiAPIndex         = 0;
 int             myWiFiAPSize          = Config.wifiAPs.size();
 WiFi_AP         *currentWiFi          = &Config.wifiAPs[myWiFiAPIndex];
@@ -53,7 +53,7 @@ void setup() {
   LoRa_Utils::setup();
   Utils::validateDigiFreqs();
   iGateBeaconPacket = GPS_Utils::generateBeacon();
-  Utils::startOTAServer();
+  Utils::startServer();
   SYSLOG_Utils::setup();
   BME_Utils::setup();
 }
@@ -77,7 +77,7 @@ void loop() {
       if (lastStationModeState == 1) {
         iGateBeaconPacket = GPS_Utils::generateBeacon();
         lastStationModeState = 0;
-        Utils::startOTAServer();
+        Utils::startServer();
       }
       APRS_IS_Utils::loop();
     } else {                              // DigiRepeater Mode

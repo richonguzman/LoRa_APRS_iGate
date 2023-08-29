@@ -14,7 +14,7 @@ void checkDisplayInterval();
 void checkWiFiInterval();
 void validateDigiFreqs();
 void typeOfPacket(String packet, String packetType);
-void startOTAServer();
+void startServer();
 
 }
 
