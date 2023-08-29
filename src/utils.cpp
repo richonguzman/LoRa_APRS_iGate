@@ -1,7 +1,7 @@
 #include <ESPAsyncWebServer.h>
 #include <AsyncElegantOTA.h>
 #include <AsyncTCP.h>
-#include <SPIFFS.h>
+#include <LittleFS.h>
 #include <WiFi.h>
 #include "configuration.h"
 #include "station_utils.h"
@@ -269,11 +269,11 @@ void startOTAServer() {
         });
 
         server.on("/test1", HTTP_GET, [](AsyncWebServerRequest *request) {
-            request->send(SPIFFS, "/index.html", "text/html");
+            request->send(LittleFS, "/index.html", "text/html");
         });
 
         server.on("/test2", HTTP_GET, [](AsyncWebServerRequest *request) {
-            request->send(SPIFFS, "/index2.html", "text/html");
+            request->send(LittleFS, "/index2.html", "text/html");
         });
 
         if (Config.ota.username != ""  && Config.ota.password != "") {

@@ -1,15 +1,15 @@
 #include <ArduinoJson.h>
-#include <SPIFFS.h>
+#include <LittleFS.h>
 #include "configuration.h"
 #include "display.h"
 
 Configuration::Configuration() {
     _filePath = "/igate_conf.json";
-    if (!SPIFFS.begin(false)) {
-      Serial.println("SPIFFS Mount Failed");
+    if (!LittleFS.begin(false)) {
+      Serial.println("LittleFS Mount Failed");
       return;
     }
-    readFile(SPIFFS, _filePath.c_str());
+    readFile(LittleFS, _filePath.c_str());
 }
 
 void Configuration::readFile(fs::FS &fs, const char *fileName) {
