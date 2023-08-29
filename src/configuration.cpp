@@ -64,6 +64,9 @@ void Configuration::readFile(fs::FS &fs, const char *fileName) {
     syslog.port                     = data["syslog"]["port"].as<int>();
 
     bme.active                      = data["bme"]["active"].as<bool>();
+
+    ota.username                    = data["ota"]["username"].as<String>();
+    ota.password                    = data["ota"]["password"].as<String>();
     
     configFile.close();
 }

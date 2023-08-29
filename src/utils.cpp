@@ -276,7 +276,11 @@ void startOTAServer() {
             request->send(SPIFFS, "/index2.html", "text/html");
         });
 
-        AsyncElegantOTA.begin(&server);
+        if (Config.ota.username != ""  && Config.ota.password != "") {
+            AsyncElegantOTA.begin(&server, Config.ota.username.c_str(), Config.ota.password.c_str());
+        } else {
+            AsyncElegantOTA.begin(&server);
+        }
         server.begin();
         Serial.println("init : OTA Server     ...     done!");
     }

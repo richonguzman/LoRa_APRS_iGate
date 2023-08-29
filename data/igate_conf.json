@@ -46,12 +46,16 @@
 		"server": "192.168.0.100",
 		"port": 514
 	},
+	"bme": {
+		"active": false
+	},
+	"ota": {
+		"username":"richon",
+		"password": "totoro"
+	},
 	"other": {
 		"beaconInterval": 15,
 		"rememberStationTime": 30,
 		"sendBatteryVoltage": false
-	},
-	"bme": {
-		"active": false
-	}
+	}	
 }

@@ -58,6 +58,14 @@ public:
   bool    active;
 };
 
+class OTA {
+public:
+  String  username;
+  String  password;
+};
+
+
+
 class Configuration {
 public:
 
@@ -74,6 +82,7 @@ public:
   Display               display;
   SYSLOG                syslog;
   BME                   bme;
+  OTA                   ota;
   
 
   Configuration();
