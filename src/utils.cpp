@@ -280,15 +280,24 @@ void startServer() {
             request->send(SPIFFS, "/index3.html", "text/html");
         });
 
+        server.on("/test4", HTTP_GET, [](AsyncWebServerRequest *request) {
+            request->send(SPIFFS, "/index4.html", "text/html");
+        });
+
         server.on("/testx", HTTP_GET, [](AsyncWebServerRequest *request) {
             request->send(SPIFFS, "/testx.html", "text/html");//"application/json");
         });
+
+        //setDefaultFile("testx.html");
 
         if (Config.ota.username != ""  && Config.ota.password != "") {
             AsyncElegantOTA.begin(&server, Config.ota.username.c_str(), Config.ota.password.c_str());
         } else {
             AsyncElegantOTA.begin(&server);
         }
+
+        server.serveStatic("/", SPIFFS, "/");
+
         server.begin();
         Serial.println("init : OTA Server     ...     done!");
     }
