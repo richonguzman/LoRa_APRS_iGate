@@ -276,6 +276,10 @@ void startServer() {
             request->send(SPIFFS, "/index2.html", "text/html");
         });
 
+        server.on("/test3", HTTP_GET, [](AsyncWebServerRequest *request) {
+            request->send(SPIFFS, "/index3.html", "text/html");
+        });
+
         server.on("/testx", HTTP_GET, [](AsyncWebServerRequest *request) {
             request->send(SPIFFS, "/testx.html", "text/html");//"application/json");
         });
