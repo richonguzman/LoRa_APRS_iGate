@@ -268,27 +268,9 @@ void startServer() {
             request->send(200, "text/plain", "Hi " + Config.callsign + ", \n\nthis is your (Richonguzman/CD2RXU) LoRa iGate , version " + versionDate + ".\n\nTo update your firmware or filesystem go to: http://" + getLocalIP().substring(getLocalIP().indexOf(":")+3) + "/update\n\n\n73!");
         });
 
-        server.on("/test1", HTTP_GET, [](AsyncWebServerRequest *request) {
-            request->send(SPIFFS, "/index.html", "text/html");
+        server.on("/test", HTTP_GET, [](AsyncWebServerRequest *request) {
+            request->send(SPIFFS, "/test_info_1.html", "text/html");//"application/json");
         });
-
-        server.on("/test2", HTTP_GET, [](AsyncWebServerRequest *request) {
-            request->send(SPIFFS, "/index2.html", "text/html");
-        });
-
-        server.on("/test3", HTTP_GET, [](AsyncWebServerRequest *request) {
-            request->send(SPIFFS, "/index3.html", "text/html");
-        });
-
-        server.on("/test4", HTTP_GET, [](AsyncWebServerRequest *request) {
-            request->send(SPIFFS, "/index4.html", "text/html");
-        });
-
-        server.on("/testx", HTTP_GET, [](AsyncWebServerRequest *request) {
-            request->send(SPIFFS, "/testx.html", "text/html");//"application/json");
-        });
-
-        //setDefaultFile("testx.html");
 
         if (Config.ota.username != ""  && Config.ota.password != "") {
             AsyncElegantOTA.begin(&server, Config.ota.username.c_str(), Config.ota.password.c_str());
