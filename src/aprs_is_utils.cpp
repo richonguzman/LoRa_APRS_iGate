@@ -87,7 +87,7 @@ void processLoRaPacket(String packet) {
       Serial.print("   ---> APRS LoRa Packet!");
       Sender = packet.substring(3,packet.indexOf(">"));
       if (Sender != Config.callsign) {   // avoid listening yourself by digirepeating
-        if (stationMode == 2) {
+        if (stationMode == 2 || stationMode == 5) {
           if (packet.indexOf("::") > 10) {    // its a Message!
             AddresseeAndMessage = packet.substring(packet.indexOf("::")+2);  
             Addressee = AddresseeAndMessage.substring(0,AddresseeAndMessage.indexOf(":"));
