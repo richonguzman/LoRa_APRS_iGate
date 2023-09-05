@@ -29,6 +29,7 @@ void processPacket(String packet) {
             Serial.println("   ---> APRS LoRa Packet");
             String sender = packet.substring(3,packet.indexOf(">"));
             STATION_Utils::updateLastHeard(sender);
+            STATION_Utils::updatePacketBuffer(packet);
             Utils::typeOfPacket(packet, "Digi");
             if ((stationMode==3 || stationMode==5) && (packet.indexOf("WIDE1-1") > 10)) {
                 loraPacket = packet.substring(3);

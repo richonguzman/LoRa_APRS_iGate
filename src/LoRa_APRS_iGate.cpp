@@ -20,7 +20,7 @@
 Configuration   Config;
 WiFiClient      espClient;
 
-String          versionDate           = "2023.09.03";
+String          versionDate           = "2023.09.05";
 int             myWiFiAPIndex         = 0;
 int             myWiFiAPSize          = Config.wifiAPs.size();
 WiFi_AP         *currentWiFi          = &Config.wifiAPs[myWiFiAPIndex];
@@ -40,6 +40,8 @@ String          batteryVoltage;
 
 std::vector<String> lastHeardStation;
 std::vector<String> lastHeardStation_temp;
+std::vector<String> packetBuffer;
+std::vector<String> packetBuffer_temp;
 
 String firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, iGateBeaconPacket;
 
