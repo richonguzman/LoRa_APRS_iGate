@@ -43,9 +43,13 @@ extern String               versionDate;
 extern uint32_t             lastWiFiCheck;
 extern bool                 WiFiConnect;
 
-
+const char* PARAM_MESSAGE = "message";
 
 namespace Utils {
+
+void notFound(AsyncWebServerRequest *request) {
+    request->send(404, "text/plain", "Not found");
+}
 
 void processStatus() {
     String status = Config.callsign + ">APLRG1";
@@ -272,11 +276,27 @@ void startServer() {
             request->send(SPIFFS, "/test_info_1.html", "text/html");//"application/json");
         });
 
+        server.on("/test2", HTTP_GET, [](AsyncWebServerRequest *request) {
+            request->send(SPIFFS, "/test1.html", "text/html");
+        });
+
         if (Config.ota.username != ""  && Config.ota.password != "") {
             AsyncElegantOTA.begin(&server, Config.ota.username.c_str(), Config.ota.password.c_str());
         } else {
             AsyncElegantOTA.begin(&server);
         }
+
+        server.on("/process_form.php", HTTP_POST, [](AsyncWebServerRequest *request){
+            String message;
+            if (request->hasParam(PARAM_MESSAGE, true)) {
+                message = request->getParam(PARAM_MESSAGE, true)->value();
+            } else {
+                message = "No message sent";
+            }
+            request->send(200, "text/plain", "Hello, POST: " + message);
+        });
+
+        server.onNotFound(notFound);
 
         server.serveStatic("/", SPIFFS, "/");
 

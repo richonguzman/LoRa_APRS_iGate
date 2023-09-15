@@ -1,6 +1,6 @@
 {
     "callsign": "CD2RXU-11",
-    "stationMode": 3,
+    "stationMode": 2,
     "iGateComment": "LoRa_APRS_iGate",
     "wifi": {
         "AP": [
