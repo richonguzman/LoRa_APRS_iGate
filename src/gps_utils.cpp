@@ -168,7 +168,7 @@ String getDistance(String packet) {
     encodedBytePosition = packet.indexOf(":=") + 14;
   }
   if (encodedBytePosition != 0) {
-    if (String(packet[encodedBytePosition]) == "G" || String(packet[encodedBytePosition]) == "Q" || String(packet[encodedBytePosition]) == "[") {
+    if (String(packet[encodedBytePosition]) == "G" || String(packet[encodedBytePosition]) == "Q" || String(packet[encodedBytePosition]) == "[" || String(packet[encodedBytePosition]) == "H") {
       return decodeEncodedGPS(packet);
     } else {
       return getReceivedGPS(packet);
