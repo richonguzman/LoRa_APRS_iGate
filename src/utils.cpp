@@ -43,7 +43,9 @@ extern String               versionDate;
 extern uint32_t             lastWiFiCheck;
 extern bool                 WiFiConnect;
 
-const char* PARAM_MESSAGE = "message";
+String name;
+String email;
+//const char* PARAM_MESSAGE = "message";
 
 namespace Utils {
 
@@ -288,12 +290,19 @@ void startServer() {
 
         server.on("/process_form.php", HTTP_POST, [](AsyncWebServerRequest *request){
             String message;
-            if (request->hasParam(PARAM_MESSAGE, true)) {
-                message = request->getParam(PARAM_MESSAGE, true)->value();
+
+            if (request->hasParam("email", true) && request->hasParam("name", true)) {
+                email = request->getParam("email", true)->value();
+                name = request->getParam("name", true)->value();
+                
+                String responseMessage = "Received EMAIL: " + email + ", NAME: " + name;
+
+                // Assuming you're sending an HTTP response, for example, in an HTTP server context
+                request->send(200, "text/plain", responseMessage);
             } else {
-                message = "No message sent";
+                // Handle the case where one or both parameters are missing
+                request->send(400, "text/plain", "Both EMAIL and NAME parameters are required.");
             }
-            request->send(200, "text/plain", "Hello, POST: " + message);
         });
 
         server.onNotFound(notFound);
