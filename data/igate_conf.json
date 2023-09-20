@@ -56,6 +56,8 @@
     "other": {
         "beaconInterval": 15,
         "rememberStationTime": 30,
-        "sendBatteryVoltage": false
+        "sendBatteryVoltage": false,
+        "externalVoltageMeasurement" : true,
+        "externalVoltagePin": 13
     }   
 }

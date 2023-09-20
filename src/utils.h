@@ -5,6 +5,7 @@
 
 namespace Utils {
 
+String meassureExternalBattery();
 void processStatus();
 String getLocalIP();
 void setupDisplay();

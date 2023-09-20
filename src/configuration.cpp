@@ -37,6 +37,8 @@ void Configuration::readFile(fs::FS &fs, const char *fileName) {
     beaconInterval                  = data["other"]["beaconInterval"].as<int>();
     rememberStationTime             = data["other"]["rememberStationTime"].as<int>();
     sendBatteryVoltage              = data["other"]["sendBatteryVoltage"].as<bool>();
+    externalVoltageMeasurement      = data["other"]["externalVoltageMeasurement"].as<bool>();
+    externalVoltagePin              = data["other"]["externalVoltagePin"].as<int>();
 
     digi.comment                    = data["digi"]["comment"].as<String>();
     digi.latitude                   = data["digi"]["latitude"].as<double>();

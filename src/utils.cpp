@@ -53,6 +53,21 @@ void notFound(AsyncWebServerRequest *request) {
     request->send(404, "text/plain", "Not found");
 }
 
+String meassureExternalBattery() {
+    int16_t sample;
+    int sampleNum = 50;
+    float readingCorrection = 0.0018;
+    float batteryVoltage, sampleSum;
+    sampleSum = 0;
+    for (int i=0; i<sampleNum; i++) {
+        sample = analogRead(Config.externalVoltagePin);
+        sampleSum += sample;
+        delayMicroseconds(50); 
+    }
+    batteryVoltage = ((sampleSum/sampleNum) - readingCorrection); 
+    return "VBat=" + String(batteryVoltage,2) + ")";
+}
+
 void processStatus() {
     String status = Config.callsign + ">APLRG1";
     if (stationMode==1 || stationMode==2 || (stationMode==5 && WiFi.status() == WL_CONNECTED)) {
