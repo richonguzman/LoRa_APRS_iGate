@@ -45,7 +45,6 @@ extern bool                 WiFiConnect;
 
 String name;
 String email;
-//const char* PARAM_MESSAGE = "message";
 
 namespace Utils {
 
@@ -53,20 +52,6 @@ void notFound(AsyncWebServerRequest *request) {
     request->send(404, "text/plain", "Not found");
 }
 
-String meassureExternalBattery() {
-    int16_t sample;
-    int sampleNum = 50;
-    float readingCorrection = 0.0018;
-    float batteryVoltage, sampleSum;
-    sampleSum = 0;
-    for (int i=0; i<sampleNum; i++) {
-        sample = analogRead(Config.externalVoltagePin);
-        sampleSum += sample;
-        delayMicroseconds(50); 
-    }
-    batteryVoltage = ((sampleSum/sampleNum) - readingCorrection); 
-    return "VBat=" + String(batteryVoltage,2) + ")";
-}
 
 void processStatus() {
     String status = Config.callsign + ">APLRG1";
@@ -128,7 +113,10 @@ void checkBeaconInterval() {
             beaconPacket = iGateBeaconPacket;
         }
         if (Config.sendBatteryVoltage) {
-            beaconPacket += " (Batt=" + String(BATTERY_Utils::checkVoltages(),2) + "V)";
+            beaconPacket += " (Batt=" + String(BATTERY_Utils::checkBattery(),2) + "V)";
+        }
+        if (Config.externalVoltageMeasurement) { 
+            beaconPacket += " (Ext V=" + String(BATTERY_Utils::checkExternalVoltage(),2) + "V)";
         }
         if (stationMode==1 || stationMode==2) {
             thirdLine = getLocalIP();
@@ -138,7 +126,10 @@ void checkBeaconInterval() {
             sixthLine = "";
             show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING iGate BEACON", 1000);         
             if (Config.sendBatteryVoltage) { 
-                sixthLine = "     (Batt=" + String(BATTERY_Utils::checkVoltages(),2) + "V)";
+                sixthLine = "     (Batt=" + String(BATTERY_Utils::checkBattery(),2) + "V)";
+            }
+            if (Config.externalVoltageMeasurement) { 
+                sixthLine = "    (Ext V=" + String(BATTERY_Utils::checkExternalVoltage(),2) + "V)";
             }
             seventhLine = "     listening...";
             espClient.write((beaconPacket + "\n").c_str());
@@ -157,7 +148,10 @@ void checkBeaconInterval() {
             sixthLine = "";
             show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING iGate BEACON", 0);
             if (Config.sendBatteryVoltage) { 
-                sixthLine = "     (Batt=" + String(BATTERY_Utils::checkVoltages(),2) + "V)";
+                sixthLine = "     (Batt=" + String(BATTERY_Utils::checkBattery(),2) + "V)";
+            }
+            if (Config.externalVoltageMeasurement) { 
+                sixthLine = "    (Ext V=" + String(BATTERY_Utils::checkExternalVoltage(),2) + "V)";
             }
             seventhLine = "     listening...";
             if (stationMode==4) {
@@ -177,7 +171,10 @@ void checkBeaconInterval() {
                 thirdLine = getLocalIP();
                 show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING iGate BEACON", 1000);         
                 if (Config.sendBatteryVoltage) { 
-                    sixthLine = "     (Batt=" + String(BATTERY_Utils::checkVoltages(),2) + "V)";
+                    sixthLine = "     (Batt=" + String(BATTERY_Utils::checkBattery(),2) + "V)";
+                }
+                if (Config.externalVoltageMeasurement) { 
+                    sixthLine = "    (Ext V=" + String(BATTERY_Utils::checkExternalVoltage(),2) + "V)";
                 }
                 seventhLine = "     listening...";
                 espClient.write((beaconPacket + "\n").c_str());
@@ -185,7 +182,10 @@ void checkBeaconInterval() {
             } else {
                 show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING iGate BEACON", 0);
                 if (Config.sendBatteryVoltage) { 
-                    sixthLine = "     (Batt=" + String(BATTERY_Utils::checkVoltages(),2) + "V)";
+                    sixthLine = "     (Batt=" + String(BATTERY_Utils::checkBattery(),2) + "V)";
+                }
+                if (Config.externalVoltageMeasurement) { 
+                    sixthLine = "    (Ext V=" + String(BATTERY_Utils::checkExternalVoltage(),2) + "V)";
                 }
                 seventhLine = "     listening...";
                 LoRa_Utils::sendNewPacket("APRS", beaconPacket);

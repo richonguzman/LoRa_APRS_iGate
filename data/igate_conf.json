@@ -50,14 +50,14 @@
         "active": false
     },
     "ota": {
-        "username":"richon",
-        "password": "totoro"
+        "username":"",
+        "password": ""
     },
     "other": {
         "beaconInterval": 15,
         "rememberStationTime": 30,
         "sendBatteryVoltage": false,
-        "externalVoltageMeasurement" : true,
-        "externalVoltagePin": 13
+        "externalVoltageMeasurement" : false,
+        "externalVoltagePin": 34
     }   
 }

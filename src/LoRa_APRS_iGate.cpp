@@ -20,7 +20,7 @@
 Configuration   Config;
 WiFiClient      espClient;
 
-String          versionDate           = "2023.09.19";
+String          versionDate           = "2023.09.20";
 int             myWiFiAPIndex         = 0;
 int             myWiFiAPSize          = Config.wifiAPs.size();
 WiFi_AP         *currentWiFi          = &Config.wifiAPs[myWiFiAPIndex];
@@ -49,6 +49,9 @@ void setup() {
   Serial.begin(115200);
   pinMode(batteryPin, INPUT);
   pinMode(greenLed, OUTPUT);
+  if (Config.externalVoltageMeasurement) {
+    pinMode(Config.externalVoltagePin, INPUT);
+  }
   delay(1000);
   Utils::setupDisplay();
   WIFI_Utils::setup();

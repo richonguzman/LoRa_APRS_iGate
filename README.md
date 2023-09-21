@@ -95,6 +95,7 @@ Versions:
 - 2023.07.16 Small OTA, BME module update.
 - 2023.07.31 StationMode5 added: iGate when WiFi and APRS available, DigiRepeater when not.
 - 2023.08.05 Ground Height Correction for Pressure readings added
+- 2023.08.20 Added External Voltage Measurement (Max 15V!)
 
 __________________________________________
 
