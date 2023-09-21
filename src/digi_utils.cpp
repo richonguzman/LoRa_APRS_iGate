@@ -1,12 +1,16 @@
+#include <WiFi.h>
 #include "configuration.h"
 #include "station_utils.h"
+#include "aprs_is_utils.h"
 #include "lora_utils.h"
 #include "digi_utils.h"
+#include "wifi_utils.h"
 #include "gps_utils.h"
 #include "display.h"
 #include "utils.h"
 
 extern Configuration    Config;
+extern WiFiClient       espClient;
 extern int              stationMode;
 extern uint32_t         lastScreenOn;
 extern int              lastStationModeState;
@@ -31,14 +35,15 @@ namespace DIGI_Utils {
                 STATION_Utils::updateLastHeard(sender);
                 STATION_Utils::updatePacketBuffer(packet);
                 Utils::typeOfPacket(packet, "Digi");
-                if ((stationMode==3 || stationMode==5 || stationMode==6) && (packet.indexOf("WIDE1-1") > 10)) {
+                if ((stationMode==3 || stationMode==5 || stationMode==6) && (packet.indexOf("WIDE1-1") > 10)) { // ver lo de WIDE para sM=6
+                    if (stationMode==6 && ((WiFi.status()==WL_CONNECTED) && espClient.connected())) {
+                        espClient.write(APRS_IS_Utils::createPacket(packet).c_str());
+                        Serial.print("(Uploaded to APRS-IS)");
+                    }
                     loraPacket = packet.substring(3);
                     loraPacket.replace("WIDE1-1", Config.callsign + "*");
                     delay(500);
                     LoRa_Utils::sendNewPacket("APRS", loraPacket);
-                    /*if (stationMode==6 && wifi ) {
-                        subir a aprsis
-                    }*/
                     display_toggle(true);
                     lastScreenOn = millis();
                 } else if (stationMode ==4){
@@ -77,8 +82,14 @@ namespace DIGI_Utils {
             Utils::checkDisplayInterval();
             Utils::checkBeaconInterval();
             show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
-            DIGI_Utils::processPacket(LoRa_Utils::receivePacket());
+            processPacket(LoRa_Utils::receivePacket());
         } else if (stationMode==6) {
+            if (WiFi.status() != WL_CONNECTED) {
+                WIFI_Utils::startWiFi();
+            }
+            if (!espClient.connected()) {
+                APRS_IS_Utils::connect();
+            }
             String Tx = String(Config.loramodule.digirepeaterTxFreq);
             secondLine = "Rx:" + String(Tx.substring(0,3)) + "." + String(Tx.substring(3,6));
             secondLine += " Tx:" + String(Tx.substring(0,3)) + "." + String(Tx.substring(3,6));
@@ -86,7 +97,7 @@ namespace DIGI_Utils {
             Utils::checkDisplayInterval();
             Utils::checkBeaconInterval();
             show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
-            DIGI_Utils::processPacket(LoRa_Utils::receivePacket());
+            processPacket(LoRa_Utils::receivePacket());
         }
     }
 

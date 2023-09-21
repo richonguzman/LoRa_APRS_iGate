@@ -26,9 +26,11 @@ void checkWiFi() {
 void startWiFi() {
   int wifiCounter = 0;
   int status = WL_IDLE_STATUS;
-  WiFi.mode(WIFI_STA);
-  WiFi.disconnect();
-  delay(500);
+  if (stationMode != 6) {
+    WiFi.mode(WIFI_STA);
+    WiFi.disconnect();
+    delay(500);
+  }
   unsigned long start = millis();
   show_display("", "", "Connecting to Wifi:", "", currentWiFi->ssid + " ...", 0);
   Serial.print("\nConnecting to WiFi '"); Serial.print(currentWiFi->ssid); Serial.println("' ...");
@@ -43,7 +45,7 @@ void startWiFi() {
       delay(1000);
       if(myWiFiAPIndex >= (myWiFiAPSize-1)) {
         myWiFiAPIndex = 0;
-        if (stationMode==5) {
+        if (stationMode==5 || stationMode==6) {
           wifiCounter++;
         }
       } else {

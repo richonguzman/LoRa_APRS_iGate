@@ -54,10 +54,10 @@ void notFound(AsyncWebServerRequest *request) {
 
 
 void processStatus() {
-    String status = Config.callsign + ">APLRG1";
+    String status = Config.callsign + ">APLRG1,WIDE1-1";
     if (stationMode==1 || stationMode==2 || (stationMode==5 && WiFi.status() == WL_CONNECTED)) {
         delay(1000);
-        status += ",qAC:>https://github.com/richonguzman/LoRa_APRS_iGate " + versionDate ;
+        status += ",qAC:>https://github.com/richonguzman/LoRa_APRS_iGate " + versionDate;
         espClient.write((status + "\n").c_str());
         SYSLOG_Utils::log("APRSIS Tx", status,0,0,0);
     } else {
@@ -208,8 +208,10 @@ void checkBeaconInterval() {
             }
             seventhLine = "     listening...";
 
-            /*si hay wifi
-                envia beacon por wifi*/
+            if (stationMode==6 && ((WiFi.status()==WL_CONNECTED) && espClient.connected())) {
+                espClient.write((beaconPacket + "\n").c_str());
+                Serial.println("---> Uploaded to APRS-IS");
+            }
             LoRa_Utils::sendNewPacket("APRS", beaconPacket);
             show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
         }

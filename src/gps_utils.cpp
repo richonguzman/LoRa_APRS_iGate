@@ -83,7 +83,11 @@ String generateBeacon() {
   if (stationMode==1 || stationMode==2 || (stationMode==5 && WiFi.status() == WL_CONNECTED && espClient.connected()) || stationMode==6) {
     stationLatitude = processLatitudeAPRS(currentWiFi->latitude);
     stationLongitude = processLongitudeAPRS(currentWiFi->longitude);
-    beaconPacket = Config.callsign + ">APLRG1,qAC:=" + stationLatitude + "L" + stationLongitude;
+    beaconPacket = Config.callsign + ">APLRG1,WIDE1-1";
+    if (stationMode!=6) {
+      beaconPacket += ",qAC";
+    }
+    beaconPacket += ":=" + stationLatitude + "L" + stationLongitude;
     if (stationMode == 1) {
       beaconPacket += "&";
     } else {
@@ -98,7 +102,7 @@ String generateBeacon() {
       stationLatitude = processLatitudeAPRS(Config.digi.latitude);
       stationLongitude = processLongitudeAPRS(Config.digi.longitude);
     }
-    beaconPacket = Config.callsign + ">APLRG1:=" + stationLatitude + "L" + stationLongitude + "#" + Config.digi.comment;
+    beaconPacket = Config.callsign + ">APLRG1,WIDE1-1:=" + stationLatitude + "L" + stationLongitude + "#" + Config.digi.comment;
   }
   return beaconPacket;
 }
