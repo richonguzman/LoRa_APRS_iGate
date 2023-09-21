@@ -87,6 +87,10 @@ void setup() {
         btStop();
     } else if (stationMode == 5) {
       Serial.println("stationMode ---> iGate when Wifi/APRS available (DigiRepeater when not)");
+    } else if (stationMode == 6) {
+      Serial.println("stationMode ---> Digirepeater with iGate capabilities (when WiFi available)");
+      WiFi.mode(WIFI_STA);
+      WiFi.disconnect();
     } else { 
       Serial.println("stationMode ---> NOT VALID, check '/data/igate_conf.json'");
       show_display("------- ERROR -------", "stationMode Not Valid", "change it on : /data/", "igate_conf.json", 0);

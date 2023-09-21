@@ -190,6 +190,28 @@ void checkBeaconInterval() {
                 seventhLine = "     listening...";
                 LoRa_Utils::sendNewPacket("APRS", beaconPacket);
             }
+        } else if (stationMode==6) {
+            /* si hay wifi 
+            secondLine muestra wifistatus
+            else
+            secondLine = freq digi*/
+            thirdLine = "<<   Digi + iGate  >>";
+            fifthLine = "";
+            sixthLine = "";
+            
+            show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING iGate BEACON", 0);
+            if (Config.sendBatteryVoltage) { 
+                sixthLine = "     (Batt=" + String(BATTERY_Utils::checkBattery(),2) + "V)";
+            }
+            if (Config.externalVoltageMeasurement) { 
+                sixthLine = "    (Ext V=" + String(BATTERY_Utils::checkExternalVoltage(),2) + "V)";
+            }
+            seventhLine = "     listening...";
+
+            /*si hay wifi
+                envia beacon por wifi*/
+            LoRa_Utils::sendNewPacket("APRS", beaconPacket);
+            show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
         }
         lastBeaconTx = millis();
         lastScreenOn = millis();

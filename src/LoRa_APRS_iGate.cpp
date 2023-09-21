@@ -70,7 +70,7 @@ void loop() {
       APRS_IS_Utils::connect();
     }
     APRS_IS_Utils::loop();
-  } else if (stationMode==3 || stationMode==4) {    // DigiRepeater (3 RxFreq=TxFreq / 4 RxFreq!=TxFreq)
+  } else if (stationMode==3 || stationMode==4 || stationMode==6) {    // DigiRepeater (3 RxFreq=TxFreq / 4 RxFreq!=TxFreq)
     DIGI_Utils::loop();
   } else if (stationMode==5) {                      // iGate when WiFi and APRS available , DigiRepeater when not (RxFreq=TxFreq)
     Utils::checkWiFiInterval();

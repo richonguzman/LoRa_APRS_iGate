@@ -80,7 +80,7 @@ String processLongitudeAPRS(double lon) {
 
 String generateBeacon() {
   String stationLatitude, stationLongitude, beaconPacket;
-  if (stationMode==1 || stationMode==2 || (stationMode==5 && WiFi.status() == WL_CONNECTED && espClient.connected())) {
+  if (stationMode==1 || stationMode==2 || (stationMode==5 && WiFi.status() == WL_CONNECTED && espClient.connected()) || stationMode==6) {
     stationLatitude = processLatitudeAPRS(currentWiFi->latitude);
     stationLongitude = processLongitudeAPRS(currentWiFi->longitude);
     beaconPacket = Config.callsign + ">APLRG1,qAC:=" + stationLatitude + "L" + stationLongitude;
