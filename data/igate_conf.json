@@ -4,6 +4,11 @@
     "iGateComment": "LoRa_APRS_iGate",
     "wifi": {
         "AP": [
+            {   "ssid": "Stam2.4",
+                "password": "Stamaudio295.",
+                "latitude": -32.8805195,
+                "longitude": -71.4282433
+            },
             {   "ssid": "Richon",
                 "password": "k4fPnmg5qnyf",
                 "latitude": -32.8805195,

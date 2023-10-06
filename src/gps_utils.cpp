@@ -128,7 +128,7 @@ String decodeEncodedGPS(String packet) {
   int X4 = int(encodedLongtitude[3]);
   float decodedLongitude = -180.0 + ((((X1-33) * pow(91,3)) + ((X2-33) * pow(91,2)) + ((X3-33) * 91) + X4-33) / 190463.0);
   distance = String(calculateDistanceTo(decodedLatitude, decodedLongitude),1);
-  return String(decodedLatitude) + "N / " + String(decodedLongitude) + "E / " + distance + "km";
+  return String(decodedLatitude,5) + "N / " + String(decodedLongitude,5) + "E / " + distance + "km";
 }
 
 String getReceivedGPS(String packet) {
@@ -160,7 +160,7 @@ String getReceivedGPS(String packet) {
     convertedLongitude = -convertedLongitude;
   }
   distance = String(calculateDistanceTo(convertedLatitude, convertedLongitude),1);
-  return String(convertedLatitude) + "N / " + String(convertedLongitude) + "E / " + distance + "km";
+  return String(convertedLatitude,5) + "N / " + String(convertedLongitude,5) + "E / " + distance + "km";
 }
 
 String getDistance(String packet) {

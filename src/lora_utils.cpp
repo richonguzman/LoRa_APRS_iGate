@@ -73,7 +73,7 @@ String receivePacket() {
     rssi      = LoRa.packetRssi();
     snr       = LoRa.packetSnr();
     freqError = LoRa.packetFrequencyError();
-    Serial.println("(RSSI:" +String(rssi) + " / SNR:" + String(snr) +  " / FreqErr:" + String(freqError) + ")");
+    //Serial.println("(RSSI:" +String(rssi) + " / SNR:" + String(snr) +  " / FreqErr:" + String(freqError) + ")");
     if (Config.syslog.active && (stationMode==1 || stationMode==2)) {
       SYSLOG_Utils::log("LoRa Rx", loraPacket, rssi, snr, freqError);
     }
