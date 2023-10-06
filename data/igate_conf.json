@@ -1,33 +1,28 @@
 {
-    "callsign": "CD2RXU-11",
-    "stationMode": 6,
+    "callsign": "NOCALL-10",
+    "stationMode": 2,
     "iGateComment": "LoRa_APRS_iGate",
     "wifi": {
         "AP": [
-            {   "ssid": "Stam2.4",
-                "password": "Stamaudio295.",
-                "latitude": -32.8805195,
-                "longitude": -71.4282433
+            {   "ssid": "XXXon",
+                "password": "XXXX5qnyf",
+                "latitude": 0.8805195,
+                "longitude": 0.4282433
             },
-            {   "ssid": "Richon",
-                "password": "k4fPnmg5qnyf",
-                "latitude": -32.8805195,
-                "longitude": -71.4282433
-            },
-            {   "ssid": "Jimenita",
-                "password": "mg6wyMhqRnxk",
-                "latitude": -33.0312492,
-                "longitude": -71.5796215
+            {   "ssid": "XXXta",
+                "password": "XXXqRnxk",
+                "latitude": 0.0312492,
+                "longitude": 0.5796215
             }
         ]
     },
     "digi": {
         "comment": "LoRa_APRS_Digirepeater",
-        "latitude": -32.8805195,
-        "longitude": -71.4282433
+        "latitude": 0.8805195,
+        "longitude": 0.4282433
     },
     "aprs_is": {
-        "passcode": "23201",
+        "passcode": "XYZWV",
         "server": "soam.aprs2.net",
         "port": 14580,
         "reportingDistance": 30
