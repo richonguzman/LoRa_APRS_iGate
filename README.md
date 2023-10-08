@@ -34,8 +34,50 @@ and more will come:
 - Web-UI
 - ...
 
+____________________________________________________
 
-__________________________________________
+# WIKI
+
+really soon!
+
+
+### 1. Installation Guide --> 
+
+### 2. iGate Configuration and Explanation for each setting --> 
+
+### 3. Supported Boards and Environment Selection --> 
+LoRa APRS iGATE/Digirepeater working on this boards:
+- LILYGO ESP32 LoRa32 v2-1-1.6  and T3
+- ESP32 Wroom +  SX1278 LoRa Module for a DIY Version.
+- HELTEC_WIFI_LORA_32_V2 (check "pins_config.h" and "display.cpp" for aditional configuration).
+
+### 4. Upload Firmware and Filesystem --> 
+
+### 5. Adding BME280 Modules --> 
+
+____________________________________________________
+## Timeline (Versions):
+
+- 2023.10.08 Added Serial Comunication with PinPoint APRS app (https://www.pinpointaprs.com)
+- 2023.08.20 Added External Voltage Measurement (Max 15V!)
+- 2023.08.05 Ground Height Correction for Pressure readings added
+- 2023.07.31 StationMode5 added: iGate when WiFi and APRS available, DigiRepeater when not.
+- 2023.07.16 Small OTA, BME module update.
+- 2023.07.05 Adding monitor info of Battery connected.
+- 2023.06.18 Info on Oled Screen mayor update, added RSSI and Distance to Listened Station.
+- 2023.06.17 Support for BME280 Module (Temperature, Humidity, Pressure) added.
+- 2023.06.12 Syslog added.
+- 2023.06.10 OTA update support for Firmware and Filesystem.
+- 2023.06.08 Adding Digirepeater Functions.
+- 2023.06.06 Full repack of Code and adding _enableTx_ only for Ham Ops.
+- 2023.05.23 Processing Query's from RF/LoRa or APRS-IS (Send "Help" Message to test).
+- 2023.05.19 Saving Last-Heard Stations for validating Tx Responses.
+- 2023.05.12 Tx Packet from APRS-IS to LoRa-RF Correction.
+- 2023.03.01 Tx Packet from APRS-IS to nearby LoRa Stations.
+- 2023.02.17 Receiving Feed from APRS-IS.
+- 2023.02.10 First Beta (receiving LoRa Beacon/Packets and uploading to APRS-IS).
+
+____________________________________________________
 
 
 Instructions (add your information into the '/data/igate_conf.json'):
@@ -80,32 +122,6 @@ g) BME section:
 
     adjust to "active" if BME280 sensor connected through I2C pins
 
-__________________________________________
-
-LoRa APRS iGATE/Digirepeater working on this boards:
-- LILYGO ESP32 LoRa32 v2-1-1.6  and T3
-- ESP32 Wroom +  SX1278 LoRa Module for a DIY Version.
-- HELTEC_WIFI_LORA_32_V2 (check "pins_config.h" and "display.cpp" for aditional configuration).
-__________________________________________
-Versions:
-- 2023.10.08 Added Serial Comunication with PinPoint APRS app (https://www.pinpointaprs.com)
-- 2023.08.20 Added External Voltage Measurement (Max 15V!)
-- 2023.08.05 Ground Height Correction for Pressure readings added
-- 2023.07.31 StationMode5 added: iGate when WiFi and APRS available, DigiRepeater when not.
-- 2023.07.16 Small OTA, BME module update.
-- 2023.07.05 Adding monitor info of Battery connected.
-- 2023.06.18 Info on Oled Screen mayor update, added RSSI and Distance to Listened Station.
-- 2023.06.17 Support for BME280 Module (Temperature, Humidity, Pressure) added.
-- 2023.06.12 Syslog added.
-- 2023.06.10 OTA update support for Firmware and Filesystem.
-- 2023.06.08 Adding Digirepeater Functions.
-- 2023.06.06 Full repack of Code and adding _enableTx_ only for Ham Ops.
-- 2023.05.23 Processing Query's from RF/LoRa or APRS-IS (Send "Help" Message to test).
-- 2023.05.19 Saving Last-Heard Stations for validating Tx Responses.
-- 2023.05.12 Tx Packet from APRS-IS to LoRa-RF Correction.
-- 2023.03.01 Tx Packet from APRS-IS to nearby LoRa Stations.
-- 2023.02.17 Receiving Feed from APRS-IS.
-- 2023.02.10 First Beta (receiving LoRa Beacon/Packets and uploading to APRS-IS).
 
 __________________________________________
 
