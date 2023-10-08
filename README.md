@@ -38,12 +38,9 @@ ____________________________________________________
 
 # WIKI
 
-really soon!
+### 1. Installation Guide --> <a href="https://github.com/richonguzman/LoRa_APRS_iGate/wiki/1.-Installation-Guide" target="_blank">here</a>.
 
-
-### 1. Installation Guide --> 
-
-### 2. iGate Configuration and Explanation for each setting --> 
+### 2. iGate Configuration and Explanation for each setting --> <a href="https://github.com/richonguzman/LoRa_APRS_iGate/wiki/2.-iGate-Configuration" target="_blank">here</a>.
 
 ### 3. Supported Boards and Environment Selection --> 
 LoRa APRS iGATE/Digirepeater working on this boards:
@@ -53,7 +50,7 @@ LoRa APRS iGATE/Digirepeater working on this boards:
 
 ### 4. Upload Firmware and Filesystem --> 
 
-### 5. Adding BME280 Modules --> 
+### 5. Adding BME280 Module --> 
 
 ____________________________________________________
 ## Timeline (Versions):
