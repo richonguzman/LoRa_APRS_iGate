@@ -46,7 +46,7 @@ ____________________________________________________
 
 ### 4. Upload Firmware and Filesystem --> <a href="https://github.com/richonguzman/LoRa_APRS_iGate/wiki/4.-Upload-Firmware-and-Filesystem" target="_blank">here</a>.
 
-### 5. Adding BME280 Module --> 
+### 5. Adding BME280 Module --> <a href="https://github.com/richonguzman/LoRa_APRS_iGate/wiki/5.-Adding-BME280-Module" target="_blank">here</a>.
 
 ____________________________________________________
 ## Timeline (Versions):
