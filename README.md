@@ -6,6 +6,14 @@ This firmware is for using ESP32 based boards with LoRa Modules and GPS to live 
 
 (NOTE: This iGate Firmware was develop to work with all LoRa APRS Trackers and specially with this firmware <a href="https://github.com/richonguzman/LoRa_APRS_Tracker" target="_blank">LoRa APRS Tracker</a>)
 
+___________________________________________________
+
+## You can support this project to continue to grow:
+
+[<img src="https://github.com/richonguzman/LoRa_APRS_Tracker/blob/main/images/github-sponsors.png">](https://github.com/sponsors/richonguzman)     [<img src="https://github.com/richonguzman/LoRa_APRS_Tracker/blob/main/images/paypalme.png">](http://paypal.me/richonguzman)
+
+____________________________________________________
+
 
 ## If you have the 2023.06.12 firmware (or later) you can update newer <a href="https://github.com/richonguzman/LoRa_APRS_iGate/tree/main/firmware" target="_blank">in here</a> , look for newest an upload over OTA (without needing VSCODE)
 
