@@ -1,5 +1,12 @@
 # Richonguzman / CD2RXU LoRa APRS iGate/Digirepeater
 
+This firmware is for using ESP32 based boards with LoRa Modules and GPS to live in the APRS world.
+
+![Screenshot](https://github.com/richonguzman/LoRa_APRS_iGate/blob/main/images/OledScreen.jpeg)
+
+(NOTE: This iGate Firmware was develop to work with all LoRa APRS Trackers and specially with this firmware <a href="https://github.com/richonguzman/LoRa_APRS_Tracker" target="_blank">LoRa APRS Tracker</a>)
+
+
 ## If you have the 2023.06.12 firmware (or later) you can update newer <a href="https://github.com/richonguzman/LoRa_APRS_iGate/tree/main/firmware" target="_blank">in here</a> , look for newest an upload over OTA (without needing VSCODE)
 
 This next generation LoRa iGate can work as:
