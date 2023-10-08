@@ -1,4 +1,5 @@
 #include "station_utils.h"
+#include "aprs_is_utils.h"
 #include "configuration.h"
 #include <vector>
 
@@ -45,12 +46,13 @@ void updateLastHeard(String station) {
   }
   fourthLine += String(lastHeardStation.size());
 
-  //////
-  Serial.print("Stations Near (last 30 minutes): ");
+  #ifndef PinPointApp  ////// This is just for debugging
+  Serial.print("Stations Near (last " + String(Config.rememberStationTime) + " minutes): ");
   for (int k=0; k<lastHeardStation.size(); k++) {
     Serial.print(lastHeardStation[k].substring(0,lastHeardStation[k].indexOf(","))); Serial.print(" ");
   }
   Serial.println("");
+  #endif  
 }
 
 bool wasHeard(String station) {

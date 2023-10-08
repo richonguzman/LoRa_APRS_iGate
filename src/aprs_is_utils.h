@@ -3,6 +3,8 @@
 
 #include <Arduino.h>
 
+//#define PinPointApp //uncomment this line when using PinPoint App ( https://www.pinpointaprs.com )
+
 namespace APRS_IS_Utils {
 
 void connect();
