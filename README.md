@@ -51,6 +51,7 @@ ____________________________________________________
 ____________________________________________________
 ## Timeline (Versions):
 
+- 2023.10.09 Added "WIDE1-1" to Tx packets from iGate to be *repeated* by Digirepeaters.
 - 2023.10.08 Added Serial Comunication with PinPoint APRS app (https://www.pinpointaprs.com)
 - 2023.08.20 Added External Voltage Measurement (Max 15V!)
 - 2023.08.05 Ground Height Correction for Pressure readings added
