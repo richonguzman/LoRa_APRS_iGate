@@ -42,7 +42,7 @@ String process(String query, String station, String queryOrigin) {
   if (queryOrigin == "APRSIS") {
     return Config.callsign + ">APLRG1,TCPIP,qAC::" + station + ":" + answer + "\n";
   } else { //} if (queryOrigin == "LoRa") {
-    return Config.callsign + ">APLRG1,RFONLY::" + station + ":" + answer;
+    return Config.callsign + ">APLRG1,RFONLY,WIDE1-1::" + station + ":" + answer;
   }
 }
 

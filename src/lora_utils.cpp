@@ -60,7 +60,7 @@ namespace LoRa_Utils {
     aprsisPacket.trim();
     firstPart = aprsisPacket.substring(0, aprsisPacket.indexOf(","));
     messagePart = aprsisPacket.substring(aprsisPacket.indexOf("::")+2);
-    return firstPart + ",TCPIP," + Config.callsign + "::" + messagePart;
+    return firstPart + ",TCPIP,WIDE1-1," + Config.callsign + "::" + messagePart;
   }
 
   String receivePacket() {
