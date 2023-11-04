@@ -40,15 +40,14 @@ namespace DIGI_Utils {
                         espClient.write(APRS_IS_Utils::createPacket(packet).c_str());
                         Serial.print("(Uploaded to APRS-IS)");
                     }
-                    //loraPacket = packet.substring(3);
-                    //
-                    loraPacket = packet.substring(3) + " test sM6";
-                    //
+                    if (stationMode==6) {
+                        loraPacket = packet.substring(3) + " test sM6";
+                        delay(5000);
+                    } else { 
+                        loraPacket = packet.substring(3);
+                        delay(500);
+                    }
                     loraPacket.replace("WIDE1-1", Config.callsign + "*");
-                    //delay(500);
-                    //
-                    delay(5000);
-                    //
                     LoRa_Utils::sendNewPacket("APRS", loraPacket);
                     display_toggle(true);
                     lastScreenOn = millis();
