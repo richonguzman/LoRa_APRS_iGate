@@ -41,7 +41,7 @@ namespace APRS_IS_Utils {
       Serial.println("Tried: " + String(count) + " FAILED!");
     } else {
       Serial.println("Connected!\n(Server: " + String(Config.aprs_is.server) + " / Port: " + String(Config.aprs_is.port) +")");
-      aprsauth = "user " + Config.callsign + " pass " + Config.aprs_is.passcode + " vers CD2RXU_LoRa_iGate 1.2 filter t/m/" + Config.callsign + "/" + (String)Config.aprs_is.reportingDistance + "\n\r"; 
+      aprsauth = "user " + Config.callsign + " pass " + Config.aprs_is.passcode + " vers CA2RXU_LoRa_iGate 1.2 filter t/m/" + Config.callsign + "/" + (String)Config.aprs_is.reportingDistance + "\n\r"; 
       espClient.write(aprsauth.c_str());
       delay(200);
     }

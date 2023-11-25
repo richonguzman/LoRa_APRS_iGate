@@ -15,7 +15,7 @@ String process(String query, String station, String queryOrigin) {
   if (query=="?APRS?" || query=="?aprs?" || query=="?Aprs?" || query=="H" || query=="h" || query=="HELP" || query=="Help" || query=="help" || query=="?") {
     answer = "?APRSV ?APRSP ?APRSL ?APRSH ?WHERE callsign";
   } else if (query=="?APRSV" || query=="?aprsv" || query=="?Aprsv") {
-    answer = "CD2RXU_LoRa_iGate 1.2 v" + versionDate + " sM" + String(stationMode);
+    answer = "CA2RXU_LoRa_iGate 1.2 v" + versionDate + " sM" + String(stationMode);
   } else if (query=="?APRSP" || query=="?aprsp" || query=="?Aprsp") {
     answer = "iGate QTH: " + String(currentWiFi->latitude,2) + " " + String(currentWiFi->longitude,2);
   } else if (query=="?APRSL" || query=="?aprsl" || query=="?Aprsl") {

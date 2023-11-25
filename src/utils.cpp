@@ -82,7 +82,7 @@ namespace Utils {
         setup_display();
         digitalWrite(greenLed,HIGH);
         Serial.println("\nStarting iGate: " + Config.callsign + "   Version: " + versionDate);
-        show_display(" LoRa APRS", "      ( iGate )", "", "     Richonguzman", "     -- CD2RXU --", "", "      " + versionDate, 4000);
+        show_display(" LoRa APRS", "      ( iGate )", "", "     Richonguzman", "     -- CA2RXU --", "", "      " + versionDate, 4000);
         digitalWrite(greenLed,LOW);
         firstLine   = Config.callsign;
         seventhLine = "     listening...";
@@ -310,7 +310,7 @@ namespace Utils {
     void startServer() {
         if (stationMode==1 || stationMode==2 || (stationMode==5 && WiFi.status() == WL_CONNECTED)) {
             server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
-                request->send(200, "text/plain", "Hi " + Config.callsign + ", \n\nthis is your (Richonguzman/CD2RXU) LoRa iGate , version " + versionDate + ".\n\nTo update your firmware or filesystem go to: http://" + getLocalIP().substring(getLocalIP().indexOf(":")+3) + "/update\n\n\n73!");
+                request->send(200, "text/plain", "Hi " + Config.callsign + ", \n\nthis is your (Richonguzman/CA2RXU) LoRa iGate , version " + versionDate + ".\n\nTo update your firmware or filesystem go to: http://" + getLocalIP().substring(getLocalIP().indexOf(":")+3) + "/update\n\n\n73!");
             });
 
             server.on("/test", HTTP_GET, [](AsyncWebServerRequest *request) {
