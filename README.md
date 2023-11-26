@@ -51,6 +51,7 @@ ____________________________________________________
 ____________________________________________________
 ## Timeline (Versions):
 
+- 2023.11.26 Small correction to enable Syslog in stationMode5.
 - 2023.10.09 Added "WIDE1-1" to Tx packets from iGate to be *repeated* by Digirepeaters.
 - 2023.10.09 Added Support also for BMP280 module.
 - 2023.10.08 Added Serial Comunication with PinPoint APRS app (https://www.pinpointaprs.com)
