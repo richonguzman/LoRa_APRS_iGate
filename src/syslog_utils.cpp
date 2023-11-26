@@ -50,7 +50,7 @@ void log(String type, String packet, int rssi, float snr, int freqError) {
 }
 
 void setup() {
-    if (Config.syslog.active && (stationMode==1 || stationMode==2)) {
+    if (Config.syslog.active && (stationMode==1 || stationMode==2 || stationMode==5)) {
         udpClient.begin(WiFi.localIP(), 0);
         Serial.println("init : Syslog Server  ...     done!    (at " + Config.syslog.server + ")");
     }
