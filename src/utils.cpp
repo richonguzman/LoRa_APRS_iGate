@@ -63,11 +63,11 @@ namespace Utils {
         } else {
             delay(5000);
             status += ":>https://github.com/richonguzman/LoRa_APRS_iGate " + versionDate;
-            if (stationMode == 4) {
+            if (stationMode==4) {
                 LoRa_Utils::changeFreqTx();
             }
             LoRa_Utils::sendNewPacket("APRS", status);
-            if (stationMode == 4) {
+            if (stationMode==4) {
                 LoRa_Utils::changeFreqRx();
             }        
         }
@@ -247,7 +247,7 @@ namespace Utils {
     }
 
     void validateDigiFreqs() {
-        if (stationMode == 4) {
+        if (stationMode==4) {
             if (abs(Config.loramodule.digirepeaterTxFreq - Config.loramodule.digirepeaterRxFreq) < 125000) {
                 Serial.println("Tx Freq less than 125kHz from Rx Freq ---> NOT VALID, check 'data/igate_conf.json'");
                 show_display("Tx Freq is less than ", "125kHz from Rx Freq", "change it on : /data/", "igate_conf.json", 0);
@@ -258,7 +258,7 @@ namespace Utils {
 
     void typeOfPacket(String packet, String packetType) {
         String sender;
-        if (stationMode==1 || stationMode==2 || (stationMode==5 && WiFi.status() == WL_CONNECTED)) {
+        if (stationMode==1 || stationMode==2 || (stationMode==5 && WiFi.status()==WL_CONNECTED)) {
             if (packetType == "LoRa-APRS") {
                 fifthLine = "LoRa Rx ----> APRS-IS";
             } else if (packetType == "APRS-LoRa") {
@@ -308,7 +308,7 @@ namespace Utils {
     }
 
     void startServer() {
-        if (stationMode==1 || stationMode==2 || (stationMode==5 && WiFi.status() == WL_CONNECTED)) {
+        if (stationMode==1 || stationMode==2 || (stationMode==5 && WiFi.status()==WL_CONNECTED)) {
             server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
                 request->send(200, "text/plain", "Hi " + Config.callsign + ", \n\nthis is your (Richonguzman/CA2RXU) LoRa iGate , version " + versionDate + ".\n\nTo update your firmware or filesystem go to: http://" + getLocalIP().substring(getLocalIP().indexOf(":")+3) + "/update\n\n\n73!");
             });

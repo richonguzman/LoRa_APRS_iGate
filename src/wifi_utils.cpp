@@ -26,7 +26,7 @@ void checkWiFi() {
 void startWiFi() {
   int wifiCounter = 0;
   int status = WL_IDLE_STATUS;
-  if (stationMode != 6) {
+  if (stationMode!=6) {
     WiFi.mode(WIFI_STA);
     WiFi.disconnect();
     delay(500);
@@ -71,7 +71,7 @@ void startWiFi() {
 }
 
 void setup() {
-    if (stationMode == 1 || stationMode == 2) {
+    if (stationMode==1 || stationMode==2) {
         if (stationMode==1) {
             Serial.println("stationMode ---> iGate (only Rx)");
         } else {
@@ -79,17 +79,17 @@ void setup() {
         }
         startWiFi();
         btStop();
-    } else if (stationMode == 3 || stationMode == 4) {
-        if (stationMode == 3) {
+    } else if (stationMode==3 || stationMode==4) {
+        if (stationMode==3) {
             Serial.println("stationMode ---> DigiRepeater (Rx freq == Tx freq)");
         } else {
             Serial.println("stationMode ---> DigiRepeater (Rx freq != Tx freq)");
         }
         WiFi.mode(WIFI_OFF);
         btStop();
-    } else if (stationMode == 5) {
+    } else if (stationMode==5) {
       Serial.println("stationMode ---> iGate when Wifi/APRS available (DigiRepeater when not)");
-    } else if (stationMode == 6) {
+    } else if (stationMode==6) {
       Serial.println("stationMode ---> Digirepeater with iGate capabilities (when WiFi available)");
       WiFi.mode(WIFI_STA);
       WiFi.disconnect();

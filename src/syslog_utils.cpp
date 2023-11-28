@@ -13,7 +13,7 @@ namespace SYSLOG_Utils {
 
 void log(String type, String packet, int rssi, float snr, int freqError) {
     String syslogPacket = "ESP32 LoRa [APRS] - " + Config.callsign + " - ";
-    if (Config.syslog.active && (stationMode==1 || stationMode==2 || stationMode==5)) {
+    if (Config.syslog.active && (stationMode==1 || stationMode==2 || (stationMode==5 && WiFi.status()==WL_CONNECTED))) {
         if (type == "APRSIS Tx") {
             if (packet.indexOf(":>") > 10) {
                 syslogPacket += type + " - StartUp STATUS - " + packet.substring(packet.indexOf(":>")+2);
@@ -50,7 +50,7 @@ void log(String type, String packet, int rssi, float snr, int freqError) {
 }
 
 void setup() {
-    if (Config.syslog.active && (stationMode==1 || stationMode==2 || stationMode==5)) {
+    if (Config.syslog.active && (stationMode==1 || stationMode==2 || (stationMode==5 && WiFi.status()==WL_CONNECTED))) {
         udpClient.begin(WiFi.localIP(), 0);
         Serial.println("init : Syslog Server  ...     done!    (at " + Config.syslog.server + ")");
     }

@@ -51,18 +51,18 @@ namespace DIGI_Utils {
                     LoRa_Utils::sendNewPacket("APRS", loraPacket);
                     display_toggle(true);
                     lastScreenOn = millis();
-                } else if (stationMode ==4){
+                } else if (stationMode==4){
                     if (packet.indexOf("WIDE1-1") == -1) {
                         loraPacket = packet.substring(3,packet.indexOf(":")) + "," + Config.callsign + "*" + packet.substring(packet.indexOf(":"));
                     } else {
                         loraPacket = packet.substring(3,packet.indexOf(",")+1) + Config.callsign + "*" + packet.substring(packet.indexOf(","));
                     }
                     delay(500);
-                    if (stationMode == 4) {
+                    if (stationMode==4) {
                         LoRa_Utils::changeFreqTx();
                     }
                     LoRa_Utils::sendNewPacket("APRS", loraPacket);
-                    if (stationMode == 4) {
+                    if (stationMode==4) {
                         LoRa_Utils::changeFreqRx();
                     }
                     display_toggle(true);

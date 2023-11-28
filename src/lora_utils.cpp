@@ -18,7 +18,7 @@ namespace LoRa_Utils {
     SPI.begin(LORA_SCK, LORA_MISO, LORA_MOSI, LORA_CS);
     LoRa.setPins(LORA_CS, LORA_RST, LORA_IRQ);
     long freq;
-    if (stationMode == 1 || stationMode == 2) {
+    if (stationMode==1 || stationMode==2) {
       freq = Config.loramodule.iGateFreq;
     } else {
       freq = Config.loramodule.digirepeaterTxFreq;
