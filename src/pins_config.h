@@ -3,6 +3,10 @@
 
 #include <Arduino.h>
 
+#undef OLED_SDA
+#undef OLED_SCL
+#undef OLED_RST
+
 #define LORA_SCK    5       // GPIO5    - SX1276 SCK
 #define LORA_MISO   19      // GPIO19   - SX1276 MISO
 #define LORA_MOSI   27      // GPIO27   - SX1276 MOSI
@@ -10,8 +14,17 @@
 #define LORA_RST    23      // GPIO14   - SX1276 RST
 #define LORA_IRQ    26      // GPIO26   - SX1276 IRQ ---->DIO0
 
-#define OLED_SDA    21      // change to "4" in Heltec WiFi Lora 32 V2
-#define OLED_SCL    22      // change to "15" in Heltec WiFi Lora 32 V2 
+#ifdef TTGO_T_LORA_V2_1
+#define OLED_SDA    21
+#define OLED_SCL    22
+#define OLED_RESET  -1      // Reset pin # (or -1 if sharing Arduino reset pin)
+#endif
+
+#ifdef HELTEC_V2
+#define OLED_SDA    4
+#define OLED_SCL    15
+#define OLED_RESET  16 
+#endif
 
 #define greenLed    25      // Green Led
 

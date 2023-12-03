@@ -25,7 +25,6 @@ void checkWiFi() {
 
 void startWiFi() {
   int wifiCounter = 0;
-  int status = WL_IDLE_STATUS;
   if (stationMode!=6) {
     WiFi.mode(WIFI_STA);
     WiFi.disconnect();
