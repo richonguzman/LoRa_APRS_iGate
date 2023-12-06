@@ -6,6 +6,7 @@
 #undef OLED_SDA
 #undef OLED_SCL
 #undef OLED_RST
+#undef LORA_RST
 
 #if defined(TTGO_T_LORA_V2_1) || defined(HELTEC_V2)
 #define LORA_SCK    5       // GPIO5    - SX1276 SCK
