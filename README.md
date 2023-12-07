@@ -11,7 +11,7 @@ __(NOTE: This iGate Firmware was develop to work with all LoRa APRS Trackers and
 ___________________________________________________
 
 
-PLEASE WHAT THIS MOD NECESARY TO COMPILE AND UPLOAD:
+PLEASE WATCH THIS MOD NECESARY TO COMPILE AND UPLOAD:
 AsyncElegantOTA is deprecated and we need to add "//" to the warning it shows to enable the use of it
 
 SOON will be updated to ElegantOTA V3 to avoid this mod:
