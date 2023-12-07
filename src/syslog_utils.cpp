@@ -21,6 +21,7 @@ void log(String type, String packet, int rssi, float snr, int freqError) {
         } else if (type == "LoRa Rx") {
             if (packet.indexOf("::") > 10) {
                 syslogPacket += type + " - MESSAGE - " + packet.substring(3,packet.indexOf(">")) + " ---> " + packet.substring(packet.indexOf("::")+2);
+                syslogPacket += " / " + String(rssi) + "dBm / " + String(snr) + "dB / " + String(freqError) + "Hz";
             } else if (packet.indexOf(":!") > 10 || packet.indexOf(":=") > 10) {
                 syslogPacket += type + " - GPS - " + packet.substring(3,packet.indexOf(">")) + " / ";
                 if (packet.indexOf("WIDE1-1") > 10) {
@@ -29,8 +30,21 @@ void log(String type, String packet, int rssi, float snr, int freqError) {
                     syslogPacket += packet.substring(packet.indexOf(">")+1,packet.indexOf(":")) + " / _ / ";
                 }
                 syslogPacket += String(rssi) + "dBm / " + String(snr) + "dB / " + String(freqError) + "Hz / " +  GPS_Utils::getDistance(packet);
+            } else if (packet.indexOf(":>") > 10) {
+                syslogPacket += type + " - STATUS - " + packet.substring(3,packet.indexOf(">")) + " ---> " + packet.substring(packet.indexOf(":>")+2);
+                syslogPacket += " / " + String(rssi) + "dBm / " + String(snr) + "dB / " + String(freqError) + "Hz";
+            } else if (packet.indexOf(":'") > 10) {
+                syslogPacket += type + " - MIC-E - " + packet.substring(3,packet.indexOf(">")) + " ---> " + packet.substring(packet.indexOf("::")+2);
+                syslogPacket += " / " + String(rssi) + "dBm / " + String(snr) + "dB / " + String(freqError) + "Hz";
+            } else if (packet.indexOf(":T#") >= 10 && packet.indexOf(":=/") == -1) {
+                syslogPacket += type + " - TELEMETRY - " + packet.substring(3,packet.indexOf(">")) + " ---> " + packet.substring(packet.indexOf("::")+2);
+                syslogPacket += " / " + String(rssi) + "dBm / " + String(snr) + "dB / " + String(freqError) + "Hz";
+            } else if (packet.indexOf(":;") > 10) {
+                syslogPacket += type + " - OBJECT - " + packet.substring(3,packet.indexOf(">")) + " ---> " + packet.substring(packet.indexOf("::")+2);
+                syslogPacket += " / " + String(rssi) + "dBm / " + String(snr) + "dB / " + String(freqError) + "Hz";
             } else {
                 syslogPacket += type + " - " + packet;
+                syslogPacket += " / " + String(rssi) + "dBm / " + String(snr) + "dB / " + String(freqError) + "Hz";
             }
         } else if (type == "LoRa Tx") {
             if (packet.indexOf("RFONLY") > 10) {

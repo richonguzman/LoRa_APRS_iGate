@@ -82,7 +82,7 @@ namespace Utils {
         setup_display();
         digitalWrite(greenLed,HIGH);
         Serial.println("\nStarting iGate: " + Config.callsign + "   Version: " + versionDate);
-        show_display(" LoRa APRS", "      ( iGate )", "", "     Richonguzman", "     -- CA2RXU --", "", "      " + versionDate, 4000);
+        show_display(" LoRa APRS", "", "      ( iGATE )", "", "", "Richonguzman / CA2RXU", "      " + versionDate, 4000);
         digitalWrite(greenLed,LOW);
         firstLine   = Config.callsign;
         seventhLine = "     listening...";
@@ -300,6 +300,12 @@ namespace Utils {
             seventhLine += "D:" + distance + "km";
         } else if (packet.indexOf(":T#") >= 10 && packet.indexOf(":=/") == -1) {
             sixthLine = sender + "> TELEMETRY";
+            seventhLine = "RSSI:" + String(rssi) + "dBm SNR: " + String(snr) + "dBm";
+        } else if (packet.indexOf(":'") >= 10) {
+            sixthLine = sender + ">  MIC-E";
+            seventhLine = "RSSI:" + String(rssi) + "dBm SNR: " + String(snr) + "dBm";
+        } else if (packet.indexOf(":;") >= 10) {
+            sixthLine = sender + ">  OBJECT";
             seventhLine = "RSSI:" + String(rssi) + "dBm SNR: " + String(snr) + "dBm";
         } else {
             sixthLine = sender + "> ??????????";
