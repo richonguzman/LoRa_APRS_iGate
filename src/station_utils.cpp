@@ -89,7 +89,7 @@ void checkBuffer() {
 }
 
 void updatePacketBuffer(String packet) {
-  if ((packet.indexOf(":!") == -1) && (packet.indexOf(":=") == -1) && (packet.indexOf(":>") == -1) && (packet.indexOf(":'") == -1)) {
+  if ((packet.indexOf(":!") == -1) && (packet.indexOf(":=") == -1) && (packet.indexOf(":>") == -1) && (packet.indexOf(":`") == -1)) {
     String sender = packet.substring(3,packet.indexOf(">"));
     String tempAddressee = packet.substring(packet.indexOf("::") + 2);
     String addressee = tempAddressee.substring(0,tempAddressee.indexOf(":"));
