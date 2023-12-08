@@ -37,10 +37,10 @@ void log(String type, String packet, int rssi, float snr, int freqError) {
                 syslogPacket += type + " - MIC-E - " + packet.substring(3,packet.indexOf(">")) + " ---> " + packet.substring(packet.indexOf(":`")+2);
                 syslogPacket += " / " + String(rssi) + "dBm / " + String(snr) + "dB / " + String(freqError) + "Hz";
             } else if (packet.indexOf(":T#") >= 10 && packet.indexOf(":=/") == -1) {
-                syslogPacket += type + " - TELEMETRY - " + packet.substring(3,packet.indexOf(">")) + " ---> " + packet.substring(packet.indexOf("::")+2);
+                syslogPacket += type + " - TELEMETRY - " + packet.substring(3,packet.indexOf(">")) + " ---> " + packet.substring(packet.indexOf(":T#")+3);
                 syslogPacket += " / " + String(rssi) + "dBm / " + String(snr) + "dB / " + String(freqError) + "Hz";
             } else if (packet.indexOf(":;") > 10) {
-                syslogPacket += type + " - OBJECT - " + packet.substring(3,packet.indexOf(">")) + " ---> " + packet.substring(packet.indexOf("::")+2);
+                syslogPacket += type + " - OBJECT - " + packet.substring(3,packet.indexOf(">")) + " ---> " + packet.substring(packet.indexOf(":;")+2);
                 syslogPacket += " / " + String(rssi) + "dBm / " + String(snr) + "dB / " + String(freqError) + "Hz";
             } else {
                 syslogPacket += type + " - " + packet;
