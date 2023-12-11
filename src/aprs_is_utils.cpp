@@ -72,9 +72,9 @@ namespace APRS_IS_Utils {
 
   String createPacket(String packet) {
     if (stationMode>1) {
-      return packet.substring(3, packet.indexOf(":`")) + ",qAR," + Config.callsign + packet.substring(packet.indexOf(":`")) + "\n";
+      return packet.substring(3, packet.indexOf(":")) + ",qAR," + Config.callsign + packet.substring(packet.indexOf(":")) + "\n";
     } else {
-      return packet.substring(3, packet.indexOf(":`")) + ",qAO," + Config.callsign + packet.substring(packet.indexOf(":`")) + "\n";
+      return packet.substring(3, packet.indexOf(":")) + ",qAO," + Config.callsign + packet.substring(packet.indexOf(":")) + "\n";
     }
   }
 
