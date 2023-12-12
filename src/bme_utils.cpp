@@ -130,7 +130,7 @@ String readDataSensor() {
     #ifndef BMPSensor
     humStr  = generateHumString(newHum);
     #else
-    humStr  = "-99";
+    humStr  = "..";
     #endif
     presStr = generatePresString(newPress + (HEIGHT_CORRECTION/CORRECTION_FACTOR));
     fifthLine = "BME-> " + String(int(newTemp))+"C " + humStr + "% " + presStr.substring(0,4) + "hPa";
