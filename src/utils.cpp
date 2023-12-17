@@ -1,5 +1,5 @@
 #include <ESPAsyncWebServer.h>
-#include <AsyncElegantOTA.h>
+#include <ElegantOTA.h>
 #include <AsyncTCP.h>
 #include <SPIFFS.h>
 #include <WiFi.h>
@@ -328,9 +328,9 @@ namespace Utils {
             });
 
             if (Config.ota.username != ""  && Config.ota.password != "") {
-                AsyncElegantOTA.begin(&server, Config.ota.username.c_str(), Config.ota.password.c_str());
+                ElegantOTA.begin(&server, Config.ota.username.c_str(), Config.ota.password.c_str());
             } else {
-                AsyncElegantOTA.begin(&server);
+                ElegantOTA.begin(&server);
             }
 
             server.on("/process_form.php", HTTP_POST, [](AsyncWebServerRequest *request){
