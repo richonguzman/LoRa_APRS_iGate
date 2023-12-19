@@ -52,7 +52,6 @@ namespace Utils {
         request->send(404, "text/plain", "Not found");
     }
 
-
     void processStatus() {
         String status = Config.callsign + ">APLRG1,WIDE1-1";
         if (stationMode==1 || stationMode==2 || (stationMode==5 && WiFi.status() == WL_CONNECTED)) {
@@ -313,6 +312,21 @@ namespace Utils {
         }
     }
 
+    void onOTAStart() {
+        Serial.println("OTA update started!");
+        show_display("", "", " OTA update started!", "", "", "", "", 100);
+    }
+
+    void onOTAEnd(bool success) {
+        if (success) {
+            Serial.println("OTA update finished successfully!");
+            show_display("", "", " OTA update success!", "", "    Rebooting ...", "", "", 2000);
+        } else {
+            Serial.println("There was an error during OTA update!");
+            show_display("", "", " OTA update fail!", "", "", "", "", 2000);
+        }
+    }
+
     void startServer() {
         if (stationMode==1 || stationMode==2 || (stationMode==5 && WiFi.status()==WL_CONNECTED)) {
             server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
@@ -333,9 +347,9 @@ namespace Utils {
                 ElegantOTA.begin(&server);
             }
             //
-            //ElegantOTA.onStart(onOTAStart); ---> avisa con callback que inicio algo
+            ElegantOTA.onStart(onOTAStart);
             //ElegantOTA.onProgress(onOTAProgress);
-            //ElegantOTA.onEnd(onOTAEnd);
+            ElegantOTA.onEnd(onOTAEnd);
             //
 
             server.on("/process_form.php", HTTP_POST, [](AsyncWebServerRequest *request){
