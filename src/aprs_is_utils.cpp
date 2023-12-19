@@ -1,4 +1,5 @@
 #include <WiFi.h>
+//#include <ElegantOTA.h>
 #include "configuration.h"
 #include "aprs_is_utils.h"
 #include "station_utils.h"
@@ -220,6 +221,7 @@ namespace APRS_IS_Utils {
         processAPRSISPacket(aprsisPacket);
       }
     }
+    //ElegantOTA.loop();
   }
 
 }

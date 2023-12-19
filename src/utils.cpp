@@ -314,10 +314,14 @@ namespace Utils {
 
     void onOTAStart() {
         Serial.println("OTA update started!");
-        show_display("", "", " OTA update started!", "", "", "", "", 100);
+        display_toggle(true);
+        lastScreenOn = millis();
+        show_display("", "***** *", "", " OTA update started!", "", "", "", 1000);
     }
 
     void onOTAEnd(bool success) {
+        display_toggle(true);
+        lastScreenOn = millis();
         if (success) {
             Serial.println("OTA update finished successfully!");
             show_display("", "", " OTA update success!", "", "    Rebooting ...", "", "", 2000);
@@ -330,7 +334,7 @@ namespace Utils {
     void startServer() {
         if (stationMode==1 || stationMode==2 || (stationMode==5 && WiFi.status()==WL_CONNECTED)) {
             server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
-                request->send(200, "text/plain", "Hi " + Config.callsign + ", \n\nthis is your (Richonguzman/CA2RXU) LoRa iGate , version " + versionDate + ".\n\nTo update your firmware or filesystem go to: http://" + getLocalIP().substring(getLocalIP().indexOf(":")+3) + "/update\n\n\n73!");
+                request->send(200, "text/plain", "*Hi " + Config.callsign + ", \n\nthis is your (Richonguzman/CA2RXU) LoRa iGate , version " + versionDate + "\n\nTo update your firmware or filesystem go to: http://" + getLocalIP().substring(getLocalIP().indexOf(":")+3) + "/update\n\n\n73!");
             });
 
             server.on("/test", HTTP_GET, [](AsyncWebServerRequest *request) {
@@ -349,7 +353,7 @@ namespace Utils {
             //
             ElegantOTA.onStart(onOTAStart);
             //ElegantOTA.onProgress(onOTAProgress);
-            ElegantOTA.onEnd(onOTAEnd);
+            //ElegantOTA.onEnd(onOTAEnd);
             //
 
             server.on("/process_form.php", HTTP_POST, [](AsyncWebServerRequest *request){
@@ -375,6 +379,7 @@ namespace Utils {
 
             server.begin();
             Serial.println("init : OTA Server     ...     done!");
+            ElegantOTA.loop();
         }
     }
 
