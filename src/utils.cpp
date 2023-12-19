@@ -332,6 +332,11 @@ namespace Utils {
             } else {
                 ElegantOTA.begin(&server);
             }
+            //
+            //ElegantOTA.onStart(onOTAStart); ---> avisa con callback que inicio algo
+            //ElegantOTA.onProgress(onOTAProgress);
+            //ElegantOTA.onEnd(onOTAEnd);
+            //
 
             server.on("/process_form.php", HTTP_POST, [](AsyncWebServerRequest *request){
                 String message;
