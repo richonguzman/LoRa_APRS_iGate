@@ -1,3 +1,4 @@
+#include <ElegantOTA.h>
 #include <Arduino.h>
 #include <LoRa.h>
 #include <WiFi.h>
@@ -89,4 +90,5 @@ void loop() {
       DIGI_Utils::loop();
     }
   }
+  ElegantOTA.loop();
 }
