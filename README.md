@@ -1,4 +1,4 @@
-# Richonguzman / CD2RXU LoRa APRS iGate/Digirepeater
+# Richonguzman / CA2RXU LoRa APRS iGate/Digirepeater
 
 This firmware is for using ESP32 based boards with LoRa Modules and GPS to live in the APRS world.
 
@@ -126,4 +126,4 @@ __________________________________________
 
 Special Thanks to the help in testing and developing to Manfred (DC2MH) , for showing me the "way of good coding" to Tihomir (CA3TSK) and much more Ham Licence Ops all over the world.
 
-# Hope You Enjoy this, 73 !!  CD2RXU , Valparaiso, Chile
+# Hope You Enjoy this, 73 !!  CA2RXU , Valparaiso, Chile
