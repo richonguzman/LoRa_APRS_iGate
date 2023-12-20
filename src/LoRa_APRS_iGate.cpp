@@ -1,4 +1,3 @@
-//#include <ElegantOTA.h>
 #include <Arduino.h>
 #include <LoRa.h>
 #include <WiFi.h>
@@ -21,7 +20,7 @@
 Configuration   Config;
 WiFiClient      espClient;
 
-String          versionDate           = "2023.12.19";
+String          versionDate           = "2023.12.20";
 int             myWiFiAPIndex         = 0;
 int             myWiFiAPSize          = Config.wifiAPs.size();
 WiFi_AP         *currentWiFi          = &Config.wifiAPs[myWiFiAPIndex];
@@ -90,5 +89,4 @@ void loop() {
       DIGI_Utils::loop();
     }
   }
-  //ElegantOTA.loop();
 }

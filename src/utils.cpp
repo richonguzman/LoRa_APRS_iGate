@@ -46,6 +46,8 @@ extern bool                 WiFiConnect;
 String name;
 String email;
 
+unsigned long ota_progress_millis = 0;
+
 namespace Utils {
 
     void notFound(AsyncWebServerRequest *request) {
@@ -316,7 +318,17 @@ namespace Utils {
         Serial.println("OTA update started!");
         display_toggle(true);
         lastScreenOn = millis();
-        show_display("", "***** *", "", " OTA update started!", "", "", "", 1000);
+        show_display("", "", "", " OTA update started!", "", "", "", 1000);
+    }
+
+    void onOTAProgress(size_t current, size_t final) {
+        if (millis() - ota_progress_millis > 1000) {
+            display_toggle(true);
+            lastScreenOn = millis();
+            ota_progress_millis = millis();
+            Serial.printf("OTA Progress Current: %u bytes, Final: %u bytes\n", current, final);
+            show_display("", "", "  OTA Progress : " + String((current*100)/final) + "%", "", "", "", "", 100);
+        }
     }
 
     void onOTAEnd(bool success) {
@@ -324,17 +336,17 @@ namespace Utils {
         lastScreenOn = millis();
         if (success) {
             Serial.println("OTA update finished successfully!");
-            show_display("", "", " OTA update success!", "", "    Rebooting ...", "", "", 2000);
+            show_display("", "", " OTA update success!", "", "    Rebooting ...", "", "", 4000);
         } else {
             Serial.println("There was an error during OTA update!");
-            show_display("", "", " OTA update fail!", "", "", "", "", 2000);
+            show_display("", "", " OTA update fail!", "", "", "", "", 4000);
         }
     }
 
     void startServer() {
         if (stationMode==1 || stationMode==2 || (stationMode==5 && WiFi.status()==WL_CONNECTED)) {
             server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
-                request->send(200, "text/plain", "*Hi " + Config.callsign + ", \n\nthis is your (Richonguzman/CA2RXU) LoRa iGate , version " + versionDate + "\n\nTo update your firmware or filesystem go to: http://" + getLocalIP().substring(getLocalIP().indexOf(":")+3) + "/update\n\n\n73!");
+                request->send(200, "text/plain", "Hi " + Config.callsign + ", \n\nthis is your (Richonguzman/CA2RXU) LoRa APRS iGate , version " + versionDate + "\n\nTo update your firmware or filesystem go to: http://" + getLocalIP().substring(getLocalIP().indexOf(":")+3) + "/update\n\n\n73!");
             });
 
             server.on("/test", HTTP_GET, [](AsyncWebServerRequest *request) {
@@ -350,11 +362,10 @@ namespace Utils {
             } else {
                 ElegantOTA.begin(&server);
             }
-            //
+            ElegantOTA.setAutoReboot(true);
             ElegantOTA.onStart(onOTAStart);
-            //ElegantOTA.onProgress(onOTAProgress);
-            //ElegantOTA.onEnd(onOTAEnd);
-            //
+            ElegantOTA.onProgress(onOTAProgress);
+            ElegantOTA.onEnd(onOTAEnd);
 
             server.on("/process_form.php", HTTP_POST, [](AsyncWebServerRequest *request){
                 String message;
@@ -378,8 +389,7 @@ namespace Utils {
             server.serveStatic("/", SPIFFS, "/");
 
             server.begin();
-            Serial.println("init : OTA Server     ...     done!");
-            ElegantOTA.loop();
+            Serial.println("init : OTA Server     ...     done!");            
         }
     }
 
