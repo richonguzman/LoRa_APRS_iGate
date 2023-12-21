@@ -1,5 +1,11 @@
 # Richonguzman / CA2RXU LoRa APRS iGate/Digirepeater
 
+___________________________________________________
+BAD NEWS : AsyncTCP library has a bug and gets this new and old firmware as NOT COMPILING STATUE, SO PLEASE WAIT, as soon as I can I will have it running again!
+___________________________________________________
+
+
+
 This firmware is for using ESP32 based boards with LoRa Modules and GPS to live in the APRS world.
 
 ![Screenshot](https://github.com/richonguzman/LoRa_APRS_iGate/blob/main/images/OledScreen.jpeg)
