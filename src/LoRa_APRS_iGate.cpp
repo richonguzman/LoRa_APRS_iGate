@@ -58,7 +58,7 @@ void setup() {
   LoRa_Utils::setup();
   Utils::validateDigiFreqs();
   iGateBeaconPacket = GPS_Utils::generateBeacon();
-  Utils::startServer();
+  //Utils::startServer();
   SYSLOG_Utils::setup();
   BME_Utils::setup();
 }
@@ -82,7 +82,7 @@ void loop() {
       if (lastStationModeState == 1) {
         iGateBeaconPacket = GPS_Utils::generateBeacon();
         lastStationModeState = 0;
-        Utils::startServer();
+        //Utils::startServer();
       }
       APRS_IS_Utils::loop();
     } else {                              // DigiRepeater Mode
