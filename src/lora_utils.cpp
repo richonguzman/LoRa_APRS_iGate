@@ -56,12 +56,20 @@ namespace LoRa_Utils {
     Serial.println(newPacket);
   }
 
-  String generatePacket(String aprsisPacket) {
+  String generatePacketMessage(String aprsisPacket) {
     String firstPart, messagePart;
     aprsisPacket.trim();
     firstPart = aprsisPacket.substring(0, aprsisPacket.indexOf(","));
     messagePart = aprsisPacket.substring(aprsisPacket.indexOf("::")+2);
     return firstPart + ",TCPIP,WIDE1-1," + Config.callsign + "::" + messagePart;
+  }
+
+  String generatePacketSameContent(String aprsisPacket) {
+    String firstPart, messagePart;
+    aprsisPacket.trim();
+    firstPart = aprsisPacket.substring(0, aprsisPacket.indexOf(","));
+    messagePart = aprsisPacket.substring(aprsisPacket.indexOf(":"));
+    return firstPart + ",TCPIP," + Config.callsign + messagePart;
   }
 
   String receivePacket() {

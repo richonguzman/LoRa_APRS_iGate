@@ -101,5 +101,9 @@ void updatePacketBuffer(String packet) {
   }
 }
 
+bool hasHeardSomeone() {
+    return !lastHeardStation.empty();
+}
+
 
 }

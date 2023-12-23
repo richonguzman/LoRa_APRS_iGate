@@ -26,6 +26,7 @@ public:
   String  server;
   int     port;
   int     reportingDistance;
+  String  filter;
 };
 
 class LoraModule {

@@ -10,6 +10,7 @@ void updateLastHeard(String station);
 bool wasHeard(String station);
 void checkBuffer();
 void updatePacketBuffer(String packet);
+bool hasHeardSomeone();
 
 }
 
