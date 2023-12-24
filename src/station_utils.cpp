@@ -102,6 +102,7 @@ void updatePacketBuffer(String packet) {
 }
 
 bool hasHeardSomeone() {
+    deleteNotHeard();
     return !lastHeardStation.empty();
 }
 
