@@ -37,7 +37,7 @@ But under the hood is much more:
 - RX first, TX will only be done if there is no traffic on the frequency.
 - automatic update of the Lora symbol at APRS-IS, black "L" for pure RX, red "L" for TX capability, green star "L" for digipeater and blue round "L" for WX iGate.
 - support for multiple WLAN with corresponding coordinates.
-- support for BME280 sensors, sending to WX data to APRS-IS.
+- support for BME/BMP280 and BME680 sensors, sending to WX data to APRS-IS.
 
 and more will come:
 - Web-UI

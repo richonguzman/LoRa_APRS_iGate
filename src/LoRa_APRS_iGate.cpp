@@ -1,5 +1,4 @@
 #include <Arduino.h>
-#include <LoRa.h>
 #include <WiFi.h>
 #include <vector>
 #include "configuration.h"
