@@ -147,7 +147,7 @@ namespace BME_Utils {
       fifthLine = "BME-> " + String(int(newTemp))+"C " + humStr + "% " + presStr.substring(0,4) + "hPa";
       wx = ".../...g...t" + tempStr + "r...p...P...h" + humStr + "b" + presStr;
       #ifdef BME680Sensor
-      wx += "Gas: " + String(newGas) + "Kohms";
+      wx += "Gas: " + String(newGas) + "Kohms ";
       #endif
       return wx;
     }
