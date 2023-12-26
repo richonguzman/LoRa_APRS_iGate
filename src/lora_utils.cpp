@@ -1,3 +1,4 @@
+#include <RadioLib.h>
 #include <LoRa.h>
 #include <WiFi.h>
 #include "configuration.h"
@@ -9,12 +10,49 @@
 extern Configuration  Config;
 extern int            stationMode;
 
+#ifdef HELTEC_V3
+SX1262 radio = new Module(RADIO_CS_PIN, RADIO_DIO1_PIN, RADIO_RST_PIN, RADIO_BUSY_PIN);
+bool transmissionFlag = true;
+bool enableInterrupt = true;
+#endif
+
 int rssi, freqError;
 float snr;
 
 namespace LoRa_Utils {
 
+  void setFlag(void) {
+    #ifdef HELTEC_V3
+    transmissionFlag = true;
+    #endif
+  }
+
   void setup() {
+    #ifdef HELTEC_V3
+    SPI.begin(RADIO_SCLK_PIN, RADIO_MISO_PIN, RADIO_MOSI_PIN);
+    float freq = (float)Config.loramodule.iGateFreq/1000000;
+    int state = radio.begin(freq);
+    if (state == RADIOLIB_ERR_NONE) {
+      Serial.print("init : LoRa Module    ...     done!");
+    } else {
+      Serial.println("Starting LoRa failed!");
+      while (true);
+    }
+    radio.setDio1Action(setFlag);
+    radio.setSpreadingFactor(Config.loramodule.spreadingFactor);
+    radio.setBandwidth(Config.loramodule.signalBandwidth);
+    radio.setCodingRate(Config.loramodule.codingRate4);
+    state = radio.setOutputPower(Config.loramodule.power + 2); // values available: 10, 17, 22 --> if 20 in tracker_conf.json it will be updated to 22.
+
+    if (state == RADIOLIB_ERR_NONE) {
+      Serial.println("LoRa SX1262 init done!");
+    } else {
+      Serial.println("Starting LoRa failed!");
+      while (true);
+    }
+    #endif
+
+    #if defined(TTGO_T_LORA_V2_1) || defined(HELTEC_V2)
     SPI.begin(LORA_SCK, LORA_MISO, LORA_MOSI, LORA_CS);
     LoRa.setPins(LORA_CS, LORA_RST, LORA_IRQ);
     long freq;
@@ -36,10 +74,25 @@ namespace LoRa_Utils {
     LoRa.enableCrc();
     LoRa.setTxPower(Config.loramodule.power);
     Serial.print("init : LoRa Module    ...     done!");
+    #endif
   }
 
   void sendNewPacket(const String &typeOfMessage, const String &newPacket) {
     digitalWrite(greenLed,HIGH);
+    #ifdef HELTEC_V3
+    int state = radio.transmit("\x3c\xff\x01" + newPacket);
+    if (state == RADIOLIB_ERR_NONE) {
+      //Serial.println(F("success!"));
+    } else if (state == RADIOLIB_ERR_PACKET_TOO_LONG) {
+      Serial.println(F("too long!"));
+    } else if (state == RADIOLIB_ERR_TX_TIMEOUT) {
+      Serial.println(F("timeout!"));
+    } else {
+      Serial.print(F("failed, code "));
+      Serial.println(state);
+    }
+    #endif
+    #if defined(TTGO_T_LORA_V2_1) || defined(HELTEC_V2)
     LoRa.beginPacket();
     LoRa.write('<');
     if (typeOfMessage == "APRS")  {
@@ -50,6 +103,7 @@ namespace LoRa_Utils {
     LoRa.write(0x01);
     LoRa.write((const uint8_t *)newPacket.c_str(), newPacket.length());
     LoRa.endPacket();
+    #endif    
     digitalWrite(greenLed,LOW);
     SYSLOG_Utils::log("LoRa Tx", newPacket,0,0,0);
     Serial.print("---> LoRa Packet Tx    : ");
@@ -66,6 +120,7 @@ namespace LoRa_Utils {
 
   String receivePacket() {
     String loraPacket = "";
+    #if defined(TTGO_T_LORA_V2_1) || defined(HELTEC_V2)
     int packetSize = LoRa.parsePacket();
     if (packetSize) {
       while (LoRa.available()) {
@@ -82,15 +137,38 @@ namespace LoRa_Utils {
         SYSLOG_Utils::log("LoRa Rx", loraPacket, rssi, snr, freqError);
       }
     }
+    #endif
+    #ifdef HELTEC_V3
+    if (transmissionFlag) {
+      transmissionFlag = false;
+      radio.startReceive();
+      int state = radio.readData(loraPacket);
+      if (state == RADIOLIB_ERR_NONE) {
+        Serial.println("LoRa Rx ---> " + loraPacket);
+      } else if (state == RADIOLIB_ERR_RX_TIMEOUT) {
+        // timeout occurred while waiting for a packet
+      } else if (state == RADIOLIB_ERR_CRC_MISMATCH) {
+        Serial.println(F("CRC error!"));
+      } else {
+        Serial.print(F("failed, code "));
+        Serial.println(state);
+      }
+      // Syslog? RSSI SNR Freq
+    }
+    #endif
     return loraPacket;
   }
 
   void changeFreqTx() {
+    // radiolib???
+
     delay(500);
     LoRa.setFrequency(Config.loramodule.digirepeaterTxFreq);
   }
 
   void changeFreqRx() {
+    // radiolib???
+    
     delay(500);
     LoRa.setFrequency(Config.loramodule.digirepeaterRxFreq);
   }

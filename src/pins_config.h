@@ -16,13 +16,23 @@
 #define LORA_RST    14      // GPIO14   - SX1276 RST
 #define LORA_IRQ    26      // GPIO26   - SX1276 IRQ ---->DIO0
 #endif
+
 #ifdef HELTEC_V3
-#define LORA_SCK    9       // SX1268 SCK
+/*#define LORA_SCK    9       // SX1262 SCK
 #define LORA_MISO   11      // SX1268 MISO
 #define LORA_MOSI   10      // SX1268 MOSI
 #define LORA_CS     8       // SX1268 CS ---> NSS
 #define LORA_RST    12      // SX1268 RST
-#define LORA_IRQ    14      // SX1268 IRQ ---->DIO0
+#define LORA_IRQ    14      // SX1268 IRQ ---->DIO0*/
+
+#define RADIO_SCLK_PIN  9   // SX1262 SCK
+#define RADIO_MISO_PIN  11  // SX1262 MISO
+#define RADIO_MOSI_PIN  10  // SX1262 MOSI
+#define RADIO_CS_PIN    8   // SX1262 NSS
+//#define RADIO_DIO0_PIN  26  // SX1262 
+#define RADIO_RST_PIN   12  // SX1262 RST
+#define RADIO_DIO1_PIN  14  // SX1262 DIO1
+#define RADIO_BUSY_PIN  13  // SX1262 BUSY
 #endif
 
 
