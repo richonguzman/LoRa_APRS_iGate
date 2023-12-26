@@ -60,9 +60,11 @@ ____________________________________________________
 ____________________________________________________
 ## Timeline (Versions):
 
+- 2023.12.27 HELTEC V3 board support added.
+- 2023.12.26 Added BME680 module to BME/BMP280 modules supported.
 - 2023.12.20 Updated to ElegantOTA v.3 (AsyncElegantOTA was deprecated).
 - 2023.12.07 MIC-E process and syslog added.
-- 2023.12.06 Heltec V2 support added.
+- 2023.12.06 HELTEC V2 board support added.
 - 2023.11.26 Small correction to enable Syslog in stationMode5.
 - 2023.10.09 Added "WIDE1-1" to Tx packets from iGate to be *repeated* by Digirepeaters.
 - 2023.10.09 Added Support also for BMP280 module.
