@@ -47,7 +47,7 @@
 #define OLED_RESET  21 
 #endif
 
-// OTHERS
+// Led and other stuff
 #if defined(TTGO_T_LORA_V2_1) || defined(HELTEC_V2)
 #define greenLed    25      // Green Led
 #define batteryPin  35
