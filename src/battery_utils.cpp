@@ -19,7 +19,12 @@ namespace BATTERY_Utils {
         int sample;
         int sampleSum = 0;
         for (int i=0; i<100; i++) {
+            #if defined(TTGO_T_LORA_V2_1) || defined(HELTEC_V2)
             sample = analogRead(batteryPin);
+            #endif
+            #ifdef HELTEC_V3
+            sample = 0;
+            #endif
             sampleSum += sample;
             delayMicroseconds(50); 
         }

@@ -47,7 +47,9 @@ String firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seven
 
 void setup() {
   Serial.begin(115200);
+  #ifndef HELTEC_V3
   pinMode(batteryPin, INPUT);
+  #endif
   pinMode(greenLed, OUTPUT);
   if (Config.externalVoltageMeasurement) {
     pinMode(Config.externalVoltagePin, INPUT);

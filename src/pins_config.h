@@ -48,8 +48,13 @@
 #endif
 
 // OTHERS
+#if defined(TTGO_T_LORA_V2_1) || defined(HELTEC_V2)
 #define greenLed    25      // Green Led
 #define batteryPin  35
+#endif
+#ifdef HELTEC_V3
+#define greenLed    35
+#endif
 
 /* (Same pins for LILYGO LoRa32 and ESP32 Wroom Dev )
 SX1278-------------------> ESP32 ttgo-lora32-v21 and ESP32 WROOM Dev

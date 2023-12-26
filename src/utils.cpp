@@ -113,9 +113,11 @@ namespace Utils {
             } else {
                 beaconPacket = iGateBeaconPacket;
             }
+            #ifndef HELTEC_V3
             if (Config.sendBatteryVoltage) {
                 beaconPacket += " (Batt=" + String(BATTERY_Utils::checkBattery(),2) + "V)";
             }
+            #endif
             if (Config.externalVoltageMeasurement) { 
                 beaconPacket += " (Ext V=" + String(BATTERY_Utils::checkExternalVoltage(),2) + "V)";
             }
@@ -126,9 +128,11 @@ namespace Utils {
                 }
                 sixthLine = "";
                 show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING iGate BEACON", 1000);         
+                #ifndef HELTEC_V3
                 if (Config.sendBatteryVoltage) { 
                     sixthLine = "     (Batt=" + String(BATTERY_Utils::checkBattery(),2) + "V)";
                 }
+                #endif
                 if (Config.externalVoltageMeasurement) { 
                     sixthLine = "    (Ext V=" + String(BATTERY_Utils::checkExternalVoltage(),2) + "V)";
                 }
@@ -148,9 +152,11 @@ namespace Utils {
                 fifthLine = "";
                 sixthLine = "";
                 show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING iGate BEACON", 0);
+                #ifndef HELTEC_V3
                 if (Config.sendBatteryVoltage) { 
                     sixthLine = "     (Batt=" + String(BATTERY_Utils::checkBattery(),2) + "V)";
                 }
+                #endif
                 if (Config.externalVoltageMeasurement) { 
                     sixthLine = "    (Ext V=" + String(BATTERY_Utils::checkExternalVoltage(),2) + "V)";
                 }
@@ -171,9 +177,11 @@ namespace Utils {
                     APRS_IS_Utils::checkStatus();
                     thirdLine = getLocalIP();
                     show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING iGate BEACON", 1000);         
+                    #ifndef HELTEC_V3
                     if (Config.sendBatteryVoltage) { 
                         sixthLine = "     (Batt=" + String(BATTERY_Utils::checkBattery(),2) + "V)";
                     }
+                    #endif
                     if (Config.externalVoltageMeasurement) { 
                         sixthLine = "    (Ext V=" + String(BATTERY_Utils::checkExternalVoltage(),2) + "V)";
                     }
@@ -182,9 +190,11 @@ namespace Utils {
                     show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
                 } else {
                     show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING iGate BEACON", 0);
+                    #ifndef HELTEC_V3
                     if (Config.sendBatteryVoltage) { 
                         sixthLine = "     (Batt=" + String(BATTERY_Utils::checkBattery(),2) + "V)";
                     }
+                    #endif
                     if (Config.externalVoltageMeasurement) { 
                         sixthLine = "    (Ext V=" + String(BATTERY_Utils::checkExternalVoltage(),2) + "V)";
                     }
@@ -201,9 +211,11 @@ namespace Utils {
                 sixthLine = "";
                 
                 show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING iGate BEACON", 0);
+                #ifndef HELTEC_V3
                 if (Config.sendBatteryVoltage) { 
                     sixthLine = "     (Batt=" + String(BATTERY_Utils::checkBattery(),2) + "V)";
                 }
+                #endif
                 if (Config.externalVoltageMeasurement) { 
                     sixthLine = "    (Ext V=" + String(BATTERY_Utils::checkExternalVoltage(),2) + "V)";
                 }
