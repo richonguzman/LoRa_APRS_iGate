@@ -138,7 +138,7 @@ namespace BME_Utils {
     } else {
       tempStr = generateTempString((newTemp * 1.8) + 32);
       #if defined(BME280Sensor) || defined(BME680Sensor)
-      humStr  = generateHumString(newHum,type);
+      humStr  = generateHumString(newHum);
       #endif
       #ifdef BMP280Sensor
       humStr  = "..";
