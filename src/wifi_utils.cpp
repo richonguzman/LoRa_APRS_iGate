@@ -36,10 +36,14 @@ namespace WIFI_Utils {
     WiFi.begin(currentWiFi->ssid.c_str(), currentWiFi->password.c_str());
     while (WiFi.status() != WL_CONNECTED && wifiCounter<2) {
       delay(500);
+      #if defined(TTGO_T_LORA_V2_1) || defined(HELTEC_V2) || defined(HELTEC_V3) || defined(ESP32_DIY_LoRa) || defined(ESP32_DIY_1W_LoRa)
       digitalWrite(internalLedPin,HIGH);
+      #endif
       Serial.print('.');
       delay(500);
+      #if defined(TTGO_T_LORA_V2_1) || defined(HELTEC_V2) || defined(HELTEC_V3) || defined(ESP32_DIY_LoRa) || defined(ESP32_DIY_1W_LoRa)
       digitalWrite(internalLedPin,LOW);
+      #endif
       if ((millis() - start) > 10000){
         delay(1000);
         if(myWiFiAPIndex >= (myWiFiAPSize-1)) {
@@ -58,7 +62,9 @@ namespace WIFI_Utils {
         WiFi.begin(currentWiFi->ssid.c_str(), currentWiFi->password.c_str());
       }
     }
+    #if defined(TTGO_T_LORA_V2_1) || defined(HELTEC_V2) || defined(HELTEC_V3) || defined(ESP32_DIY_LoRa) || defined(ESP32_DIY_1W_LoRa)
     digitalWrite(internalLedPin,LOW);
+    #endif
     if (WiFi.status() == WL_CONNECTED) {
         Serial.print("Connected as ");
         Serial.println(WiFi.localIP());

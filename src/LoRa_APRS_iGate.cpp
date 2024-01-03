@@ -7,6 +7,7 @@
 #include "syslog_utils.h"
 #include "pins_config.h"
 #include "query_utils.h"
+#include "power_utils.h"
 #include "lora_utils.h"
 #include "wifi_utils.h"
 #include "digi_utils.h"
@@ -19,7 +20,7 @@
 Configuration   Config;
 WiFiClient      espClient;
 
-String          versionDate           = "2024.01.02";
+String          versionDate           = "2024.01.03";
 int             myWiFiAPIndex         = 0;
 int             myWiFiAPSize          = Config.wifiAPs.size();
 WiFi_AP         *currentWiFi          = &Config.wifiAPs[myWiFiAPIndex];
@@ -49,10 +50,15 @@ void setup() {
   #if defined(TTGO_T_LORA_V2_1) || defined(HELTEC_V2)
   pinMode(batteryPin, INPUT);
   #endif
+  #if defined(TTGO_T_LORA_V2_1) || defined(HELTEC_V2) || defined(HELTEC_V3) || defined(ESP32_DIY_LoRa) || defined(ESP32_DIY_1W_LoRa)
   pinMode(internalLedPin, OUTPUT);
+  #endif
   if (Config.externalVoltageMeasurement) {
     pinMode(Config.externalVoltagePin, INPUT);
   }
+  #if defined(TTGO_T_Beam_V1_0) || defined(TTGO_T_Beam_V1_0_SX1268) || defined(TTGO_T_Beam_V1_2) || defined(TTGO_T_Beam_V1_2_SX1262)
+  POWER_Utils::setup();
+  #endif
   delay(1000);
   Utils::setupDisplay();
   WIFI_Utils::setup();

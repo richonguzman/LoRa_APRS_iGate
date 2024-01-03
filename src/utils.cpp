@@ -81,10 +81,14 @@ namespace Utils {
 
     void setupDisplay() {
         setup_display();
+        #if defined(TTGO_T_LORA_V2_1) || defined(HELTEC_V2) || defined(HELTEC_V3) || defined(ESP32_DIY_LoRa) || defined(ESP32_DIY_1W_LoRa)
         digitalWrite(internalLedPin,HIGH);
+        #endif
         Serial.println("\nStarting iGate: " + Config.callsign + "   Version: " + versionDate);
         show_display(" LoRa APRS", "", "      ( iGATE )", "", "", "Richonguzman / CA2RXU", "      " + versionDate, 4000);
+        #if defined(TTGO_T_LORA_V2_1) || defined(HELTEC_V2) || defined(HELTEC_V3) || defined(ESP32_DIY_LoRa) || defined(ESP32_DIY_1W_LoRa)
         digitalWrite(internalLedPin,LOW);
+        #endif
         firstLine   = Config.callsign;
         seventhLine = "     listening...";
     }
