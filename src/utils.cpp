@@ -113,7 +113,7 @@ namespace Utils {
             } else {
                 beaconPacket = iGateBeaconPacket;
             }
-            #ifndef HELTEC_V3
+            #if defined(TTGO_T_LORA_V2_1) || defined(HELTEC_V2)
             if (Config.sendBatteryVoltage) {
                 beaconPacket += " (Batt=" + String(BATTERY_Utils::checkBattery(),2) + "V)";
             }
@@ -127,8 +127,8 @@ namespace Utils {
                     fifthLine = "";
                 }
                 sixthLine = "";
-                show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING iGate BEACON", 1000);         
-                #ifndef HELTEC_V3
+                show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING iGate BEACON", 1000);     
+                #if defined(TTGO_T_LORA_V2_1) || defined(HELTEC_V2)
                 if (Config.sendBatteryVoltage) { 
                     sixthLine = "     (Batt=" + String(BATTERY_Utils::checkBattery(),2) + "V)";
                 }
@@ -152,7 +152,7 @@ namespace Utils {
                 fifthLine = "";
                 sixthLine = "";
                 show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING iGate BEACON", 0);
-                #ifndef HELTEC_V3
+                #if defined(TTGO_T_LORA_V2_1) || defined(HELTEC_V2)
                 if (Config.sendBatteryVoltage) { 
                     sixthLine = "     (Batt=" + String(BATTERY_Utils::checkBattery(),2) + "V)";
                 }
@@ -176,8 +176,8 @@ namespace Utils {
                 if (WiFi.status() == WL_CONNECTED && espClient.connected()) {
                     APRS_IS_Utils::checkStatus();
                     thirdLine = getLocalIP();
-                    show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING iGate BEACON", 1000);         
-                    #ifndef HELTEC_V3
+                    show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING iGate BEACON", 1000);        
+                    #if defined(TTGO_T_LORA_V2_1) || defined(HELTEC_V2)
                     if (Config.sendBatteryVoltage) { 
                         sixthLine = "     (Batt=" + String(BATTERY_Utils::checkBattery(),2) + "V)";
                     }
@@ -190,7 +190,7 @@ namespace Utils {
                     show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
                 } else {
                     show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING iGate BEACON", 0);
-                    #ifndef HELTEC_V3
+                    #if defined(TTGO_T_LORA_V2_1) || defined(HELTEC_V2)
                     if (Config.sendBatteryVoltage) { 
                         sixthLine = "     (Batt=" + String(BATTERY_Utils::checkBattery(),2) + "V)";
                     }
@@ -211,7 +211,7 @@ namespace Utils {
                 sixthLine = "";
                 
                 show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING iGate BEACON", 0);
-                #ifndef HELTEC_V3
+                #if defined(TTGO_T_LORA_V2_1) || defined(HELTEC_V2)
                 if (Config.sendBatteryVoltage) { 
                     sixthLine = "     (Batt=" + String(BATTERY_Utils::checkBattery(),2) + "V)";
                 }

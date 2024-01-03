@@ -15,6 +15,11 @@ SX1262 radio = new Module(RADIO_CS_PIN, RADIO_DIO1_PIN, RADIO_RST_PIN, RADIO_BUS
 bool transmissionFlag = true;
 bool enableInterrupt = true;
 #endif
+#ifdef ESP32_DIY_1W_LoRa
+SX1268 radio = new Module(RADIO_CS_PIN, RADIO_DIO1_PIN, RADIO_RST_PIN, RADIO_BUSY_PIN);
+bool transmissionFlag = true;
+bool enableInterrupt = true;
+#endif
 
 int rssi, freqError;
 float snr;
@@ -22,7 +27,7 @@ float snr;
 namespace LoRa_Utils {
 
   void setFlag(void) {
-    #ifdef HELTEC_V3
+    #if defined(HELTEC_V3) || defined(ESP32_DIY_1W_LoRa)
     transmissionFlag = true;
     #endif
   }
@@ -51,12 +56,11 @@ namespace LoRa_Utils {
     LoRa.setTxPower(Config.loramodule.power);
     Serial.print("init : LoRa Module    ...     done!");
     #endif
-    #ifdef HELTEC_V3
+    #if defined(HELTEC_V3) || defined(ESP32_DIY_1W_LoRa)
     SPI.begin(RADIO_SCLK_PIN, RADIO_MISO_PIN, RADIO_MOSI_PIN);
     float freq = (float)Config.loramodule.iGateFreq/1000000;
     int state = radio.begin(freq);
     if (state == RADIOLIB_ERR_NONE) {
-      
       Serial.print("Initializing SX126X LoRa Module");
     } else {
       Serial.println("Starting LoRa failed!");
@@ -66,8 +70,12 @@ namespace LoRa_Utils {
     radio.setSpreadingFactor(Config.loramodule.spreadingFactor);
     radio.setBandwidth(Config.loramodule.signalBandwidth);
     radio.setCodingRate(Config.loramodule.codingRate4);
+    #ifdef HELTEC_V3
     state = radio.setOutputPower(Config.loramodule.power + 2); // values available: 10, 17, 22 --> if 20 in tracker_conf.json it will be updated to 22.
-
+    #endif
+    #ifdef ESP32_DIY_1W_LoRa_GPS
+    state = radio.setOutputPower(Config.loramodule.power); // max value 20 (when 20dB in setup 30dB in output as 400M30S has Low Noise Amp) 
+    #endif
     if (state == RADIOLIB_ERR_NONE) {
       Serial.println("init : LoRa Module    ...     done!");
     } else {
@@ -91,7 +99,7 @@ namespace LoRa_Utils {
     LoRa.write((const uint8_t *)newPacket.c_str(), newPacket.length());
     LoRa.endPacket();
     #endif
-    #ifdef HELTEC_V3
+    #if defined(HELTEC_V3) || defined(ESP32_DIY_1W_LoRa)
     int state = radio.transmit("\x3c\xff\x01" + newPacket);
     if (state == RADIOLIB_ERR_NONE) {
       //Serial.println(F("success!"));
@@ -132,7 +140,7 @@ namespace LoRa_Utils {
       freqError = LoRa.packetFrequencyError();
     }
     #endif
-    #ifdef HELTEC_V3
+    #if defined(HELTEC_V3) || defined(ESP32_DIY_1W_LoRa)
     if (transmissionFlag) {
       transmissionFlag = false;
       radio.startReceive();
@@ -166,7 +174,7 @@ namespace LoRa_Utils {
     #if defined(TTGO_T_LORA_V2_1) || defined(HELTEC_V2) || defined(ESP32_DIY_LoRa)
     LoRa.setFrequency(Config.loramodule.digirepeaterTxFreq);
     #endif
-    #ifdef HELTEC_V3
+    #if defined(HELTEC_V3) || defined(ESP32_DIY_1W_LoRa)
     float freq = (float)Config.loramodule.digirepeaterTxFreq/1000000;
     radio.setFrequency(freq);
     #endif
@@ -177,7 +185,7 @@ namespace LoRa_Utils {
     #if defined(TTGO_T_LORA_V2_1) || defined(HELTEC_V2) || defined(ESP32_DIY_LoRa)
     LoRa.setFrequency(Config.loramodule.digirepeaterRxFreq);
     #endif
-    #ifdef HELTEC_V3
+    #if defined(HELTEC_V3) || defined(ESP32_DIY_1W_LoRa)
     float freq = (float)Config.loramodule.digirepeaterRxFreq/1000000;
     radio.setFrequency(freq);
     #endif

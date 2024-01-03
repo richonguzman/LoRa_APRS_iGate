@@ -28,8 +28,21 @@
 #define RADIO_BUSY_PIN  13  // SX1262 BUSY
 #endif
 
+#ifdef ESP32_DIY_1W_LoRa    // Ebyte E22 400M30S
+#define RADIO_SCLK_PIN  18
+#define RADIO_MISO_PIN  19
+#define RADIO_MOSI_PIN  23
+#define RADIO_CS_PIN    5
+#define RADIO_RST_PIN   27
+#define RADIO_DIO1_PIN  12
+#define RADIO_BUSY_PIN  14
+#define RADIO_RXEN      32
+#define RADIO_TXEN      25
+#endif
+
+
 // OLED 
-#if defined(TTGO_T_LORA_V2_1) || defined(ESP32_DIY_LoRa)
+#if defined(TTGO_T_LORA_V2_1) || defined(ESP32_DIY_LoRa) || defined(ESP32_DIY_1W_LoRa)
 #define OLED_SDA    21
 #define OLED_SCL    22
 #define OLED_RESET  -1      // Reset pin # (or -1 if sharing Arduino reset pin)
@@ -55,7 +68,7 @@
 #ifdef HELTEC_V3
 #define internalLedPin  35
 #endif
-#ifdef ESP32_DIY_LoRa
+#if defined(ESP32_DIY_LoRa) || defined(ESP32_DIY_1W_LoRa)
 #define internalLedPin  2
 #endif
 

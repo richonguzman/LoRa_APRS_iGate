@@ -22,7 +22,7 @@ namespace BATTERY_Utils {
             #if defined(TTGO_T_LORA_V2_1) || defined(HELTEC_V2)
             sample = analogRead(batteryPin);
             #endif
-            #ifdef HELTEC_V3
+            #if defined(HELTEC_V3) || defined(ESP32_DIY_LoRa) || defined(ESP32_DIY_1W_LoRa)
             sample = 0;
             #endif
             sampleSum += sample;
