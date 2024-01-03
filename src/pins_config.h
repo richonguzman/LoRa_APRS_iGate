@@ -47,16 +47,16 @@
 #define OLED_RESET  21 
 #endif
 
-// Led and other stuff
+// Leds and other stuff
 #if defined(TTGO_T_LORA_V2_1) || defined(HELTEC_V2)
-#define internalLedPin    25      // Green Led
-#define batteryPin  35
+#define internalLedPin  25      // Green Led
+#define batteryPin      35
 #endif
 #ifdef HELTEC_V3
-#define internalLedPin    35
+#define internalLedPin  35
 #endif
 #ifdef ESP32_DIY_LoRa
-#define internalLedPin    2
+#define internalLedPin  2
 #endif
 
 

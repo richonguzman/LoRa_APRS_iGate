@@ -46,7 +46,7 @@ String firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seven
 
 void setup() {
   Serial.begin(115200);
-  #ifndef HELTEC_V3
+  #if defined(TTGO_T_LORA_V2_1) || defined(HELTEC_V2)
   pinMode(batteryPin, INPUT);
   #endif
   pinMode(internalLedPin, OUTPUT);

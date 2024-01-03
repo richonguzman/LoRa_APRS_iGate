@@ -28,7 +28,7 @@ namespace LoRa_Utils {
   }
 
   void setup() {
-    #if defined(TTGO_T_LORA_V2_1) || defined(HELTEC_V2)
+    #if defined(TTGO_T_LORA_V2_1) || defined(HELTEC_V2) || defined(ESP32_DIY_LoRa)
     SPI.begin(LORA_SCK, LORA_MISO, LORA_MOSI, LORA_CS);
     LoRa.setPins(LORA_CS, LORA_RST, LORA_IRQ);
     long freq;
@@ -79,7 +79,7 @@ namespace LoRa_Utils {
 
   void sendNewPacket(const String &typeOfMessage, const String &newPacket) {
     digitalWrite(internalLedPin,HIGH);
-    #if defined(TTGO_T_LORA_V2_1) || defined(HELTEC_V2)
+    #if defined(TTGO_T_LORA_V2_1) || defined(HELTEC_V2) || defined(ESP32_DIY_LoRa)
     LoRa.beginPacket();
     LoRa.write('<');
     if (typeOfMessage == "APRS")  {
@@ -120,7 +120,7 @@ namespace LoRa_Utils {
 
   String receivePacket() {
     String loraPacket = "";
-    #if defined(TTGO_T_LORA_V2_1) || defined(HELTEC_V2)
+    #if defined(TTGO_T_LORA_V2_1) || defined(HELTEC_V2) || defined(ESP32_DIY_LoRa)
     int packetSize = LoRa.parsePacket();
     if (packetSize) {
       while (LoRa.available()) {
@@ -163,7 +163,7 @@ namespace LoRa_Utils {
 
   void changeFreqTx() {
     delay(500);
-    #if defined(TTGO_T_LORA_V2_1) || defined(HELTEC_V2)
+    #if defined(TTGO_T_LORA_V2_1) || defined(HELTEC_V2) || defined(ESP32_DIY_LoRa)
     LoRa.setFrequency(Config.loramodule.digirepeaterTxFreq);
     #endif
     #ifdef HELTEC_V3
@@ -174,7 +174,7 @@ namespace LoRa_Utils {
 
   void changeFreqRx() {
     delay(500);
-    #if defined(TTGO_T_LORA_V2_1) || defined(HELTEC_V2)
+    #if defined(TTGO_T_LORA_V2_1) || defined(HELTEC_V2) || defined(ESP32_DIY_LoRa)
     LoRa.setFrequency(Config.loramodule.digirepeaterRxFreq);
     #endif
     #ifdef HELTEC_V3
