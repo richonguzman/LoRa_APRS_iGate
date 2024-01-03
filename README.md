@@ -60,7 +60,7 @@ ____________________________________________________
 ____________________________________________________
 ## Timeline (Versions):
 
-- 2024.01.03 Added support for T-Beam V1, V1.2, V1 + SX1268, V1.2 + SX1262.
+- 2024.01.03 Added support for Lilygo TTGO T-Beam V1, V1.2, V1 + SX1268, V1.2 + SX1262.
 - 2024.01.02 Added support for EByte 400M30S 1Watt LoRa module for DIY ESP32 iGate.
 - 2023.12.27 HELTEC V3 board support added.
 - 2023.12.26 Added BME680 module to BME/BMP280 modules supported.
