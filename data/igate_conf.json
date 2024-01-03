@@ -1,13 +1,13 @@
 {
-    "callsign": "CA2RXU-13",
+    "callsign": "NOCALL-10",
     "stationMode": 2,
     "iGateComment": "LoRa_APRS_iGate",
     "wifi": {
         "AP": [
-            {   "ssid": "Richon",
-                "password": "k4fPnmg5qnyf",
-                "latitude": -33.0437718,
-                "longitude": -71.5837141
+            {   "ssid": "WIFI_1",
+                "password": "wifi_1_password",
+                "latitude": 0.0000000,
+                "longitude": 0.0000000
             },
             {   "ssid": "WIFI_2",
                 "password": "wifi_2_password",
@@ -22,7 +22,7 @@
         "longitude": 0.0000000
     },
     "aprs_is": {
-        "passcode": "23204",
+        "passcode": "XYZVW",
         "server": "soam.aprs2.net",
         "port": 14580,
         "reportingDistance": 30
