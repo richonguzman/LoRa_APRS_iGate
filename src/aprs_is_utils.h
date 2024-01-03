@@ -7,12 +7,12 @@
 
 namespace APRS_IS_Utils {
 
-void connect();
-void checkStatus();
-String createPacket(String unprocessedPacket);
-void processLoRaPacket(String packet);
-void processAPRSISPacket(String packet);
-void loop();
+    void connect();
+    void checkStatus();
+    String createPacket(String unprocessedPacket);
+    void processLoRaPacket(String packet);
+    void processAPRSISPacket(String packet);
+    void loop();
 
 }
 

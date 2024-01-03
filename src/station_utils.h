@@ -5,11 +5,11 @@
 
 namespace STATION_Utils {
 
-void deleteNotHeard();
-void updateLastHeard(String station);
-bool wasHeard(String station);
-void checkBuffer();
-void updatePacketBuffer(String packet);
+    void deleteNotHeard();
+    void updateLastHeard(String station);
+    bool wasHeard(String station);
+    void checkBuffer();
+    void updatePacketBuffer(String packet);
 
 }
 

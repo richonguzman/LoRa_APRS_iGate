@@ -9,7 +9,7 @@
 #undef LORA_RST
 
 // LORA MODULES
-#if defined(TTGO_T_LORA_V2_1) || defined(HELTEC_V2)
+#if defined(TTGO_T_LORA_V2_1) || defined(HELTEC_V2) || defined(ESP32_DIY_LoRa)
 #define LORA_SCK    5       // GPIO5    - SX1276 SCK
 #define LORA_MISO   19      // GPIO19   - SX1276 MISO
 #define LORA_MOSI   27      // GPIO27   - SX1276 MOSI
@@ -29,7 +29,7 @@
 #endif
 
 // OLED 
-#ifdef TTGO_T_LORA_V2_1
+#if defined(TTGO_T_LORA_V2_1) || defined(ESP32_DIY_LoRa)
 #define OLED_SDA    21
 #define OLED_SCL    22
 #define OLED_RESET  -1      // Reset pin # (or -1 if sharing Arduino reset pin)
@@ -49,12 +49,16 @@
 
 // Led and other stuff
 #if defined(TTGO_T_LORA_V2_1) || defined(HELTEC_V2)
-#define greenLed    25      // Green Led
+#define internalLedPin    25      // Green Led
 #define batteryPin  35
 #endif
 #ifdef HELTEC_V3
-#define greenLed    35
+#define internalLedPin    35
 #endif
+#ifdef ESP32_DIY_LoRa
+#define internalLedPin    2
+#endif
+
 
 /* (Same pins for LILYGO LoRa32 and ESP32 Wroom Dev )
 SX1278-------------------> ESP32 ttgo-lora32-v21 and ESP32 WROOM Dev

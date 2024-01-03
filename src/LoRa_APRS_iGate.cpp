@@ -49,7 +49,7 @@ void setup() {
   #ifndef HELTEC_V3
   pinMode(batteryPin, INPUT);
   #endif
-  pinMode(greenLed, OUTPUT);
+  pinMode(internalLedPin, OUTPUT);
   if (Config.externalVoltageMeasurement) {
     pinMode(Config.externalVoltagePin, INPUT);
   }

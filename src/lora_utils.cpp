@@ -78,7 +78,7 @@ namespace LoRa_Utils {
   }
 
   void sendNewPacket(const String &typeOfMessage, const String &newPacket) {
-    digitalWrite(greenLed,HIGH);
+    digitalWrite(internalLedPin,HIGH);
     #if defined(TTGO_T_LORA_V2_1) || defined(HELTEC_V2)
     LoRa.beginPacket();
     LoRa.write('<');
@@ -104,7 +104,7 @@ namespace LoRa_Utils {
       Serial.println(state);
     }
     #endif
-    digitalWrite(greenLed,LOW);
+    digitalWrite(internalLedPin,LOW);
     SYSLOG_Utils::log("LoRa Tx", newPacket,0,0,0);
     Serial.print("---> LoRa Packet Tx    : ");
     Serial.println(newPacket);

@@ -81,10 +81,10 @@ namespace Utils {
 
     void setupDisplay() {
         setup_display();
-        digitalWrite(greenLed,HIGH);
+        digitalWrite(internalLedPin,HIGH);
         Serial.println("\nStarting iGate: " + Config.callsign + "   Version: " + versionDate);
         show_display(" LoRa APRS", "", "      ( iGATE )", "", "", "Richonguzman / CA2RXU", "      " + versionDate, 4000);
-        digitalWrite(greenLed,LOW);
+        digitalWrite(internalLedPin,LOW);
         firstLine   = Config.callsign;
         seventhLine = "     listening...";
     }

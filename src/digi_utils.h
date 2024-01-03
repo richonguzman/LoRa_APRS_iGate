@@ -5,8 +5,8 @@
 
 namespace DIGI_Utils {
 
-void processPacket(String packet);
-void loop();
+    void processPacket(String packet);
+    void loop();
 
 }
 
