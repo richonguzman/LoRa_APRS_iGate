@@ -155,7 +155,7 @@ namespace LoRa_Utils {
     #ifndef PinPointApp
     Serial.println("(RSSI:" +String(rssi) + " / SNR:" + String(snr) +  " / FreqErr:" + String(freqError) + ")");
     #endif
-    if (Config.syslog.active && (stationMode==1 || stationMode==2 || (stationMode==5 && WiFi.status()==WL_CONNECTED))) {
+    if (Config.syslog.active && (stationMode==1 || stationMode==2 || (stationMode==5 && WiFi.status()==WL_CONNECTED)) && loraPacket!="") {
       SYSLOG_Utils::log("LoRa Rx", loraPacket, rssi, snr, freqError);
     }
     return loraPacket;
