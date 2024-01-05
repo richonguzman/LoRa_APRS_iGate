@@ -47,10 +47,10 @@ String firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seven
 
 void setup() {
   Serial.begin(115200);
-  #if defined(TTGO_T_LORA_V2_1) || defined(HELTEC_V2)
+  #if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2)
   pinMode(batteryPin, INPUT);
   #endif
-  #if defined(TTGO_T_LORA_V2_1) || defined(HELTEC_V2) || defined(HELTEC_V3) || defined(ESP32_DIY_LoRa) || defined(ESP32_DIY_1W_LoRa)
+  #if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2) || defined(HELTEC_V3) || defined(ESP32_DIY_LoRa) || defined(ESP32_DIY_1W_LoRa)
   pinMode(internalLedPin, OUTPUT);
   #endif
   if (Config.externalVoltageMeasurement) {

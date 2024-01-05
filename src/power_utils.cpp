@@ -55,7 +55,7 @@ namespace POWER_Utils {
   }
 
   bool begin(TwoWire &port) {
-    #if defined (TTGO_T_LORA_V2_1) || defined(HELTEC_V2) || defined(ESP32_DIY_LoRa) || defined(HELTEC_V3) || defined(ESP32_DIY_1W_LoRa)
+    #if defined (TTGO_T_LORA32_V2_1) || defined(HELTEC_V2) || defined(ESP32_DIY_LoRa) || defined(HELTEC_V3) || defined(ESP32_DIY_1W_LoRa)
     return true;
     #endif
 
@@ -88,6 +88,8 @@ namespace POWER_Utils {
       PMU.disableDLDO2();
       PMU.setDC1Voltage(3300);
       PMU.enableDC1();
+      PMU.setButtonBatteryChargeVoltage(3300);
+      PMU.enableButtonBatteryCharge();
       PMU.disableIRQ(XPOWERS_AXP2101_ALL_IRQ);
     }
     return result;
@@ -104,7 +106,6 @@ namespace POWER_Utils {
       Serial.println("AXP192 init failed!");
     }
     activateLoRa();
-    //activateGPS();
     activateMeasurement();
     PMU.setChargerTerminationCurr(XPOWERS_AXP192_CHG_ITERM_LESS_10_PERCENT);
     PMU.setChargeTargetVoltage(XPOWERS_AXP192_CHG_VOL_4V2);
@@ -120,7 +121,6 @@ namespace POWER_Utils {
       Serial.println("AXP2101 init failed!");
     }
     activateLoRa();
-    //activateGPS();
     activateMeasurement();
     PMU.setPrechargeCurr(XPOWERS_AXP2101_PRECHARGE_200MA);
     PMU.setChargerTerminationCurr(XPOWERS_AXP2101_CHG_ITERM_25MA);
@@ -131,7 +131,7 @@ namespace POWER_Utils {
   }
 
   /*void lowerCpuFrequency() {
-    #if defined(TTGO_T_Beam_V1_0) || defined(TTGO_T_Beam_V1_0_SX1268) || defined(TTGO_T_Beam_V1_2) || defined(ESP32_DIY_LoRa_GPS) || defined(TTGO_T_LORA_V2_1_GPS) || defined(TTGO_T_LORA_V2_1_TNC) || defined(ESP32_DIY_1W_LoRa_GPS) || defined(TTGO_T_Beam_V1_2_SX1262)
+    #if defined(TTGO_T_Beam_V1_0) || defined(TTGO_T_Beam_V1_0_SX1268) || defined(TTGO_T_Beam_V1_2) || defined(ESP32_DIY_LoRa_GPS) || defined(TTGO_T_LORA32_V2_1_GPS) || defined(TTGO_T_LORA32_V2_1_TNC) || defined(ESP32_DIY_1W_LoRa_GPS) || defined(TTGO_T_Beam_V1_2_SX1262)
     if (setCpuFrequencyMhz(80)) {
       logger.log(logging::LoggerLevel::LOGGER_LEVEL_INFO, "Main", "CPU frequency set to 80MHz");
     } else {

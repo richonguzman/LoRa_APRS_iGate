@@ -9,7 +9,7 @@
 
 
 // LORA MODULES
-#if defined(TTGO_T_LORA_V2_1) || defined(HELTEC_V2) || defined(ESP32_DIY_LoRa)
+#if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2) || defined(ESP32_DIY_LoRa)
 #undef LORA_RST
 #define LORA_SCK    5       // GPIO5    - SX1276 SCK
 #define LORA_MISO   19      // GPIO19   - SX1276 MISO
@@ -54,7 +54,7 @@
 
 
 // OLED 
-#if defined(TTGO_T_LORA_V2_1) || defined(ESP32_DIY_LoRa) || defined(ESP32_DIY_1W_LoRa) || defined(TTGO_T_Beam_V1_0) || defined(TTGO_T_Beam_V1_2) || defined(TTGO_T_Beam_V1_0_SX1268) || defined(TTGO_T_Beam_V1_2_SX1262)
+#if defined(TTGO_T_LORA32_V2_1) || defined(ESP32_DIY_LoRa) || defined(ESP32_DIY_1W_LoRa) || defined(TTGO_T_Beam_V1_0) || defined(TTGO_T_Beam_V1_2) || defined(TTGO_T_Beam_V1_0_SX1268) || defined(TTGO_T_Beam_V1_2_SX1262)
 #define OLED_SDA    21
 #define OLED_SCL    22
 #define OLED_RESET  -1      // Reset pin # (or -1 if sharing Arduino reset pin)
@@ -73,7 +73,7 @@
 #endif
 
 // Leds and other stuff
-#if defined(TTGO_T_LORA_V2_1) || defined(HELTEC_V2)
+#if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2)
 #define internalLedPin  25      // Green Led
 #define batteryPin      35
 #endif
