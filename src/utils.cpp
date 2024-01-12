@@ -116,12 +116,12 @@ namespace Utils {
             if (Config.bme.active) {
                 String sensorData = BME_Utils::readDataSensor();
                 beaconPacket = iGateBeaconPacket.substring(0,iGateBeaconPacket.indexOf(":=")+20) + "_" + sensorData + iGateBeaconPacket.substring(iGateBeaconPacket.indexOf(":=")+21) + " + WX";
-                if (Config.igateLoRaBeacon && stationMode!=1) {
+                if (Config.igateSendsLoRaBeacons && stationMode!=1) {
                     secondaryBeaconPacket = iGateLoRaBeaconPacket + sensorData + Config.iGateComment + " + WX";
                 }
             } else {
                 beaconPacket = iGateBeaconPacket;
-                if (Config.igateLoRaBeacon && stationMode!=1) {
+                if (Config.igateSendsLoRaBeacons && stationMode!=1) {
                     secondaryBeaconPacket = iGateLoRaBeaconPacket + Config.iGateComment;
                 }
             }
@@ -150,7 +150,7 @@ namespace Utils {
                 }
                 seventhLine = "     listening...";
                 espClient.write((beaconPacket + "\n").c_str());
-                if (Config.igateLoRaBeacon && stationMode==2) { 
+                if (Config.igateSendsLoRaBeacons && stationMode==2) { 
                     LoRa_Utils::sendNewPacket("APRS", secondaryBeaconPacket);
                 }
                 show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
@@ -202,7 +202,7 @@ namespace Utils {
                     }
                     seventhLine = "     listening...";
                     espClient.write((beaconPacket + "\n").c_str());
-                    if (Config.igateLoRaBeacon) { 
+                    if (Config.igateSendsLoRaBeacons) { 
                         LoRa_Utils::sendNewPacket("APRS", secondaryBeaconPacket);
                     }
                     show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);

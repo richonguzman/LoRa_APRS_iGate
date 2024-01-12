@@ -73,7 +73,7 @@ public:
   int                   stationMode;
   String                iGateComment;
   int                   beaconInterval;
-  bool                  igateLoRaBeacon;
+  bool                  igateSendsLoRaBeacons;
   bool                  igateRepeatsLoRaPackets;
   int                   rememberStationTime;
   bool                  sendBatteryVoltage;
