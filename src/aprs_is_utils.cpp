@@ -156,6 +156,7 @@ namespace APRS_IS_Utils {
     }
   }
 
+  // We should take care of this page : https://aprs-is.net/IGateDetails.aspx
   void processAPRSISPacket(String packet) {
     String Sender, Message, Addressee, receivedMessage;
     if (!packet.isEmpty() && !packet.startsWith("#")){
@@ -213,7 +214,7 @@ namespace APRS_IS_Utils {
         }
         show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
       }
-      else if (!(Addressee.indexOf("qAX") != -1 || Addressee.indexOf("RFONLY") != -1 || Addressee.indexOf("NOGATE") != -1 || Addressee.indexOf("TCPXX") != -1)) {
+      else if (Addressee.indexOf("qAX") == -1 && Addressee.indexOf("RFONLY") == -1 && Addressee.indexOf("NOGATE") == -1 && Addressee.indexOf("TCPXX") == -1) {
           if ((stationMode==2 || stationMode==5) && STATION_Utils::hasHeardSomeone()) {
               LoRa_Utils::sendNewPacket("APRS", LoRa_Utils::generatePacketSameContent(packet));
               display_toggle(true);
