@@ -107,6 +107,19 @@ namespace GPS_Utils {
     return beaconPacket;
   }
 
+  String generateiGateLoRaBeacon() {
+    String stationLatitude, stationLongitude, beaconPacket;
+    stationLatitude = processLatitudeAPRS(currentWiFi->latitude);
+    stationLongitude = processLongitudeAPRS(currentWiFi->longitude);
+    beaconPacket = Config.callsign + ">APLRG1,RFONLY:=" + stationLatitude + "L" + stationLongitude;
+    if (Config.bme.active) {
+      beaconPacket += "_";
+    } else {
+      beaconPacket += "a";
+    }
+    return beaconPacket;
+  }
+
   double calculateDistanceTo(double latitude, double longitude) {
     return TinyGPSPlus::distanceBetween(currentWiFi->latitude,currentWiFi->longitude, latitude, longitude) / 1000.0;
   }

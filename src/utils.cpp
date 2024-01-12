@@ -34,6 +34,7 @@ extern uint32_t             lastScreenOn;
 extern bool                 beaconUpdate;
 extern int                  stationMode;
 extern String               iGateBeaconPacket;
+extern String               iGateLoRaBeaconPacket;
 extern std::vector<String>  lastHeardStation;
 extern int                  rssi;
 extern float                snr;
@@ -103,7 +104,7 @@ namespace Utils {
 
     void checkBeaconInterval() {
         uint32_t lastTx = millis() - lastBeaconTx;
-        String beaconPacket;
+        String beaconPacket, secondaryBeaconPacket;
         if (lastTx >= Config.beaconInterval*60*1000) {
             beaconUpdate = true;    
         }
@@ -113,9 +114,16 @@ namespace Utils {
             STATION_Utils::deleteNotHeard();
             activeStations();
             if (Config.bme.active) {
-                beaconPacket = iGateBeaconPacket.substring(0,iGateBeaconPacket.indexOf(":=")+20) + "_" + BME_Utils::readDataSensor() + iGateBeaconPacket.substring(iGateBeaconPacket.indexOf(":=")+21) + " + WX";
+                String sensorData = BME_Utils::readDataSensor();
+                beaconPacket = iGateBeaconPacket.substring(0,iGateBeaconPacket.indexOf(":=")+20) + "_" + sensorData + iGateBeaconPacket.substring(iGateBeaconPacket.indexOf(":=")+21) + " + WX";
+                if (Config.igateLoRaBeacon) {
+                    secondaryBeaconPacket = iGateLoRaBeaconPacket + sensorData + Config.iGateComment + " + WX";
+                }
             } else {
                 beaconPacket = iGateBeaconPacket;
+                if (Config.igateLoRaBeacon) {
+                    secondaryBeaconPacket = iGateLoRaBeaconPacket + Config.iGateComment;
+                }
             }
             #if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2)
             if (Config.sendBatteryVoltage) {
@@ -142,6 +150,9 @@ namespace Utils {
                 }
                 seventhLine = "     listening...";
                 espClient.write((beaconPacket + "\n").c_str());
+                if (Config.igateLoRaBeacon) { 
+                    LoRa_Utils::sendNewPacket("APRS", secondaryBeaconPacket);
+                }
                 show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
             } else if (stationMode==3 || stationMode==4) {
                 String Rx = String(Config.loramodule.digirepeaterRxFreq);

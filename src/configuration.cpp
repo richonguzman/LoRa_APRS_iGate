@@ -35,6 +35,8 @@ void Configuration::readFile(fs::FS &fs, const char *fileName) {
     stationMode                     = data["stationMode"].as<int>();
     iGateComment                    = data["iGateComment"].as<String>();
     beaconInterval                  = data["other"]["beaconInterval"].as<int>();
+    igateLoRaBeacon                 = data["other"]["igateLoRaBeacon"].as<bool>();
+    igateRepeatsLoRaPackets         = data["other"]["igateRepeatsLoRaPackets"].as<bool>();
     rememberStationTime             = data["other"]["rememberStationTime"].as<int>();
     sendBatteryVoltage              = data["other"]["sendBatteryVoltage"].as<bool>();
     externalVoltageMeasurement      = data["other"]["externalVoltageMeasurement"].as<bool>();

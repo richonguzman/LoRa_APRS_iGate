@@ -9,6 +9,7 @@ namespace GPS_Utils {
     String processLatitudeAPRS();
     String processLongitudeAPRS();
     String generateBeacon();
+    String generateiGateLoRaBeacon();
     double calculateDistanceCourse(double latitude, double longitude);
     String decodeEncodedGPS(String packet);
     String getReceivedGPS(String packet);

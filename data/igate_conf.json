@@ -1,18 +1,18 @@
 {
-    "callsign": "NOCALL-10",
+    "callsign": "CA2RXU-11",
     "stationMode": 2,
     "iGateComment": "LoRa_APRS_iGate",
     "wifi": {
         "AP": [
-            {   "ssid": "WIFI_1",
-                "password": "wifi_1_password",
-                "latitude": 0.0000000,
-                "longitude": 0.0000000
+            {   "ssid": "Richon",
+                "password": "k4fPnmg5qnyf",
+                "latitude": -33.0337718,
+                "longitude": -71.5737141
             },
-            {   "ssid": "WIFI_2",
-                "password": "wifi_2_password",
-                "latitude": 0.0000000,
-                "longitude": 0.0000000
+            {   "ssid": "Jimenita",
+                "password": "mg6wyMhqRnxk",
+                "latitude": -33.0312492,
+                "longitude": -71.5796215
             }
         ]
     },
@@ -22,7 +22,7 @@
         "longitude": 0.0000000
     },
     "aprs_is": {
-        "passcode": "XYZVW",
+        "passcode": "23204",
         "server": "soam.aprs2.net",
         "port": 14580,
         "reportingDistance": 30
@@ -55,6 +55,8 @@
     },
     "other": {
         "beaconInterval": 15,
+        "igateLoRaBeacon": true,
+        "igateRepeatsLoRaPackets": true,
         "rememberStationTime": 30,
         "sendBatteryVoltage": false,
         "externalVoltageMeasurement" : false,

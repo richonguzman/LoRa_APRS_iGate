@@ -20,7 +20,7 @@
 Configuration   Config;
 WiFiClient      espClient;
 
-String          versionDate           = "2024.01.05";
+String          versionDate           = "2024.01.11";
 int             myWiFiAPIndex         = 0;
 int             myWiFiAPSize          = Config.wifiAPs.size();
 WiFi_AP         *currentWiFi          = &Config.wifiAPs[myWiFiAPIndex];
@@ -43,7 +43,7 @@ std::vector<String> lastHeardStation_temp;
 std::vector<String> packetBuffer;
 std::vector<String> packetBuffer_temp;
 
-String firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, iGateBeaconPacket;
+String firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, iGateBeaconPacket, iGateLoRaBeaconPacket;
 
 void setup() {
   Serial.begin(115200);
@@ -65,6 +65,7 @@ void setup() {
   LoRa_Utils::setup();
   Utils::validateDigiFreqs();
   iGateBeaconPacket = GPS_Utils::generateBeacon();
+  iGateLoRaBeaconPacket = GPS_Utils::generateiGateLoRaBeacon();
   //Utils::startServer();
   SYSLOG_Utils::setup();
   BME_Utils::setup();
