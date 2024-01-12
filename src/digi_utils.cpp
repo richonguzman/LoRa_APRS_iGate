@@ -25,6 +25,34 @@ extern String           seventhLine;
 
 namespace DIGI_Utils {
 
+    String generateDigiRepeatedPacket(String packet, String callsign) {
+        String sender, temp0, tocall, path;
+        sender = packet.substring(0,packet.indexOf(">"));
+        temp0 = packet.substring(packet.indexOf(">")+1,packet.indexOf(":"));
+        if (temp0.indexOf(",") > 2) {
+            tocall = temp0.substring(0,temp0.indexOf(","));
+            path = temp0.substring(temp0.indexOf(",")+1,temp0.indexOf(":"));
+            if (path.indexOf("WIDE1-")>=0) {
+                String hop = path.substring(path.indexOf("WIDE1-")+6, path.indexOf("WIDE1-")+7);
+                if (hop.toInt()>=1 && hop.toInt()<=7) {
+                    if (hop.toInt()==1) {
+                        path.replace("WIDE1-1", callsign + "*");
+                    } else {
+                        path.replace("WIDE1-" + hop , callsign + "*,WIDE1-" + String(hop.toInt()-1));
+                    }
+                    String repeatedPacket = sender + ">" + tocall + "," + path + packet.substring(packet.indexOf(":"));
+                    return repeatedPacket;
+                } else {
+                    return "X";
+                }
+            } else {
+                return "X";
+            }
+        } else {
+            return "X";
+        }
+    }
+
     void processPacket(String packet) {
         String loraPacket;
         if (packet != "") {
@@ -35,24 +63,17 @@ namespace DIGI_Utils {
                 STATION_Utils::updateLastHeard(sender);
                 STATION_Utils::updatePacketBuffer(packet);
                 Utils::typeOfPacket(packet, "Digi");
-                if ((stationMode==3 || stationMode==5 || stationMode==6) && (packet.indexOf("WIDE1-1") > 10)) { // ver lo de WIDE para sM=6
-                    if (stationMode==6 && ((WiFi.status()==WL_CONNECTED) && espClient.connected())) {
-                        espClient.write(APRS_IS_Utils::createPacket(packet).c_str());
-                        Serial.print("(Uploaded to APRS-IS)");
-                    }
-                    if (stationMode==6) {
-                        loraPacket = packet.substring(3) + " test sM6";
-                        delay(5000);
-                    } else { 
-                        loraPacket = packet.substring(3);
+                if ((stationMode==3 || stationMode==5) && (packet.indexOf("WIDE1-") > 10)) {
+                    loraPacket = generateDigiRepeatedPacket(packet.substring(3), Config.callsign);
+                    if (loraPacket != "X") {
                         delay(500);
+                        Serial.println(loraPacket);
+                        LoRa_Utils::sendNewPacket("APRS", loraPacket);
+                        display_toggle(true);
+                        lastScreenOn = millis();
                     }
-                    loraPacket.replace("WIDE1-1", Config.callsign + "*");
-                    LoRa_Utils::sendNewPacket("APRS", loraPacket);
-                    display_toggle(true);
-                    lastScreenOn = millis();
                 } else if (stationMode==4){
-                    if (packet.indexOf("WIDE1-1") == -1) {
+                    if (packet.indexOf("WIDE1-") == -1) {
                         loraPacket = packet.substring(3,packet.indexOf(":")) + "," + Config.callsign + "*" + packet.substring(packet.indexOf(":"));
                     } else {
                         loraPacket = packet.substring(3,packet.indexOf(",")+1) + Config.callsign + "*" + packet.substring(packet.indexOf(","));
@@ -84,21 +105,6 @@ namespace DIGI_Utils {
                 secondLine += " Tx:" + String(Tx.substring(0,3)) + "." + String(Tx.substring(3,6));
                 thirdLine = "<<   DigiRepeater  >>";
             }
-            Utils::checkDisplayInterval();
-            Utils::checkBeaconInterval();
-            show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
-            processPacket(LoRa_Utils::receivePacket());
-        } else if (stationMode==6) {
-            if (WiFi.status() != WL_CONNECTED) {
-                WIFI_Utils::startWiFi();
-            }
-            if (!espClient.connected()) {
-                APRS_IS_Utils::connect();
-            }
-            String Tx = String(Config.loramodule.digirepeaterTxFreq);
-            secondLine = "Rx:" + String(Tx.substring(0,3)) + "." + String(Tx.substring(3,6));
-            secondLine += " Tx:" + String(Tx.substring(0,3)) + "." + String(Tx.substring(3,6));
-            thirdLine = "<<   Digi + iGate  >>";
             Utils::checkDisplayInterval();
             Utils::checkBeaconInterval();
             show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);

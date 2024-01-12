@@ -5,6 +5,7 @@
 #include "station_utils.h"
 #include "query_utils.h"
 #include "lora_utils.h"
+#include "digi_utils.h"
 #include "display.h"
 #include "utils.h"
 
@@ -95,43 +96,48 @@ namespace APRS_IS_Utils {
       #else
       Serial.print("Received Lora Packet   : " + String(packet));
       #endif    
-      if ((packet.substring(0, 3) == "\x3c\xff\x01") && (packet.indexOf("TCPIP") == -1) && (packet.indexOf("NOGATE") == -1) && (packet.indexOf("RFONLY") == -1)) {
+      if ((packet.substring(0,3) == "\x3c\xff\x01") && (packet.indexOf("TCPIP") == -1) && (packet.indexOf("NOGATE") == -1) && (packet.indexOf("RFONLY") == -1)) {
         #ifndef PinPointApp
         Serial.print("   ---> APRS LoRa Packet!");
         #endif
         Sender = packet.substring(3,packet.indexOf(">"));
         if (Sender != Config.callsign) {   // avoid listening yourself by digirepeating
-          if (stationMode==2 || stationMode==5) {
-            if (packet.indexOf("::") > 10) {    // its a Message!
-              AddresseeAndMessage = packet.substring(packet.indexOf("::")+2);  
-              Addressee = AddresseeAndMessage.substring(0,AddresseeAndMessage.indexOf(":"));
-              Addressee.trim();
-              if (Addressee == Config.callsign) {             // its for me!                     
-                if (AddresseeAndMessage.indexOf("{")>0) {     // ack?
-                  ackMessage = "ack" + AddresseeAndMessage.substring(AddresseeAndMessage.indexOf("{")+1);
-                  ackMessage.trim();
-                  delay(4000);
-                  //Serial.println(ackMessage);
-                  for(int i = Sender.length(); i < 9; i++) {
-                    Sender += ' ';
-                  }
-                  LoRa_Utils::sendNewPacket("APRS", Config.callsign + ">APLRG1,RFONLY,WIDE1-1::" + Sender + ":" + ackMessage);
-                  receivedMessage = AddresseeAndMessage.substring(AddresseeAndMessage.indexOf(":")+1, AddresseeAndMessage.indexOf("{"));
-                } else {
-                  receivedMessage = AddresseeAndMessage.substring(AddresseeAndMessage.indexOf(":")+1);
-                }
-                if (receivedMessage.indexOf("?") == 0) {
-                  queryMessage = true;
-                  delay(2000);
-                  if (!Config.display.alwaysOn) {
-                    display_toggle(true);
-                  }
-                  LoRa_Utils::sendNewPacket("APRS", QUERY_Utils::process(receivedMessage, Sender, "LoRa"));
-                  lastScreenOn = millis();
-                  show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, "Callsign = " + Sender, "TYPE --> QUERY",  0);
-                }
-              }
+          AddresseeAndMessage = packet.substring(packet.indexOf("::")+2);  
+          Addressee = AddresseeAndMessage.substring(0,AddresseeAndMessage.indexOf(":"));
+          Addressee.trim();
+
+          if (stationMode!=1 && Config.igateRepeatsLoRaPackets && Addressee != Config.callsign) { // if its not for me
+            String digiRepeatedPacket = DIGI_Utils::generateDigiRepeatedPacket(packet.substring(3), Config.callsign);
+            if (digiRepeatedPacket != "X") {
+              delay(500);
+              LoRa_Utils::sendNewPacket("APRS", digiRepeatedPacket);
             }
+          }
+                    
+          if (packet.indexOf("::") > 10 && Addressee == Config.callsign) {      // its a message for me!                     
+              if (AddresseeAndMessage.indexOf("{")>0) {     // ack?
+                ackMessage = "ack" + AddresseeAndMessage.substring(AddresseeAndMessage.indexOf("{")+1);
+                ackMessage.trim();
+                delay(4000);
+                //Serial.println(ackMessage);
+                for(int i = Sender.length(); i < 9; i++) {
+                  Sender += ' ';
+                }
+                LoRa_Utils::sendNewPacket("APRS", Config.callsign + ">APLRG1,RFONLY,WIDE1-1::" + Sender + ":" + ackMessage);
+                receivedMessage = AddresseeAndMessage.substring(AddresseeAndMessage.indexOf(":")+1, AddresseeAndMessage.indexOf("{"));
+              } else {
+                receivedMessage = AddresseeAndMessage.substring(AddresseeAndMessage.indexOf(":")+1);
+              }
+              if (receivedMessage.indexOf("?") == 0) {
+                queryMessage = true;
+                delay(2000);
+                if (!Config.display.alwaysOn) {
+                  display_toggle(true);
+                }
+                LoRa_Utils::sendNewPacket("APRS", QUERY_Utils::process(receivedMessage, Sender, "LoRa"));
+                lastScreenOn = millis();
+                show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, "Callsign = " + Sender, "TYPE --> QUERY",  0);
+              }
           }
           if (!queryMessage) {
             aprsPacket = createPacket(packet);

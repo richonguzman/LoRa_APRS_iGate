@@ -4,21 +4,28 @@
 #include <Arduino.h>
 #include <Adafruit_Sensor.h>
 
-//#define BMPSensor // uncoment this line if BMP280 Module is connected instead of BME280
+#define BME280Sensor        // its set by default but you should comment it with "//"
+//#define BMP280Sensor      // and delete "//" from the one you want to use.
+//#define BME680Sensor
 
-#ifndef BMPSensor
+#ifdef BME280Sensor
 #include <Adafruit_BME280.h>
-#else
+#endif
+#ifdef BMP280Sensor
 #include <Adafruit_BMP280.h>
+#endif
+#ifdef BME680Sensor
+#include <Adafruit_BME680.h>
 #endif
 
 namespace BME_Utils {
 
 void setup();
-String generateTempString(float bmeTemp);
-String generateHumString(float bmeHum);
-String generatePresString(float bmePress);
-String readDataSensor();
+
+    String generateTempString(float bmeTemp);
+    String generateHumString(float bmeHum);
+    String generatePresString(float bmePress);
+    String readDataSensor();
 
 }
 

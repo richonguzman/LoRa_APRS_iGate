@@ -5,8 +5,8 @@
 
 namespace BATTERY_Utils {
 
-float checkBattery();
-float checkExternalVoltage();
+    float checkBattery();
+    float checkExternalVoltage();
 
 }
 

@@ -37,7 +37,7 @@ But under the hood is much more:
 - RX first, TX will only be done if there is no traffic on the frequency.
 - automatic update of the Lora symbol at APRS-IS, black "L" for pure RX, red "L" for TX capability, green star "L" for digipeater and blue round "L" for WX iGate.
 - support for multiple WLAN with corresponding coordinates.
-- support for BME280 sensors, sending to WX data to APRS-IS.
+- support for BME/BMP280 and BME680 sensors, sending to WX data to APRS-IS.
 
 and more will come:
 - Web-UI
@@ -60,9 +60,15 @@ ____________________________________________________
 ____________________________________________________
 ## Timeline (Versions):
 
+- 2024.01.12 Added iGate Mode to also repeat packets (like a iGate+DigiRepeater) in stationMode 2 and 5.
+- 2024.01.11 Added iGate Mode to enable APRS-IS and LoRa beacon report at the same time.
+- 2024.01.05 Added support for Lilygo TTGO T-Beam V1, V1.2, V1 + SX1268, V1.2 + SX1262.
+- 2024.01.02 Added support for EByte 400M30S 1Watt LoRa module for DIY ESP32 iGate.
+- 2023.12.27 HELTEC V3 board support added. Thanks Luc ON2ON.
+- 2023.12.26 Added BME680 module to BME/BMP280 modules supported.
 - 2023.12.20 Updated to ElegantOTA v.3 (AsyncElegantOTA was deprecated).
 - 2023.12.07 MIC-E process and syslog added.
-- 2023.12.06 Heltec V2 support added.
+- 2023.12.06 HELTEC V2 board support added.
 - 2023.11.26 Small correction to enable Syslog in stationMode5.
 - 2023.10.09 Added "WIDE1-1" to Tx packets from iGate to be *repeated* by Digirepeaters.
 - 2023.10.09 Added Support also for BMP280 module.

@@ -5,8 +5,9 @@
 
 namespace DIGI_Utils {
 
-void processPacket(String packet);
-void loop();
+    String generateDigiRepeatedPacket(String packet, String callsign);
+    void processPacket(String packet);
+    void loop();
 
 }
 

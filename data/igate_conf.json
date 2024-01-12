@@ -5,12 +5,12 @@
     "wifi": {
         "AP": [
             {   "ssid": "WIFI_1",
-                "password": "wifi_1_password",
+                "password": "WIFI_1_password",
                 "latitude": 0.0000000,
                 "longitude": 0.0000000
             },
             {   "ssid": "WIFI_2",
-                "password": "wifi_2_password",
+                "password": "WIFI_2_password",
                 "latitude": 0.0000000,
                 "longitude": 0.0000000
             }
@@ -22,8 +22,8 @@
         "longitude": 0.0000000
     },
     "aprs_is": {
-        "passcode": "XYZWV",
-        "server": "soam.aprs2.net",
+        "passcode": "XYZVW",
+        "server": "rotate.aprs2.net",
         "port": 14580,
         "reportingDistance": 30
     },
@@ -55,6 +55,8 @@
     },
     "other": {
         "beaconInterval": 15,
+        "igateSendsLoRaBeacons": false,
+        "igateRepeatsLoRaPackets": false,
         "rememberStationTime": 30,
         "sendBatteryVoltage": false,
         "externalVoltageMeasurement" : false,
