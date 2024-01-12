@@ -25,11 +25,9 @@ namespace WIFI_Utils {
 
   void startWiFi() {
     int wifiCounter = 0;
-    if (stationMode!=6) {
-      WiFi.mode(WIFI_STA);
-      WiFi.disconnect();
-      delay(500);
-    }
+    WiFi.mode(WIFI_STA);
+    WiFi.disconnect();
+    delay(500);
     unsigned long start = millis();
     show_display("", "", "Connecting to Wifi:", "", currentWiFi->ssid + " ...", 0);
     Serial.print("\nConnecting to WiFi '"); Serial.print(currentWiFi->ssid); Serial.println("' ...");
@@ -48,7 +46,7 @@ namespace WIFI_Utils {
         delay(1000);
         if(myWiFiAPIndex >= (myWiFiAPSize-1)) {
           myWiFiAPIndex = 0;
-          if (stationMode==5 || stationMode==6) {
+          if (stationMode==5) {
             wifiCounter++;
           }
         } else {
@@ -94,10 +92,6 @@ namespace WIFI_Utils {
       btStop();
     } else if (stationMode==5) {
       Serial.println("stationMode ---> iGate when Wifi/APRS available (DigiRepeater when not)");
-    } else if (stationMode==6) {
-      Serial.println("stationMode ---> Digirepeater with iGate capabilities (when WiFi available)");
-      WiFi.mode(WIFI_STA);
-      WiFi.disconnect();
     } else { 
       Serial.println("stationMode ---> NOT VALID, check '/data/igate_conf.json'");
       show_display("------- ERROR -------", "stationMode Not Valid", "change it on : /data/", "igate_conf.json", 0);

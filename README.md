@@ -60,6 +60,8 @@ ____________________________________________________
 ____________________________________________________
 ## Timeline (Versions):
 
+- 2024.01.12 Added iGate Mode to also repeat packets (like a iGate+DigiRepeater) in stationMode 2 and 5.
+- 2024.01.11 Added iGate Mode to enable APRS-IS and LoRa beacon report at the same time.
 - 2024.01.05 Added support for Lilygo TTGO T-Beam V1, V1.2, V1 + SX1268, V1.2 + SX1262.
 - 2024.01.02 Added support for EByte 400M30S 1Watt LoRa module for DIY ESP32 iGate.
 - 2023.12.27 HELTEC V3 board support added. Thanks Luc ON2ON.

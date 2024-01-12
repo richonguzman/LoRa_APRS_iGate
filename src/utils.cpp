@@ -116,12 +116,12 @@ namespace Utils {
             if (Config.bme.active) {
                 String sensorData = BME_Utils::readDataSensor();
                 beaconPacket = iGateBeaconPacket.substring(0,iGateBeaconPacket.indexOf(":=")+20) + "_" + sensorData + iGateBeaconPacket.substring(iGateBeaconPacket.indexOf(":=")+21) + " + WX";
-                if (Config.igateLoRaBeacon) {
+                if (Config.igateLoRaBeacon && stationMode!=1) {
                     secondaryBeaconPacket = iGateLoRaBeaconPacket + sensorData + Config.iGateComment + " + WX";
                 }
             } else {
                 beaconPacket = iGateBeaconPacket;
-                if (Config.igateLoRaBeacon) {
+                if (Config.igateLoRaBeacon && stationMode!=1) {
                     secondaryBeaconPacket = iGateLoRaBeaconPacket + Config.iGateComment;
                 }
             }
@@ -150,7 +150,7 @@ namespace Utils {
                 }
                 seventhLine = "     listening...";
                 espClient.write((beaconPacket + "\n").c_str());
-                if (Config.igateLoRaBeacon) { 
+                if (Config.igateLoRaBeacon && stationMode==2) { 
                     LoRa_Utils::sendNewPacket("APRS", secondaryBeaconPacket);
                 }
                 show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
@@ -202,6 +202,9 @@ namespace Utils {
                     }
                     seventhLine = "     listening...";
                     espClient.write((beaconPacket + "\n").c_str());
+                    if (Config.igateLoRaBeacon) { 
+                        LoRa_Utils::sendNewPacket("APRS", secondaryBeaconPacket);
+                    }
                     show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
                 } else {
                     show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING iGate BEACON", 0);
@@ -216,32 +219,6 @@ namespace Utils {
                     seventhLine = "     listening...";
                     LoRa_Utils::sendNewPacket("APRS", beaconPacket);
                 }
-            } else if (stationMode==6) {
-                /* si hay wifi 
-                secondLine muestra wifistatus
-                else
-                secondLine = freq digi*/
-                thirdLine = "<<   Digi + iGate  >>";
-                fifthLine = "";
-                sixthLine = "";
-                
-                show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING iGate BEACON", 0);
-                #if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2)
-                if (Config.sendBatteryVoltage) { 
-                    sixthLine = "     (Batt=" + String(BATTERY_Utils::checkBattery(),2) + "V)";
-                }
-                #endif
-                if (Config.externalVoltageMeasurement) { 
-                    sixthLine = "    (Ext V=" + String(BATTERY_Utils::checkExternalVoltage(),2) + "V)";
-                }
-                seventhLine = "     listening...";
-
-                if (stationMode==6 && ((WiFi.status()==WL_CONNECTED) && espClient.connected())) {
-                    espClient.write((beaconPacket + "\n").c_str());
-                    Serial.println("---> Uploaded to APRS-IS");
-                }
-                LoRa_Utils::sendNewPacket("APRS", beaconPacket);
-                show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
             }
             lastBeaconTx = millis();
             lastScreenOn = millis();
