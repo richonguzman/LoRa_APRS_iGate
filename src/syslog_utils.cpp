@@ -48,7 +48,7 @@ namespace SYSLOG_Utils {
                 }
             } else if (type == "LoRa Tx") {
                 if (packet.indexOf("RFONLY") > 10) {
-                    syslogPacket += type + " / RFONLY / " + packet.substring(packet.indexOf("::")+2);
+                    syslogPacket += type + " / RFONLY / " + packet;
                 } else if (packet.indexOf("::") > 10) {
                     syslogPacket += type + " / MESSAGE / " + packet.substring(0,packet.indexOf(">")) + " ---> " + packet.substring(packet.indexOf("::")+2);
                 } else {
