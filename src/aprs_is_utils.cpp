@@ -84,13 +84,13 @@ namespace APRS_IS_Utils {
     bool queryMessage = false;
     String aprsPacket, Sender, AddresseeAndMessage, Addressee, ackMessage, receivedMessage;
     if (packet != "") {
-      #ifdef PinPointApp
+      #ifdef TextSerialOutputForApp
       Serial.println(packet.substring(3));
       #else
       Serial.print("Received Lora Packet   : " + String(packet));
       #endif    
       if ((packet.substring(0,3) == "\x3c\xff\x01") && (packet.indexOf("TCPIP") == -1) && (packet.indexOf("NOGATE") == -1) && (packet.indexOf("RFONLY") == -1)) {
-        #ifndef PinPointApp
+        #ifndef TextSerialOutputForApp
         Serial.print("   ---> APRS LoRa Packet!");
         #endif
         Sender = packet.substring(3,packet.indexOf(">"));
@@ -139,7 +139,7 @@ namespace APRS_IS_Utils {
             }
             lastScreenOn = millis();
             espClient.write(aprsPacket.c_str());
-            #ifndef PinPointApp
+            #ifndef TextSerialOutputForApp
             Serial.println("   ---> Uploaded to APRS-IS");
             #endif
             STATION_Utils::updateLastHeard(Sender);
@@ -148,7 +148,7 @@ namespace APRS_IS_Utils {
           }
         }    
       } else {
-        #ifndef PinPointApp
+        #ifndef TextSerialOutputForApp
         Serial.println("   ---> LoRa Packet Ignored (first 3 bytes or TCPIP/NOGATE/RFONLY)\n");
         #endif
       }
@@ -179,7 +179,7 @@ namespace APRS_IS_Utils {
             receivedMessage = AddresseeAndMessage.substring(AddresseeAndMessage.indexOf(":")+1);
           }
           if (receivedMessage.indexOf("?") == 0) {
-            #ifndef PinPointApp
+            #ifndef TextSerialOutputForApp
             Serial.println("Received Query APRS-IS : " + packet);
             #endif
             String queryAnswer = QUERY_Utils::process(receivedMessage, Sender, "APRSIS");
@@ -199,7 +199,7 @@ namespace APRS_IS_Utils {
             seventhLine = "QUERY = " + receivedMessage;
           }
         } else {
-          #ifndef PinPointApp
+          #ifndef TextSerialOutputForApp
           Serial.print("Received from APRS-IS  : " + packet);
           #endif
           if ((stationMode==2 || stationMode==5) && STATION_Utils::wasHeard(Addressee)) {

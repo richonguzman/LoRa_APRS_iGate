@@ -3,7 +3,12 @@
 
 #include <Arduino.h>
 
-//#define PinPointApp //uncomment this line when using PinPoint App ( https://www.pinpointaprs.com )
+
+//#define TextSerialOutputForApp
+/*  uncomment the previous line to get text from Serial-Output over USB into PC for:
+    - PinPoint App ( https://www.pinpointaprs.com )
+    - APRSIS32 App ( http://aprsisce.wikidot.com )
+*/
 
 namespace APRS_IS_Utils {
 

@@ -60,6 +60,7 @@ ____________________________________________________
 ____________________________________________________
 ## Timeline (Versions):
 
+- 2024.01.19 TextSerialOutputForApp added to get text from Serial-Output over USB into PC for PinPoint App (https://www.pinpointaprs.com) and APRSIS32 App (http://aprsisce.wikidot.com)
 - 2024.01.12 Added iGate Mode to also repeat packets (like a iGate+DigiRepeater) in stationMode 2 and 5.
 - 2024.01.11 Added iGate Mode to enable APRS-IS and LoRa beacon report at the same time.
 - 2024.01.05 Added support for Lilygo TTGO T-Beam V1, V1.2, V1 + SX1268, V1.2 + SX1262.
@@ -72,7 +73,6 @@ ____________________________________________________
 - 2023.11.26 Small correction to enable Syslog in stationMode5.
 - 2023.10.09 Added "WIDE1-1" to Tx packets from iGate to be *repeated* by Digirepeaters.
 - 2023.10.09 Added Support also for BMP280 module.
-- 2023.10.08 Added Serial Comunication with PinPoint APRS app (https://www.pinpointaprs.com)
 - 2023.08.20 Added External Voltage Measurement (Max 15V!)
 - 2023.08.05 Ground Height Correction for Pressure readings added.
 - 2023.07.31 StationMode5 added: iGate when WiFi and APRS available, DigiRepeater when not.

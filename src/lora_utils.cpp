@@ -167,7 +167,7 @@ namespace LoRa_Utils {
       }
     }
     #endif
-    #ifndef PinPointApp
+    #ifndef TextSerialOutputForApp
     if (loraPacket!="") {
       Serial.println("(RSSI:" +String(rssi) + " / SNR:" + String(snr) +  " / FreqErr:" + String(freqError) + ")");
     }

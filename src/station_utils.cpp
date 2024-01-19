@@ -46,7 +46,7 @@ namespace STATION_Utils {
     }
     fourthLine += String(lastHeardStation.size());
 
-    #ifndef PinPointApp  ////// This is just for debugging
+    #ifndef TextSerialOutputForApp  ////// This is just for debugging
     Serial.print("Stations Near (last " + String(Config.rememberStationTime) + " minutes): ");
     for (int k=0; k<lastHeardStation.size(); k++) {
       Serial.print(lastHeardStation[k].substring(0,lastHeardStation[k].indexOf(","))); Serial.print(" ");
