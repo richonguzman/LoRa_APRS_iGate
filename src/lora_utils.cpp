@@ -120,7 +120,7 @@ namespace LoRa_Utils {
     #if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2) || defined(HELTEC_V3) || defined(ESP32_DIY_LoRa) || defined(ESP32_DIY_1W_LoRa)
     digitalWrite(internalLedPin,LOW);
     #endif
-    SYSLOG_Utils::log("LoRa Tx", newPacket,0,0,0);
+    SYSLOG_Utils::log("Tx", newPacket,0,0,0);
     Serial.print("---> LoRa Packet Tx    : ");
     Serial.println(newPacket);
   }
@@ -173,7 +173,7 @@ namespace LoRa_Utils {
     }
     #endif
     if (Config.syslog.active && (stationMode==1 || stationMode==2 || (stationMode==5 && WiFi.status()==WL_CONNECTED)) && loraPacket!="") {
-      SYSLOG_Utils::log("LoRa Rx", loraPacket, rssi, snr, freqError);
+      SYSLOG_Utils::log("Rx", loraPacket, rssi, snr, freqError);
     }
     return loraPacket;
   }
