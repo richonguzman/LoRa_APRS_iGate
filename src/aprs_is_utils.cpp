@@ -3,6 +3,7 @@
 #include "configuration.h"
 #include "aprs_is_utils.h"
 #include "station_utils.h"
+#include "syslog_utils.h"
 #include "query_utils.h"
 #include "lora_utils.h"
 #include "digi_utils.h"
@@ -190,6 +191,7 @@ namespace APRS_IS_Utils {
             lastScreenOn = millis();
             delay(500);
             espClient.write(queryAnswer.c_str());
+            SYSLOG_Utils::log("APRSIS Tx", queryAnswer,0,0,0);
             fifthLine = "APRS-IS ----> APRS-IS";
             sixthLine = Config.callsign;
             for (int j=sixthLine.length();j<9;j++) {
