@@ -29,7 +29,7 @@ namespace SYSLOG_Utils {
                     if (packet.indexOf("WIDE1-1") > 10) {
                         syslogPacket += packet.substring(packet.indexOf(">")+1,packet.indexOf(",")) + " / WIDE1-1 / ";
                     } else {
-                        syslogPacket += packet.substring(packet.indexOf(">")+1,packet.indexOf(":")) + " / _ / ";
+                        syslogPacket += packet.substring(packet.indexOf(">")+1,packet.indexOf(":")) + " / - / ";
                     }
                     syslogPacket += String(rssi) + "dBm / " + String(snr) + "dB / " + String(freqError) + "Hz / " +  GPS_Utils::getDistance(packet);
                 } else if (packet.indexOf(":>") > 10) {
