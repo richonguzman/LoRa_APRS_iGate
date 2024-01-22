@@ -12,7 +12,7 @@ WiFiUDP udpClient;
 namespace SYSLOG_Utils {
 
     void log(String type, String packet, int rssi, float snr, int freqError) {
-        String syslogPacket = "<165>1 - " + Config.callsign + " CA2RXU_LoRa_iGate 1.2" + " - - - "; //RFC5424 The Syslog Protocol
+        String syslogPacket = "<165>1 - " + Config.callsign + " CA2RXU_LoRa_iGate_1.2" + " - - - "; //RFC5424 The Syslog Protocol
         if (Config.syslog.active && (stationMode==1 || stationMode==2 || (stationMode==5 && WiFi.status()==WL_CONNECTED))) {
             if (type == "APRSIS Tx") {
                 if (packet.indexOf(":>") > 10) {
