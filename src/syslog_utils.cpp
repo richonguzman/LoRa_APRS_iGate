@@ -16,7 +16,9 @@ namespace SYSLOG_Utils {
         if (Config.syslog.active && (stationMode==1 || stationMode==2 || (stationMode==5 && WiFi.status()==WL_CONNECTED))) {
             if (type == "APRSIS Tx") {
                 if (packet.indexOf(":>") > 10) {
-                    syslogPacket += type + " / StartUp STATUS / " + packet.substring(packet.indexOf(":>")+2);
+                    syslogPacket += type + " / StartUp_Status / " + packet.substring(packet.indexOf(":>")+2);
+                } else {
+                    syslogPacket += type + " / QUERY / " + packet;
                 }
             } else if (type == "Rx") {
                 if (packet.indexOf("::") > 10) {
