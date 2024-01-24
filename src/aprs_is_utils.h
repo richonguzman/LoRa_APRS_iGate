@@ -12,6 +12,7 @@
 
 namespace APRS_IS_Utils {
 
+    void upload(String line);
     void connect();
     void checkStatus();
     String createPacket(String unprocessedPacket);
