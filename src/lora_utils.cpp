@@ -133,6 +133,20 @@ namespace LoRa_Utils {
     return firstPart + ",TCPIP,WIDE1-1," + Config.callsign + "::" + messagePart;
   }
 
+  String packetSanitization(String packet) {
+    Serial.println(packet);
+    if (packet.indexOf("\0")>0) {
+      packet.replace("\0","000");
+    }
+    if (packet.indexOf("\r")>0) {
+      packet.replace("\r","RRR");
+    }
+    if (packet.indexOf("\n")>0) {
+      packet.replace("\n","NNN");
+    }
+    return packet;
+  }
+
   String receivePacket() {
     String loraPacket = "";
     #if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2) || defined(ESP32_DIY_LoRa) || defined(TTGO_T_Beam_V1_0) || defined(TTGO_T_Beam_V1_2)
@@ -167,6 +181,9 @@ namespace LoRa_Utils {
       }
     }
     #endif
+    if ((loraPacket.indexOf("\0")!=-1) || (loraPacket.indexOf("\r")!=-1) || (loraPacket.indexOf("\n")!=-1)) {
+      loraPacket = packetSanitization(loraPacket);
+    }
     #ifndef TextSerialOutputForApp
     if (loraPacket!="") {
       Serial.println("(RSSI:" +String(rssi) + " / SNR:" + String(snr) +  " / FreqErr:" + String(freqError) + ")");
