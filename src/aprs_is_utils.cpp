@@ -27,7 +27,7 @@ extern String         seventhLine;
 namespace APRS_IS_Utils {
 
   void upload(String line) {
-    espClient.println(line + "\r");
+    espClient.print(line + "\r\n");
   }
 
   void connect(){
