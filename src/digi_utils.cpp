@@ -10,7 +10,6 @@
 #include "utils.h"
 
 extern Configuration    Config;
-//extern WiFiClient       espClient;
 extern int              stationMode;
 extern uint32_t         lastScreenOn;
 extern int              lastStationModeState;
