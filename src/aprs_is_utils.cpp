@@ -27,7 +27,7 @@ extern String         seventhLine;
 namespace APRS_IS_Utils {
 
   void upload(String line) {
-    espClient.write((line + "\r\n").c_str());
+    espClient.print(line + "\r");
   }
 
   void connect(){
@@ -50,7 +50,6 @@ namespace APRS_IS_Utils {
       Serial.println("Connected!\n(Server: " + String(Config.aprs_is.server) + " / Port: " + String(Config.aprs_is.port) +")");
       aprsauth = "user " + Config.callsign + " pass " + Config.aprs_is.passcode + " vers CA2RXU_LoRa_iGate 1.2 filter t/m/" + Config.callsign + "/" + (String)Config.aprs_is.reportingDistance;// + "\r\n"; 
       upload(aprsauth);
-      //espClient.write(aprsauth.c_str());
       delay(200);
     }
   }
@@ -145,7 +144,6 @@ namespace APRS_IS_Utils {
             }
             lastScreenOn = millis();
             upload(aprsPacket);
-            //espClient.write(aprsPacket.c_str());
             #ifndef TextSerialOutputForApp
             Serial.println("   ---> Uploaded to APRS-IS");
             #endif
@@ -181,7 +179,6 @@ namespace APRS_IS_Utils {
             }
             String ackPacket = Config.callsign + ">APLRG1,TCPIP,qAC::" + Sender + ":" + ackMessage;// + "\n";
             upload(ackPacket);
-            //espClient.write(ackPacket.c_str());
             receivedMessage = AddresseeAndMessage.substring(AddresseeAndMessage.indexOf(":")+1, AddresseeAndMessage.indexOf("{"));
           } else {
             receivedMessage = AddresseeAndMessage.substring(AddresseeAndMessage.indexOf(":")+1);
@@ -198,7 +195,6 @@ namespace APRS_IS_Utils {
             lastScreenOn = millis();
             delay(500);
             upload(queryAnswer);
-            //espClient.write(queryAnswer.c_str());
             SYSLOG_Utils::log("APRSIS Tx", queryAnswer,0,0,0);
             fifthLine = "APRS-IS ----> APRS-IS";
             sixthLine = Config.callsign;
