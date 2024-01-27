@@ -61,7 +61,6 @@ namespace Utils {
             delay(1000);
             status += ",qAC:>https://github.com/richonguzman/LoRa_APRS_iGate " + versionDate;
             APRS_IS_Utils::upload(status);
-            //espClient.write((status + "\n").c_str());
             SYSLOG_Utils::log("APRSIS Tx", status,0,0,0);
         } else {
             delay(5000);
@@ -151,7 +150,6 @@ namespace Utils {
                 }
                 seventhLine = "     listening...";
                 APRS_IS_Utils::upload(beaconPacket);
-                //espClient.write((beaconPacket + "\n").c_str());
                 if (Config.igateSendsLoRaBeacons && stationMode==2) { 
                     LoRa_Utils::sendNewPacket("APRS", secondaryBeaconPacket);
                 }
@@ -204,7 +202,6 @@ namespace Utils {
                     }
                     seventhLine = "     listening...";
                     APRS_IS_Utils::upload(beaconPacket);
-                    //espClient.write((beaconPacket + "\n").c_str());
                     if (Config.igateSendsLoRaBeacons) { 
                         LoRa_Utils::sendNewPacket("APRS", secondaryBeaconPacket);
                     }
