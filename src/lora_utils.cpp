@@ -27,13 +27,13 @@ float snr;
 namespace LoRa_Utils {
 
   void setFlag(void) {
-    #if defined(HELTEC_V3) || defined(ESP32_DIY_1W_LoRa) || defined(TTGO_T_Beam_V1_0_SX1268) || defined(TTGO_T_Beam_V1_2_SX1262)
+    #ifdef HAS_SX126X
     transmissionFlag = true;
     #endif
   }
 
   void setup() {
-    #if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2) || defined(ESP32_DIY_LoRa) || defined(TTGO_T_Beam_V1_0) || defined(TTGO_T_Beam_V1_2)
+    #ifdef HAS_SX127X
     SPI.begin(LORA_SCK, LORA_MISO, LORA_MOSI, LORA_CS);
     LoRa.setPins(LORA_CS, LORA_RST, LORA_IRQ);
     long freq;
@@ -56,7 +56,7 @@ namespace LoRa_Utils {
     LoRa.setTxPower(Config.loramodule.power);
     Serial.print("init : LoRa Module    ...     done!");
     #endif
-    #if defined(HELTEC_V3) || defined(ESP32_DIY_1W_LoRa) || defined(TTGO_T_Beam_V1_0_SX1268) || defined(TTGO_T_Beam_V1_2_SX1262)
+    #ifdef HAS_SX126X
     SPI.begin(RADIO_SCLK_PIN, RADIO_MISO_PIN, RADIO_MOSI_PIN);
     float freq = (float)Config.loramodule.iGateFreq/1000000;
     int state = radio.begin(freq);
@@ -92,7 +92,7 @@ namespace LoRa_Utils {
     #if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2) || defined(HELTEC_V3) || defined(ESP32_DIY_LoRa) || defined(ESP32_DIY_1W_LoRa)
     digitalWrite(internalLedPin,HIGH);
     #endif
-    #if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2) || defined(ESP32_DIY_LoRa) || defined(TTGO_T_Beam_V1_0) || defined(TTGO_T_Beam_V1_2)
+    #ifdef HAS_SX127X
     LoRa.beginPacket();
     LoRa.write('<');
     if (typeOfMessage == "APRS")  {
@@ -104,7 +104,7 @@ namespace LoRa_Utils {
     LoRa.write((const uint8_t *)newPacket.c_str(), newPacket.length());
     LoRa.endPacket();
     #endif
-    #if defined(HELTEC_V3) || defined(ESP32_DIY_1W_LoRa) || defined(TTGO_T_Beam_V1_0_SX1268) || defined(TTGO_T_Beam_V1_2_SX1262)
+    #ifdef HAS_SX126X
     int state = radio.transmit("\x3c\xff\x01" + newPacket);
     if (state == RADIOLIB_ERR_NONE) {
       //Serial.println(F("success!"));
@@ -149,7 +149,7 @@ namespace LoRa_Utils {
 
   String receivePacket() {
     String loraPacket = "";
-    #if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2) || defined(ESP32_DIY_LoRa) || defined(TTGO_T_Beam_V1_0) || defined(TTGO_T_Beam_V1_2)
+    #ifdef HAS_SX127X
     int packetSize = LoRa.parsePacket();
     if (packetSize) {
       while (LoRa.available()) {
@@ -161,7 +161,7 @@ namespace LoRa_Utils {
       freqError = LoRa.packetFrequencyError();
     }
     #endif
-    #if defined(HELTEC_V3) || defined(ESP32_DIY_1W_LoRa) || defined(TTGO_T_Beam_V1_0_SX1268) || defined(TTGO_T_Beam_V1_2_SX1262)
+    #ifdef HAS_SX126X
     if (transmissionFlag) {
       transmissionFlag = false;
       radio.startReceive();
@@ -181,9 +181,11 @@ namespace LoRa_Utils {
       }
     }
     #endif
+    // // // // // //
     if ((loraPacket.indexOf("\0")!=-1) || (loraPacket.indexOf("\r")!=-1) || (loraPacket.indexOf("\n")!=-1)) {
       loraPacket = packetSanitization(loraPacket);
     }
+    // // // // // //
     #ifndef TextSerialOutputForApp
     if (loraPacket!="") {
       Serial.println("(RSSI:" +String(rssi) + " / SNR:" + String(snr) +  " / FreqErr:" + String(freqError) + ")");
@@ -197,10 +199,10 @@ namespace LoRa_Utils {
 
   void changeFreqTx() {
     delay(500);
-    #if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2) || defined(ESP32_DIY_LoRa) || defined(TTGO_T_Beam_V1_0) || defined(TTGO_T_Beam_V1_2)
+    #ifdef HAS_SX127X
     LoRa.setFrequency(Config.loramodule.digirepeaterTxFreq);
     #endif
-    #if defined(HELTEC_V3) || defined(ESP32_DIY_1W_LoRa) || defined(TTGO_T_Beam_V1_0_SX1268) || defined(TTGO_T_Beam_V1_2_SX1262)
+    #ifdef HAS_SX126X
     float freq = (float)Config.loramodule.digirepeaterTxFreq/1000000;
     radio.setFrequency(freq);
     #endif
@@ -208,10 +210,10 @@ namespace LoRa_Utils {
 
   void changeFreqRx() {
     delay(500);
-    #if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2) || defined(ESP32_DIY_LoRa) || defined(TTGO_T_Beam_V1_0) || defined(TTGO_T_Beam_V1_2)
+    #ifdef HAS_SX127X
     LoRa.setFrequency(Config.loramodule.digirepeaterRxFreq);
     #endif
-    #if defined(HELTEC_V3) || defined(ESP32_DIY_1W_LoRa) || defined(TTGO_T_Beam_V1_0_SX1268) || defined(TTGO_T_Beam_V1_2_SX1262)
+    #ifdef HAS_SX126X
     float freq = (float)Config.loramodule.digirepeaterRxFreq/1000000;
     radio.setFrequency(freq);
     #endif

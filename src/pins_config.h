@@ -7,6 +7,21 @@
 #undef OLED_SCL
 #undef OLED_RST
 
+#if defined(HELTEC_V3) || defined(ESP32_DIY_1W_LoRa) || defined(TTGO_T_Beam_V1_0_SX1268) || defined(TTGO_T_Beam_V1_2_SX1262)
+#define HAS_SX126X
+#endif
+
+#if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2) || defined(ESP32_DIY_LoRa) || defined(TTGO_T_Beam_V1_0) || defined(TTGO_T_Beam_V1_2)
+#define HAS_SX127X
+#endif
+
+#if defined(TTGO_T_Beam_V1_0) || defined(TTGO_T_Beam_V1_0_SX1268)
+#define HAS_AXP192
+#endif
+
+#if defined(TTGO_T_Beam_V1_2) || defined(TTGO_T_Beam_V1_2_SX1262)
+#define HAS_AXP2101
+#endif
 
 // LORA MODULES
 #if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2) || defined(ESP32_DIY_LoRa)

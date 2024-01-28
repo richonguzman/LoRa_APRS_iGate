@@ -2,16 +2,16 @@
 #include "power_utils.h"
 #include "pins_config.h"
 
-#if defined(TTGO_T_Beam_V1_0) || defined(TTGO_T_Beam_V1_0_SX1268) || defined(TTGO_T_Beam_V1_2) || defined(TTGO_T_Beam_V1_2_SX1262)
+#if defined(HAS_AXP192) || defined(HAS_AXP2101)
 #define I2C_SDA 21
 #define I2C_SCL 22
 #define IRQ_PIN 35
 #endif
 
-#if defined(TTGO_T_Beam_V1_0) || defined(TTGO_T_Beam_V1_0_SX1268)
+#ifdef HAS_AXP192
 XPowersAXP192 PMU;
 #endif
-#if defined(TTGO_T_Beam_V1_2) || defined(TTGO_T_Beam_V1_2_SX1262)
+#ifdef HAS_AXP2101
 XPowersAXP2101 PMU;
 #endif
 
@@ -25,7 +25,7 @@ namespace POWER_Utils {
   String batteryChargeDischargeCurrent = "";
 
   void activateMeasurement() {
-    #if defined(TTGO_T_Beam_V1_0) || defined(TTGO_T_Beam_V1_0_SX1268) || defined(TTGO_T_Beam_V1_2) || defined(TTGO_T_Beam_V1_2_SX1262)
+    #if defined(HAS_AXP192) || defined(HAS_AXP2101)
     PMU.disableTSPinMeasure();
     PMU.enableBattDetection();
     PMU.enableVbusVoltageMeasure();
@@ -35,21 +35,21 @@ namespace POWER_Utils {
   }
 
   void activateLoRa() {
-    #if defined(TTGO_T_Beam_V1_0) || defined(TTGO_T_Beam_V1_0_SX1268)
+    #ifdef HAS_AXP192
     PMU.setLDO2Voltage(3300);
     PMU.enableLDO2();
     #endif
-    #if defined(TTGO_T_Beam_V1_2) || defined(TTGO_T_Beam_V1_2_SX1262)
+    #ifdef HAS_AXP2101
     PMU.setALDO2Voltage(3300);
     PMU.enableALDO2();
     #endif
   }
 
   void deactivateLoRa() {
-    #if defined(TTGO_T_Beam_V1_0) || defined(TTGO_T_Beam_V1_0_SX1268)
+    #ifdef HAS_AXP192
     PMU.disableLDO2();
     #endif
-    #if defined(TTGO_T_Beam_V1_2) || defined(TTGO_T_Beam_V1_2_SX1262)
+    #ifdef HAS_AXP2101
     PMU.disableALDO2();
     #endif
   }
@@ -59,7 +59,7 @@ namespace POWER_Utils {
     return true;
     #endif
 
-    #if defined(TTGO_T_Beam_V1_0) || defined(TTGO_T_Beam_V1_0_SX1268)
+    #ifdef HAS_AXP192
     bool result = PMU.begin(Wire, AXP192_SLAVE_ADDRESS, I2C_SDA, I2C_SCL);
     if (result) {
       PMU.disableDC2();
@@ -73,7 +73,7 @@ namespace POWER_Utils {
     return result;
     #endif
 
-    #if defined(TTGO_T_Beam_V1_2) || defined(TTGO_T_Beam_V1_2_SX1262)
+    #ifdef HAS_AXP2101
     bool result = PMU.begin(Wire, AXP2101_SLAVE_ADDRESS, I2C_SDA, I2C_SCL);
     if (result) {
       PMU.disableDC2();
@@ -98,7 +98,7 @@ namespace POWER_Utils {
 
   void setup() {
     Wire.end();
-    #if defined(TTGO_T_Beam_V1_0) || defined(TTGO_T_Beam_V1_0_SX1268)
+    #ifdef HAS_AXP192
     Wire.begin(SDA, SCL);
     if (begin(Wire)) {
       Serial.println("AXP192 init done!");
@@ -113,7 +113,7 @@ namespace POWER_Utils {
     PMU.setSysPowerDownVoltage(2600);
     #endif
 
-    #if defined(TTGO_T_Beam_V1_2) || defined(TTGO_T_Beam_V1_2_SX1262)
+    #ifdef HAS_AXP2101
     Wire.begin(SDA, SCL);
     if (begin(Wire)) {
       Serial.println("AXP2101 init done!");
