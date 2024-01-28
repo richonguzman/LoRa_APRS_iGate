@@ -1,6 +1,6 @@
-/*#include <ESPAsyncWebServer.h>
+#include <ESPAsyncWebServer.h>
 #include <ElegantOTA.h>
-#include <AsyncTCP.h>*/
+#include <AsyncTCP.h>
 #include <SPIFFS.h>
 #include <WiFi.h>
 #include "configuration.h"
@@ -16,7 +16,7 @@
 #include "display.h"
 #include "utils.h"
 
-//AsyncWebServer  server(80);
+AsyncWebServer  server(80);
 
 extern WiFiClient           espClient;
 extern Configuration        Config;
@@ -51,9 +51,9 @@ unsigned long ota_progress_millis = 0;
 
 namespace Utils {
 
-    /*void notFound(AsyncWebServerRequest *request) {
+    void notFound(AsyncWebServerRequest *request) {
         request->send(404, "text/plain", "Not found");
-    }*/
+    }
 
     void processStatus() {
         String status = Config.callsign + ">APLRG1,WIDE1-1";
@@ -318,7 +318,7 @@ namespace Utils {
         }
     }
 
-    /*void onOTAStart() {
+    void onOTAStart() {
         Serial.println("OTA update started!");
         display_toggle(true);
         lastScreenOn = millis();
@@ -346,8 +346,8 @@ namespace Utils {
             show_display("", "", " OTA update fail!", "", "", "", "", 4000);
         }
     }
-    */
-    /*void startServer() {
+    
+    void startServer() {
         if (stationMode==1 || stationMode==2 || (stationMode==5 && WiFi.status()==WL_CONNECTED)) {
             server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
                 request->send(200, "text/plain", "Hi " + Config.callsign + ", \n\nthis is your (Richonguzman/CA2RXU) LoRa APRS iGate , version " + versionDate + "\n\nTo update your firmware or filesystem go to: http://" + getLocalIP().substring(getLocalIP().indexOf(":")+3) + "/update\n\n\n73!");
@@ -395,6 +395,6 @@ namespace Utils {
             server.begin();
             Serial.println("init : OTA Server     ...     done!");            
         }
-    }*/
+    }
 
 }

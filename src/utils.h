@@ -14,10 +14,10 @@ namespace Utils {
     void checkWiFiInterval();
     void validateDigiFreqs();
     void typeOfPacket(String packet, String packetType);
-    /*void onOTAStart();
+    void onOTAStart();
     void onOTAProgress(size_t current, size_t final);
     void onOTAEnd(bool success);
-    void startServer();*/
+    void startServer();
 
 }
 
