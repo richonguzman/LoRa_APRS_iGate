@@ -1,7 +1,3 @@
-#include <ESPAsyncWebServer.h>
-#include <ElegantOTA.h>
-#include <AsyncTCP.h>
-#include <SPIFFS.h>
 #include <WiFi.h>
 #include "configuration.h"
 #include "station_utils.h"
@@ -15,8 +11,6 @@
 #include "bme_utils.h"
 #include "display.h"
 #include "utils.h"
-
-AsyncWebServer  server(80);
 
 extern WiFiClient           espClient;
 extern Configuration        Config;
@@ -40,20 +34,12 @@ extern int                  rssi;
 extern float                snr;
 extern int                  freqError;
 extern String               distance;
-extern String               versionDate;
 extern uint32_t             lastWiFiCheck;
 extern bool                 WiFiConnect;
+extern bool                 WiFiConnected;
 
-String name;
-String email;
-
-unsigned long ota_progress_millis = 0;
 
 namespace Utils {
-
-    void notFound(AsyncWebServerRequest *request) {
-        request->send(404, "text/plain", "Not found");
-    }
 
     void processStatus() {
         String status = Config.callsign + ">APLRG1,WIDE1-1";
@@ -77,7 +63,11 @@ namespace Utils {
     }
 
     String getLocalIP() {
-        return "IP :  " + String(WiFi.localIP()[0]) + "." + String(WiFi.localIP()[1]) + "." + String(WiFi.localIP()[2]) + "." + String(WiFi.localIP()[3]);
+        if (!WiFiConnected) {
+            return "IP : 192.168.4.1";
+        } else {
+            return "IP :  " + String(WiFi.localIP()[0]) + "." + String(WiFi.localIP()[1]) + "." + String(WiFi.localIP()[2]) + "." + String(WiFi.localIP()[3]);
+        }        
     }
 
     void setupDisplay() {
@@ -85,8 +75,8 @@ namespace Utils {
         #if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2) || defined(HELTEC_V3) || defined(ESP32_DIY_LoRa) || defined(ESP32_DIY_1W_LoRa)
         digitalWrite(internalLedPin,HIGH);
         #endif
-        Serial.println("\nStarting iGate: " + Config.callsign + "   Version: " + versionDate);
-        show_display(" LoRa APRS", "", "      ( iGATE )", "", "", "Richonguzman / CA2RXU", "      " + versionDate, 4000);
+        Serial.println("\nStarting Station: " + Config.callsign + "   Version: " + versionDate);
+        show_display(" LoRa APRS", "", "   ( iGATE & Digi )", "", "", "Richonguzman / CA2RXU", "      " + versionDate, 4000);
         #if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2) || defined(HELTEC_V3) || defined(ESP32_DIY_LoRa) || defined(ESP32_DIY_1W_LoRa)
         digitalWrite(internalLedPin,LOW);
         #endif
@@ -254,9 +244,11 @@ namespace Utils {
     void validateDigiFreqs() {
         if (stationMode==4) {
             if (abs(Config.loramodule.digirepeaterTxFreq - Config.loramodule.digirepeaterRxFreq) < 125000) {
-                Serial.println("Tx Freq less than 125kHz from Rx Freq ---> NOT VALID, check 'data/igate_conf.json'");
-                show_display("Tx Freq is less than ", "125kHz from Rx Freq", "change it on : /data/", "igate_conf.json", 0);
-                while (1);
+                Serial.println("Tx Freq less than 125kHz from Rx Freq ---> NOT VALID");
+                show_display("Tx Freq is less than ", "125kHz from Rx Freq", "device will autofix", "and then reboot", 1000);
+                Config.loramodule.digirepeaterTxFreq = Config.loramodule.digirepeaterRxFreq;        // Inform about that but then change the digirepeaterTxFreq to digirepeaterRxFreq and reset the device
+                Config.writeFile();
+                ESP.restart();
             }
         }
     }
@@ -315,85 +307,6 @@ namespace Utils {
         } else {
             sixthLine = sender + "> ??????????";
             seventhLine = "RSSI:" + String(rssi) + "dBm SNR: " + String(snr) + "dBm";
-        }
-    }
-
-    void onOTAStart() {
-        Serial.println("OTA update started!");
-        display_toggle(true);
-        lastScreenOn = millis();
-        show_display("", "", "", " OTA update started!", "", "", "", 1000);
-    }
-
-    void onOTAProgress(size_t current, size_t final) {
-        if (millis() - ota_progress_millis > 1000) {
-            display_toggle(true);
-            lastScreenOn = millis();
-            ota_progress_millis = millis();
-            Serial.printf("OTA Progress Current: %u bytes, Final: %u bytes\n", current, final);
-            show_display("", "", "  OTA Progress : " + String((current*100)/final) + "%", "", "", "", "", 100);
-        }
-    }
-
-    void onOTAEnd(bool success) {
-        display_toggle(true);
-        lastScreenOn = millis();
-        if (success) {
-            Serial.println("OTA update finished successfully!");
-            show_display("", "", " OTA update success!", "", "    Rebooting ...", "", "", 4000);
-        } else {
-            Serial.println("There was an error during OTA update!");
-            show_display("", "", " OTA update fail!", "", "", "", "", 4000);
-        }
-    }
-    
-    void startServer() {
-        if (stationMode==1 || stationMode==2 || (stationMode==5 && WiFi.status()==WL_CONNECTED)) {
-            server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
-                request->send(200, "text/plain", "Hi " + Config.callsign + ", \n\nthis is your (Richonguzman/CA2RXU) LoRa APRS iGate , version " + versionDate + "\n\nTo update your firmware or filesystem go to: http://" + getLocalIP().substring(getLocalIP().indexOf(":")+3) + "/update\n\n\n73!");
-            });
-
-            server.on("/test", HTTP_GET, [](AsyncWebServerRequest *request) {
-                request->send(SPIFFS, "/test_info_1.html", "text/html");//"application/json");
-            });
-
-            server.on("/test2", HTTP_GET, [](AsyncWebServerRequest *request) {
-                request->send(SPIFFS, "/test1.html", "text/html");
-            });
-
-            if (Config.ota.username != ""  && Config.ota.password != "") {
-                ElegantOTA.begin(&server, Config.ota.username.c_str(), Config.ota.password.c_str());
-            } else {
-                ElegantOTA.begin(&server);
-            }
-            ElegantOTA.setAutoReboot(true);
-            ElegantOTA.onStart(onOTAStart);
-            ElegantOTA.onProgress(onOTAProgress);
-            ElegantOTA.onEnd(onOTAEnd);
-
-            server.on("/process_form.php", HTTP_POST, [](AsyncWebServerRequest *request){
-                String message;
-
-                if (request->hasParam("email", true) && request->hasParam("name", true)) {
-                    email = request->getParam("email", true)->value();
-                    name = request->getParam("name", true)->value();
-                    
-                    String responseMessage = "Received EMAIL: " + email + ", NAME: " + name;
-
-                    // Assuming you're sending an HTTP response, for example, in an HTTP server context
-                    request->send(200, "text/plain", responseMessage);
-                } else {
-                    // Handle the case where one or both parameters are missing
-                    request->send(400, "text/plain", "Both EMAIL and NAME parameters are required.");
-                }
-            });
-
-            server.onNotFound(notFound);
-
-            server.serveStatic("/", SPIFFS, "/");
-
-            server.begin();
-            Serial.println("init : OTA Server     ...     done!");            
         }
     }
 

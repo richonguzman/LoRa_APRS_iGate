@@ -6,15 +6,13 @@
 
 namespace POWER_Utils {
 
-  void activateMeasurement();
+    void activateMeasurement();
+    void activateLoRa();
+    void deactivateLoRa();
+    bool begin(TwoWire &port);
+    void setup();
+    //void lowerCpuFrequency();
 
-  void activateLoRa();
-  void deactivateLoRa();
-
-  bool begin(TwoWire &port);
-  void setup();
-
-  //void lowerCpuFrequency();
 }
 
 #endif
