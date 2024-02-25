@@ -3,6 +3,7 @@
 #include "pins_config.h"
 #include "wifi_utils.h"
 #include "display.h"
+#include "utils.h"
 
 extern Configuration  Config;
 extern WiFi_AP        *currentWiFi;
@@ -140,6 +141,8 @@ namespace WIFI_Utils {
             btStop();
         } else if (stationMode==5) {
             Serial.println("stationMode ---> iGate when Wifi/APRS available (DigiRepeater when not)");
+            startWiFi();
+            btStop();
         } else { 
             Serial.println("stationMode ---> NOT VALID");
             show_display("------- ERROR -------", "stationMode Not Valid", "device will autofix", "and then reboot", 1000);
