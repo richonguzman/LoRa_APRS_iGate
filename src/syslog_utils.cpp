@@ -9,6 +9,7 @@ extern int              stationMode;
 
 WiFiUDP udpClient;
 
+
 namespace SYSLOG_Utils {
 
     void log(String type, String packet, int rssi, float snr, int freqError) {

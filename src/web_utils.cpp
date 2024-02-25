@@ -1,6 +1,6 @@
+#include "configuration.h"
 #include "ota_utils.h"
 #include "web_utils.h"
-#include "configuration.h"
 
 extern Configuration        Config;
 
@@ -23,6 +23,7 @@ extern const size_t web_bootstrap_css_len = web_bootstrap_css_end - web_bootstra
 extern const char web_bootstrap_js[] asm("_binary_data_embed_bootstrap_js_gz_start");
 extern const char web_bootstrap_js_end[] asm("_binary_data_embed_bootstrap_js_gz_end");
 extern const size_t web_bootstrap_js_len = web_bootstrap_js_end - web_bootstrap_js;
+
 
 namespace WEB_Utils {
 
@@ -189,4 +190,5 @@ namespace WEB_Utils {
 
         server.begin();
     }
+
 }

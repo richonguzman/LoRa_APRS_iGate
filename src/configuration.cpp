@@ -4,7 +4,6 @@
 #include "display.h"
 
 
-
 void Configuration::writeFile() {
     Serial.println("Saving config..");
 

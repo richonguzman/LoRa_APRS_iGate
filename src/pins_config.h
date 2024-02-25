@@ -114,4 +114,5 @@ NSS                         18
 DIO0                        26
 REST                        14
 GND                         -  */
+
 #endif

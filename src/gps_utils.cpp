@@ -9,6 +9,7 @@ extern WiFiClient     espClient;
 extern int            stationMode;
 String                distance;
 
+
 namespace GPS_Utils {
 
     String double2string(double n, int ndec) {

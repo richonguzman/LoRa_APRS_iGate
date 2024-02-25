@@ -13,6 +13,7 @@ float R2 = 27.000; //in Kilo-Ohms
 float readingCorrection = 0.125;
 float multiplyCorrection = 0.035;
 
+
 namespace BATTERY_Utils {
 
     float checkBattery() { 

@@ -8,6 +8,7 @@ extern std::vector<String>  lastHeardStation_temp;
 extern String               versionDate;
 extern int                  stationMode;
 
+
 namespace QUERY_Utils {
 
     String process(String query, String station, String queryOrigin) {

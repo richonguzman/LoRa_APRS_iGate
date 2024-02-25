@@ -2,13 +2,14 @@
 #include <ElegantOTA.h>
 #include <AsyncTCP.h>
 #include "configuration.h"
-#include "display.h"
 #include "ota_utils.h"
+#include "display.h"
 
 extern Configuration        Config;
 extern uint32_t             lastScreenOn;
 
 unsigned long ota_progress_millis = 0;
+
 
 namespace OTA_Utils {
     
@@ -53,4 +54,5 @@ namespace OTA_Utils {
             show_display("", "", " OTA update fail!", "", "", "", "", 4000);
         }
     }
+    
 }

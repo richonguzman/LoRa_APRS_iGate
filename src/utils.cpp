@@ -64,7 +64,7 @@ namespace Utils {
 
     String getLocalIP() {
         if (!WiFiConnected) {
-            return "IP : 192.168.4.1";
+            return "IP :  192.168.4.1";
         } else {
             return "IP :  " + String(WiFi.localIP()[0]) + "." + String(WiFi.localIP()[1]) + "." + String(WiFi.localIP()[2]) + "." + String(WiFi.localIP()[3]);
         }        
@@ -76,7 +76,7 @@ namespace Utils {
         digitalWrite(internalLedPin,HIGH);
         #endif
         Serial.println("\nStarting Station: " + Config.callsign + "   Version: " + versionDate);
-        show_display(" LoRa APRS", "", "   ( iGATE & Digi )", "", "", "Richonguzman / CA2RXU", "      " + versionDate, 4000);
+        show_display(" LoRa APRS", "", "   ( iGATE & DIGI )", "", "", "Richonguzman / CA2RXU", "      " + versionDate, 4000);
         #if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2) || defined(HELTEC_V3) || defined(ESP32_DIY_LoRa) || defined(ESP32_DIY_1W_LoRa)
         digitalWrite(internalLedPin,LOW);
         #endif

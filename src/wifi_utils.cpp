@@ -14,6 +14,7 @@ extern bool           WiFiConnected;
 extern long           WiFiAutoAPTime;
 extern bool           WiFiAutoAPStarted;
 
+
 namespace WIFI_Utils {
 
     void checkWiFi() {
@@ -143,7 +144,7 @@ namespace WIFI_Utils {
             Config.writeFile();
 
             ESP.restart();
-    }
+        }
 
     }
 
