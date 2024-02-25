@@ -7,6 +7,7 @@
 namespace WIFI_Utils {
 
     void checkWiFi();
+    void startAutoAP();
     void startWiFi();
     void checkIfAutoAPShouldPowerOff();
     void setup();
