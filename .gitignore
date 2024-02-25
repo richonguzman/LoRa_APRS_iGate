@@ -4,3 +4,7 @@
 .vscode/launch.json
 .vscode/ipch
 .DS_Store
+/data_embed/*.gz
+installer/firmware
+installer/*.bin
+**/__pycache__/

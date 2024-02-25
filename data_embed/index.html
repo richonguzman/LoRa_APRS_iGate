@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="auto">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>LoRa iGate</title>
+        <link rel="stylesheet" href="/bootstrap.css" />
+        <link rel="stylesheet" href="/style.css" />
+    </head>
+    <body class="bg-body-tertiary">
+        <input type="file" accept="text/json,.json" style="display: none" />
+        <form autocomplete="off" action="/configuration.json" method="POST">
+            <nav
+                class="navbar bg-body-secondary shadow-sm border-bottom sticky-top"
+            >
+                <div class="container">
+                    <a class="navbar-brand"
+                        >CA2RXU's LoRa iGate Configuration</a
+                    >
+                    <div class="d-flex">
+                        <button
+                            class="btn btn-primary mx-2"
+                            type="button"
+                            id="backup"
+                        >
+                            Backup
+                        </button>
+                        <button
+                            class="btn btn-primary mx-2"
+                            type="button"
+                            id="restore"
+                        >
+                            Restore
+                        </button>
+                        <button
+                            class="btn btn-success mx-2"
+                            type="submit"
+                            id="save"
+                        >
+                            Save
+                        </button>
+                    </div>
+                </div>
+            </nav>
+            <div class="container">
+                <main>
+                    <div class="col-10 my-5 mx-auto">
+                        <div class="row">
+                            <div class="d-flex align-items-center">
+                                <img
+                                    src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHgAAAB4CAYAAAA5ZDbSAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAQ6SURBVHgB7d0/axRBGMfx50IMWPoKkpA02gUsLfZdqOCLOPBFWAliHbCUVNpaxQNrIY0WVjZaJlUsIsZ5uDu9bGb/zMwzs/PM/L7wIG4Ocflwl7ndvVsihBBCmTajunpk5uHG33+aOSGkvhdmLs1cW+bKzDEhle2a+UZ22Pacrx6PlMRYXc/arrkkIKvIBxfISgrBBXLmSeACOdMkcYGcWTFwgZxJMXGBPHEpcIE8USlxgSzcbGD2KD0ukIXKGRfIAuWOC+TANOACOSAtuEAemQ10a2P2KV9cIA+0ZZltMzurOaT8cYHcUx+wJlwgd9QFrBEXyJZswAekFxfIrdq4GhZUQO7Itlq+QzoXVEC21AdcIm51yF3AJeNWhWwDLmFBBeRVmg4/Atmj2nGLR/bCbZrm2qWx/+7Ekwx5i9LGO/XFzF2qO97/r5QAOSUwcG+WBDkVMHDtRUdOAcz/ed4J4NqLihwbGLjjioYcExi4bkVBjgUMXL/EkWMAAzcsUWRpYODKJIYsCQxc2USQpYCBG6dgZAlg4MYtCDkUGLhp8kYOAQZu2ryQfYGT4S7PAKJVzsg+wEmfubNZbd+XOpgTsiswXpbzaDSyCzBw82oU8lhg4ObZIPIYYODmXS/yEDBwdcQ+72w/6AMGrq6OaHnLghv1AQNXX6/bG7qAPxNwNbbf3mAD5qf5EaEisgG/IVRMNuA9QsVkA94mpLWP7Q2pP5uE4vayvQHA5bQw86m90Qb8i5C22Kyx/cAG/IGQphj3ftcPbcBzM78JaWiN+73rATZgfvAzWn4SHeXbIC7Xtcg6MfOUgJxro3C5vlU0kPNsNC439DYJyHnlhMuNeR8M5DxyxuXGHugA8rR54XIuR7KAPE3euJzroUogpy0Il/M5Fg3kNAXjcr4nG4AcNxFcLuTc78nqz7e0/A7KLDo9PbV+nkn6Q2xnZ2c0n88pQmK4XOjJ/eyQm6YhxYnichLng/FyLZM4Lid1wh/IYUXB5SSv6ACyX9FwOelLdoDsVlRcLsY1WUAeV3RcLtZFd0Duj3EfUGRcLuZVlUC2lwyXi32Re/D75IuLC1osFtYDFXxAo73dts21MV/8wgc6PEqKm7LHZv5QnndASTV8p5U9unl7oaJ6QvUi23CLA+YdqhGZcQ/Jfmu/olrvVE3Ia9wdqgB4sxp+JzPuPv2/+XV1lYzcxq32Q34lvlzbcKsF5h0vCZlxD+g2btXApSCvF1TbBOB/ba4oNSOvn7lr3KpWzC5pXHgVf4RKOk3P5CqOUEmn5eW6CxfAA2n4ndyHC+AR5YwMXOFyWngx7i4h8XJABm7kpkQGbqKmQAZu4lIiA3eiUiADd+JiIgM3k2IgAzezJJGBm2kSyMDNvBBk4CrJBxm4ynJB/kHAVRnf3OucumGvzBxTBZV+eouhn5u5t7HtvZlXhBBCCCEUsb+qGDWF0d8l5AAAAABJRU5ErkJggg=="
+                                    width="60"
+                                    height="60"
+                                    class="me-2"
+                                />
+                                <div>
+                                    <label for="stationMode" class="form-label"
+                                        >Station Mode</label
+                                    >
+                                    <select
+                                        class="form-select form-select-lg"
+                                        name="stationMode"
+                                        id="stationMode"
+                                    >
+                                        <option value="1">
+                                            Rx (only) iGate with black diamond +
+                                            "L" as symbol.
+                                        </option>
+                                        <option value="2">
+                                            [HAM only] Rx + Tx iGate with red
+                                            diamond + "L" as symbol.
+                                        </option>
+                                        <option value="3">
+                                            [HAM only] Digipeater simplex,
+                                            green-star + "L" as symbol.
+                                        </option>
+                                        <option value="4">
+                                            [HAM only] Digipeater split
+                                            frequency, green-star + "L" as
+                                            symbol.
+                                        </option>
+                                        <option value="5">
+                                            [HAM only] Rx + Tx iGate connected
+                                            to WiFi, Digipeater mode as fallback
+                                        </option>
+                                    </select>
+                                    <div class="form-check form-switch mt-3">
+                                        <input
+                                            type="checkbox"
+                                            name="bme.active"
+                                            id="bme.active"
+                                            class="form-check-input"
+                                        />
+                                        <label
+                                            for="bme.active"
+                                            class="form-check-label"
+                                            ><b>Activate Wx Telemetry</b>
+                                            <small
+                                                >Requires a BME/BMP280 or BME680
+                                                sensor installed</small
+                                            ></label
+                                        >
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row my-5 d-flex align-items-top">
+                            <div class="col-lg-3 col-sm-12">
+                                <h5>
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="20"
+                                        height="20"
+                                        fill="currentColor"
+                                        class="bi bi-person-circle"
+                                        viewBox="0 0 16 16"
+                                    >
+                                        <path
+                                            d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"
+                                        />
+                                        <path
+                                            fill-rule="evenodd"
+                                            d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"
+                                        />
+                                    </svg>
+                                    Identification
+                                </h5>
+                                <small
+                                    >Add your ham callsign and SSID. Optionally,
+                                    you can leave a comment describing your
+                                    station.</small
+                                >
+                            </div>
+                            <div class="col-lg-9 col-sm-12">
+                                <div class="col-12">
+                                    <label for="callsign" class="form-label"
+                                        >Callsign</label
+                                    >
+                                    <input
+                                        type="text"
+                                        name="callsign"
+                                        id="callsign"
+                                        class="form-control"
+                                        placeholder="N0CALL-10"
+                                        required=""
+                                    />
+                                </div>
+                                <div class="col-12 mt-3">
+                                    <label for="iGateComment" class="form-label"
+                                        >APRS Beacon Comment</label
+                                    >
+                                    <input
+                                        type="text"
+                                        name="iGateComment"
+                                        id="iGateComment"
+                                        class="form-control"
+                                        placeholder="LoRa_APRS_iGate"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                        <hr />
+
+                        <div class="row my-5 d-flex align-items-top">
+                            <div class="col-lg-3 col-sm-12">
+                                <h5>
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="20"
+                                        height="20"
+                                        fill="currentColor"
+                                        class="bi bi-router-fill"
+                                        viewBox="0 0 16 16"
+                                    >
+                                        <path
+                                            d="M5.525 3.025a3.5 3.5 0 0 1 4.95 0 .5.5 0 1 0 .707-.707 4.5 4.5 0 0 0-6.364 0 .5.5 0 0 0 .707.707"
+                                        />
+                                        <path
+                                            d="M6.94 4.44a1.5 1.5 0 0 1 2.12 0 .5.5 0 0 0 .708-.708 2.5 2.5 0 0 0-3.536 0 .5.5 0 0 0 .707.707Z"
+                                        />
+                                        <path
+                                            d="M2.974 2.342a.5.5 0 1 0-.948.316L3.806 8H1.5A1.5 1.5 0 0 0 0 9.5v2A1.5 1.5 0 0 0 1.5 13H2a.5.5 0 0 0 .5.5h2A.5.5 0 0 0 5 13h6a.5.5 0 0 0 .5.5h2a.5.5 0 0 0 .5-.5h.5a1.5 1.5 0 0 0 1.5-1.5v-2A1.5 1.5 0 0 0 14.5 8h-2.306l1.78-5.342a.5.5 0 1 0-.948-.316L11.14 8H4.86zM2.5 11a.5.5 0 1 1 0-1 .5.5 0 0 1 0 1m4.5-.5a.5.5 0 1 1 1 0 .5.5 0 0 1-1 0m2.5.5a.5.5 0 1 1 0-1 .5.5 0 0 1 0 1m1.5-.5a.5.5 0 1 1 1 0 .5.5 0 0 1-1 0m2 0a.5.5 0 1 1 1 0 .5.5 0 0 1-1 0"
+                                        />
+                                        <path
+                                            d="M8.5 5.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0"
+                                        />
+                                    </svg>
+                                    Auto AP
+                                </h5>
+                                <small
+                                    >Add your password and power off timeout to
+                                    auto access point. Auto AP will start if
+                                    there is no WiFi connection. Timeout will
+                                    count from startup or last client
+                                    disconnected.</small
+                                >
+                            </div>
+                            <div class="col-lg-9 col-sm-12">
+                                <div class="col-12">
+                                    <label
+                                        for="wifi.autoAP.password"
+                                        class="form-label"
+                                        >Password</label
+                                    >
+                                    <input
+                                        type="text"
+                                        name="wifi.autoAP.password"
+                                        id="wifi.autoAP.password"
+                                        class="form-control"
+                                        placeholder="1234567890"
+                                        required=""
+                                    />
+                                </div>
+                                <div class="col-12 mt-3">
+                                    <label
+                                        for="wifi.autoAP.powerOff"
+                                        class="form-label"
+                                        >Power off timeout
+                                        <small>(in minutes)</small></label
+                                    >
+                                    <input
+                                        type="text"
+                                        name="wifi.autoAP.powerOff"
+                                        id="wifi.autoAP.powerOff"
+                                        class="form-control"
+                                        placeholder="15"
+                                    />
+                                    <div class="form-text">
+                                        Set to <strong>0</strong> if you don't
+                                        want this option.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr />
+
+                        <div class="row my-5 d-flex align-items-top">
+                            <div class="col-lg-3 col-sm-12">
+                                <h5>
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="20"
+                                        height="20"
+                                        fill="currentColor"
+                                        class="bi bi-router-fill"
+                                        viewBox="0 0 16 16"
+                                    >
+                                        <path
+                                            d="M5.525 3.025a3.5 3.5 0 0 1 4.95 0 .5.5 0 1 0 .707-.707 4.5 4.5 0 0 0-6.364 0 .5.5 0 0 0 .707.707"
+                                        />
+                                        <path
+                                            d="M6.94 4.44a1.5 1.5 0 0 1 2.12 0 .5.5 0 0 0 .708-.708 2.5 2.5 0 0 0-3.536 0 .5.5 0 0 0 .707.707Z"
+                                        />
+                                        <path
+                                            d="M2.974 2.342a.5.5 0 1 0-.948.316L3.806 8H1.5A1.5 1.5 0 0 0 0 9.5v2A1.5 1.5 0 0 0 1.5 13H2a.5.5 0 0 0 .5.5h2A.5.5 0 0 0 5 13h6a.5.5 0 0 0 .5.5h2a.5.5 0 0 0 .5-.5h.5a1.5 1.5 0 0 0 1.5-1.5v-2A1.5 1.5 0 0 0 14.5 8h-2.306l1.78-5.342a.5.5 0 1 0-.948-.316L11.14 8H4.86zM2.5 11a.5.5 0 1 1 0-1 .5.5 0 0 1 0 1m4.5-.5a.5.5 0 1 1 1 0 .5.5 0 0 1-1 0m2.5.5a.5.5 0 1 1 0-1 .5.5 0 0 1 0 1m1.5-.5a.5.5 0 1 1 1 0 .5.5 0 0 1-1 0m2 0a.5.5 0 1 1 1 0 .5.5 0 0 1-1 0"
+                                        />
+                                        <path
+                                            d="M8.5 5.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0"
+                                        />
+                                    </svg>
+                                    WiFi Access
+                                </h5>
+                                <small
+                                    >Add all Wi-Fi Networks intended to be used,
+                                    and their respective coordinates to
+                                    georeference the iGate location.</small
+                                >
+                            </div>
+                            <div class="col-lg-9 col-sm-12">
+                                <input
+                                    type="hidden"
+                                    name="wifi.APs"
+                                    id="wifi.APs"
+                                />
+
+                                <div class="list-networks"></div>
+
+                                <div class="row new">
+                                    <div class="d-grid gap-2">
+                                        <button
+                                            type="button"
+                                            class="btn btn-outline-primary"
+                                            data-toggle="collapse"
+                                            data-target="#add-ap"
+                                            aria-expanded="false"
+                                            aria-controls="add-ap"
+                                        >
+                                            Add network
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr />
+
+                        <div class="row my-5 d-flex align-items-top">
+                            <div class="col-lg-3 col-sm-12">
+                                <h5>
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="20"
+                                        height="20"
+                                        fill="currentColor"
+                                        class="bi bi-database-fill"
+                                        viewBox="0 0 16 16"
+                                    >
+                                        <path
+                                            d="M3.904 1.777C4.978 1.289 6.427 1 8 1s3.022.289 4.096.777C13.125 2.245 14 2.993 14 4s-.875 1.755-1.904 2.223C11.022 6.711 9.573 7 8 7s-3.022-.289-4.096-.777C2.875 5.755 2 5.007 2 4s.875-1.755 1.904-2.223"
+                                        />
+                                        <path
+                                            d="M2 6.161V7c0 1.007.875 1.755 1.904 2.223C4.978 9.71 6.427 10 8 10s3.022-.289 4.096-.777C13.125 8.755 14 8.007 14 7v-.839c-.457.432-1.004.751-1.49.972C11.278 7.693 9.682 8 8 8s-3.278-.307-4.51-.867c-.486-.22-1.033-.54-1.49-.972"
+                                        />
+                                        <path
+                                            d="M2 9.161V10c0 1.007.875 1.755 1.904 2.223C4.978 12.711 6.427 13 8 13s3.022-.289 4.096-.777C13.125 11.755 14 11.007 14 10v-.839c-.457.432-1.004.751-1.49.972-1.232.56-2.828.867-4.51.867s-3.278-.307-4.51-.867c-.486-.22-1.033-.54-1.49-.972"
+                                        />
+                                        <path
+                                            d="M2 12.161V13c0 1.007.875 1.755 1.904 2.223C4.978 15.711 6.427 16 8 16s3.022-.289 4.096-.777C13.125 14.755 14 14.007 14 13v-.839c-.457.432-1.004.751-1.49.972-1.232.56-2.828.867-4.51.867s-3.278-.307-4.51-.867c-.486-.22-1.033-.54-1.49-.972"
+                                        />
+                                    </svg>
+                                    APRS-IS
+                                </h5>
+                                <small
+                                    >Enter you APRS-IS server and
+                                    credentials.</small
+                                >
+                            </div>
+                            <div class="col-lg-9 col-sm-12">
+                                <div class="row">
+                                    <div class="col-8">
+                                        <label
+                                            for="aprs_is.server"
+                                            class="form-label"
+                                            >Server</label
+                                        >
+                                        <input
+                                            type="text"
+                                            name="aprs_is.server"
+                                            id="aprs_is.server"
+                                            placeholder="soam.aprs2.net"
+                                            class="form-control"
+                                        />
+                                    </div>
+                                    <div class="col-4">
+                                        <label
+                                            for="aprs_is.port"
+                                            class="form-label"
+                                            >Port</label
+                                        >
+                                        <input
+                                            type="text"
+                                            name="aprs_is.port"
+                                            id="aprs_is.port"
+                                            placeholder="14580"
+                                            class="form-control"
+                                        />
+                                    </div>
+                                </div>
+                                <div class="row mt-3">
+                                    <div class="col-8">
+                                        <label
+                                            for="aprs_is.passcode"
+                                            class="form-label"
+                                            >Passcode</label
+                                        >
+                                        <input
+                                            type="text"
+                                            name="aprs_is.passcode"
+                                            id="aprs_is.passcode"
+                                            class="form-control"
+                                        />
+                                    </div>
+                                    <div class="col-4" class="form-label">
+                                        <label for="aprs_is.reportingDistance"
+                                            >Reporting Distance</label
+                                        >
+                                        <div class="input-group mt-2">
+                                            <input
+                                                type="text"
+                                                class="form-control"
+                                                placeholder="30"
+                                                name="aprs_is.reportingDistance"
+                                                id="aprs_is.reportingDistance"
+                                            />
+                                            <span class="input-group-text"
+                                                >Km</span
+                                            >
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr />
+
+                        <div class="row my-5 d-flex align-items-top">
+                            <div class="col-lg-3 col-sm-12">
+                                <h5>
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="20"
+                                        height="20"
+                                        fill="currentColor"
+                                        class="bi bi-tv-fill"
+                                        viewBox="0 0 16 16"
+                                    >
+                                        <path
+                                            d="M2.5 13.5A.5.5 0 0 1 3 13h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5M2 2h12s2 0 2 2v6s0 2-2 2H2s-2 0-2-2V4s0-2 2-2"
+                                        />
+                                    </svg>
+                                    Display
+                                </h5>
+                                <small>OLED screen configuration.</small>
+                            </div>
+                            <div class="col-lg-9 col-sm-12">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="form-check form-switch">
+                                            <input
+                                                type="checkbox"
+                                                name="display.alwaysOn"
+                                                id="display.alwaysOn"
+                                                class="form-check-input"
+                                            />
+                                            <label
+                                                for="display.alwaysOn"
+                                                class="form-label"
+                                                >Always On</label
+                                            >
+                                        </div>
+                                        <div
+                                            class="form-check form-switch mt-1"
+                                        >
+                                            <input
+                                                type="checkbox"
+                                                name="display.turn180"
+                                                id="display.turn180"
+                                                class="form-check-input"
+                                            />
+                                            <label
+                                                for="display.turn180"
+                                                class="form-label"
+                                                >Turn 180º</label
+                                            >
+                                        </div>
+                                    </div>
+                                    <div class="form-floating col-6 p-1">
+                                        <input
+                                            type="text"
+                                            name="display.timeout"
+                                            id="display.timeout"
+                                            value="4"
+                                            class="form-control"
+                                        />
+                                        <label
+                                            for="display.timeout"
+                                            class="form-label"
+                                            >Display Timeout</label
+                                        >
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr />
+
+                        <div class="row my-5 d-flex align-items-top">
+                            <div class="col-lg-3 col-sm-12">
+                                <h5>
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="20"
+                                        height="20"
+                                        fill="currentColor"
+                                        class="bi bi-broadcast-pin"
+                                        viewBox="0 0 16 16"
+                                    >
+                                        <path
+                                            d="M3.05 3.05a7 7 0 0 0 0 9.9.5.5 0 0 1-.707.707 8 8 0 0 1 0-11.314.5.5 0 0 1 .707.707m2.122 2.122a4 4 0 0 0 0 5.656.5.5 0 1 1-.708.708 5 5 0 0 1 0-7.072.5.5 0 0 1 .708.708m5.656-.708a.5.5 0 0 1 .708 0 5 5 0 0 1 0 7.072.5.5 0 1 1-.708-.708 4 4 0 0 0 0-5.656.5.5 0 0 1 0-.708m2.122-2.12a.5.5 0 0 1 .707 0 8 8 0 0 1 0 11.313.5.5 0 0 1-.707-.707 7 7 0 0 0 0-9.9.5.5 0 0 1 0-.707zM6 8a2 2 0 1 1 2.5 1.937V15.5a.5.5 0 0 1-1 0V9.937A2 2 0 0 1 6 8"
+                                        />
+                                    </svg>
+                                    Digipeating
+                                </h5>
+                                <small
+                                    >Define the location coordinates for the
+                                    Digipeater mode, and a special comment if
+                                    you like.</small
+                                >
+                            </div>
+                            <div class="col-9 mt-2">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <label
+                                            for="digi.latitude"
+                                            class="form-label"
+                                            >Latitude</label
+                                        >
+                                        <input
+                                            type="text"
+                                            name="digi.latitude"
+                                            id="digi.latitude"
+                                            placeholder="-33.440"
+                                            class="form-control"
+                                        />
+                                    </div>
+                                    <div class="col-6">
+                                        <label
+                                            for="digi.longitude"
+                                            class="form-label"
+                                            >Longitude</label
+                                        >
+                                        <input
+                                            type="text"
+                                            name="digi.longitude"
+                                            id="digi.longitude"
+                                            placeholder="-70.613"
+                                            class="form-control"
+                                        />
+                                    </div>
+                                </div>
+                                <div class="col-12 mt-3">
+                                    <label for="digi.comment" class="form-label"
+                                        >Digipeater APRS Comment</label
+                                    >
+                                    <input
+                                        type="text"
+                                        name="digi.comment"
+                                        id="digi.comment"
+                                        class="form-control"
+                                        placeholder="LoRa_APRS_Digipeater"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                        <hr />
+
+                        <div class="row my-5 d-flex align-items-top">
+                            <div class="col-lg-3 col-sm-12">
+                                <h5>
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="20"
+                                        height="20"
+                                        fill="currentColor"
+                                        class="bi bi-cloud-upload-fill"
+                                        viewBox="0 0 16 16"
+                                    >
+                                        <path
+                                            fill-rule="evenodd"
+                                            d="M8 0a5.53 5.53 0 0 0-3.594 1.342c-.766.66-1.321 1.52-1.464 2.383C1.266 4.095 0 5.555 0 7.318 0 9.366 1.708 11 3.781 11H7.5V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V11h4.188C14.502 11 16 9.57 16 7.773c0-1.636-1.242-2.969-2.834-3.194C12.923 1.999 10.69 0 8 0m-.5 14.5V11h1v3.5a.5.5 0 0 1-1 0"
+                                        />
+                                    </svg>
+                                    OTA
+                                </h5>
+                                <small
+                                    >Set your username and password to allow
+                                    firmware updating over-the-air.</small
+                                >
+                            </div>
+                            <div class="col-lg-9 col-sm-12">
+                                <div class="col-12">
+                                    <label for="ota.username" class="form-label"
+                                        >Username</label
+                                    >
+                                    <input
+                                        type="text"
+                                        name="ota.username"
+                                        id="ota.username"
+                                        class="form-control"
+                                    />
+                                </div>
+                                <div class="col-12 mt-3">
+                                    <label for="ota.password" class="form-label"
+                                        >Password</label
+                                    >
+                                    <input
+                                        type="text"
+                                        name="ota.password"
+                                        id="ota.password"
+                                        class="form-control"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                        <hr />
+
+                        <div class="row my-5 d-flex align-items-top">
+                            <div class="col-lg-3 col-sm-12">
+                                <h5>
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="20"
+                                        height="20"
+                                        fill="currentColor"
+                                        class="bi bi-heart-pulse-fill"
+                                        viewBox="0 0 16 16"
+                                    >
+                                        <path
+                                            d="M1.475 9C2.702 10.84 4.779 12.871 8 15c3.221-2.129 5.298-4.16 6.525-6H12a.5.5 0 0 1-.464-.314l-1.457-3.642-1.598 5.593a.5.5 0 0 1-.945.049L5.889 6.568l-1.473 2.21A.5.5 0 0 1 4 9z"
+                                        />
+                                        <path
+                                            d="M.88 8C-2.427 1.68 4.41-2 7.823 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C11.59-2 18.426 1.68 15.12 8h-2.783l-1.874-4.686a.5.5 0 0 0-.945.049L7.921 8.956 6.464 5.314a.5.5 0 0 0-.88-.091L3.732 8z"
+                                        />
+                                    </svg>
+                                    Beaconing
+                                </h5>
+                                <small>Set APRS beacon attributes.</small>
+                            </div>
+                            <div class="col-lg-9 col-sm-12">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <label
+                                            for="other.beaconInterval"
+                                            class="form-label"
+                                            >Interval</label
+                                        >
+                                        <div class="input-group">
+                                            <input
+                                                type="text"
+                                                name="other.beaconInterval"
+                                                id="other.beaconInterval"
+                                                placeholder="15"
+                                                class="form-control"
+                                            />
+                                            <span class="input-group-text"
+                                                >minutes</span
+                                            >
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <label
+                                            for="other.rememberStationTime"
+                                            class="form-label"
+                                            >Remember Station Time</label
+                                        >
+                                        <div class="input-group">
+                                            <input
+                                                type="text"
+                                                name="other.rememberStationTime"
+                                                id="other.rememberStationTime"
+                                                placeholder="30"
+                                                class="form-control"
+                                            />
+                                            <span class="input-group-text"
+                                                >minutes</span
+                                            >
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row mt-3">
+                                    <div class="col-6">
+                                        <div class="form-check form-switch">
+                                            <input
+                                                type="checkbox"
+                                                name="other.sendBatteryVoltage"
+                                                id="other.sendBatteryVoltage"
+                                                class="form-check-input"
+                                            />
+                                            <label
+                                                for="other.sendBatteryVoltage"
+                                                class="form-label"
+                                                >Send Battery Telemetry</label
+                                            >
+                                        </div>
+                                        <div
+                                            class="form-check form-switch mt-1"
+                                        >
+                                            <input
+                                                type="checkbox"
+                                                name="other.externalVoltageMeasurement"
+                                                id="other.externalVoltageMeasurement"
+                                                class="form-check-input"
+                                                disabled
+                                            />
+                                            <label
+                                                for="other.externalVoltageMeasurement"
+                                                class="form-label"
+                                                >Measure External Voltage</label
+                                            >
+                                        </div>
+                                    </div>
+                                    <div class="form-floating col-6 p-1">
+                                        <input
+                                            type="text"
+                                            name="other.externalVoltagePin"
+                                            id="other.externalVoltagePin"
+                                            value="34"
+                                            class="form-control"
+                                            disabled
+                                        />
+                                        <label
+                                            for="other.externalVoltagePin"
+                                            class="form-label"
+                                            >External Voltage Pin</label
+                                        >
+                                    </div>
+                                </div>
+                                <div class="row mt-3">
+                                    <div class="col-6">
+                                        <div class="form-check form-switch">
+                                            <input
+                                                type="checkbox"
+                                                name="other.igateSendsLoRaBeacon"
+                                                id="other.igateSendsLoRaBeacon"
+                                                class="form-check-input"
+                                            />
+                                            <label
+                                                for="other.igateSendsLoRaBeacon"
+                                                class="form-label"
+                                                >IGate sends LoRa beacon</label
+                                            >
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="form-check form-switch">
+                                            <input
+                                                type="checkbox"
+                                                name="other.igateRepeatLoRaPackets"
+                                                id="other.igateRepeatLoRaPackets"
+                                                class="form-check-input"
+                                            />
+                                            <label
+                                                for="other.igateRepeatLoRaPackets"
+                                                class="form-label"
+                                                >IGate repeat LoRa
+                                                packets</label
+                                            >
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr />
+
+                        <div class="row my-5 d-flex align-items-top">
+                            <div class="col-lg-3 col-sm-12">
+                                <h5>
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="20"
+                                        height="20"
+                                        fill="currentColor"
+                                        class="bi bi-file-earmark-text-fill"
+                                        viewBox="0 0 16 16"
+                                    >
+                                        <path
+                                            d="M9.293 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.707A1 1 0 0 0 13.707 4L10 .293A1 1 0 0 0 9.293 0M9.5 3.5v-2l3 3h-2a1 1 0 0 1-1-1M4.5 9a.5.5 0 0 1 0-1h7a.5.5 0 0 1 0 1zM4 10.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5m.5 2.5a.5.5 0 0 1 0-1h4a.5.5 0 0 1 0 1z"
+                                        />
+                                    </svg>
+                                    Syslog
+                                </h5>
+                                <small
+                                    >Broadcast the system log over the
+                                    network.</small
+                                >
+                            </div>
+                            <div class="col-lg-9 col-sm-12">
+                                <div class="form-check form-switch">
+                                    <input
+                                        type="checkbox"
+                                        name="syslog.active"
+                                        id="syslog.active"
+                                        class="form-check-input"
+                                    />
+                                    <label
+                                        for="syslog.active"
+                                        class="form-label"
+                                        >Active</label
+                                    >
+                                </div>
+                                <div class="row mt-3">
+                                    <div class="col-6">
+                                        <label
+                                            for="syslog.server"
+                                            class="form-label"
+                                            >Server</label
+                                        >
+                                        <input
+                                            type="text"
+                                            name="syslog.server"
+                                            id="syslog.server"
+                                            placeholder="192.168.0.100"
+                                            class="form-control"
+                                            disabled
+                                        />
+                                    </div>
+                                    <div class="col-6">
+                                        <label
+                                            for="syslog.port"
+                                            class="form-label"
+                                            >Port</label
+                                        >
+                                        <input
+                                            type="text"
+                                            name="syslog.port"
+                                            id="syslog.port"
+                                            placeholder="514"
+                                            class="form-control"
+                                            disabled
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr />
+
+                        <div class="row my-5 d-flex align-items-top">
+                            <div class="col-lg-3 col-sm-12">
+                                <h5>
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="20"
+                                        height="20"
+                                        fill="currentColor"
+                                        class="bi bi-broadcast"
+                                        viewBox="0 0 16 16"
+                                    >
+                                        <path
+                                            d="M3.05 3.05a7 7 0 0 0 0 9.9.5.5 0 0 1-.707.707 8 8 0 0 1 0-11.314.5.5 0 0 1 .707.707m2.122 2.122a4 4 0 0 0 0 5.656.5.5 0 1 1-.708.708 5 5 0 0 1 0-7.072.5.5 0 0 1 .708.708m5.656-.708a.5.5 0 0 1 .708 0 5 5 0 0 1 0 7.072.5.5 0 1 1-.708-.708 4 4 0 0 0 0-5.656.5.5 0 0 1 0-.708m2.122-2.12a.5.5 0 0 1 .707 0 8 8 0 0 1 0 11.313.5.5 0 0 1-.707-.707 7 7 0 0 0 0-9.9.5.5 0 0 1 0-.707zM10 8a2 2 0 1 1-4 0 2 2 0 0 1 4 0"
+                                        />
+                                    </svg>
+                                    LoRa
+                                </h5>
+                                <small
+                                    >Config LoRa APRS Xmitting settings.</small
+                                >
+                            </div>
+                            <div class="col-lg-9 col-sm-12">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <label
+                                            for="lora.digirepeaterTxFreq"
+                                            class="form-label"
+                                            >Tx Frequency</label
+                                        >
+                                        <div class="input-group">
+                                            <input
+                                                type="text"
+                                                name="lora.digirepeaterTxFreq"
+                                                id="lora.digirepeaterTxFreq"
+                                                placeholder="433775000"
+                                                class="form-control"
+                                            />
+                                            <input
+                                                type="hidden"
+                                                name="lora.iGateFreq"
+                                                id="lora.iGateFreq"
+                                                placeholder="433775000"
+                                                class="form-control"
+                                            />
+                                            <span class="input-group-text"
+                                                >Hz</span
+                                            >
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <label
+                                            for="lora.digirepeaterRxFreq"
+                                            class="form-label"
+                                            >Rx Frequency</label
+                                        >
+                                        <div class="input-group">
+                                            <input
+                                                type="text"
+                                                name="lora.digirepeaterRxFreq"
+                                                id="lora.digirepeaterRxFreq"
+                                                placeholder="433775000"
+                                                class="form-control"
+                                                disabled
+                                            />
+                                            <span class="input-group-text"
+                                                >Hz</span
+                                            >
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row mt-3">
+                                    <div class="col-5">
+                                        <label
+                                            for="lora.signalBandwidth"
+                                            class="form-label"
+                                            >Bandwidth</label
+                                        >
+                                        <div class="input-group">
+                                            <select
+                                                class="form-select form-select"
+                                                name="lora.signalBandwidth"
+                                                id="lora.signalBandwidth"
+                                                required=""
+                                            >
+                                                <option value="125000" selected>
+                                                    125 kHz
+                                                </option>
+                                                <option value="250000">
+                                                    250 kHz
+                                                </option>
+                                                <option value="500000">
+                                                    500 kHz
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-7">
+                                        <label
+                                            for="lora.spreadingFactor"
+                                            class="form-label"
+                                            >Spreading Factor</label
+                                        >
+                                        <select
+                                            class="form-select form-select"
+                                            name="lora.spreadingFactor"
+                                            id="lora.spreadingFactor"
+                                            required=""
+                                        >
+                                            <option value="7">
+                                                SF7 - Lowest battery usage
+                                            </option>
+                                            <option value="8">SF8</option>
+                                            <option value="9">SF9</option>
+                                            <option value="10">SF10</option>
+                                            <option value="11">SF11</option>
+                                            <option value="12" selected>
+                                                SF12 - Highest sensitivity
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row mt-3">
+                                    <div class="col-6">
+                                        <label
+                                            for="lora.codingRate4"
+                                            class="form-label"
+                                            >Coding Rate</label
+                                        >
+                                        <select
+                                            class="form-select form-select"
+                                            name="lora.codingRate4"
+                                            id="lora.codingRate4"
+                                            required=""
+                                        >
+                                            <option value="4">4</option>
+                                            <option value="5" selected>
+                                                5
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div class="col-6">
+                                        <label
+                                            for="lora.power"
+                                            class="form-label"
+                                            >Power</label
+                                        >
+                                        <div class="input-group">
+                                            <input
+                                                type="text"
+                                                name="lora.power"
+                                                id="lora.power"
+                                                placeholder="20"
+                                                class="form-control"
+                                                required=""
+                                            />
+                                            <span class="input-group-text"
+                                                >dBm</span
+                                            >
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+                <footer
+                    class="my-5 py-5 text-body-secondary text-center text-small"
+                >
+                    <p class="mb-1 small">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="16"
+                            height="16"
+                            fill="currentColor"
+                            class="bi bi-cc-circle-fill"
+                            viewBox="0 0 16 16"
+                        >
+                            <path
+                                d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M5.408 5.89c.681 0 1.138.47 1.187 1.107h1.147v-.11c-.053-1.187-1.024-2-2.343-2-1.604 0-2.518 1.05-2.518 2.751v.747c0 1.7.906 2.73 2.518 2.73 1.314 0 2.285-.792 2.343-1.939v-.114H6.595c-.049.615-.497 1.05-1.187 1.05-.84 0-1.318-.62-1.318-1.727v-.742c0-1.112.488-1.754 1.318-1.754Zm5.404 0c.68 0 1.138.47 1.186 1.107h1.147v-.11c-.053-1.187-1.024-2-2.342-2-1.604 0-2.518 1.05-2.518 2.751v.747c0 1.7.905 2.73 2.518 2.73 1.314 0 2.285-.792 2.342-1.939v-.114h-1.147c-.048.615-.496 1.05-1.186 1.05-.84 0-1.319-.62-1.319-1.727v-.742c0-1.112.488-1.754 1.319-1.754Z"
+                            />
+                        </svg>
+                        2023-24
+                        <b
+                            ><a href="https://github.com/richonguzman"
+                                >CA2RXU</a
+                            ></b
+                        >:
+                        <a
+                            href="https://github.com/richonguzman/LoRa_APRS_iGate"
+                            >LoRa APRS iGate Firmware</a
+                        >.
+                    </p>
+                    <p class="mb-1 small">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="16"
+                            height="16"
+                            fill="currentColor"
+                            class="bi bi-cc-circle-fill"
+                            viewBox="0 0 16 16"
+                        >
+                            <path
+                                d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M5.408 5.89c.681 0 1.138.47 1.187 1.107h1.147v-.11c-.053-1.187-1.024-2-2.343-2-1.604 0-2.518 1.05-2.518 2.751v.747c0 1.7.906 2.73 2.518 2.73 1.314 0 2.285-.792 2.343-1.939v-.114H6.595c-.049.615-.497 1.05-1.187 1.05-.84 0-1.318-.62-1.318-1.727v-.742c0-1.112.488-1.754 1.318-1.754Zm5.404 0c.68 0 1.138.47 1.186 1.107h1.147v-.11c-.053-1.187-1.024-2-2.342-2-1.604 0-2.518 1.05-2.518 2.751v.747c0 1.7.905 2.73 2.518 2.73 1.314 0 2.285-.792 2.342-1.939v-.114h-1.147c-.048.615-.496 1.05-1.186 1.05-.84 0-1.319-.62-1.319-1.727v-.742c0-1.112.488-1.754 1.319-1.754Z"
+                            />
+                        </svg>
+                        2024
+                        <b
+                            ><a
+                                href="https://sq2cpa.pl/r/lora-footer"
+                                target="_blank"
+                                >SQ2CPA</a
+                            >
+                            &
+                            <a
+                                href="https://cd3eap.aguayoki.cl/"
+                                target="_blank"
+                                >CD3EAP</a
+                            ></b
+                        >: Settings Page.
+                    </p>
+                </footer>
+            </div>
+        </form>
+        <div
+            class="modal fade"
+            id="saveModal"
+            tabindex="-1"
+            aria-labelledby="saveModal"
+            aria-hidden="true"
+        >
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Saving settings</h5>
+                    </div>
+                    <div class="modal-body">
+                        Please wait... Settings will be saved and LoRa will
+                        reboot
+                    </div>
+                    <div class="modal-footer">Waiting for connection...</div>
+                </div>
+            </div>
+        </div>
+        <div
+            class="modal fade"
+            id="savedModal"
+            tabindex="-1"
+            aria-labelledby="saveModal"
+            aria-hidden="true"
+        >
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Settings</h5>
+                        <button
+                            type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"
+                        ></button>
+                    </div>
+                    <div class="modal-body">Settings saved!</div>
+                    <div class="modal-footer">
+                        <button
+                            type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal"
+                        >
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+    <script src="/bootstrap.js"></script>
+    <script src="/script.js"></script>
+</html>
