@@ -21,7 +21,7 @@
 Configuration   Config;
 WiFiClient      espClient;
 
-String          versionDate           = "2024.02.23";
+String          versionDate           = "2024.02.25";
 int             myWiFiAPIndex         = 0;
 int             myWiFiAPSize          = Config.wifiAPs.size();
 WiFi_AP         *currentWiFi          = &Config.wifiAPs[myWiFiAPIndex];

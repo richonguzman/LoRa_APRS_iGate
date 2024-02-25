@@ -3,6 +3,7 @@
 
 #include <Arduino.h>
 
+
 namespace SYSLOG_Utils {
 
     void log(String type ,String packet, int rssi, float snr, int freqError);

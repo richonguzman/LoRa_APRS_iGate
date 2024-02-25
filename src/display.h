@@ -7,6 +7,7 @@
 #define SCREEN_HEIGHT   64      // OLED display height, in pixels
 #define SCREEN_ADDRESS  0x3C    ///< See datasheet for Address; 0x3D for 128x64, 0x3C for 128x32
 
+
 void setup_display();
 void display_toggle(bool toggle);
 

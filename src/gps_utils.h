@@ -3,6 +3,7 @@
 
 #include <Arduino.h>
 
+
 namespace GPS_Utils {
 
     String double2string(double n, int ndec);

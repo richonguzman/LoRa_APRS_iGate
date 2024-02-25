@@ -4,6 +4,7 @@
 #include <Arduino.h>
 #include "XPowersLib.h"
 
+
 namespace POWER_Utils {
 
     void activateMeasurement();

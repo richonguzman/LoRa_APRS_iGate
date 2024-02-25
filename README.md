@@ -23,6 +23,7 @@ In all configurations the display shows the current stationMode, heard packets a
 
 But under the hood is much more:
 
+- Web Configuration UI.
 - Sending events to remote syslog server.
 - OTA update capability (for Firmware and Filesystem).
 - RX first, TX will only be done if there is no traffic on the frequency.
@@ -31,8 +32,7 @@ But under the hood is much more:
 - support for BME/BMP280 and BME680 sensors, sending to WX data to APRS-IS.
 
 and more will come:
-- Web-UI
-- ...
+- More Web UI Station Information
 
 ____________________________________________________
 
@@ -51,6 +51,7 @@ ____________________________________________________
 ____________________________________________________
 ## Timeline (Versions):
 
+- 2024.02.25 New Web Configuration UI with WiFi AP (thanks Damian SQ2CPA).
 - 2023.01.28 Updated to ElegantOTA v.3 (AsyncElegantOTA was deprecated).
 - 2024.01.19 TextSerialOutputForApp added to get text from Serial-Output over USB into PC for PinPoint App (https://www.pinpointaprs.com) and APRSIS32 App (http://aprsisce.wikidot.com)
 - 2024.01.12 Added iGate Mode to also repeat packets (like a iGate+DigiRepeater) in stationMode 2 and 5.

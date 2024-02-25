@@ -73,9 +73,9 @@ public:
 
 
 
+
 class Configuration {
 public:
-
     String                callsign;  
     int                   stationMode;
     String                iGateComment;

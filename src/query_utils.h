@@ -3,6 +3,7 @@
 
 #include <Arduino.h>
 
+
 namespace QUERY_Utils {
 
     String process(String query, String station, String queryOrigin);
