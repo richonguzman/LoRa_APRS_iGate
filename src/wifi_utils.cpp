@@ -3,6 +3,7 @@
 #include "pins_config.h"
 #include "wifi_utils.h"
 #include "display.h"
+#include "utils.h"
 
 extern Configuration  Config;
 extern WiFi_AP        *currentWiFi;
@@ -25,6 +26,16 @@ namespace WIFI_Utils {
             WiFi.reconnect();
             previousWiFiMillis = millis();
         }
+    }
+
+    void startAutoAP() {
+        WiFi.mode(WIFI_MODE_NULL);
+
+        WiFi.mode(WIFI_AP);
+        WiFi.softAP(Config.callsign + " AP", "1234567890");
+
+        WiFiAutoAPTime = millis();
+        WiFiAutoAPStarted = true;
     }
 
     void startWiFi() {
@@ -88,13 +99,7 @@ namespace WIFI_Utils {
             Serial.println("\nNot connected to WiFi! Starting Auto AP");
             show_display("", "", "   Starting Auto AP", " Please connect to it " , "     loading ...", 1000);
 
-            WiFi.mode(WIFI_MODE_NULL);
-
-            WiFi.mode(WIFI_AP);
-            WiFi.softAP(Config.callsign + " AP", "1234567890");
-
-            WiFiAutoAPTime = millis();
-            WiFiAutoAPStarted = true;
+            startAutoAP();
         }
     }
 
@@ -132,10 +137,12 @@ namespace WIFI_Utils {
             } else {
                 Serial.println("stationMode ---> DigiRepeater (Rx freq != Tx freq)");
             }
-            WiFi.mode(WIFI_OFF);
+            startAutoAP();
             btStop();
         } else if (stationMode==5) {
             Serial.println("stationMode ---> iGate when Wifi/APRS available (DigiRepeater when not)");
+            startWiFi();
+            btStop();
         } else { 
             Serial.println("stationMode ---> NOT VALID");
             show_display("------- ERROR -------", "stationMode Not Valid", "device will autofix", "and then reboot", 1000);
