@@ -74,7 +74,7 @@ namespace APRS_IS_Utils {
             }
             lastScreenOn = millis();
         }
-        secondLine = "WiFi: " + wifiState + "/ APRS-IS: " + aprsisState;
+        secondLine = "WiFi: " + wifiState + "  APRS-IS: " + aprsisState;
     }
 
     String createPacket(String packet) {
