@@ -99,7 +99,7 @@ function loadSettings(settings) {
                     <label for="${attributeName}.ssid">SSID</label>
                   </div>
                   <div class="form-floating col-6 col-md-3 px-1 mb-2">
-                    <input type="text" class="form-control form-control-sm" name="${attributeName}.password" id="${attributeName}.password" value="${network.password}">
+                    <input type="password" class="form-control form-control-sm" name="${attributeName}.password" id="${attributeName}.password" value="${network.password}">
                     <label for="${attributeName}.password">Passphrase</label>
                   </div>
                   <div class="col-4 col-md-2 form-floating px-1 mb-2">
