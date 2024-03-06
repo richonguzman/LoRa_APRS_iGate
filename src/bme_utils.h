@@ -4,9 +4,9 @@
 #include <Arduino.h>
 #include <Adafruit_Sensor.h>
 
-//#define BME280Sensor        // its set by default but you should comment it with "//"
+#define BME280Sensor        // its set by default but you should comment it with "//"
 //#define BMP280Sensor      // and delete "//" from the one you want to use.
-#define BME680Sensor
+//#define BME680Sensor
 
 #ifdef BME280Sensor
 #include <Adafruit_BME280.h>
