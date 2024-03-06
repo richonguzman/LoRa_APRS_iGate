@@ -7,8 +7,11 @@
 #define HEIGHT_CORRECTION 0             // in meters
 #define CORRECTION_FACTOR (8.2296)      // for meters
 
-extern Configuration  Config;
-extern String         fifthLine;
+extern Configuration    Config;
+extern String           fifthLine;
+extern uint32_t         bmeLastReading;
+
+float newHum, newTemp, newPress, newGas;
 
 
 namespace BME_Utils {
@@ -33,14 +36,29 @@ namespace BME_Utils {
                 while (1); // sacar esto para que quede pegado si no encuentra BME280
             } else {
                 #ifdef BME280Sensor
+                bme.setSampling(Adafruit_BME280::MODE_FORCED,
+                                Adafruit_BME280::SAMPLING_X1,
+                                Adafruit_BME280::SAMPLING_X1,
+                                Adafruit_BME280::SAMPLING_X1,
+                                Adafruit_BME280::FILTER_OFF
+                                );
                 Serial.println("init : BME280 Module  ...     done!");
                 #endif
                 #ifdef BMP280Sensor
+                bme.setSampling(Adafruit_BMP280::MODE_FORCED,
+                                Adafruit_BMP280::SAMPLING_X1,
+                                Adafruit_BMP280::SAMPLING_X1,
+                                Adafruit_BMP280::FILTER_OFF
+                                ); 
                 Serial.println("init : BMP280 Module  ...     done!");
                 #endif
                 #ifdef BME680Sensor
+                bme.setTemperatureOversampling(BME680_OS_1X);
+                bme.setHumidityOversampling(BME680_OS_1X);
+                bme.setPressureOversampling(BME680_OS_1X);
+                bme.setIIRFilterSize(BME680_FILTER_SIZE_0);
                 Serial.println("init : BME680 Module  ...     done!");
-                #endif   
+                #endif
             }
         } else {
             Serial.println("(BME/BMP sensor not 'active' in 'igate_conf.json')");
@@ -113,22 +131,33 @@ namespace BME_Utils {
 
     String readDataSensor() {
         String wx, tempStr, humStr, presStr;
-        float newHum;
-        
-        float newTemp   = bme.readTemperature();
-        #if defined(BME280Sensor) || defined(BME680Sensor)
-        newHum = bme.readHumidity();
-        #endif
-        #ifdef BMP280Sensor
-        newHum = 0;
-        #endif
-        float newPress  = (bme.readPressure() / 100.0F);
 
-        #ifdef BME680Sensor
-        float newGas = bme.gas_resistance / 1000.0; // in Kilo ohms
-        #endif
-        
-        //bme.readAltitude(SEALEVELPRESSURE_HPA) // this is for approximate Altitude Calculation.
+        uint32_t lastReading = millis() - bmeLastReading;
+        if (lastReading > 60*1000) {
+            #if defined(BME280Sensor) || defined(BMP280Sensor)
+            bme.takeForcedMeasurement();
+            newTemp   = bme.readTemperature();
+            newPress  = (bme.readPressure() / 100.0F);
+            #ifdef BME280Sensor
+            newHum = bme.readHumidity();
+            #endif
+            #ifdef BMP280Sensor
+            newHum = 0;
+            #endif
+            #endif
+
+            #ifdef BME680Sensor
+            bme.performReading();
+            delay(50);
+            if (bme.endReading()) {
+                newTemp     = bme.temperature;
+                newPress    = (bme.pressure / 100.0F);
+                newHum      = bme.humidity;
+                newGas      = bme.gas_resistance / 1000.0; // in Kilo ohms
+            }
+            #endif
+            bmeLastReading = millis();
+        }
     
         if (isnan(newTemp) || isnan(newHum) || isnan(newPress)) {
             Serial.println("BME/BMP Module data failed");

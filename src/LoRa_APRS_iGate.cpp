@@ -41,6 +41,8 @@ int             lastStationModeState  = 1;
 bool            WiFiAutoAPStarted     = false;
 long            WiFiAutoAPTime        = false;
 
+uint32_t        bmeLastReading        = -60000;
+
 String          batteryVoltage;
 
 std::vector<String> lastHeardStation;
