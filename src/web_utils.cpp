@@ -29,10 +29,6 @@ namespace WEB_Utils {
 
     AsyncWebServer server(80);
 
-    void loop() {
-        
-    }
-
     void handleNotFound(AsyncWebServerRequest *request) {
         AsyncWebServerResponse *response = request->beginResponse(404, "text/plain", "Not found");
         response->addHeader("Cache-Control", "max-age=3600");
@@ -71,42 +67,47 @@ namespace WEB_Utils {
             WiFi_AP wifiap;
             wifiap.ssid                   = request->getParam("wifi.AP." + String(i) + ".ssid", true)->value();
             wifiap.password               = request->getParam("wifi.AP." + String(i) + ".password", true)->value();
-            wifiap.latitude               = request->getParam("wifi.AP." + String(i) + ".latitude", true)->value().toDouble();
-            wifiap.longitude              = request->getParam("wifi.AP." + String(i) + ".longitude", true)->value().toDouble();
+            // wifiap.latitude               = request->getParam("wifi.AP." + String(i) + ".latitude", true)->value().toDouble();
+            // wifiap.longitude              = request->getParam("wifi.AP." + String(i) + ".longitude", true)->value().toDouble();
 
             Config.wifiAPs.push_back(wifiap);
         }
 
         Config.callsign = request->getParam("callsign", true)->value();
-        Config.stationMode = request->getParam("stationMode", true)->value().toInt();
-        Config.iGateComment = request->getParam("iGateComment", true)->value();
+        // Config.iGateComment = request->getParam("iGateComment", true)->value();
         
         Config.wifiAutoAP.password = request->getParam("wifi.autoAP.password", true)->value();
         Config.wifiAutoAP.powerOff = request->getParam("wifi.autoAP.powerOff", true)->value().toInt();
 
-        Config.digi.comment = request->getParam("digi.comment", true)->value();
-        Config.digi.latitude = request->getParam("digi.latitude", true)->value().toDouble();
-        Config.digi.longitude = request->getParam("digi.longitude", true)->value().toDouble();
+        Config.digi.mode = request->getParam("digi.mode", true)->value().toInt();
+        // Config.digi.comment = request->getParam("digi.comment", true)->value();
+        // Config.digi.latitude = request->getParam("digi.latitude", true)->value().toDouble();
+        // Config.digi.longitude = request->getParam("digi.longitude", true)->value().toDouble();
 
+        Config.aprs_is.active = request->hasParam("aprs_is.active", true);
         Config.aprs_is.passcode = request->getParam("aprs_is.passcode", true)->value();
         Config.aprs_is.server = request->getParam("aprs_is.server", true)->value();
         Config.aprs_is.port = request->getParam("aprs_is.port", true)->value().toInt();
-        Config.aprs_is.reportingDistance = request->getParam("aprs_is.reportingDistance", true)->value().toInt();
+        // Config.aprs_is.reportingDistance = request->getParam("aprs_is.reportingDistance", true)->value().toInt();
+        Config.aprs_is.filter = request->getParam("aprs_is.filter", true)->value();
+        Config.aprs_is.toRF = request->hasParam("aprs_is.toRF", true);
+        
+        // Config.loramodule.iGateFreq = request->getParam("lora.iGateFreq", true)->value().toInt();
+        // if (request->hasParam("lora.digirepeaterTxFreq", true)) {
+        //     Config.loramodule.digirepeaterTxFreq = request->getParam("lora.digirepeaterTxFreq", true)->value().toInt();
+        // }
+        // if (request->hasParam("lora.digirepeaterRxFreq", true)) {
+        //     Config.loramodule.digirepeaterRxFreq = request->getParam("lora.digirepeaterRxFreq", true)->value().toInt();
+        // }
 
-        Config.loramodule.iGateFreq = request->getParam("lora.iGateFreq", true)->value().toInt();
-
-        if (request->hasParam("lora.digirepeaterTxFreq", true)) {
-            Config.loramodule.digirepeaterTxFreq = request->getParam("lora.digirepeaterTxFreq", true)->value().toInt();
-        }
-
-        if (request->hasParam("lora.digirepeaterRxFreq", true)) {
-            Config.loramodule.digirepeaterRxFreq = request->getParam("lora.digirepeaterRxFreq", true)->value().toInt();
-        }
-
+        Config.loramodule.txFreq = request->getParam("lora.txFreq", true)->value().toInt();
+        Config.loramodule.rxFreq = request->getParam("lora.rxFreq", true)->value().toInt();
         Config.loramodule.spreadingFactor = request->getParam("lora.spreadingFactor", true)->value().toInt();
         Config.loramodule.signalBandwidth = request->getParam("lora.signalBandwidth", true)->value().toInt();
         Config.loramodule.codingRate4 = request->getParam("lora.codingRate4", true)->value().toInt();
         Config.loramodule.power = request->getParam("lora.power", true)->value().toInt();
+        Config.loramodule.txActive = request->hasParam("lora.txActive", true);
+        Config.loramodule.rxActive = request->hasParam("lora.rxActive", true);
 
         Config.display.alwaysOn = request->hasParam("display.alwaysOn", true);
 
@@ -128,9 +129,19 @@ namespace WEB_Utils {
         Config.ota.username = request->getParam("ota.username", true)->value();
         Config.ota.password = request->getParam("ota.password", true)->value();
 
-        Config.beaconInterval = request->getParam("other.beaconInterval", true)->value().toInt();
-        Config.igateSendsLoRaBeacons = request->hasParam("other.igateSendsLoRaBeacons", true);
-        Config.igateRepeatsLoRaPackets = request->hasParam("other.igateRepeatsLoRaPackets", true);
+        Config.beacon.interval = request->getParam("beacon.interval", true)->value().toInt();
+        Config.beacon.sendViaAPRSIS = request->hasParam("beacon.sendViaAPRSIS", true);
+        Config.beacon.sendViaRF = request->hasParam("beacon.sendViaRF", true);
+        Config.beacon.latitude = request->getParam("beacon.latitude", true)->value().toDouble();
+        Config.beacon.longitude = request->getParam("beacon.longitude", true)->value().toDouble();
+        Config.beacon.comment = request->getParam("beacon.comment", true)->value();
+        Config.beacon.overlay = request->getParam("beacon.overlay", true)->value();
+        Config.beacon.symbol = request->getParam("beacon.symbol", true)->value();
+        Config.beacon.path = request->getParam("beacon.path", true)->value();
+
+        // Config.beaconInterval = request->getParam("other.beaconInterval", true)->value().toInt();
+        // Config.igateSendsLoRaBeacons = request->hasParam("other.igateSendsLoRaBeacons", true);
+        // Config.igateRepeatsLoRaPackets = request->hasParam("other.igateRepeatsLoRaPackets", true);
         Config.rememberStationTime = request->getParam("other.rememberStationTime", true)->value().toInt();
         Config.sendBatteryVoltage = request->hasParam("other.sendBatteryVoltage", true);
         Config.externalVoltageMeasurement = request->hasParam("other.externalVoltageMeasurement", true);

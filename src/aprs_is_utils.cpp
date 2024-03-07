@@ -1,4 +1,3 @@
-#include <ElegantOTA.h>
 #include <WiFi.h>
 #include "configuration.h"
 #include "aprs_is_utils.h"
@@ -14,7 +13,6 @@ extern Configuration  Config;
 extern WiFiClient     espClient;
 extern int            internalLedPin;
 extern uint32_t       lastScreenOn;
-extern int            stationMode;
 extern String         firstLine;
 extern String         secondLine;
 extern String         thirdLine;
@@ -48,7 +46,10 @@ namespace APRS_IS_Utils {
             Serial.println("Tried: " + String(count) + " FAILED!");
         } else {
             Serial.println("Connected!\n(Server: " + String(Config.aprs_is.server) + " / Port: " + String(Config.aprs_is.port) +")");
-            aprsauth = "user " + Config.callsign + " pass " + Config.aprs_is.passcode + " vers CA2RXU_LoRa_iGate 1.3 filter t/m/" + Config.callsign + "/" + (String)Config.aprs_is.reportingDistance;// + "\r\n"; 
+
+            // String filter = "t/m/" + Config.callsign + "/" + (String)Config.aprs_is.reportingDistance;
+
+            aprsauth = "user " + Config.callsign + " pass " + Config.aprs_is.passcode + " vers CA2RXU_LoRa_iGate 1.3 filter " + Config.aprs_is.filter;// + "\r\n"; 
             upload(aprsauth);
             delay(200);
         }
@@ -60,25 +61,33 @@ namespace APRS_IS_Utils {
             wifiState = "OK"; 
         } else {
             wifiState = "AP";
+
             if (!Config.display.alwaysOn) {
                 display_toggle(true);
             }
+
             lastScreenOn = millis();
         }
-        if (espClient.connected()) {
+
+        if (!Config.aprs_is.active) {
+            aprsisState = "OFF"; 
+        } else if (espClient.connected()) {
             aprsisState = "OK"; 
         } else {
             aprsisState = "--";
+
             if (!Config.display.alwaysOn) {
                 display_toggle(true);
             }
+
             lastScreenOn = millis();
         }
-        secondLine = "WiFi: " + wifiState + "  APRS-IS: " + aprsisState;
+        
+        secondLine = "WiFi: " + wifiState + " APRS-IS: " + aprsisState;
     }
 
     String createPacket(String packet) {
-        if (stationMode>1) {
+        if (!(Config.aprs_is.active && Config.digi.mode == 0)) { // Check if NOT only IGate
             return packet.substring(3, packet.indexOf(":")) + ",qAR," + Config.callsign + packet.substring(packet.indexOf(":"));// + "\n";
         } else {
             return packet.substring(3, packet.indexOf(":")) + ",qAO," + Config.callsign + packet.substring(packet.indexOf(":"));// + "\n";
@@ -103,14 +112,6 @@ namespace APRS_IS_Utils {
                     AddresseeAndMessage = packet.substring(packet.indexOf("::")+2);  
                     Addressee = AddresseeAndMessage.substring(0,AddresseeAndMessage.indexOf(":"));
                     Addressee.trim();
-
-                    if (stationMode!=1 && Config.igateRepeatsLoRaPackets && Addressee != Config.callsign) { // if its not for me
-                        String digiRepeatedPacket = DIGI_Utils::generateDigiRepeatedPacket(packet.substring(3), Config.callsign);
-                        if (digiRepeatedPacket != "X") {
-                            delay(500);
-                            LoRa_Utils::sendNewPacket("APRS", digiRepeatedPacket);
-                        }
-                    }
                     
                     if (packet.indexOf("::") > 10 && Addressee == Config.callsign) {      // its a message for me!                     
                         if (AddresseeAndMessage.indexOf("{")>0) {     // ack?
@@ -208,7 +209,8 @@ namespace APRS_IS_Utils {
                     #ifndef TextSerialOutputForApp
                     Serial.print("Received from APRS-IS  : " + packet);
                     #endif
-                    if ((stationMode==2 || stationMode==5) && STATION_Utils::wasHeard(Addressee)) {
+
+                    if (Config.aprs_is.toRF && STATION_Utils::wasHeard(Addressee)) {
                         LoRa_Utils::sendNewPacket("APRS", LoRa_Utils::generatePacket(packet));
                         display_toggle(true);
                         lastScreenOn = millis();
@@ -220,19 +222,17 @@ namespace APRS_IS_Utils {
         }
     }
 
-    void loop() {
-        checkStatus();
-        show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);    
-        while (espClient.connected()) {
-            Utils::checkDisplayInterval();
-            Utils::checkBeaconInterval();
-            processLoRaPacket(LoRa_Utils::receivePacket());            
+    void loop(String packet) {
+        if (espClient.connected()) {
+            processLoRaPacket(packet);
+
             if (espClient.available()) {
-                String aprsisPacket;
-                aprsisPacket.concat(espClient.readStringUntil('\r'));
+                String aprsisPacket = espClient.readStringUntil('\r');
+
+                // Serial.println(aprsisPacket);
+
                 processAPRSISPacket(aprsisPacket);
             }
-            ElegantOTA.loop();
         }
     }
 

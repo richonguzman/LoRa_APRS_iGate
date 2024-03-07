@@ -9,8 +9,6 @@
 
 
 namespace WEB_Utils {
-  
-    void loop();
 
     void handleNotFound(AsyncWebServerRequest *request);
     void handleStatus(AsyncWebServerRequest *request);

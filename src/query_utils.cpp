@@ -2,11 +2,9 @@
 #include "query_utils.h"
 
 extern Configuration        Config;
-extern WiFi_AP              *currentWiFi;
 extern std::vector<String>  lastHeardStation;
 extern std::vector<String>  lastHeardStation_temp;
 extern String               versionDate;
-extern int                  stationMode;
 
 
 namespace QUERY_Utils {
@@ -16,9 +14,9 @@ namespace QUERY_Utils {
         if (query=="?APRS?" || query=="?aprs?" || query=="?Aprs?" || query=="H" || query=="h" || query=="HELP" || query=="Help" || query=="help" || query=="?") {
             answer = "?APRSV ?APRSP ?APRSL ?APRSH ?WHERE callsign";
         } else if (query=="?APRSV" || query=="?aprsv" || query=="?Aprsv") {
-            answer = "CA2RXU_LoRa_iGate 1.3 v" + versionDate + " sM" + String(stationMode);
+            answer = "CA2RXU_LoRa_iGate 1.3 v" + versionDate;
         } else if (query=="?APRSP" || query=="?aprsp" || query=="?Aprsp") {
-            answer = "iGate QTH: " + String(currentWiFi->latitude,2) + " " + String(currentWiFi->longitude,2);
+            answer = "iGate QTH: " + String(Config.beacon.latitude,2) + " " + String(Config.beacon.longitude,2);
         } else if (query=="?APRSL" || query=="?aprsl" || query=="?Aprsl") {
             if (lastHeardStation.size() == 0) {
                 answer = "No Station Listened in the last " + String(Config.rememberStationTime) + "min.";

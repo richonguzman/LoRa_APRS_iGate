@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>LoRa iGate</title>
+        <title>LoRa iGate & Digi software &minus; Ricardo Guzman CA2RXU</title>
         <link rel="stylesheet" href="/bootstrap.css" />
         <link rel="stylesheet" href="/style.css" />
     </head>
@@ -18,6 +18,7 @@
                         >CA2RXU's LoRa iGate Configuration</a
                     >
                     <div class="d-flex">
+                        <a href="/update" class="btn btn-warning mx-2"> OTA </a>
                         <button
                             class="btn btn-primary mx-2"
                             type="button"
@@ -45,7 +46,7 @@
             <div class="container">
                 <main>
                     <div class="col-10 my-5 mx-auto">
-                        <div class="row">
+                        <!-- <div class="row">
                             <div class="d-flex align-items-center">
                                 <img
                                     src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHgAAAB4CAYAAAA5ZDbSAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAQ6SURBVHgB7d0/axRBGMfx50IMWPoKkpA02gUsLfZdqOCLOPBFWAliHbCUVNpaxQNrIY0WVjZaJlUsIsZ5uDu9bGb/zMwzs/PM/L7wIG4Ocflwl7ndvVsihBBCmTajunpk5uHG33+aOSGkvhdmLs1cW+bKzDEhle2a+UZ22Pacrx6PlMRYXc/arrkkIKvIBxfISgrBBXLmSeACOdMkcYGcWTFwgZxJMXGBPHEpcIE8USlxgSzcbGD2KD0ukIXKGRfIAuWOC+TANOACOSAtuEAemQ10a2P2KV9cIA+0ZZltMzurOaT8cYHcUx+wJlwgd9QFrBEXyJZswAekFxfIrdq4GhZUQO7Itlq+QzoXVEC21AdcIm51yF3AJeNWhWwDLmFBBeRVmg4/Atmj2nGLR/bCbZrm2qWx/+7Ekwx5i9LGO/XFzF2qO97/r5QAOSUwcG+WBDkVMHDtRUdOAcz/ed4J4NqLihwbGLjjioYcExi4bkVBjgUMXL/EkWMAAzcsUWRpYODKJIYsCQxc2USQpYCBG6dgZAlg4MYtCDkUGLhp8kYOAQZu2ryQfYGT4S7PAKJVzsg+wEmfubNZbd+XOpgTsiswXpbzaDSyCzBw82oU8lhg4ObZIPIYYODmXS/yEDBwdcQ+72w/6AMGrq6OaHnLghv1AQNXX6/bG7qAPxNwNbbf3mAD5qf5EaEisgG/IVRMNuA9QsVkA94mpLWP7Q2pP5uE4vayvQHA5bQw86m90Qb8i5C22Kyx/cAG/IGQphj3ftcPbcBzM78JaWiN+73rATZgfvAzWn4SHeXbIC7Xtcg6MfOUgJxro3C5vlU0kPNsNC439DYJyHnlhMuNeR8M5DxyxuXGHugA8rR54XIuR7KAPE3euJzroUogpy0Il/M5Fg3kNAXjcr4nG4AcNxFcLuTc78nqz7e0/A7KLDo9PbV+nkn6Q2xnZ2c0n88pQmK4XOjJ/eyQm6YhxYnichLng/FyLZM4Lid1wh/IYUXB5SSv6ACyX9FwOelLdoDsVlRcLsY1WUAeV3RcLtZFd0Duj3EfUGRcLuZVlUC2lwyXi32Re/D75IuLC1osFtYDFXxAo73dts21MV/8wgc6PEqKm7LHZv5QnndASTV8p5U9unl7oaJ6QvUi23CLA+YdqhGZcQ/Jfmu/olrvVE3Ia9wdqgB4sxp+JzPuPv2/+XV1lYzcxq32Q34lvlzbcKsF5h0vCZlxD+g2btXApSCvF1TbBOB/ba4oNSOvn7lr3KpWzC5pXHgVf4RKOk3P5CqOUEmn5eW6CxfAA2n4ndyHC+AR5YwMXOFyWngx7i4h8XJABm7kpkQGbqKmQAZu4lIiA3eiUiADd+JiIgM3k2IgAzezJJGBm2kSyMDNvBBk4CrJBxm4ynJB/kHAVRnf3OucumGvzBxTBZV+eouhn5u5t7HtvZlXhBBCCCEUsb+qGDWF0d8l5AAAAABJRU5ErkJggg=="
@@ -103,7 +104,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
 
                         <div class="row my-5 d-flex align-items-top">
                             <div class="col-lg-3 col-sm-12">
@@ -124,7 +125,7 @@
                                             d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"
                                         />
                                     </svg>
-                                    Identification
+                                    Station
                                 </h5>
                                 <small
                                     >Add your ham callsign and SSID. Optionally,
@@ -133,30 +134,129 @@
                                 >
                             </div>
                             <div class="col-lg-9 col-sm-12">
-                                <div class="col-12">
-                                    <label for="callsign" class="form-label"
-                                        >Callsign</label
+                                <div class="row">
+                                    <div class="col-12">
+                                        <label for="callsign" class="form-label"
+                                            >Callsign and SSID</label
+                                        >
+                                        <input
+                                            type="text"
+                                            name="callsign"
+                                            id="callsign"
+                                            class="form-control"
+                                            placeholder="N0CALL-10"
+                                            required=""
+                                        />
+                                    </div>
+                                    <div class="col-12 mt-3">
+                                        <label
+                                            for="beacon.comment"
+                                            class="form-label"
+                                            >Beacon Comment</label
+                                        >
+                                        <input
+                                            type="text"
+                                            name="beacon.comment"
+                                            id="beacon.comment"
+                                            class="form-control"
+                                            placeholder="LoRa APRS"
+                                        />
+                                    </div>
+                                    <div class="col-12 mt-3">
+                                        <label
+                                            for="beacon.path"
+                                            class="form-label"
+                                            >Beacon path</label
+                                        >
+                                        <input
+                                            type="text"
+                                            name="beacon.path"
+                                            id="beacon.path"
+                                            class="form-control"
+                                            placeholder="WIDE1-1"
+                                            required=""
+                                        />
+                                    </div>
+                                    <div class="col-8 mt-3">
+                                        <input
+                                            type="hidden"
+                                            name="beacon.overlay"
+                                            id="beacon.overlay"
+                                            class="form-control"
+                                            size="1"
+                                            required=""
+                                        />
+                                        <input
+                                            type="hidden"
+                                            name="beacon.symbol"
+                                            id="beacon.symbol"
+                                            class="form-control"
+                                            size="1"
+                                            required=""
+                                        />
+                                        <label
+                                            for="action.symbol"
+                                            class="form-label"
+                                            >Symbol</label
+                                        >
+                                        <select
+                                            class="form-select form-select"
+                                            name="action.symbol"
+                                            id="action.symbol"
+                                        >
+                                            <option value="L#">
+                                                Green star with L
+                                            </option>
+                                            <option value="L_">
+                                                Blue circle with L
+                                            </option>
+                                            <option value="L&">
+                                                Black diamond with L
+                                            </option>
+                                            <option value="La">
+                                                Red diamond with L
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div
+                                        class="col-4 mt-3"
+                                        style="text-align: center"
                                     >
-                                    <input
-                                        type="text"
-                                        name="callsign"
-                                        id="callsign"
-                                        class="form-control"
-                                        placeholder="N0CALL-10"
-                                        required=""
-                                    />
-                                </div>
-                                <div class="col-12 mt-3">
-                                    <label for="iGateComment" class="form-label"
-                                        >APRS Beacon Comment</label
-                                    >
-                                    <input
-                                        type="text"
-                                        name="iGateComment"
-                                        id="iGateComment"
-                                        class="form-control"
-                                        placeholder="LoRa_APRS_iGate"
-                                    />
+                                        <img
+                                            src=""
+                                            width="60"
+                                            height="60"
+                                            class="me-2"
+                                        />
+                                    </div>
+                                    <div class="col-6 mt-3">
+                                        <label
+                                            for="beacon.latitude"
+                                            class="form-label"
+                                            >Latitude</label
+                                        >
+                                        <input
+                                            type="text"
+                                            name="beacon.latitude"
+                                            id="beacon.latitude"
+                                            placeholder="-33.440"
+                                            class="form-control"
+                                        />
+                                    </div>
+                                    <div class="col-6 mt-3">
+                                        <label
+                                            for="beacon.longitude"
+                                            class="form-label"
+                                            >Longitude</label
+                                        >
+                                        <input
+                                            type="text"
+                                            name="beacon.longitude"
+                                            id="beacon.longitude"
+                                            placeholder="-70.613"
+                                            class="form-control"
+                                        />
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -204,7 +304,7 @@
                                         >Password</label
                                     >
                                     <input
-                                        type="text"
+                                        type="password"
                                         name="wifi.autoAP.password"
                                         id="wifi.autoAP.password"
                                         class="form-control"
@@ -327,6 +427,54 @@
                             </div>
                             <div class="col-lg-9 col-sm-12">
                                 <div class="row">
+                                    <div class="col-12">
+                                        <div class="form-check form-switch">
+                                            <input
+                                                type="checkbox"
+                                                name="aprs_is.active"
+                                                id="aprs_is.active"
+                                                class="form-check-input"
+                                            />
+                                            <label
+                                                for="aprs_is.active"
+                                                class="form-label"
+                                                >Enable APRS-IS
+                                                connection</label
+                                            >
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="form-check form-switch">
+                                            <input
+                                                type="checkbox"
+                                                name="aprs_is.toRF"
+                                                id="aprs_is.toRF"
+                                                class="form-check-input"
+                                            />
+                                            <label
+                                                for="aprs_is.toRF"
+                                                class="form-label"
+                                                >Gate APRS-IS traffic to
+                                                RF</label
+                                            >
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="form-check form-switch">
+                                            <input
+                                                type="checkbox"
+                                                name="beacon.sendViaAPRSIS"
+                                                id="beacon.sendViaAPRSIS"
+                                                class="form-check-input"
+                                            />
+                                            <label
+                                                for="beacon.sendViaAPRSIS"
+                                                class="form-label"
+                                                >Send our beacon to
+                                                APRS-IS</label
+                                            >
+                                        </div>
+                                    </div>
                                     <div class="col-8">
                                         <label
                                             for="aprs_is.server"
@@ -370,22 +518,18 @@
                                             class="form-control"
                                         />
                                     </div>
-                                    <div class="col-4" class="form-label">
-                                        <label for="aprs_is.reportingDistance"
-                                            >Reporting Distance</label
+                                    <div class="col-4">
+                                        <label
+                                            for="aprs_is.filter"
+                                            class="form-label"
+                                            >Filter</label
                                         >
-                                        <div class="input-group mt-2">
-                                            <input
-                                                type="text"
-                                                class="form-control"
-                                                placeholder="30"
-                                                name="aprs_is.reportingDistance"
-                                                id="aprs_is.reportingDistance"
-                                            />
-                                            <span class="input-group-text"
-                                                >Km</span
-                                            >
-                                        </div>
+                                        <input
+                                            type="text"
+                                            class="form-control"
+                                            name="aprs_is.filter"
+                                            id="aprs_is.filter"
+                                        />
                                     </div>
                                 </div>
                             </div>
@@ -427,6 +571,8 @@
                                                 >Always On</label
                                             >
                                         </div>
+                                    </div>
+                                    <div class="col-6">
                                         <div
                                             class="form-check form-switch mt-1"
                                         >
@@ -443,19 +589,45 @@
                                             >
                                         </div>
                                     </div>
-                                    <div class="form-floating col-6 p-1">
-                                        <input
-                                            type="text"
-                                            name="display.timeout"
-                                            id="display.timeout"
-                                            value="4"
-                                            class="form-control"
-                                        />
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-6">
                                         <label
                                             for="display.timeout"
                                             class="form-label"
                                             >Display Timeout</label
                                         >
+                                        <div class="input-group">
+                                            <input
+                                                type="text"
+                                                name="display.timeout"
+                                                id="display.timeout"
+                                                value="4"
+                                                class="form-control"
+                                            />
+                                            <span class="input-group-text"
+                                                >seconds</span
+                                            >
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <label
+                                            for="other.rememberStationTime"
+                                            class="form-label"
+                                            >Remember Station Time</label
+                                        >
+                                        <div class="input-group">
+                                            <input
+                                                type="text"
+                                                name="other.rememberStationTime"
+                                                id="other.rememberStationTime"
+                                                placeholder="30"
+                                                class="form-control"
+                                            />
+                                            <span class="input-group-text"
+                                                >minutes</span
+                                            >
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -479,55 +651,62 @@
                                     </svg>
                                     Digipeating
                                 </h5>
-                                <small
-                                    >Define the location coordinates for the
-                                    Digipeater mode, and a special comment if
-                                    you like.</small
-                                >
+                                <small>Define the Digipeater mode</small>
                             </div>
                             <div class="col-9 mt-2">
                                 <div class="row">
-                                    <div class="col-6">
+                                    <div class="col-12">
                                         <label
-                                            for="digi.latitude"
+                                            for="digi.mode"
                                             class="form-label"
-                                            >Latitude</label
+                                            >Repeater Mode</label
                                         >
-                                        <input
-                                            type="text"
-                                            name="digi.latitude"
-                                            id="digi.latitude"
-                                            placeholder="-33.440"
-                                            class="form-control"
-                                        />
-                                    </div>
-                                    <div class="col-6">
-                                        <label
-                                            for="digi.longitude"
-                                            class="form-label"
-                                            >Longitude</label
+                                        <select
+                                            class="form-select form-select"
+                                            name="digi.mode"
                                         >
-                                        <input
-                                            type="text"
-                                            name="digi.longitude"
-                                            id="digi.longitude"
-                                            placeholder="-70.613"
-                                            class="form-control"
-                                        />
+                                            <option value="0">
+                                                off
+                                            </option>
+                                            <option value="2">
+                                                WIDE1 (fill-in) Digi
+                                            </option>
+                                        </select>
                                     </div>
                                 </div>
-                                <div class="col-12 mt-3">
-                                    <label for="digi.comment" class="form-label"
-                                        >Digipeater APRS Comment</label
-                                    >
-                                    <input
-                                        type="text"
-                                        name="digi.comment"
-                                        id="digi.comment"
-                                        class="form-control"
-                                        placeholder="LoRa_APRS_Digipeater"
-                                    />
-                                </div>
+                                <!-- <div class="row mt-3">
+                                    <div class="col-6">
+                                        <div class="form-check form-switch">
+                                            <input
+                                                type="checkbox"
+                                                name="beacon.igateSendsLoRaBeacon"
+                                                id="beacon.igateSendsLoRaBeacon"
+                                                class="form-check-input"
+                                            />
+                                            <label
+                                                for="beacon.igateSendsLoRaBeacon"
+                                                class="form-label"
+                                                >IGate sends LoRa beacon</label
+                                            >
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="form-check form-switch">
+                                            <input
+                                                type="checkbox"
+                                                name="beacon.igateRepeatLoRaPackets"
+                                                id="beacon.igateRepeatLoRaPackets"
+                                                class="form-check-input"
+                                            />
+                                            <label
+                                                for="beacon.igateRepeatLoRaPackets"
+                                                class="form-label"
+                                                >IGate repeat LoRa
+                                                packets</label
+                                            >
+                                        </div>
+                                    </div>
+                                </div> -->
                             </div>
                         </div>
                         <hr />
@@ -572,11 +751,57 @@
                                         >Password</label
                                     >
                                     <input
-                                        type="text"
+                                        type="password"
                                         name="ota.password"
                                         id="ota.password"
                                         class="form-control"
                                     />
+                                </div>
+                            </div>
+                        </div>
+                        <hr />
+
+                        <div class="row my-5 d-flex align-items-top">
+                            <div class="col-lg-3 col-sm-12">
+                                <h5>
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="20"
+                                        height="20"
+                                        fill="currentColor"
+                                        class="bi bi-broadcast-pin"
+                                        viewBox="0 0 16 16"
+                                    >
+                                        <path
+                                            d="M3.05 3.05a7 7 0 0 0 0 9.9.5.5 0 0 1-.707.707 8 8 0 0 1 0-11.314.5.5 0 0 1 .707.707m2.122 2.122a4 4 0 0 0 0 5.656.5.5 0 1 1-.708.708 5 5 0 0 1 0-7.072.5.5 0 0 1 .708.708m5.656-.708a.5.5 0 0 1 .708 0 5 5 0 0 1 0 7.072.5.5 0 1 1-.708-.708 4 4 0 0 0 0-5.656.5.5 0 0 1 0-.708m2.122-2.12a.5.5 0 0 1 .707 0 8 8 0 0 1 0 11.313.5.5 0 0 1-.707-.707 7 7 0 0 0 0-9.9.5.5 0 0 1 0-.707zM6 8a2 2 0 1 1 2.5 1.937V15.5a.5.5 0 0 1-1 0V9.937A2 2 0 0 1 6 8"
+                                        />
+                                    </svg>
+                                    Telemetry
+                                </h5>
+                                <small>Define the telemetry</small>
+                            </div>
+                            <div class="col-9 mt-2">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="form-check form-switch">
+                                            <input
+                                                type="checkbox"
+                                                name="bme.active"
+                                                id="bme.active"
+                                                class="form-check-input"
+                                            />
+                                            <label
+                                                for="bme.active"
+                                                class="form-label"
+                                                ><b>Activate Wx Telemetry</b>
+                                                <small
+                                                    >Requires a BME/BMP280 or
+                                                    BME680 sensor
+                                                    installed</small
+                                                ></label
+                                            >
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -606,37 +831,35 @@
                             </div>
                             <div class="col-lg-9 col-sm-12">
                                 <div class="row">
-                                    <div class="col-6">
+                                    <div class="col-12">
+                                        <div class="form-check form-switch">
+                                            <input
+                                                type="checkbox"
+                                                name="beacon.sendViaRF"
+                                                id="beacon.sendViaRF"
+                                                class="form-check-input"
+                                            />
+                                            <label
+                                                for="beacon.sendViaRF"
+                                                class="form-label"
+                                                >Send beacon via RF</label
+                                            >
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row mt-3">
+                                    <div class="col-12">
                                         <label
-                                            for="other.beaconInterval"
+                                            for="beacon.interval"
                                             class="form-label"
                                             >Interval</label
                                         >
                                         <div class="input-group">
                                             <input
                                                 type="text"
-                                                name="other.beaconInterval"
-                                                id="other.beaconInterval"
+                                                name="beacon.interval"
+                                                id="beacon.interval"
                                                 placeholder="15"
-                                                class="form-control"
-                                            />
-                                            <span class="input-group-text"
-                                                >minutes</span
-                                            >
-                                        </div>
-                                    </div>
-                                    <div class="col-6">
-                                        <label
-                                            for="other.rememberStationTime"
-                                            class="form-label"
-                                            >Remember Station Time</label
-                                        >
-                                        <div class="input-group">
-                                            <input
-                                                type="text"
-                                                name="other.rememberStationTime"
-                                                id="other.rememberStationTime"
-                                                placeholder="30"
                                                 class="form-control"
                                             />
                                             <span class="input-group-text"
@@ -693,39 +916,6 @@
                                         >
                                     </div>
                                 </div>
-                                <div class="row mt-3">
-                                    <div class="col-6">
-                                        <div class="form-check form-switch">
-                                            <input
-                                                type="checkbox"
-                                                name="other.igateSendsLoRaBeacon"
-                                                id="other.igateSendsLoRaBeacon"
-                                                class="form-check-input"
-                                            />
-                                            <label
-                                                for="other.igateSendsLoRaBeacon"
-                                                class="form-label"
-                                                >IGate sends LoRa beacon</label
-                                            >
-                                        </div>
-                                    </div>
-                                    <div class="col-6">
-                                        <div class="form-check form-switch">
-                                            <input
-                                                type="checkbox"
-                                                name="other.igateRepeatLoRaPackets"
-                                                id="other.igateRepeatLoRaPackets"
-                                                class="form-check-input"
-                                            />
-                                            <label
-                                                for="other.igateRepeatLoRaPackets"
-                                                class="form-label"
-                                                >IGate repeat LoRa
-                                                packets</label
-                                            >
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                         <hr />
@@ -763,7 +953,7 @@
                                     <label
                                         for="syslog.active"
                                         class="form-label"
-                                        >Active</label
+                                        >Enable syslog</label
                                     >
                                 </div>
                                 <div class="row mt-3">
@@ -826,16 +1016,46 @@
                             <div class="col-lg-9 col-sm-12">
                                 <div class="row">
                                     <div class="col-6">
+                                        <div class="form-check form-switch">
+                                            <input
+                                                type="checkbox"
+                                                name="lora.txActive"
+                                                id="lora.txActive"
+                                                class="form-check-input"
+                                            />
+                                            <label
+                                                for="lora.txActive"
+                                                class="form-label"
+                                                >Enable LoRa TX</label
+                                            >
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="form-check form-switch">
+                                            <input
+                                                type="checkbox"
+                                                name="lora.rxActive"
+                                                id="lora.rxActive"
+                                                class="form-check-input"
+                                            />
+                                            <label
+                                                for="lora.rxActive"
+                                                class="form-label"
+                                                >Enable LoRa RX</label
+                                            >
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
                                         <label
-                                            for="lora.digirepeaterTxFreq"
+                                            for="lora.txFreq"
                                             class="form-label"
                                             >Tx Frequency</label
                                         >
                                         <div class="input-group">
                                             <input
                                                 type="text"
-                                                name="lora.digirepeaterTxFreq"
-                                                id="lora.digirepeaterTxFreq"
+                                                name="lora.txFreq"
+                                                id="lora.txFreq"
                                                 placeholder="433775000"
                                                 class="form-control"
                                             />
@@ -853,18 +1073,17 @@
                                     </div>
                                     <div class="col-6">
                                         <label
-                                            for="lora.digirepeaterRxFreq"
+                                            for="lora.rxFreq"
                                             class="form-label"
                                             >Rx Frequency</label
                                         >
                                         <div class="input-group">
                                             <input
                                                 type="text"
-                                                name="lora.digirepeaterRxFreq"
-                                                id="lora.digirepeaterRxFreq"
+                                                name="lora.rxFreq"
+                                                id="lora.rxFreq"
                                                 placeholder="433775000"
                                                 class="form-control"
-                                                disabled
                                             />
                                             <span class="input-group-text"
                                                 >Hz</span
@@ -872,7 +1091,43 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="row mt-3">
+                                <div class="row mt-4">
+                                    <div class="col-12 mb-4">
+                                        <label
+                                            for="action.speed"
+                                            class="form-label"
+                                            >Predefined speeds</label
+                                        >
+                                        <select
+                                            class="form-select form-select"
+                                            name="action.speed"
+                                            id="action.speed"
+                                        >
+                                            <option value="300">
+                                                BW 125khz CR 4:5 SF 12 (Slow
+                                                Standard, 300bps)
+                                            </option>
+                                            <option value="244">
+                                                BW 125khz CR 4:6 SF 12 (244bps)
+                                            </option>
+                                            <option value="209">
+                                                BW 125khz CR 4:7 SF 12 (209bps)
+                                            </option>
+                                            <option value="183">
+                                                BW 125khz CR 4:8 SF 12 (183bps)
+                                            </option>
+                                            <option value="610">
+                                                BW 125khz CR 4:8 SF 10 (610bps)
+                                            </option>
+                                            <option value="1200">
+                                                BW 125khz CR 4:7 SF 9 (Fast
+                                                Standard, 1200bps)
+                                            </option>
+                                            <option value="">
+                                                User defined
+                                            </option>
+                                        </select>
+                                    </div>
                                     <div class="col-5">
                                         <label
                                             for="lora.signalBandwidth"
@@ -937,9 +1192,10 @@
                                             required=""
                                         >
                                             <option value="4">4</option>
-                                            <option value="5" selected>
-                                                5
-                                            </option>
+                                            <option value="5">5</option>
+                                            <option value="6">6</option>
+                                            <option value="7">7</option>
+                                            <option value="8">8</option>
                                         </select>
                                     </div>
                                     <div class="col-6">
@@ -950,10 +1206,13 @@
                                         >
                                         <div class="input-group">
                                             <input
-                                                type="text"
+                                                type="number"
                                                 name="lora.power"
                                                 id="lora.power"
                                                 placeholder="20"
+                                                min="0"
+                                                max="23"
+                                                step="1"
                                                 class="form-control"
                                                 required=""
                                             />

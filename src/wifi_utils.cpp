@@ -9,7 +9,6 @@ extern Configuration  Config;
 extern WiFi_AP        *currentWiFi;
 extern int            myWiFiAPIndex;
 extern int            myWiFiAPSize;
-extern int            stationMode;
 extern uint32_t       previousWiFiMillis;
 extern bool           WiFiConnected;
 extern long           WiFiAutoAPTime;
@@ -32,7 +31,7 @@ namespace WIFI_Utils {
         WiFi.mode(WIFI_MODE_NULL);
 
         WiFi.mode(WIFI_AP);
-        WiFi.softAP(Config.callsign + " AP", "1234567890");
+        WiFi.softAP(Config.callsign + " AP", Config.wifiAutoAP.password);
 
         WiFiAutoAPTime = millis();
         WiFiAutoAPStarted = true;
@@ -65,9 +64,7 @@ namespace WIFI_Utils {
                     delay(1000);
                     if(myWiFiAPIndex >= (myWiFiAPSize-1)) {
                         myWiFiAPIndex = 0;
-                        if (stationMode==5) {
-                            wifiCounter++;
-                        }
+                        wifiCounter++;
                     } else {
                         myWiFiAPIndex++;
                     }
@@ -123,36 +120,8 @@ namespace WIFI_Utils {
     }
 
     void setup() {
-        if (stationMode==1 || stationMode==2) {
-            if (stationMode==1) {
-                Serial.println("stationMode ---> iGate (only Rx)");
-            } else {
-                Serial.println("stationMode ---> iGate (Rx + Tx)");
-            }
-            startWiFi();
-            btStop();
-        } else if (stationMode==3 || stationMode==4) {
-            if (stationMode==3) {
-                Serial.println("stationMode ---> DigiRepeater (Rx freq == Tx freq)");
-            } else {
-                Serial.println("stationMode ---> DigiRepeater (Rx freq != Tx freq)");
-            }
-            startAutoAP();
-            btStop();
-        } else if (stationMode==5) {
-            Serial.println("stationMode ---> iGate when Wifi/APRS available (DigiRepeater when not)");
-            startWiFi();
-            btStop();
-        } else { 
-            Serial.println("stationMode ---> NOT VALID");
-            show_display("------- ERROR -------", "stationMode Not Valid", "device will autofix", "and then reboot", 1000);
-
-            Config.stationMode = 1;     // Inform about that but then change the station mode to 1 and reset the device
-            Config.writeFile();
-
-            ESP.restart();
-        }
-
+        startWiFi();
+        btStop();
     }
 
 }

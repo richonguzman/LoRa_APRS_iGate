@@ -13,7 +13,7 @@ namespace Utils {
     void checkBeaconInterval();
     void checkDisplayInterval();
     void checkWiFiInterval();
-    void validateDigiFreqs();
+    void validateFreqs();
     void typeOfPacket(String packet, String packetType);
     void onOTAStart();
     void onOTAProgress(size_t current, size_t final);

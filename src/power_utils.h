@@ -12,7 +12,6 @@ namespace POWER_Utils {
     void deactivateLoRa();
     bool begin(TwoWire &port);
     void setup();
-    //void lowerCpuFrequency();
 
 }
 

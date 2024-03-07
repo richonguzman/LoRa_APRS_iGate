@@ -7,6 +7,7 @@
 
 extern Configuration        Config;
 extern uint32_t             lastScreenOn;
+extern bool                 isUpdatingOTA;
 
 unsigned long ota_progress_millis = 0;
 
@@ -31,6 +32,7 @@ namespace OTA_Utils {
         display_toggle(true);
         lastScreenOn = millis();
         show_display("", "", "", " OTA update started!", "", "", "", 1000);
+        isUpdatingOTA = true;
     }
 
     void onOTAProgress(size_t current, size_t final) {
@@ -53,6 +55,7 @@ namespace OTA_Utils {
             Serial.println("There was an error during OTA update!");
             show_display("", "", " OTA update fail!", "", "", "", "", 4000);
         }
+        isUpdatingOTA = false;
     }
     
 }
