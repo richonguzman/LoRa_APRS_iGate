@@ -283,7 +283,7 @@ void Configuration::init() {
     aprs_is.passcode = "XYZVW";
     aprs_is.server = "rotate.aprs2.net";
     aprs_is.port = 14580;
-    aprs_is.filter = ""; // new
+    aprs_is.filter = "m/10"; // new
     aprs_is.toRF = false; // new
 
     // loramodule.iGateFreq = 433775000; // deprecated

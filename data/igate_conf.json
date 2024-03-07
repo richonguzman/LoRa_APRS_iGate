@@ -26,7 +26,7 @@
         "passcode": "XYZVW",
         "server": "rotate.aprs2.net",
         "port": 14580,
-        "filter": "",
+        "filter": "m/10",
         "toRF": false
     },
     "lora": {
