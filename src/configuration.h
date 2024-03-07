@@ -9,8 +9,8 @@ class WiFi_AP {
 public:
     String  ssid;
     String  password;
-    double  latitude;
-    double  longitude;
+    // double  latitude; // deprecated
+    // double  longitude; // deprecated
 };
 
 class WiFi_Auto_AP {
@@ -19,27 +19,47 @@ public:
     int     powerOff;
 };
 
+class Beacon {
+public:
+    double  latitude; // new
+    double  longitude; // new
+    String  comment; // new
+    String  overlay; // new
+    String  symbol; // new
+    int     interval; // new
+    bool    sendViaRF; // new
+    bool    sendViaAPRSIS; // new
+    String  path; // new
+};
 
 class DIGI {
 public:
-    String  comment;
-    double  latitude;
-    double  longitude;
+    int     mode; // new
+    // String  comment; // deprecated
+    // double  latitude; // deprecated
+    // double  longitude; // deprecated
 };
 
 class APRS_IS {
 public:
+    bool    active; // new
     String  passcode;
     String  server;
     int     port;
-    int     reportingDistance;
+    // int     reportingDistance; // deprecated
+    String  filter; // new
+    bool    toRF; // new
 };
 
 class LoraModule {
 public:
-    long    iGateFreq;
-    long    digirepeaterTxFreq;
-    long    digirepeaterRxFreq;
+    // long    iGateFreq; // deprecated
+    // long    digirepeaterTxFreq; // deprecated
+    // long    digirepeaterRxFreq; // deprecated
+    long    txFreq; // new
+    long    rxFreq; // new
+    bool    txActive; // new
+    bool    rxActive; // new
     int     spreadingFactor;
     long    signalBandwidth;
     int     codingRate4;
@@ -76,18 +96,20 @@ public:
 
 class Configuration {
 public:
+    bool                  reload;
     String                callsign;  
-    int                   stationMode;
-    String                iGateComment;
-    int                   beaconInterval;
-    bool                  igateSendsLoRaBeacons;
-    bool                  igateRepeatsLoRaPackets;
+    // int                   stationMode; // deprecated
+    // String                iGateComment; // deprecated
+    // int                   beaconInterval; // deprecated
+    // bool                  igateSendsLoRaBeacons; // deprecated
+    // bool                  igateRepeatsLoRaPackets; // deprecated
     int                   rememberStationTime;
     bool                  sendBatteryVoltage;
     bool                  externalVoltageMeasurement;
     int                   externalVoltagePin;
     std::vector<WiFi_AP>  wifiAPs;
     WiFi_Auto_AP          wifiAutoAP;
+    Beacon                beacon; // new
     DIGI                  digi;
     APRS_IS               aprs_is;
     LoraModule            loramodule;
@@ -98,6 +120,7 @@ public:
   
     void init();
     void writeFile();
+    void check();
     Configuration();
 
 private:

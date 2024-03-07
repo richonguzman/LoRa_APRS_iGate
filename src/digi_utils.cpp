@@ -10,9 +10,7 @@
 #include "utils.h"
 
 extern Configuration    Config;
-extern int              stationMode;
 extern uint32_t         lastScreenOn;
-extern int              lastStationModeState;
 extern String           iGateBeaconPacket;
 extern String           firstLine;
 extern String           secondLine;
@@ -43,13 +41,13 @@ namespace DIGI_Utils {
                     String repeatedPacket = sender + ">" + tocall + "," + path + packet.substring(packet.indexOf(":"));
                     return repeatedPacket;
                 } else {
-                    return "X";
+                    return "";
                 }
             } else {
-                return "X";
+                return "";
             }
         } else {
-            return "X";
+            return "";
         }
     }
 
@@ -62,32 +60,16 @@ namespace DIGI_Utils {
                 String sender = packet.substring(3,packet.indexOf(">"));
                 STATION_Utils::updateLastHeard(sender);
                 STATION_Utils::updatePacketBuffer(packet);
-                Utils::typeOfPacket(packet, "Digi");
-                if ((stationMode==3 || stationMode==5) && (packet.indexOf("WIDE1-") > 10)) {
+                Utils::typeOfPacket(packet.substring(3), "Digi");
+                if (packet.indexOf("WIDE1-") > 10 && Config.digi.mode == 2) { // If should repeat packet (WIDE1 Digi)
                     loraPacket = generateDigiRepeatedPacket(packet.substring(3), Config.callsign);
-                    if (loraPacket != "X") {
+                    if (loraPacket != "") {
                         delay(500);
                         Serial.println(loraPacket);
                         LoRa_Utils::sendNewPacket("APRS", loraPacket);
                         display_toggle(true);
                         lastScreenOn = millis();
                     }
-                } else if (stationMode==4){
-                    if (packet.indexOf("WIDE1-") == -1) {
-                        loraPacket = packet.substring(3,packet.indexOf(":")) + "," + Config.callsign + "*" + packet.substring(packet.indexOf(":"));
-                    } else {
-                        loraPacket = packet.substring(3,packet.indexOf(",")+1) + Config.callsign + "*" + packet.substring(packet.indexOf(","));
-                    }
-                    delay(500);
-                    if (stationMode==4) {
-                        LoRa_Utils::changeFreqTx();
-                    }
-                    LoRa_Utils::sendNewPacket("APRS", loraPacket);
-                    if (stationMode==4) {
-                        LoRa_Utils::changeFreqRx();
-                    }
-                    display_toggle(true);
-                    lastScreenOn = millis();
                 }
             } else {
                 Serial.println("   ---> LoRa Packet Ignored (first 3 bytes or NOGATE)\n");
@@ -95,21 +77,8 @@ namespace DIGI_Utils {
         }
     }
 
-    void loop() {
-        if (stationMode==3 || stationMode==4 || stationMode==5) {
-            if (lastStationModeState==0 && stationMode==5) {
-                iGateBeaconPacket = GPS_Utils::generateBeacon();
-                lastStationModeState = 1;
-                String Tx = String(Config.loramodule.digirepeaterTxFreq);
-                secondLine = "Rx:" + String(Tx.substring(0,3)) + "." + String(Tx.substring(3,6));
-                secondLine += " Tx:" + String(Tx.substring(0,3)) + "." + String(Tx.substring(3,6));
-                thirdLine = "<<   DigiRepeater  >>";
-            }
-            Utils::checkDisplayInterval();
-            Utils::checkBeaconInterval();
-            show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
-            processPacket(LoRa_Utils::receivePacket());
-        }
+    void loop(String packet) {
+        processPacket(packet);
     }
 
 }

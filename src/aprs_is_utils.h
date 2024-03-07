@@ -19,7 +19,7 @@ namespace APRS_IS_Utils {
     String createPacket(String unprocessedPacket);
     void processLoRaPacket(String packet);
     void processAPRSISPacket(String packet);
-    void loop();
+    void loop(String packet);
 
 }
 

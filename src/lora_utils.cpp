@@ -8,7 +8,6 @@
 #include "display.h"
 
 extern Configuration  Config;
-extern int            stationMode;
 
 #if defined(HELTEC_V3) || defined(TTGO_T_Beam_V1_2_SX1262)
 SX1262 radio = new Module(RADIO_CS_PIN, RADIO_DIO1_PIN, RADIO_RST_PIN, RADIO_BUSY_PIN);
@@ -37,12 +36,7 @@ namespace LoRa_Utils {
         #ifdef HAS_SX127X
         SPI.begin(LORA_SCK, LORA_MISO, LORA_MOSI, LORA_CS);
         LoRa.setPins(LORA_CS, LORA_RST, LORA_IRQ);
-        long freq;
-        if (stationMode==1 || stationMode==2) {
-            freq = Config.loramodule.iGateFreq;
-        } else {
-            freq = Config.loramodule.digirepeaterTxFreq;
-        }
+        long freq = Config.loramodule.rxFreq;
         if (!LoRa.begin(freq)) {
             Serial.println("Starting LoRa failed!");
             show_display("ERROR", "Starting LoRa failed!");
@@ -59,7 +53,7 @@ namespace LoRa_Utils {
         #endif
         #ifdef HAS_SX126X
         SPI.begin(RADIO_SCLK_PIN, RADIO_MISO_PIN, RADIO_MOSI_PIN);
-        float freq = (float)Config.loramodule.iGateFreq/1000000;
+        float freq = (float)Config.loramodule.rxFreq/1000000;
         int state = radio.begin(freq);
         if (state == RADIOLIB_ERR_NONE) {
             Serial.print("Initializing SX126X LoRa Module");
@@ -90,7 +84,35 @@ namespace LoRa_Utils {
         #endif
     }
 
+    void changeFreqTx() {
+        delay(500);
+        #ifdef HAS_SX127X
+        LoRa.setFrequency(Config.loramodule.txFreq);
+        #endif
+        #ifdef HAS_SX126X
+        float freq = (float)Config.loramodule.txFreq/1000000;
+        radio.setFrequency(freq);
+        #endif
+    }
+
+    void changeFreqRx() {
+        delay(500);
+        #ifdef HAS_SX127X
+        LoRa.setFrequency(Config.loramodule.rxFreq);
+        #endif
+        #ifdef HAS_SX126X
+        float freq = (float)Config.loramodule.rxFreq/1000000;
+        radio.setFrequency(freq);
+        #endif
+    }
+    
     void sendNewPacket(const String &typeOfMessage, const String &newPacket) {
+        if (!Config.loramodule.txActive) return;
+
+        if (Config.loramodule.txFreq != Config.loramodule.rxFreq) {
+            changeFreqTx();    
+        }
+
         #if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2) || defined(HELTEC_V3) || defined(ESP32_DIY_LoRa) || defined(ESP32_DIY_1W_LoRa)
         digitalWrite(internalLedPin,HIGH);
         #endif
@@ -125,6 +147,10 @@ namespace LoRa_Utils {
         SYSLOG_Utils::log("Tx", newPacket,0,0,0);
         Serial.print("---> LoRa Packet Tx    : ");
         Serial.println(newPacket);
+
+        if (Config.loramodule.txFreq != Config.loramodule.rxFreq) {
+            changeFreqRx();
+        }
     }
 
     String generatePacket(String aprsisPacket) {
@@ -194,32 +220,10 @@ namespace LoRa_Utils {
         }
         #endif
         
-        if (Config.syslog.active && (stationMode==1 || stationMode==2 || (stationMode==5 && WiFi.status()==WL_CONNECTED)) && loraPacket!="") {
+        if (Config.syslog.active && WiFi.status() == WL_CONNECTED && loraPacket != "") {
             SYSLOG_Utils::log("Rx", loraPacket, rssi, snr, freqError);
         }
         return loraPacket;
-    }
-
-    void changeFreqTx() {
-        delay(500);
-        #ifdef HAS_SX127X
-        LoRa.setFrequency(Config.loramodule.digirepeaterTxFreq);
-        #endif
-        #ifdef HAS_SX126X
-        float freq = (float)Config.loramodule.digirepeaterTxFreq/1000000;
-        radio.setFrequency(freq);
-        #endif
-    }
-
-    void changeFreqRx() {
-        delay(500);
-        #ifdef HAS_SX127X
-        LoRa.setFrequency(Config.loramodule.digirepeaterRxFreq);
-        #endif
-        #ifdef HAS_SX126X
-        float freq = (float)Config.loramodule.digirepeaterRxFreq/1000000;
-        radio.setFrequency(freq);
-        #endif
     }
 
 }

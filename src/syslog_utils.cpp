@@ -5,7 +5,6 @@
 #include "gps_utils.h"
 
 extern Configuration    Config;
-extern int              stationMode;
 
 WiFiUDP udpClient;
 
@@ -14,7 +13,7 @@ namespace SYSLOG_Utils {
 
     void log(String type, String packet, int rssi, float snr, int freqError) {
         String syslogPacket = "<165>1 - " + Config.callsign + " CA2RXU_LoRa_iGate_1.2" + " - - - "; //RFC5424 The Syslog Protocol
-        if (Config.syslog.active && (stationMode==1 || stationMode==2 || (stationMode==5 && WiFi.status()==WL_CONNECTED))) {
+        if (Config.syslog.active && WiFi.status() == WL_CONNECTED) {
             if (type == "APRSIS Tx") {
                 if (packet.indexOf(":>") > 10) {
                     syslogPacket += type + " / StartUp_Status / " + packet.substring(packet.indexOf(":>")+2);
@@ -67,7 +66,7 @@ namespace SYSLOG_Utils {
     }
 
     void setup() {
-        if (Config.syslog.active && (stationMode==1 || stationMode==2 || (stationMode==5 && WiFi.status()==WL_CONNECTED))) {
+        if (Config.syslog.active && WiFi.status() == WL_CONNECTED) {
             udpClient.begin(WiFi.localIP(), 0);
             Serial.println("init : Syslog Server  ...     done!    (at " + Config.syslog.server + ")");
         }

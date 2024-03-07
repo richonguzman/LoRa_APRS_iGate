@@ -16,17 +16,18 @@
 #include "web_utils.h"
 #include "display.h"
 #include "utils.h"
+#include <ElegantOTA.h>
 
 
 Configuration   Config;
 WiFiClient      espClient;
 
-String          versionDate           = "2024.02.25";
+String          versionDate           = "2024.03.07";
 int             myWiFiAPIndex         = 0;
 int             myWiFiAPSize          = Config.wifiAPs.size();
 WiFi_AP         *currentWiFi          = &Config.wifiAPs[myWiFiAPIndex];
 
-int             stationMode           = Config.stationMode;
+bool            isUpdatingOTA         = false;
 bool            statusAfterBoot       = true;
 bool            beaconUpdate          = true;
 uint32_t        lastBeaconTx          = 0;
@@ -36,7 +37,6 @@ uint32_t        lastScreenOn          = millis();
 uint32_t        lastWiFiCheck         = 0;
 bool            WiFiConnect           = true;
 bool            WiFiConnected         = false;
-int             lastStationModeState  = 1;
 
 bool            WiFiAutoAPStarted     = false;
 long            WiFiAutoAPTime        = false;
@@ -69,47 +69,56 @@ void setup() {
     #endif
     delay(1000);
     Utils::setupDisplay();
+
+    Config.check();
+
     WIFI_Utils::setup();
     LoRa_Utils::setup();
-    Utils::validateDigiFreqs();
+    Utils::validateFreqs();
+
     iGateBeaconPacket = GPS_Utils::generateBeacon();
     iGateLoRaBeaconPacket = GPS_Utils::generateiGateLoRaBeacon();
+
     SYSLOG_Utils::setup();
     BME_Utils::setup();
     WEB_Utils::setup();
 }
 
 void loop() {
-    WEB_Utils::loop();
-
     WIFI_Utils::checkIfAutoAPShouldPowerOff();
 
-    if (stationMode==1 || stationMode==2 ) {          // iGate (1 Only Rx / 2 Rx+Tx)
-        if (!WiFiConnected) {
-            thirdLine = Utils::getLocalIP();
-        }
-
-        WIFI_Utils::checkWiFi();
-        if (!espClient.connected()) {
-            APRS_IS_Utils::connect();
-        }
-        APRS_IS_Utils::loop();
-    } else if (stationMode==3 || stationMode==4) {    // DigiRepeater (3 RxFreq=TxFreq / 4 RxFreq!=TxFreq)
-        DIGI_Utils::loop();
-    } else if (stationMode==5) {                      // iGate when WiFi and APRS available , DigiRepeater when not (RxFreq=TxFreq)
-        Utils::checkWiFiInterval();
-        thirdLine = Utils::getLocalIP();
-        if (WiFi.status() == WL_CONNECTED) {  // iGate Mode
-            if (!espClient.connected()) {
-                APRS_IS_Utils::connect();
-            }
-            if (lastStationModeState == 1) {
-                iGateBeaconPacket = GPS_Utils::generateBeacon();
-                lastStationModeState = 0;
-            }
-            APRS_IS_Utils::loop();
-        } else {                              // DigiRepeater Mode
-            DIGI_Utils::loop();
-        }
+    if (isUpdatingOTA) {
+        ElegantOTA.loop();
+        return; // Don't process IGate and Digi during OTA update
     }
+
+    thirdLine = Utils::getLocalIP();
+
+    WIFI_Utils::checkWiFi(); // Always use WiFi, not related to IGate/Digi mode
+    // Utils::checkWiFiInterval();
+
+    if (Config.aprs_is.active && !espClient.connected()) {
+        APRS_IS_Utils::connect();
+    }
+
+    Utils::checkDisplayInterval();
+    Utils::checkBeaconInterval();
+
+    String packet;
+    
+    if (Config.loramodule.rxActive) {
+        packet = LoRa_Utils::receivePacket(); // We need to fetch LoRa packet above APRSIS and Digi
+    }
+
+    APRS_IS_Utils::checkStatus(); // Need that to update display, maybe split this and send APRSIS status to display func?
+
+    if (Config.aprs_is.active) { // If APRSIS enabled
+        APRS_IS_Utils::loop(packet); // Send received packet to APRSIS
+    }
+
+    if (Config.digi.mode == 2) { // If Digi enabled
+        DIGI_Utils::loop(packet); // Send received packet to Digi
+    }
+
+    show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
 }

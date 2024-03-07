@@ -26,7 +26,6 @@ extern String               seventhLine;
 extern uint32_t             lastBeaconTx;
 extern uint32_t             lastScreenOn;
 extern bool                 beaconUpdate;
-extern int                  stationMode;
 extern String               iGateBeaconPacket;
 extern String               iGateLoRaBeaconPacket;
 extern std::vector<String>  lastHeardStation;
@@ -42,23 +41,21 @@ extern bool                 WiFiConnected;
 namespace Utils {
 
     void processStatus() {
-        String status = Config.callsign + ">APLRG1,WIDE1-1";
-        if (stationMode==1 || stationMode==2 || (stationMode==5 && WiFi.status() == WL_CONNECTED)) {
+        String status = Config.callsign + ">APLRG1," + Config.beacon.path;
+        
+        if (Config.aprs_is.active && Config.digi.mode == 0) { // If only IGate
             delay(1000);
             status += ",qAC:>https://github.com/richonguzman/LoRa_APRS_iGate " + versionDate;
             APRS_IS_Utils::upload(status);
             SYSLOG_Utils::log("APRSIS Tx", status,0,0,0);
-        } else {
-            delay(5000);
-            status += ":>https://github.com/richonguzman/LoRa_APRS_iGate " + versionDate;
-            if (stationMode==4) {
-                LoRa_Utils::changeFreqTx();
-            }
-            LoRa_Utils::sendNewPacket("APRS", status);
-            if (stationMode==4) {
-                LoRa_Utils::changeFreqRx();
-            }        
         }
+        // Comment this for now we will need this in the future
+        // } else if (Config.digi.mode == 2) {
+        //     delay(5000);
+        //     status += ":>https://github.com/richonguzman/LoRa_APRS_iGate " + versionDate;
+        //     LoRa_Utils::sendNewPacket("APRS", status); 
+        // }
+
         statusAfterBoot = false;
     }
 
@@ -95,125 +92,60 @@ namespace Utils {
     void checkBeaconInterval() {
         uint32_t lastTx = millis() - lastBeaconTx;
         String beaconPacket, secondaryBeaconPacket;
-        if (lastTx >= Config.beaconInterval*60*1000) {
+
+        if (lastTx >= Config.beacon.interval*60*1000) {
             beaconUpdate = true;    
         }
+
         if (beaconUpdate) {
             display_toggle(true);
-            Serial.println("---- Sending iGate Beacon ----");
+            Serial.println("-- Sending Beacon to APRSIS --");
             STATION_Utils::deleteNotHeard();
+
             activeStations();
+
             if (Config.bme.active) {
                 String sensorData = BME_Utils::readDataSensor();
-                beaconPacket = iGateBeaconPacket.substring(0,iGateBeaconPacket.indexOf(":=")+20) + "_" + sensorData + iGateBeaconPacket.substring(iGateBeaconPacket.indexOf(":=")+21) + " + WX";
-                if (Config.igateSendsLoRaBeacons && stationMode!=1) {
-                    secondaryBeaconPacket = iGateLoRaBeaconPacket + sensorData + Config.iGateComment + " + WX";
-                }
+                beaconPacket = iGateBeaconPacket.substring(0,iGateBeaconPacket.indexOf(":=")+20) + "_" + sensorData + iGateBeaconPacket.substring(iGateBeaconPacket.indexOf(":=")+21);
+                secondaryBeaconPacket = iGateLoRaBeaconPacket + sensorData + Config.beacon.comment;
             } else {
                 beaconPacket = iGateBeaconPacket;
-                if (Config.igateSendsLoRaBeacons && stationMode!=1) {
-                    secondaryBeaconPacket = iGateLoRaBeaconPacket + Config.iGateComment;
-                }
+                secondaryBeaconPacket = iGateLoRaBeaconPacket + Config.beacon.comment;
             }
+
             #if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2)
             if (Config.sendBatteryVoltage) {
                 beaconPacket += " (Batt=" + String(BATTERY_Utils::checkBattery(),2) + "V)";
+                sixthLine = "     (Batt=" + String(BATTERY_Utils::checkBattery(),2) + "V)";
             }
             #endif
+
             if (Config.externalVoltageMeasurement) { 
                 beaconPacket += " (Ext V=" + String(BATTERY_Utils::checkExternalVoltage(),2) + "V)";
+                sixthLine = "    (Ext V=" + String(BATTERY_Utils::checkExternalVoltage(),2) + "V)";
             }
-            if (stationMode==1 || stationMode==2) {
-                thirdLine = getLocalIP();
-                if (!Config.bme.active) {
-                    fifthLine = "";
-                }
-                sixthLine = "";
-                show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING iGate BEACON", 1000);     
-                #if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2)
-                if (Config.sendBatteryVoltage) { 
-                    sixthLine = "     (Batt=" + String(BATTERY_Utils::checkBattery(),2) + "V)";
-                }
-                #endif
-                if (Config.externalVoltageMeasurement) { 
-                    sixthLine = "    (Ext V=" + String(BATTERY_Utils::checkExternalVoltage(),2) + "V)";
-                }
+
+            if (Config.aprs_is.active && Config.beacon.sendViaAPRSIS) {
+                show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING IGATE BEACON", 0); 
+                   
                 seventhLine = "     listening...";
+
                 APRS_IS_Utils::upload(beaconPacket);
-                if (Config.igateSendsLoRaBeacons && stationMode==2) { 
-                    LoRa_Utils::sendNewPacket("APRS", secondaryBeaconPacket);
-                }
-                show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
-            } else if (stationMode==3 || stationMode==4) {
-                String Rx = String(Config.loramodule.digirepeaterRxFreq);
-                String Tx = String(Config.loramodule.digirepeaterTxFreq);
-                if (stationMode==3) {
-                    secondLine = "Rx:" + String(Tx.substring(0,3)) + "." + String(Tx.substring(3,6));
-                } else {
-                    secondLine = "Rx:" + String(Rx.substring(0,3)) + "." + String(Rx.substring(3,6));
-                }
-                secondLine += " Tx:" + String(Tx.substring(0,3)) + "." + String(Tx.substring(3,6));
-                thirdLine = "<<   DigiRepeater  >>";
-                fifthLine = "";
-                sixthLine = "";
-                show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING iGate BEACON", 0);
-                #if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2)
-                if (Config.sendBatteryVoltage) { 
-                    sixthLine = "     (Batt=" + String(BATTERY_Utils::checkBattery(),2) + "V)";
-                }
-                #endif
-                if (Config.externalVoltageMeasurement) { 
-                    sixthLine = "    (Ext V=" + String(BATTERY_Utils::checkExternalVoltage(),2) + "V)";
-                }
-                seventhLine = "     listening...";
-                if (stationMode==4) {
-                    LoRa_Utils::changeFreqTx();
-                }
-                LoRa_Utils::sendNewPacket("APRS", beaconPacket);
-                if (stationMode==4) {
-                    LoRa_Utils::changeFreqRx();
-                }
-            } else if (stationMode==5) {
-                if (!Config.bme.active) {
-                    fifthLine = "";
-                }
-                sixthLine = "";
-                if (WiFi.status() == WL_CONNECTED && espClient.connected()) {
-                    APRS_IS_Utils::checkStatus();
-                    thirdLine = getLocalIP();
-                    show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING iGate BEACON", 1000);        
-                    #if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2)
-                    if (Config.sendBatteryVoltage) { 
-                        sixthLine = "     (Batt=" + String(BATTERY_Utils::checkBattery(),2) + "V)";
-                    }
-                    #endif
-                    if (Config.externalVoltageMeasurement) { 
-                        sixthLine = "    (Ext V=" + String(BATTERY_Utils::checkExternalVoltage(),2) + "V)";
-                    }
-                    seventhLine = "     listening...";
-                    APRS_IS_Utils::upload(beaconPacket);
-                    if (Config.igateSendsLoRaBeacons) { 
-                        LoRa_Utils::sendNewPacket("APRS", secondaryBeaconPacket);
-                    }
-                    show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
-                } else {
-                    show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING iGate BEACON", 0);
-                    #if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2)
-                    if (Config.sendBatteryVoltage) { 
-                        sixthLine = "     (Batt=" + String(BATTERY_Utils::checkBattery(),2) + "V)";
-                    }
-                    #endif
-                    if (Config.externalVoltageMeasurement) { 
-                        sixthLine = "    (Ext V=" + String(BATTERY_Utils::checkExternalVoltage(),2) + "V)";
-                    }
-                    seventhLine = "     listening...";
-                    LoRa_Utils::sendNewPacket("APRS", beaconPacket);
-                }
             }
+
+            if (Config.beacon.sendViaRF) {
+                show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING DIGI BEACON", 0);
+
+                seventhLine = "     listening...";
+
+                LoRa_Utils::sendNewPacket("APRS", secondaryBeaconPacket);
+            }
+
             lastBeaconTx = millis();
             lastScreenOn = millis();
             beaconUpdate = false;
         }
+
         if (statusAfterBoot) {
             processStatus();
         }
@@ -241,21 +173,19 @@ namespace Utils {
         }
     }
 
-    void validateDigiFreqs() {
-        if (stationMode==4) {
-            if (abs(Config.loramodule.digirepeaterTxFreq - Config.loramodule.digirepeaterRxFreq) < 125000) {
-                Serial.println("Tx Freq less than 125kHz from Rx Freq ---> NOT VALID");
-                show_display("Tx Freq is less than ", "125kHz from Rx Freq", "device will autofix", "and then reboot", 1000);
-                Config.loramodule.digirepeaterTxFreq = Config.loramodule.digirepeaterRxFreq;        // Inform about that but then change the digirepeaterTxFreq to digirepeaterRxFreq and reset the device
-                Config.writeFile();
-                ESP.restart();
-            }
+    void validateFreqs() {
+        if (Config.loramodule.txFreq != Config.loramodule.rxFreq && abs(Config.loramodule.txFreq - Config.loramodule.rxFreq) < 125000) {
+            Serial.println("Tx Freq less than 125kHz from Rx Freq ---> NOT VALID");
+            show_display("Tx Freq is less than ", "125kHz from Rx Freq", "device will autofix", "and then reboot", 1000);
+            Config.loramodule.txFreq = Config.loramodule.rxFreq; // Inform about that but then change the TX QRG to RX QRG and reset the device
+            Config.writeFile();
+            ESP.restart();
         }
     }
 
     void typeOfPacket(String packet, String packetType) {
         String sender;
-        if (stationMode==1 || stationMode==2 || (stationMode==5 && WiFi.status()==WL_CONNECTED)) {
+        if (WiFi.status() == WL_CONNECTED) { // If mode 1 2 5
             if (packetType == "LoRa-APRS") {
                 fifthLine = "LoRa Rx ----> APRS-IS";
             } else if (packetType == "APRS-LoRa") {

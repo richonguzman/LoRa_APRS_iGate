@@ -1,46 +1,43 @@
 {
     "callsign": "NOCALL-10",
-    "stationMode": 2,
-    "iGateComment": "LoRa_APRS_iGate",
     "wifi": {
         "autoAP": {
             "password": "1234567890",
             "powerOff": 10
         },
-        "AP": [
-            {
-                "ssid": "WIFI_1",
-                "password": "WIFI_1_password",
-                "latitude": 0.0,
-                "longitude": 0.0
-            },
-            {
-                "ssid": "WIFI_2",
-                "password": "WIFI_2_password",
-                "latitude": 0.0,
-                "longitude": 0.0
-            }
-        ]
+        "AP": []
+    },
+    "beacon": {
+        "latitude": 0.0,
+        "longitude": 0.0,
+        "comment": "LoRa APRS",
+        "interval": 15,
+        "overlay": "L",
+        "symbol": "#",
+        "path": "WIDE1-1",
+        "sendViaAPRSIS": false,
+        "sendViaRF": false
     },
     "digi": {
-        "comment": "LoRa_APRS_Digirepeater",
-        "latitude": 0.0,
-        "longitude": 0.0
+        "mode": 0
     },
     "aprs_is": {
+        "active": false,
         "passcode": "XYZVW",
         "server": "rotate.aprs2.net",
         "port": 14580,
-        "reportingDistance": 30
+        "filter": "",
+        "toRF": false
     },
     "lora": {
-        "iGateFreq": 433775000,
-        "digirepeaterTxFreq": 433775000,
-        "digirepeaterRxFreq": 433900000,
+        "txFreq": 433775000,
+        "rxFreq": 433775000,
         "spreadingFactor": 12,
         "signalBandwidth": 125000,
         "codingRate4": 5,
-        "power": 20
+        "power": 20,
+        "txActive": false,
+        "rxActive": true
     },
     "display": {
         "alwaysOn": true,
@@ -60,9 +57,6 @@
         "password": ""
     },
     "other": {
-        "beaconInterval": 15,
-        "igateSendsLoRaBeacons": false,
-        "igateRepeatsLoRaPackets": false,
         "rememberStationTime": 30,
         "sendBatteryVoltage": false,
         "externalVoltageMeasurement": false,

@@ -4,9 +4,7 @@
 #include "gps_utils.h"
 
 extern Configuration  Config;
-extern WiFi_AP        *currentWiFi;
 extern WiFiClient     espClient;
-extern int            stationMode;
 String                distance;
 
 
@@ -80,49 +78,32 @@ namespace GPS_Utils {
     }
 
     String generateBeacon() {
-        String stationLatitude, stationLongitude, beaconPacket;
-        if (stationMode==1 || stationMode==2 || (stationMode==5 && WiFi.status()==WL_CONNECTED && espClient.connected())) {
-            stationLatitude = processLatitudeAPRS(currentWiFi->latitude);
-            stationLongitude = processLongitudeAPRS(currentWiFi->longitude);
-            beaconPacket = Config.callsign + ">APLRG1,WIDE1-1";
-            if (stationMode!=6) {
-                beaconPacket += ",qAC";
-            }
-            beaconPacket += ":=" + stationLatitude + "L" + stationLongitude;
-            if (stationMode==1) {
-                beaconPacket += "&";
-            } else {
-                beaconPacket += "a";
-            }
-            beaconPacket += Config.iGateComment;
-        } else { //stationMode 3, 4 and 5
-            if (stationMode==5) {
-                stationLatitude = processLatitudeAPRS(currentWiFi->latitude);
-                stationLongitude = processLongitudeAPRS(currentWiFi->longitude);
-            } else {
-                stationLatitude = processLatitudeAPRS(Config.digi.latitude);
-                stationLongitude = processLongitudeAPRS(Config.digi.longitude);
-            }
-            beaconPacket = Config.callsign + ">APLRG1,WIDE1-1:=" + stationLatitude + "L" + stationLongitude + "#" + Config.digi.comment;
-        }
+        String stationLatitude = processLatitudeAPRS(Config.beacon.latitude);
+        String stationLongitude = processLongitudeAPRS(Config.beacon.longitude);
+
+        String beaconPacket = Config.callsign + ">APLRG1," + Config.beacon.path;
+
+        if (Config.aprs_is.active && Config.digi.mode == 0) { // If APRSIS enabled and Digi disabled
+            beaconPacket += ",qAC";
+        } else {}
+
+        beaconPacket += ":=" + stationLatitude + Config.beacon.overlay + stationLongitude + Config.beacon.symbol;
+        beaconPacket += Config.beacon.comment;
+
         return beaconPacket;
     }
 
     String generateiGateLoRaBeacon() {
-        String stationLatitude, stationLongitude, beaconPacket;
-        stationLatitude = processLatitudeAPRS(currentWiFi->latitude);
-        stationLongitude = processLongitudeAPRS(currentWiFi->longitude);
-        beaconPacket = Config.callsign + ">APLRG1,RFONLY:=" + stationLatitude + "L" + stationLongitude;
-        if (Config.bme.active) {
-            beaconPacket += "_";
-        } else {
-            beaconPacket += "a";
-        }
+        String stationLatitude = processLatitudeAPRS(Config.beacon.latitude);
+        String stationLongitude = processLongitudeAPRS(Config.beacon.longitude);
+        
+        String beaconPacket = Config.callsign + ">APLRG1," + Config.beacon.path + ":=" + stationLatitude + Config.beacon.overlay + stationLongitude + Config.beacon.symbol;
+
         return beaconPacket;
     }
 
     double calculateDistanceTo(double latitude, double longitude) {
-        return TinyGPSPlus::distanceBetween(currentWiFi->latitude,currentWiFi->longitude, latitude, longitude) / 1000.0;
+        return TinyGPSPlus::distanceBetween(Config.beacon.latitude,Config.beacon.longitude, latitude, longitude) / 1000.0;
     }
 
     String decodeEncodedGPS(String packet) {
