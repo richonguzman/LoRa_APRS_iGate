@@ -56,6 +56,18 @@
 #define RADIO_TXEN 25
 #endif
 
+#ifdef ESP32_LOLIN_OLED_DIY_LoRa // Ebyte E22 400M30S / SX1268
+#define RADIO_SCLK_PIN 18
+#define RADIO_MISO_PIN 19
+#define RADIO_MOSI_PIN 23
+#define RADIO_CS_PIN 2
+#define RADIO_RST_PIN 27
+#define RADIO_DIO1_PIN 12
+#define RADIO_BUSY_PIN 14
+#define RADIO_RXEN 32
+#define RADIO_TXEN 25
+#endif
+
 #if defined(TTGO_T_Beam_V1_0_SX1268) || defined(TTGO_T_Beam_V1_2_SX1262)
 #define RADIO_SCLK_PIN 5
 #define RADIO_MISO_PIN 19
@@ -74,7 +86,7 @@
 #define OLED_RESET -1 // Reset pin # (or -1 if sharing Arduino reset pin)
 #endif
 
-#ifndef SP32_LOLIN_OLED_DIY_LoRa
+#ifdef ESP32_LOLIN_OLED_DIY_LoRa
 #define OLED_SDA 5
 #define OLED_SCL 4
 #define OLED_RESET -1 // Reset pin # (or -1 if sharing Arduino reset pin)
