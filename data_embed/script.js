@@ -148,6 +148,7 @@ function loadSettings(settings) {
     // document.getElementById("digi.comment").value = settings.digi.comment;
     // document.getElementById("digi.latitude").value = settings.digi.latitude;
     // document.getElementById("digi.longitude").value = settings.digi.longitude;
+    document.getElementById("digi.mode").value = settings.digi.mode;
 
     // OTA
     document.getElementById("ota.username").value = settings.ota.username;
