@@ -160,6 +160,7 @@
                                             id="beacon.comment"
                                             class="form-control"
                                             placeholder="LoRa APRS"
+                                            required=""
                                         />
                                     </div>
                                     <div class="col-12 mt-3">
@@ -320,11 +321,14 @@
                                         <small>(in minutes)</small></label
                                     >
                                     <input
-                                        type="text"
+                                        type="number"
                                         name="wifi.autoAP.powerOff"
                                         id="wifi.autoAP.powerOff"
                                         class="form-control"
                                         placeholder="15"
+                                        required=""
+                                        step="1"
+                                        min="0"
                                     />
                                     <div class="form-text">
                                         Set to <strong>0</strong> if you don't
@@ -618,11 +622,14 @@
                                         >
                                         <div class="input-group">
                                             <input
-                                                type="text"
+                                                type="number"
                                                 name="other.rememberStationTime"
                                                 id="other.rememberStationTime"
                                                 placeholder="30"
                                                 class="form-control"
+                                                required=""
+                                                step="1"
+                                                min="1"
                                             />
                                             <span class="input-group-text"
                                                 >minutes</span
@@ -855,11 +862,14 @@
                                         >
                                         <div class="input-group">
                                             <input
-                                                type="text"
+                                                type="number"
                                                 name="beacon.interval"
                                                 id="beacon.interval"
                                                 placeholder="15"
                                                 class="form-control"
+                                                required=""
+                                                step="1"
+                                                min="1"
                                             />
                                             <span class="input-group-text"
                                                 >minutes</span
@@ -1057,6 +1067,7 @@
                                                 id="lora.txFreq"
                                                 placeholder="433775000"
                                                 class="form-control"
+                                                required=""
                                             />
                                             <input
                                                 type="hidden"
@@ -1064,6 +1075,7 @@
                                                 id="lora.iGateFreq"
                                                 placeholder="433775000"
                                                 class="form-control"
+                                                required=""
                                             />
                                             <span class="input-group-text"
                                                 >Hz</span
