@@ -14,6 +14,7 @@
 #include "gps_utils.h"
 #include "bme_utils.h"
 #include "web_utils.h"
+#include "tnc_utils.h"
 #include "display.h"
 #include "utils.h"
 #include <ElegantOTA.h>
@@ -82,6 +83,7 @@ void setup() {
     SYSLOG_Utils::setup();
     BME_Utils::setup();
     WEB_Utils::setup();
+    TNC_Utils::setup();
 }
 
 void loop() {
@@ -101,6 +103,8 @@ void loop() {
         APRS_IS_Utils::connect();
     }
 
+    TNC_Utils::loop();
+
     Utils::checkDisplayInterval();
     Utils::checkBeaconInterval();
 
@@ -112,12 +116,16 @@ void loop() {
 
     APRS_IS_Utils::checkStatus(); // Need that to update display, maybe split this and send APRSIS status to display func?
 
-    if (Config.aprs_is.active) { // If APRSIS enabled
-        APRS_IS_Utils::loop(packet); // Send received packet to APRSIS
-    }
+    if (packet != "") {
+        if (Config.aprs_is.active) { // If APRSIS enabled
+            APRS_IS_Utils::loop(packet); // Send received packet to APRSIS
+        }
 
-    if (Config.digi.mode == 2) { // If Digi enabled
-        DIGI_Utils::loop(packet); // Send received packet to Digi
+        if (Config.digi.mode == 2) { // If Digi enabled
+            DIGI_Utils::loop(packet); // Send received packet to Digi
+        }
+
+        TNC_Utils::sendToClients(packet); // Send received packet to TNC KISS
     }
 
     show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
