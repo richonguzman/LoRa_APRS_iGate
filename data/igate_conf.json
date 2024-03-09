@@ -13,7 +13,7 @@
         "comment": "LoRa APRS",
         "interval": 15,
         "overlay": "L",
-        "symbol": "#",
+        "symbol": "a",
         "path": "WIDE1-1",
         "sendViaAPRSIS": false,
         "sendViaRF": false
