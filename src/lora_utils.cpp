@@ -9,7 +9,7 @@
 
 extern Configuration  Config;
 
-#if defined(HELTEC_V3) || defined(TTGO_T_Beam_V1_2_SX1262)
+#if defined(HELTEC_V3) || defined(HELTEC_WS) || defined(TTGO_T_Beam_V1_2_SX1262)
 SX1262 radio = new Module(RADIO_CS_PIN, RADIO_DIO1_PIN, RADIO_RST_PIN, RADIO_BUSY_PIN);
 bool transmissionFlag = true;
 bool enableInterrupt = true;
@@ -69,7 +69,7 @@ namespace LoRa_Utils {
         #if defined(ESP32_DIY_1W_LoRa)
         radio.setRfSwitchPins(RADIO_RXEN, RADIO_TXEN);
         #endif
-        #if defined(HELTEC_V3)  || defined(TTGO_T_Beam_V1_0_SX1268) || defined(TTGO_T_Beam_V1_2_SX1262)
+        #if defined(HELTEC_V3)  || defined(HELTEC_WS) || defined(TTGO_T_Beam_V1_0_SX1268) || defined(TTGO_T_Beam_V1_2_SX1262)
         state = radio.setOutputPower(Config.loramodule.power + 2); // values available: 10, 17, 22 --> if 20 in tracker_conf.json it will be updated to 22.
         #endif
         #ifdef ESP32_DIY_1W_LoRa_GPS
@@ -113,7 +113,7 @@ namespace LoRa_Utils {
             changeFreqTx();    
         }
 
-        #if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2) || defined(HELTEC_V3) || defined(ESP32_DIY_LoRa) || defined(ESP32_DIY_1W_LoRa)
+        #ifdef HAS_INTERNAL_LED
         digitalWrite(internalLedPin,HIGH);
         #endif
         #ifdef HAS_SX127X
@@ -141,7 +141,7 @@ namespace LoRa_Utils {
             Serial.println(state);
         }
         #endif
-        #if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2) || defined(HELTEC_V3) || defined(ESP32_DIY_LoRa) || defined(ESP32_DIY_1W_LoRa)
+        #ifdef HAS_INTERNAL_LED
         digitalWrite(internalLedPin,LOW);
         #endif
         SYSLOG_Utils::log("Tx", newPacket,0,0,0);

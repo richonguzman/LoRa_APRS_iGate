@@ -22,7 +22,7 @@
 Configuration   Config;
 WiFiClient      espClient;
 
-String          versionDate           = "2024.03.08";
+String          versionDate           = "2024.03.09";
 int             myWiFiAPIndex         = 0;
 int             myWiFiAPSize          = Config.wifiAPs.size();
 WiFi_AP         *currentWiFi          = &Config.wifiAPs[myWiFiAPIndex];
@@ -58,7 +58,7 @@ void setup() {
     #if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2)
     pinMode(batteryPin, INPUT);
     #endif
-    #if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2) || defined(HELTEC_V3) || defined(ESP32_DIY_LoRa) || defined(ESP32_DIY_1W_LoRa)
+    #ifdef HAS_INTERNAL_LED
     pinMode(internalLedPin, OUTPUT);
     #endif
     if (Config.externalVoltageMeasurement) {

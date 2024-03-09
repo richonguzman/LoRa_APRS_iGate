@@ -7,7 +7,7 @@
 #undef OLED_SCL
 #undef OLED_RST
 
-#if defined(HELTEC_V3) || defined(ESP32_DIY_1W_LoRa) || defined(TTGO_T_Beam_V1_0_SX1268) || defined(TTGO_T_Beam_V1_2_SX1262)
+#if defined(HELTEC_V3) || defined(HELTEC_WS) || defined(ESP32_DIY_1W_LoRa) || defined(TTGO_T_Beam_V1_0_SX1268) || defined(TTGO_T_Beam_V1_2_SX1262)
 #define HAS_SX126X
 #endif
 
@@ -34,7 +34,7 @@
 #define LORA_IRQ    26      // GPIO26   - SX1276 IRQ ---->DIO0
 #endif
 
-#ifdef HELTEC_V3
+#if defined(HELTEC_V3) || defined(HELTEC_WS)
 #define RADIO_SCLK_PIN  9   // SX1262 SCK
 #define RADIO_MISO_PIN  11  // SX1262 MISO
 #define RADIO_MOSI_PIN  10  // SX1262 MOSI
@@ -78,21 +78,26 @@
 #ifdef HELTEC_V2
 #define OLED_SDA    4
 #define OLED_SCL    15
-#define OLED_RESET  16 
+#define OLED_RESET  16
 #endif
 
-#ifdef HELTEC_V3
+#if defined(HELTEC_V3) || defined(HELTEC_WS)
 #define OLED_SDA    17
 #define OLED_SCL    18
-#define OLED_RESET  21 
+#define OLED_RESET  21
 #endif
 
+
 // Leds and other stuff
+#if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2) || defined(HELTEC_V3) || defined(HELTEC_WS) || defined(ESP32_DIY_LoRa) || defined(ESP32_DIY_1W_LoRa)
+#define HAS_INTERNAL_LED
+#endif
+
 #if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2)
 #define internalLedPin  25      // Green Led
 #define batteryPin      35
 #endif
-#ifdef HELTEC_V3
+#if defined(HELTEC_V3) || defined(HELTEC_WS)
 #define internalLedPin  35
 #endif
 #if defined(ESP32_DIY_LoRa) || defined(ESP32_DIY_1W_LoRa)
