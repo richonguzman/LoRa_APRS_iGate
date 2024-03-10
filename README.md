@@ -38,15 +38,9 @@ ____________________________________________________
 
 # WIKI
 
-### 1. Installation Guide --> <a href="https://github.com/richonguzman/LoRa_APRS_iGate/wiki/1.-Installation-Guide" target="_blank">here</a>.
+### Installation Guide --> <a href="https://github.com/richonguzman/LoRa_APRS_iGate/wiki/01.-Installation-Guide" target="_blank">here</a>.
 
-### 2. iGate Configuration and Explanation for each setting --> <a href="https://github.com/richonguzman/LoRa_APRS_iGate/wiki/2.-iGate-Configuration" target="_blank">here</a>.
-
-### 3. Supported Boards and Environment Selection --> <a href="https://github.com/richonguzman/LoRa_APRS_iGate/wiki/3.-Supported-Boards-and-Environment-Selection" target="_blank">here</a>.
-
-### 4. Upload Firmware and Filesystem --> <a href="https://github.com/richonguzman/LoRa_APRS_iGate/wiki/4.-Upload-Firmware-and-Filesystem" target="_blank">here</a>.
-
-### 5. Adding BME280 Module --> <a href="https://github.com/richonguzman/LoRa_APRS_iGate/wiki/5.-Adding-BME280-Module" target="_blank">here</a>.
+### Wiki has all configuration explanation, supported boards list, adding BME/BMP Wx modules and more.
 
 ____________________________________________________
 ## Timeline (Versions):
