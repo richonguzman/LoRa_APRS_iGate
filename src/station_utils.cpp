@@ -83,9 +83,9 @@ namespace STATION_Utils {
         packetBuffer_temp.clear();
 
         // BORRAR ESTO !!
-        for (int i=0; i<packetBuffer.size(); i++) {
+        /*for (int i=0; i<packetBuffer.size(); i++) {
             Serial.println(packetBuffer[i]);
-        }
+        }*/
         //
     }
 

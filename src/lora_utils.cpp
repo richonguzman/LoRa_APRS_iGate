@@ -162,7 +162,7 @@ namespace LoRa_Utils {
     }
 
     String packetSanitization(String packet) {
-        Serial.println(packet);
+        //Serial.println(packet);
         if (packet.indexOf("\0")>0) {
             packet.replace("\0","");
         }
