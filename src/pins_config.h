@@ -11,7 +11,7 @@
 #define HAS_SX126X
 #endif
 
-#if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2) || defined(ESP32_DIY_LoRa) || defined(TTGO_T_Beam_V1_0) || defined(TTGO_T_Beam_V1_2)
+#if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2) || defined(ESP32_DIY_LoRa) || defined(TTGO_T_Beam_V1_0) || defined(TTGO_T_Beam_V1_2) || defined(ESP32_LOLIN_OLED_DIY_LoRa)
 #define HAS_SX127X
 #endif
 
@@ -25,13 +25,21 @@
 
 // LORA MODULES
 #if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2) || defined(ESP32_DIY_LoRa)
-#undef LORA_RST
 #define LORA_SCK 5   // GPIO5    - SX1276 SCK
 #define LORA_MISO 19 // GPIO19   - SX1276 MISO
 #define LORA_MOSI 27 // GPIO27   - SX1276 MOSI
 #define LORA_CS 18   // GPIO18   - SX1276 CS ---> NSS
 #define LORA_RST 14  // GPIO14   - SX1276 RST
 #define LORA_IRQ 26  // GPIO26   - SX1276 IRQ ---->DIO0
+#endif
+
+#ifdef ESP32_LOLIN_OLED_DIY_LoRa
+#define LORA_SCK 15  // GPIO5    - SX1276 SCK
+#define LORA_MISO 13 // GPIO19   - SX1276 MISO
+#define LORA_MOSI 12 // GPIO27   - SX1276 MOSI
+#define LORA_CS 14   // GPIO18   - SX1276 CS ---> NSS
+#define LORA_RST 2   // GPIO14   - SX1276 RST
+#define LORA_IRQ 25  // GPIO26   - SX1276 IRQ ---->DIO0
 #endif
 
 #ifdef HELTEC_V3
@@ -49,18 +57,6 @@
 #define RADIO_MISO_PIN 19
 #define RADIO_MOSI_PIN 23
 #define RADIO_CS_PIN 5
-#define RADIO_RST_PIN 27
-#define RADIO_DIO1_PIN 12
-#define RADIO_BUSY_PIN 14
-#define RADIO_RXEN 32
-#define RADIO_TXEN 25
-#endif
-
-#ifdef ESP32_LOLIN_OLED_DIY_LoRa // Ebyte E22 400M30S / SX1268
-#define RADIO_SCLK_PIN 18
-#define RADIO_MISO_PIN 19
-#define RADIO_MOSI_PIN 23
-#define RADIO_CS_PIN 2
 #define RADIO_RST_PIN 27
 #define RADIO_DIO1_PIN 12
 #define RADIO_BUSY_PIN 14
