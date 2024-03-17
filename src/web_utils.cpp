@@ -84,6 +84,10 @@ namespace WEB_Utils {
         // Config.digi.latitude = request->getParam("digi.latitude", true)->value().toDouble();
         // Config.digi.longitude = request->getParam("digi.longitude", true)->value().toDouble();
 
+        Config.tnc.enableServer = request->hasParam("tnc.enableServer", true);
+        Config.tnc.enableSerial = request->hasParam("tnc.enableSerial", true);
+        Config.tnc.acceptOwn = request->hasParam("tnc.acceptOwn", true);
+
         Config.aprs_is.active = request->hasParam("aprs_is.active", true);
         Config.aprs_is.passcode = request->getParam("aprs_is.passcode", true)->value();
         Config.aprs_is.server = request->getParam("aprs_is.server", true)->value();

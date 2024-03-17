@@ -15,9 +15,8 @@ namespace Utils {
     void checkWiFiInterval();
     void validateFreqs();
     void typeOfPacket(String packet, String packetType);
-    void onOTAStart();
-    void onOTAProgress(size_t current, size_t final);
-    void onOTAEnd(bool success);
+    void print(String text);
+    void println(String text);
 
 }
 

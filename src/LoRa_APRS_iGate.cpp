@@ -125,7 +125,13 @@ void loop() {
             DIGI_Utils::loop(packet); // Send received packet to Digi
         }
 
-        TNC_Utils::sendToClients(packet); // Send received packet to TNC KISS
+        if (Config.tnc.enableServer) { // If TNC server enabled
+            TNC_Utils::sendToClients(packet); // Send received packet to TNC KISS
+        }
+
+        if (Config.tnc.enableSerial) { // If Serial KISS enabled
+            TNC_Utils::sendToSerial(packet); // Send received packet to Serial KISS
+        }
     }
 
     show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);

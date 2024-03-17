@@ -21,6 +21,11 @@
     "digi": {
         "mode": 0
     },
+    "tnc": {
+        "enableServer": false,
+        "enableSerial": false,
+        "acceptOwn": false
+    },
     "aprs_is": {
         "active": false,
         "passcode": "XYZVW",

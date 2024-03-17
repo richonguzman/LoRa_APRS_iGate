@@ -73,6 +73,13 @@ public:
     bool    turn180;
 };
 
+class TNC {
+public:
+    bool    enableServer;
+    bool    enableSerial;
+    bool    acceptOwn;
+};
+
 class SYSLOG {
 public:
     bool    active;
@@ -111,6 +118,7 @@ public:
     WiFi_Auto_AP          wifiAutoAP;
     Beacon                beacon; // new
     DIGI                  digi;
+    TNC                   tnc; // new
     APRS_IS               aprs_is;
     LoraModule            loramodule;
     Display               display;

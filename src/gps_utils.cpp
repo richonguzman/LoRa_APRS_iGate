@@ -35,7 +35,6 @@ namespace GPS_Utils {
         if (abs(degrees.toFloat()) < 10) {
             latitude += "0";
         }
-        Serial.println(latitude);
         if (degrees.indexOf("-") == 0) {
             north_south = "S";
             latitude += degrees.substring(1,degrees.indexOf("."));

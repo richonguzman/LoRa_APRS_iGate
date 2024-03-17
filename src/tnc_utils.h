@@ -9,6 +9,7 @@ namespace TNC_Utils {
     void loop();
     
     void sendToClients(String packet);
+    void sendToSerial(String packet);
 
 }
 

@@ -2,9 +2,13 @@
 #include "kiss_utils.h"
 #include "kiss_protocol.h"
 #include "lora_utils.h"
+#include "configuration.h"
+#include "utils.h"
+
+extern Configuration        Config;
 
 #define MAX_CLIENTS 4
-#define INPUT_TNC_BUFFER_SIZE (2 + MAX_CLIENTS)
+#define INPUT_BUFFER_SIZE (2 + MAX_CLIENTS)
 
 #define TNC_PORT 8001
 
@@ -12,12 +16,15 @@ WiFiClient* clients[MAX_CLIENTS];
 
 WiFiServer tncServer(TNC_PORT);
 
-String inputBuffer[INPUT_TNC_BUFFER_SIZE];
+String inputServerBuffer[INPUT_BUFFER_SIZE];
+String inputSerialBuffer = "";
 
 namespace TNC_Utils {
     void setup() {
-        tncServer.stop();
-        tncServer.begin();
+        if (Config.tnc.enableServer) {
+            tncServer.stop();
+            tncServer.begin();
+        }
     }
 
     void checkNewClients() {
@@ -30,7 +37,7 @@ namespace TNC_Utils {
                 if (client == nullptr) {
                     clients[i] = new WiFiClient(new_client);
 
-                    Serial.println("New TNC client connected");
+                    Utils::println("New TNC client connected");
 
                     break;
                 }
@@ -38,8 +45,8 @@ namespace TNC_Utils {
         }
     }
 
-    void handleInputData(char character, int bufferIndex) {
-        String* inTNCData = &inputBuffer[bufferIndex];
+    void handleServerInputData(char character, int bufferIndex) {
+        String* inTNCData = &inputServerBuffer[bufferIndex];
 
         if (inTNCData->length() == 0 && character != (char)FEND) {
             return;
@@ -52,10 +59,16 @@ namespace TNC_Utils {
             const String& frame = decodeKISS(*inTNCData, isDataFrame);
 
             if (isDataFrame) {
-                Serial.print("---> Got from TNC      : ");
-                Serial.println(frame);
+                Utils::print("<--- Got from TNC      : ");
+                Utils::println(frame);
 
-                LoRa_Utils::sendNewPacket("APRS", frame);
+                String sender = frame.substring(0,frame.indexOf(">"));
+
+                if (Config.tnc.acceptOwn || sender != Config.callsign) {
+                    LoRa_Utils::sendNewPacket("APRS", frame);
+                } else {
+                    Utils::println("Ignored own frame from TNC");
+                }
             }
 
             inTNCData->clear();
@@ -66,6 +79,33 @@ namespace TNC_Utils {
         }
     }
 
+    void handleSerialInputData(char character) {
+        if (inputSerialBuffer.length() == 0 && character != (char)FEND) {
+            return;
+        }
+
+        inputSerialBuffer.concat(character);
+
+        if (character == (char)FEND && inputSerialBuffer.length() > 3) {
+            bool isDataFrame = false;
+            const String& frame = decodeKISS(inputSerialBuffer, isDataFrame);
+
+            if (isDataFrame) {
+                String sender = frame.substring(0,frame.indexOf(">"));
+
+                if (Config.tnc.acceptOwn || sender != Config.callsign) {
+                    LoRa_Utils::sendNewPacket("APRS", frame);
+                }
+            }
+
+            inputSerialBuffer.clear();
+        }
+
+        if (inputSerialBuffer.length() > 255) {
+            inputSerialBuffer.clear();
+        }
+    }
+
     void readFromClients() {
         for (int i = 0; i < MAX_CLIENTS; i++) {
             auto client = clients[i];
@@ -73,13 +113,20 @@ namespace TNC_Utils {
                 if (client->connected()) {
                     while (client->available() > 0) {
                         char character = client->read();
-                        handleInputData(character, 2 + i);
+                        handleServerInputData(character, 2 + i);
                     }
                 } else {
                     delete client;
                     clients[i] = nullptr;
                 }
             }
+        }
+    }
+
+    void readFromSerial() {
+        while (Serial.available() > 0) {
+            char character = Serial.read();
+            handleSerialInputData(character);
         }
     }
 
@@ -101,13 +148,26 @@ namespace TNC_Utils {
             }
         }
 
-        Serial.print("---> Sent to TNC       : ");
-        Serial.println(packet);
+        Utils::print("---> Sent to TNC       : ");
+        Utils::println(packet);
+    }
+
+    void sendToSerial(String packet) {
+        packet = packet.substring(3);
+
+        Serial.print(encodeKISS(packet));
+        Serial.flush();
     }
 
     void loop() {
-        checkNewClients();
+        if (Config.tnc.enableServer) {
+            checkNewClients();
 
-        readFromClients();
+            readFromClients();
+        }
+
+        if (Config.tnc.enableSerial) {
+            readFromSerial();
+        }
     }
 }

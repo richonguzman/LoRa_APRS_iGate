@@ -99,7 +99,9 @@ namespace Utils {
 
         if (beaconUpdate) {
             display_toggle(true);
-            Serial.println("-- Sending Beacon to APRSIS --");
+
+            Utils::println("-- Sending Beacon to APRSIS --");
+
             STATION_Utils::deleteNotHeard();
 
             activeStations();
@@ -229,6 +231,18 @@ namespace Utils {
         } else {
             sixthLine = sender + "> ??????????";
             seventhLine = "RSSI:" + String(rssi) + "dBm SNR: " + String(snr) + "dBm";
+        }
+    }
+
+    void print(String text) {
+        if (!Config.tnc.enableSerial) {
+            Serial.print(text);
+        }
+    }
+
+    void println(String text) {
+        if (!Config.tnc.enableSerial) {
+            Serial.println(text);
         }
     }
 

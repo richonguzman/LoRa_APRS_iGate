@@ -48,6 +48,10 @@ void Configuration::writeFile() {
     // data["digi"]["latitude"] = digi.latitude;
     // data["digi"]["longitude"] = digi.longitude;
 
+    data["tnc"]["enableServer"] = tnc.enableServer;
+    data["tnc"]["enableSerial"] = tnc.enableSerial;
+    data["tnc"]["acceptOwn"] = tnc.acceptOwn;
+
     data["aprs_is"]["active"] = aprs_is.active;
     data["aprs_is"]["passcode"] = aprs_is.passcode;
     data["aprs_is"]["server"] = aprs_is.server;
@@ -151,6 +155,10 @@ bool Configuration::readFile() {
 
         ota.username                    = data["ota"]["username"].as<String>();
         ota.password                    = data["ota"]["password"].as<String>();
+
+        tnc.enableServer                = data["tnc"]["enableServer"].as<bool>();
+        tnc.enableSerial                = data["tnc"]["enableSerial"].as<bool>();
+        tnc.acceptOwn                   = data["tnc"]["acceptOwn"].as<bool>();
 
         int stationMode                     = data["stationMode"].as<int>(); // deprecated but need to specify config version
 
@@ -278,6 +286,10 @@ void Configuration::init() {
     // digi.comment = "LoRa_APRS_iGate Development"; // deprecated
     // digi.latitude = 0.0; // deprecated
     // digi.longitude = 0.0; // deprecated
+
+    tnc.enableServer = false;
+    tnc.enableSerial = false;
+    tnc.acceptOwn = false;
 
     aprs_is.active = false; // new
     aprs_is.passcode = "XYZVW";
