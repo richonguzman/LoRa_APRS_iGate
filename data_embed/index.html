@@ -11,101 +11,51 @@
         <input type="file" accept="text/json,.json" style="display: none" />
         <form autocomplete="off" action="/configuration.json" method="POST">
             <nav
-                class="navbar bg-body-secondary shadow-sm border-bottom sticky-top"
+                class="navbar bg-body-secondary shadow-sm border-bottom sticky-top navbar-expand-lg"
             >
                 <div class="container">
                     <a class="navbar-brand"
-                        >CA2RXU's LoRa iGate Configuration</a
+                        >CA2RXU's LoRa</a
                     >
-                    <div class="d-flex">
-                        <a href="/update" class="btn btn-warning mx-2"> OTA </a>
-                        <button
-                            class="btn btn-primary mx-2"
-                            type="button"
-                            id="backup"
-                        >
-                            Backup
-                        </button>
-                        <button
-                            class="btn btn-primary mx-2"
-                            type="button"
-                            id="restore"
-                        >
-                            Restore
-                        </button>
-                        <button
-                            class="btn btn-success mx-2"
-                            type="submit"
-                            id="save"
-                        >
-                            Save
-                        </button>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarColor01">
+                        <ul class="navbar-nav me-auto">
+                            <li class="nav-item">
+                                <a class="nav-link" href="/update">
+                                    Update <small>OTA</small>
+                                </a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Backup</a>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item" href="#" id="backup">Download</a>
+                                    <a class="dropdown-item" href="#" id="restore">Restore</a>
+                                </div>
+                            </li>
+                            <!-- <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Device</a>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item" href="#" id="reboot">Reboot</a>
+                                    <a class="dropdown-item" href="#" id="shutdown">Shutdown</a>
+                                </div>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#" id="received-packets">
+                                    Received packets
+                                </a>
+                            </li> -->
+                        </ul>
+                        <div class="d-flex">
+                            <button class="btn btn-success my-2 my-sm-0" type="submit">Save</button>
+                        </div>
                     </div>
                 </div>
             </nav>
             <div class="container">
                 <main>
                     <div class="col-10 my-5 mx-auto">
-                        <!-- <div class="row">
-                            <div class="d-flex align-items-center">
-                                <img
-                                    src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHgAAAB4CAYAAAA5ZDbSAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAQ6SURBVHgB7d0/axRBGMfx50IMWPoKkpA02gUsLfZdqOCLOPBFWAliHbCUVNpaxQNrIY0WVjZaJlUsIsZ5uDu9bGb/zMwzs/PM/L7wIG4Ocflwl7ndvVsihBBCmTajunpk5uHG33+aOSGkvhdmLs1cW+bKzDEhle2a+UZ22Pacrx6PlMRYXc/arrkkIKvIBxfISgrBBXLmSeACOdMkcYGcWTFwgZxJMXGBPHEpcIE8USlxgSzcbGD2KD0ukIXKGRfIAuWOC+TANOACOSAtuEAemQ10a2P2KV9cIA+0ZZltMzurOaT8cYHcUx+wJlwgd9QFrBEXyJZswAekFxfIrdq4GhZUQO7Itlq+QzoXVEC21AdcIm51yF3AJeNWhWwDLmFBBeRVmg4/Atmj2nGLR/bCbZrm2qWx/+7Ekwx5i9LGO/XFzF2qO97/r5QAOSUwcG+WBDkVMHDtRUdOAcz/ed4J4NqLihwbGLjjioYcExi4bkVBjgUMXL/EkWMAAzcsUWRpYODKJIYsCQxc2USQpYCBG6dgZAlg4MYtCDkUGLhp8kYOAQZu2ryQfYGT4S7PAKJVzsg+wEmfubNZbd+XOpgTsiswXpbzaDSyCzBw82oU8lhg4ObZIPIYYODmXS/yEDBwdcQ+72w/6AMGrq6OaHnLghv1AQNXX6/bG7qAPxNwNbbf3mAD5qf5EaEisgG/IVRMNuA9QsVkA94mpLWP7Q2pP5uE4vayvQHA5bQw86m90Qb8i5C22Kyx/cAG/IGQphj3ftcPbcBzM78JaWiN+73rATZgfvAzWn4SHeXbIC7Xtcg6MfOUgJxro3C5vlU0kPNsNC439DYJyHnlhMuNeR8M5DxyxuXGHugA8rR54XIuR7KAPE3euJzroUogpy0Il/M5Fg3kNAXjcr4nG4AcNxFcLuTc78nqz7e0/A7KLDo9PbV+nkn6Q2xnZ2c0n88pQmK4XOjJ/eyQm6YhxYnichLng/FyLZM4Lid1wh/IYUXB5SSv6ACyX9FwOelLdoDsVlRcLsY1WUAeV3RcLtZFd0Duj3EfUGRcLuZVlUC2lwyXi32Re/D75IuLC1osFtYDFXxAo73dts21MV/8wgc6PEqKm7LHZv5QnndASTV8p5U9unl7oaJ6QvUi23CLA+YdqhGZcQ/Jfmu/olrvVE3Ia9wdqgB4sxp+JzPuPv2/+XV1lYzcxq32Q34lvlzbcKsF5h0vCZlxD+g2btXApSCvF1TbBOB/ba4oNSOvn7lr3KpWzC5pXHgVf4RKOk3P5CqOUEmn5eW6CxfAA2n4ndyHC+AR5YwMXOFyWngx7i4h8XJABm7kpkQGbqKmQAZu4lIiA3eiUiADd+JiIgM3k2IgAzezJJGBm2kSyMDNvBBk4CrJBxm4ynJB/kHAVRnf3OucumGvzBxTBZV+eouhn5u5t7HtvZlXhBBCCCEUsb+qGDWF0d8l5AAAAABJRU5ErkJggg=="
-                                    width="60"
-                                    height="60"
-                                    class="me-2"
-                                />
-                                <div>
-                                    <label for="stationMode" class="form-label"
-                                        >Station Mode</label
-                                    >
-                                    <select
-                                        class="form-select form-select-lg"
-                                        name="stationMode"
-                                        id="stationMode"
-                                    >
-                                        <option value="1">
-                                            Rx (only) iGate with black diamond +
-                                            "L" as symbol.
-                                        </option>
-                                        <option value="2">
-                                            [HAM only] Rx + Tx iGate with red
-                                            diamond + "L" as symbol.
-                                        </option>
-                                        <option value="3">
-                                            [HAM only] Digipeater simplex,
-                                            green-star + "L" as symbol.
-                                        </option>
-                                        <option value="4">
-                                            [HAM only] Digipeater split
-                                            frequency, green-star + "L" as
-                                            symbol.
-                                        </option>
-                                        <option value="5">
-                                            [HAM only] Rx + Tx iGate connected
-                                            to WiFi, Digipeater mode as fallback
-                                        </option>
-                                    </select>
-                                    <div class="form-check form-switch mt-3">
-                                        <input
-                                            type="checkbox"
-                                            name="bme.active"
-                                            id="bme.active"
-                                            class="form-check-input"
-                                        />
-                                        <label
-                                            for="bme.active"
-                                            class="form-check-label"
-                                            ><b>Activate Wx Telemetry</b>
-                                            <small
-                                                >Requires a BME/BMP280 or BME680
-                                                sensor installed</small
-                                            ></label
-                                        >
-                                    </div>
-                                </div>
-                            </div>
-                        </div> -->
-
                         <div class="row my-5 d-flex align-items-top">
                             <div class="col-lg-3 col-sm-12">
                                 <h5>
@@ -765,39 +715,6 @@
                                         </select>
                                     </div>
                                 </div>
-                                <!-- <div class="row mt-3">
-                                    <div class="col-6">
-                                        <div class="form-check form-switch">
-                                            <input
-                                                type="checkbox"
-                                                name="beacon.igateSendsLoRaBeacon"
-                                                id="beacon.igateSendsLoRaBeacon"
-                                                class="form-check-input"
-                                            />
-                                            <label
-                                                for="beacon.igateSendsLoRaBeacon"
-                                                class="form-label"
-                                                >IGate sends LoRa beacon</label
-                                            >
-                                        </div>
-                                    </div>
-                                    <div class="col-6">
-                                        <div class="form-check form-switch">
-                                            <input
-                                                type="checkbox"
-                                                name="beacon.igateRepeatLoRaPackets"
-                                                id="beacon.igateRepeatLoRaPackets"
-                                                class="form-check-input"
-                                            />
-                                            <label
-                                                for="beacon.igateRepeatLoRaPackets"
-                                                class="form-label"
-                                                >IGate repeat LoRa
-                                                packets</label
-                                            >
-                                        </div>
-                                    </div>
-                                </div> -->
                             </div>
                         </div>
                         <hr />
@@ -937,6 +854,9 @@
                                             >
                                         </div>
                                     </div>
+                                    <!-- <div class="col-6 d-grid gap-2">
+                                        <button class="btn btn-primary">Send beacon now</button>
+                                    </div> -->
                                 </div>
                                 <div class="row mt-3">
                                     <div class="col-12">
@@ -985,7 +905,6 @@
                                                 name="other.externalVoltageMeasurement"
                                                 id="other.externalVoltageMeasurement"
                                                 class="form-check-input"
-                                                disabled
                                             />
                                             <label
                                                 for="other.externalVoltageMeasurement"
@@ -1001,7 +920,6 @@
                                             id="other.externalVoltagePin"
                                             value="34"
                                             class="form-control"
-                                            disabled
                                         />
                                         <label
                                             for="other.externalVoltagePin"

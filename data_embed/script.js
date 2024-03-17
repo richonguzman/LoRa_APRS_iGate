@@ -167,6 +167,7 @@ function loadSettings(settings) {
         settings.other.sendBatteryVoltage;
     document.getElementById("other.externalVoltageMeasurement").checked =
         settings.other.externalVoltageMeasurement;
+
     document.getElementById("other.externalVoltagePin").value =
         settings.other.externalVoltagePin;
     // document.getElementById("beacon.igateSendsLoRaBeacon").value =
@@ -212,6 +213,7 @@ function loadSettings(settings) {
 
     updateImage();
     refreshSpeedStandard();
+    toggleFields();
 }
 
 const bmeCheckbox = document.querySelector("input[name='bme.active']");
@@ -272,8 +274,16 @@ const externalVoltagePinInput = document.querySelector(
 
 sendBatteryVoltageCheckbox.addEventListener("change", function () {
     externalVoltageMeasurementCheckbox.disabled = !this.checked;
-    externalVoltagePinInput.disabled =
-        !externalVoltageMeasurementCheckbox.checked;
+
+    if (!this.checked) {
+        externalVoltageMeasurementCheckbox.checked = false;
+    }
+
+    externalVoltagePinInput.disabled = !externalVoltageMeasurementCheckbox.checked;
+});
+
+externalVoltageMeasurementCheckbox.addEventListener("change", function () {
+    externalVoltagePinInput.disabled = !this.checked;
 });
 
 document.querySelector(".new button").addEventListener("click", function () {
@@ -382,8 +392,6 @@ document.getElementById("action.speed").addEventListener("change", function () {
         document.getElementById("lora.spreadingFactor").value = sf;
     }
 });
-
-toggleFields();
 
 const form = document.querySelector("form");
 
