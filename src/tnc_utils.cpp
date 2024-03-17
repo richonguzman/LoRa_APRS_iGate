@@ -45,64 +45,45 @@ namespace TNC_Utils {
         }
     }
 
-    void handleServerInputData(char character, int bufferIndex) {
-        String* inTNCData = &inputServerBuffer[bufferIndex];
+    void handleInputData(char character, int bufferIndex) {
+        String* data;
+        
+        if (bufferIndex == -1) {
+            data = &inputSerialBuffer;
+        } else {
+            data = &inputServerBuffer[bufferIndex];
+        }
 
-        if (inTNCData->length() == 0 && character != (char)FEND) {
+        if (data->length() == 0 && character != (char)FEND) {
             return;
         }
 
-        inTNCData->concat(character);
+        data->concat(character);
 
-        if (character == (char)FEND && inTNCData->length() > 3) {
+        if (character == (char)FEND && data->length() > 3) {
             bool isDataFrame = false;
-            const String& frame = decodeKISS(*inTNCData, isDataFrame);
+            const String& frame = decodeKISS(*data, isDataFrame);
 
             if (isDataFrame) {
-                Utils::print("<--- Got from TNC      : ");
-                Utils::println(frame);
+                if (bufferIndex != -1) {
+                    Utils::print("<--- Got from TNC      : ");
+                    Utils::println(frame);
+                }
 
                 String sender = frame.substring(0,frame.indexOf(">"));
 
                 if (Config.tnc.acceptOwn || sender != Config.callsign) {
                     LoRa_Utils::sendNewPacket("APRS", frame);
                 } else {
-                    Utils::println("Ignored own frame from TNC");
+                    Utils::println("Ignored own frame from KISS");
                 }
             }
 
-            inTNCData->clear();
+            data->clear();
         }
 
-        if (inTNCData->length() > 255) {
-            inTNCData->clear();
-        }
-    }
-
-    void handleSerialInputData(char character) {
-        if (inputSerialBuffer.length() == 0 && character != (char)FEND) {
-            return;
-        }
-
-        inputSerialBuffer.concat(character);
-
-        if (character == (char)FEND && inputSerialBuffer.length() > 3) {
-            bool isDataFrame = false;
-            const String& frame = decodeKISS(inputSerialBuffer, isDataFrame);
-
-            if (isDataFrame) {
-                String sender = frame.substring(0,frame.indexOf(">"));
-
-                if (Config.tnc.acceptOwn || sender != Config.callsign) {
-                    LoRa_Utils::sendNewPacket("APRS", frame);
-                }
-            }
-
-            inputSerialBuffer.clear();
-        }
-
-        if (inputSerialBuffer.length() > 255) {
-            inputSerialBuffer.clear();
+        if (data->length() > 255) {
+            data->clear();
         }
     }
 
@@ -113,7 +94,7 @@ namespace TNC_Utils {
                 if (client->connected()) {
                     while (client->available() > 0) {
                         char character = client->read();
-                        handleServerInputData(character, 2 + i);
+                        handleInputData(character, 2 + i);
                     }
                 } else {
                     delete client;
@@ -126,7 +107,7 @@ namespace TNC_Utils {
     void readFromSerial() {
         while (Serial.available() > 0) {
             char character = Serial.read();
-            handleSerialInputData(character);
+            handleInputData(character, -1);
         }
     }
 
