@@ -17,6 +17,7 @@ namespace APRS_IS_Utils {
     void connect();
     void checkStatus();
     String createPacket(String unprocessedPacket);
+    bool processReceivedLoRaMessage(String sender, String packet);
     void processLoRaPacket(String packet);
     void processAPRSISPacket(String packet);
     void loop(String packet);

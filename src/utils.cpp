@@ -185,14 +185,13 @@ namespace Utils {
 
     void typeOfPacket(String packet, String packetType) {
         String sender;
-        if (WiFi.status() == WL_CONNECTED) { // If mode 1 2 5
-            if (packetType == "LoRa-APRS") {
-                fifthLine = "LoRa Rx ----> APRS-IS";
-            } else if (packetType == "APRS-LoRa") {
-                fifthLine = "APRS-IS ----> LoRa Tx";
-            }
+        if (packetType == "LoRa-APRS") {
+            fifthLine = "LoRa Rx ----> APRS-IS";
             sender = packet.substring(0,packet.indexOf(">"));
-        } else {
+        } else if (packetType == "APRS-LoRa") {
+            fifthLine = "APRS-IS ----> LoRa Tx";
+            sender = packet.substring(0,packet.indexOf(">"));
+        } else if (packetType == "Digi") {
             fifthLine = "LoRa Rx ----> LoRa Tx";
             sender = packet.substring(3,packet.indexOf(">"));
         }
@@ -200,14 +199,7 @@ namespace Utils {
             sender += " ";
         }
         if (packet.indexOf("::") >= 10) {
-            if (packetType == "APRS-LoRa") {
-                String addresseeAndMessage = packet.substring(packet.indexOf("::")+2);
-                String addressee = addresseeAndMessage.substring(0, addresseeAndMessage.indexOf(":"));
-                addressee.trim();
-                sixthLine = sender + " > " + addressee;
-            } else {
-                sixthLine = sender + "> MESSAGE";
-            }
+            sixthLine = sender + "> MESSAGE";
             seventhLine = "RSSI:" + String(rssi) + "dBm SNR: " + String(snr) + "dBm";
         } else if (packet.indexOf(":>") >= 10) {
             sixthLine = sender + "> NEW STATUS";

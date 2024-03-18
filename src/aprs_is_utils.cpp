@@ -94,9 +94,38 @@ namespace APRS_IS_Utils {
         }
     }
 
+    bool processReceivedLoRaMessage(String sender, String packet) {
+        String ackMessage, receivedMessage;
+        if (packet.indexOf("{")>0) {     // ack?
+            ackMessage = "ack" + packet.substring(packet.indexOf("{")+1);
+            ackMessage.trim();
+            delay(4000);
+            //Serial.println(ackMessage);
+            for(int i = sender.length(); i < 9; i++) {
+                sender += ' ';
+            }
+            LoRa_Utils::sendNewPacket("APRS", Config.callsign + ">APLRG1,RFONLY,WIDE1-1::" + sender + ":" + ackMessage);
+            receivedMessage = packet.substring(packet.indexOf(":")+1, packet.indexOf("{"));
+        } else {
+            receivedMessage = packet.substring(packet.indexOf(":")+1);
+        }
+        if (receivedMessage.indexOf("?") == 0) {
+            delay(2000);
+            if (!Config.display.alwaysOn) {
+                display_toggle(true);
+            }
+            LoRa_Utils::sendNewPacket("APRS", QUERY_Utils::process(receivedMessage, sender, "LoRa"));
+            lastScreenOn = millis();
+            show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, "Callsign = " + sender, "TYPE --> QUERY",  0);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     void processLoRaPacket(String packet) {
         bool queryMessage = false;
-        String aprsPacket, Sender, AddresseeAndMessage, Addressee, ackMessage, receivedMessage;
+        String aprsPacket, Sender, AddresseeAndMessage, Addressee;
         if (packet != "") {
             #ifdef TextSerialOutputForApp
             Serial.println(packet.substring(3));
@@ -108,35 +137,16 @@ namespace APRS_IS_Utils {
                 Serial.print("   ---> APRS LoRa Packet!");
                 #endif
                 Sender = packet.substring(3,packet.indexOf(">"));
+                STATION_Utils::updateLastHeard(Sender);
+                //STATION_Utils::updatePacketBuffer(packet);
+                Utils::typeOfPacket(aprsPacket, "LoRa-APRS");
                 if (Sender != Config.callsign) {   // avoid listening yourself by digirepeating
                     AddresseeAndMessage = packet.substring(packet.indexOf("::")+2);  
                     Addressee = AddresseeAndMessage.substring(0,AddresseeAndMessage.indexOf(":"));
                     Addressee.trim();
                     
                     if (packet.indexOf("::") > 10 && Addressee == Config.callsign) {      // its a message for me!
-                        if (AddresseeAndMessage.indexOf("{")>0) {     // ack?
-                            ackMessage = "ack" + AddresseeAndMessage.substring(AddresseeAndMessage.indexOf("{")+1);
-                            ackMessage.trim();
-                            delay(4000);
-                            //Serial.println(ackMessage);
-                            for(int i = Sender.length(); i < 9; i++) {
-                                Sender += ' ';
-                            }
-                            LoRa_Utils::sendNewPacket("APRS", Config.callsign + ">APLRG1,RFONLY,WIDE1-1::" + Sender + ":" + ackMessage);
-                            receivedMessage = AddresseeAndMessage.substring(AddresseeAndMessage.indexOf(":")+1, AddresseeAndMessage.indexOf("{"));
-                        } else {
-                            receivedMessage = AddresseeAndMessage.substring(AddresseeAndMessage.indexOf(":")+1);
-                        }
-                        if (receivedMessage.indexOf("?") == 0) {
-                            queryMessage = true;
-                            delay(2000);
-                            if (!Config.display.alwaysOn) {
-                                display_toggle(true);
-                            }
-                            LoRa_Utils::sendNewPacket("APRS", QUERY_Utils::process(receivedMessage, Sender, "LoRa"));
-                            lastScreenOn = millis();
-                            show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, "Callsign = " + Sender, "TYPE --> QUERY",  0);
-                        }
+                        queryMessage = processReceivedLoRaMessage(Sender, AddresseeAndMessage);
                     }
                     if (!queryMessage) {
                         aprsPacket = createPacket(packet);
@@ -148,8 +158,6 @@ namespace APRS_IS_Utils {
                         #ifndef TextSerialOutputForApp
                         Serial.println("   ---> Uploaded to APRS-IS");
                         #endif
-                        STATION_Utils::updateLastHeard(Sender);
-                        Utils::typeOfPacket(aprsPacket, "LoRa-APRS");
                         show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
                     }
                 }    
