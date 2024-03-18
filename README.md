@@ -45,6 +45,7 @@ ____________________________________________________
 ____________________________________________________
 ## Timeline (Versions):
 
+- 2024.03.18 OE5HWN MeshCom board support added.
 - 2024.02.25 New Web Configuration UI with WiFi AP (thanks Damian SQ2CPA).
 - 2023.01.28 Updated to ElegantOTA v.3 (AsyncElegantOTA was deprecated).
 - 2024.01.19 TextSerialOutputForApp added to get text from Serial-Output over USB into PC for PinPoint App (https://www.pinpointaprs.com) and APRSIS32 App (http://aprsisce.wikidot.com)
