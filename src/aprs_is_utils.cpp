@@ -49,7 +49,7 @@ namespace APRS_IS_Utils {
 
             // String filter = "t/m/" + Config.callsign + "/" + (String)Config.aprs_is.reportingDistance;
 
-            aprsauth = "user " + Config.callsign + " pass " + Config.aprs_is.passcode + " vers CA2RXU_LoRa_iGate 1.3 filter " + Config.aprs_is.filter;// + "\r\n"; 
+            aprsauth = "user " + Config.callsign + " pass " + Config.aprs_is.passcode + " vers CA2RXU_LoRa_iGate 1.3 filter " + Config.aprs_is.filter;
             upload(aprsauth);
             delay(200);
         }
@@ -82,15 +82,15 @@ namespace APRS_IS_Utils {
 
             lastScreenOn = millis();
         }
-        
+
         secondLine = "WiFi: " + wifiState + " APRS-IS: " + aprsisState;
     }
 
     String createPacket(String packet) {
         if (!(Config.aprs_is.active && Config.digi.mode == 0)) { // Check if NOT only IGate
-            return packet.substring(3, packet.indexOf(":")) + ",qAR," + Config.callsign + packet.substring(packet.indexOf(":"));// + "\n";
+            return packet.substring(3, packet.indexOf(":")) + ",qAR," + Config.callsign + packet.substring(packet.indexOf(":"));
         } else {
-            return packet.substring(3, packet.indexOf(":")) + ",qAO," + Config.callsign + packet.substring(packet.indexOf(":"));// + "\n";
+            return packet.substring(3, packet.indexOf(":")) + ",qAO," + Config.callsign + packet.substring(packet.indexOf(":"));
         }
     }
 
@@ -113,7 +113,7 @@ namespace APRS_IS_Utils {
                     Addressee = AddresseeAndMessage.substring(0,AddresseeAndMessage.indexOf(":"));
                     Addressee.trim();
                     
-                    if (packet.indexOf("::") > 10 && Addressee == Config.callsign) {      // its a message for me!                     
+                    if (packet.indexOf("::") > 10 && Addressee == Config.callsign) {      // its a message for me!
                         if (AddresseeAndMessage.indexOf("{")>0) {     // ack?
                             ackMessage = "ack" + AddresseeAndMessage.substring(AddresseeAndMessage.indexOf("{")+1);
                             ackMessage.trim();
@@ -218,7 +218,7 @@ namespace APRS_IS_Utils {
                     }
                 }
                 show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
-            }        
+            }
         }
     }
 
