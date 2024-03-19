@@ -270,9 +270,6 @@ function updateImage() {
 }
 
 function toggleFields() {
-    const sendBatteryVoltageCheckbox = document.querySelector(
-        'input[name="other.sendBatteryVoltage"]'
-    );
     const externalVoltageMeasurementCheckbox = document.querySelector(
         'input[name="other.externalVoltageMeasurement"]'
     );
@@ -280,31 +277,16 @@ function toggleFields() {
         'input[name="other.externalVoltagePin"]'
     );
 
-    externalVoltageMeasurementCheckbox.disabled =
-        !sendBatteryVoltageCheckbox.checked;
     externalVoltagePinInput.disabled =
         !externalVoltageMeasurementCheckbox.checked;
 }
 
-const sendBatteryVoltageCheckbox = document.querySelector(
-    'input[name="other.sendBatteryVoltage"]'
-);
 const externalVoltageMeasurementCheckbox = document.querySelector(
     'input[name="other.externalVoltageMeasurement"]'
 );
 const externalVoltagePinInput = document.querySelector(
     'input[name="other.externalVoltagePin"]'
 );
-
-sendBatteryVoltageCheckbox.addEventListener("change", function () {
-    externalVoltageMeasurementCheckbox.disabled = !this.checked;
-
-    if (!this.checked) {
-        externalVoltageMeasurementCheckbox.checked = false;
-    }
-
-    externalVoltagePinInput.disabled = !externalVoltageMeasurementCheckbox.checked;
-});
 
 externalVoltageMeasurementCheckbox.addEventListener("change", function () {
     externalVoltagePinInput.disabled = !this.checked;
