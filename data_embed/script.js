@@ -216,6 +216,30 @@ function loadSettings(settings) {
     toggleFields();
 }
 
+function showToast(message) {
+    const el = document.querySelector('#toast');
+
+    el.querySelector('.toast-body').innerHTML = message;
+
+    (new bootstrap.Toast(el)).show();
+}
+
+document.getElementById('send-beacon').addEventListener('click', function (e) {
+    e.preventDefault();
+
+    fetch("/action?type=send-beacon", { method: "POST" });
+
+    showToast("Your beacon will be sent in a moment. <br> <u>This action will be ignored if you have APRSIS and LoRa TX disabled!</u>");
+});
+
+document.getElementById('reboot').addEventListener('click', function (e) {
+    e.preventDefault();
+
+    fetch("/action?type=reboot", { method: "POST" });
+
+    showToast("Your device will be rebooted in a while");
+});
+
 const bmeCheckbox = document.querySelector("input[name='bme.active']");
 
 const stationModeSelect = document.querySelector("select[name='stationMode']");

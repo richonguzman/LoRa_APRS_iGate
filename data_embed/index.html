@@ -34,14 +34,13 @@
                                     <a class="dropdown-item" href="#" id="restore">Restore</a>
                                 </div>
                             </li>
-                            <!-- <li class="nav-item dropdown">
+                            <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Device</a>
                                 <div class="dropdown-menu">
                                     <a class="dropdown-item" href="#" id="reboot">Reboot</a>
-                                    <a class="dropdown-item" href="#" id="shutdown">Shutdown</a>
                                 </div>
                             </li>
-                            <li class="nav-item">
+                            <!--  <li class="nav-item">
                                 <a class="nav-link" href="#" id="received-packets">
                                     Received packets
                                 </a>
@@ -839,7 +838,7 @@
                             </div>
                             <div class="col-lg-9 col-sm-12">
                                 <div class="row">
-                                    <div class="col-12">
+                                    <div class="col-6">
                                         <div class="form-check form-switch">
                                             <input
                                                 type="checkbox"
@@ -854,9 +853,9 @@
                                             >
                                         </div>
                                     </div>
-                                    <!-- <div class="col-6 d-grid gap-2">
-                                        <button class="btn btn-primary">Send beacon now</button>
-                                    </div> -->
+                                    <div class="col-6 d-grid gap-2">
+                                        <button class="btn btn-primary" id="send-beacon">Send beacon now</button>
+                                    </div>
                                 </div>
                                 <div class="row mt-3">
                                     <div class="col-12">
@@ -1359,6 +1358,15 @@
                         </button>
                     </div>
                 </div>
+            </div>
+        </div>
+        <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+            <div id="toast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header">
+                    <strong class="me-auto">System Message</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body text-center"></div>
             </div>
         </div>
     </body>
