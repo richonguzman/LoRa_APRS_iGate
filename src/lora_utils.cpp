@@ -63,7 +63,8 @@ namespace LoRa_Utils {
         }
         radio.setDio1Action(setFlag);
         radio.setSpreadingFactor(Config.loramodule.spreadingFactor);
-        radio.setBandwidth(Config.loramodule.signalBandwidth);
+        float signalBandwidth = Config.loramodule.signalBandwidth/1000;
+        radio.setBandwidth(signalBandwidth);
         radio.setCodingRate(Config.loramodule.codingRate4);
         radio.setCRC(true);
         #if defined(ESP32_DIY_1W_LoRa)
@@ -195,7 +196,9 @@ namespace LoRa_Utils {
             radio.startReceive();
             int state = radio.readData(loraPacket);
             if (state == RADIOLIB_ERR_NONE) {
-                Serial.println("LoRa Rx ---> " + loraPacket);
+                if(!loraPacket.isEmpty()) {
+                    Serial.println("LoRa Rx ---> " + loraPacket);
+                }                
                 rssi      = radio.getRSSI();
                 snr       = radio.getSNR();
                 freqError = radio.getFrequencyError();
