@@ -86,7 +86,7 @@ function loadSettings(settings) {
     document.querySelector(".list-networks").innerHTML = "";
 
     // Networks
-    const wifiNetworks = settings.wifi.AP;
+    const wifiNetworks = settings.wifi.AP || [];
     const networksContainer = document.querySelector(".list-networks");
 
     let networkCount = 0;
