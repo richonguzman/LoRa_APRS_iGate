@@ -63,22 +63,24 @@ namespace DIGI_Utils {
                 STATION_Utils::updateLastHeard(Sender);
                 //STATION_Utils::updatePacketBuffer(packet);
                 Utils::typeOfPacket(packet.substring(3), "Digi");
-                AddresseeAndMessage = packet.substring(packet.indexOf("::")+2);  
-                Addressee = AddresseeAndMessage.substring(0,AddresseeAndMessage.indexOf(":"));
-                Addressee.trim();
-                if (packet.indexOf("::") > 10 && Addressee == Config.callsign) {      // its a message for me!
-                    queryMessage = APRS_IS_Utils::processReceivedLoRaMessage(Sender,AddresseeAndMessage);
-                }
-                if (!queryMessage && packet.indexOf("WIDE1-") > 10 && Config.digi.mode == 2) { // If should repeat packet (WIDE1 Digi)
-                    loraPacket = generateDigiRepeatedPacket(packet.substring(3), Config.callsign);
-                    if (loraPacket != "") {
-                        delay(500);
-                        Serial.println(loraPacket);
-                        LoRa_Utils::sendNewPacket("APRS", loraPacket);
-                        display_toggle(true);
-                        lastScreenOn = millis();
+                if (Sender != Config.callsign) { 
+                    AddresseeAndMessage = packet.substring(packet.indexOf("::")+2);  
+                    Addressee = AddresseeAndMessage.substring(0,AddresseeAndMessage.indexOf(":"));
+                    Addressee.trim();
+                    if (packet.indexOf("::") > 10 && Addressee == Config.callsign) {      // its a message for me!
+                        queryMessage = APRS_IS_Utils::processReceivedLoRaMessage(Sender,AddresseeAndMessage);
                     }
-                }            
+                    if (!queryMessage && packet.indexOf("WIDE1-") > 10 && Config.digi.mode == 2) { // If should repeat packet (WIDE1 Digi)
+                        loraPacket = generateDigiRepeatedPacket(packet.substring(3), Config.callsign);
+                        if (loraPacket != "") {
+                            delay(500);
+                            Serial.println(loraPacket);
+                            LoRa_Utils::sendNewPacket("APRS", loraPacket);
+                            display_toggle(true);
+                            lastScreenOn = millis();
+                        }
+                    }      
+                }                      
             } else {
                 Serial.println("   ---> LoRa Packet Ignored (first 3 bytes or NOGATE)\n");
             }
