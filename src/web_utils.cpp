@@ -168,7 +168,6 @@ namespace WEB_Utils {
         String type = request->getParam("type", false)->value();
 
         if (type == "send-beacon") {
-            Serial.println(lastBeaconTx);
             lastBeaconTx = 0;
 
             request->send(200, "text/plain", "Beacon will be sent in a while");

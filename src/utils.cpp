@@ -115,15 +115,17 @@ namespace Utils {
                 secondaryBeaconPacket = iGateLoRaBeaconPacket + Config.beacon.comment;
             }
 
-            #if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2)
+            #if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2) || defined(HELTEC_WSL)
             if (Config.sendBatteryVoltage) {
-                beaconPacket += " (Batt=" + String(BATTERY_Utils::checkBattery(),2) + "V)";
+                beaconPacket += " Batt=" + String(BATTERY_Utils::checkBattery(),2) + "V";
+                secondaryBeaconPacket += " Batt=" + String(BATTERY_Utils::checkBattery(),2) + "V";
                 sixthLine = "     (Batt=" + String(BATTERY_Utils::checkBattery(),2) + "V)";
             }
             #endif
 
             if (Config.externalVoltageMeasurement) { 
-                beaconPacket += " (Ext V=" + String(BATTERY_Utils::checkExternalVoltage(),2) + "V)";
+                beaconPacket += " Ext=" + String(BATTERY_Utils::checkExternalVoltage(),2) + "V";
+                secondaryBeaconPacket += " Ext=" + String(BATTERY_Utils::checkExternalVoltage(),2) + "V";
                 sixthLine = "    (Ext V=" + String(BATTERY_Utils::checkExternalVoltage(),2) + "V)";
             }
 

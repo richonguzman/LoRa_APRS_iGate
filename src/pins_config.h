@@ -119,6 +119,9 @@
 #define HAS_INTERNAL_LED
 #endif
 
+#ifdef HELTEC_WSL
+#define batteryPin      1
+#endif
 #if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2)
 #define internalLedPin  25      // Green Led
 #define batteryPin      35

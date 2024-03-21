@@ -2,7 +2,13 @@
 #include "configuration.h"
 #include "pins_config.h"
 
+// Uncomment if you want to monitor voltage and sleep if voltage is too low (<3.1V)
+#define LOW_VOLTAGE_CUTOFF
+
+float cutOffVoltage = 3.1;
+
 extern Configuration    Config;
+extern uint32_t         lastBatteryCheck;
 
 float adcReadingTransformation = (3.3/4095);
 float voltageDividerCorrection = 0.288;
@@ -16,11 +22,15 @@ float multiplyCorrection = 0.035;
 
 namespace BATTERY_Utils {
 
+    float mapVoltage(float voltage, float in_min, float in_max, float out_min, float out_max) {
+        return (voltage - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+    }
+
     float checkBattery() { 
         int sample;
         int sampleSum = 0;
         for (int i=0; i<100; i++) {
-            #if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2)
+            #if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2) || defined(HELTEC_WSL)
             sample = analogRead(batteryPin);
             #endif
             #if defined(HELTEC_V3) || defined(ESP32_DIY_LoRa) || defined(ESP32_DIY_1W_LoRa)
@@ -29,7 +39,12 @@ namespace BATTERY_Utils {
             sampleSum += sample;
             delayMicroseconds(50); 
         }
-        return (2 * (sampleSum/100) * adcReadingTransformation) + voltageDividerCorrection;
+
+        float voltage = (2 * (sampleSum/100) * adcReadingTransformation) + voltageDividerCorrection;
+
+        return voltage; // raw voltage without mapping
+
+        // return mapVoltage(voltage, 3.34, 4.71, 3.0, 4.2); // mapped voltage
     }
 
     float checkExternalVoltage() {
@@ -40,7 +55,28 @@ namespace BATTERY_Utils {
             sampleSum += sample;
             delayMicroseconds(50); 
         }
-        return ((((sampleSum/100)* adcReadingTransformation) + readingCorrection) * ((R1+R2)/R2)) - multiplyCorrection;
+
+        float voltage = ((((sampleSum/100)* adcReadingTransformation) + readingCorrection) * ((R1+R2)/R2)) - multiplyCorrection;
+
+        return voltage; // raw voltage without mapping
+
+        // return mapVoltage(voltage, 5.05, 6.32, 4.5, 5.5); // mapped voltage
+    }
+
+    bool checkIfShouldSleep() {
+        #ifdef LOW_VOLTAGE_CUTOFF
+        if (lastBatteryCheck == 0 || millis() - lastBatteryCheck >= 15 * 60 * 1000) {
+            lastBatteryCheck = millis();
+
+            float voltage = checkBattery();
+            
+            if (voltage < cutOffVoltage) {
+                return true;
+            }
+        }
+        #endif
+
+        return false;
     }
 
 }

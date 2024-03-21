@@ -18,7 +18,7 @@
 #include "display.h"
 #include "utils.h"
 #include <ElegantOTA.h>
-
+#include "battery_utils.h"
 
 Configuration   Config;
 WiFiClient      espClient;
@@ -42,6 +42,8 @@ bool            WiFiConnected         = false;
 bool            WiFiAutoAPStarted     = false;
 long            WiFiAutoAPTime        = false;
 
+uint32_t        lastBatteryCheck      = 0;
+
 uint32_t        bmeLastReading        = -60000;
 
 String          batteryVoltage;
@@ -56,7 +58,7 @@ String firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seven
 void setup() {
     Serial.begin(115200);
 
-    #if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2)
+    #if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2) || defined(HELTEC_WSL)
     pinMode(batteryPin, INPUT);
     #endif
     #ifdef HAS_INTERNAL_LED
@@ -92,6 +94,10 @@ void loop() {
     if (isUpdatingOTA) {
         ElegantOTA.loop();
         return; // Don't process IGate and Digi during OTA update
+    }
+
+    if (BATTERY_Utils::checkIfShouldSleep()) {
+        ESP.deepSleep(1800000000); // 30 min sleep (60s = 60e6)
     }
 
     thirdLine = Utils::getLocalIP();
