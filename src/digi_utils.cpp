@@ -60,10 +60,10 @@ namespace DIGI_Utils {
             if (packet.substring(0, 3) == "\x3c\xff\x01") {
                 Serial.println("   ---> APRS LoRa Packet");
                 Sender = packet.substring(3,packet.indexOf(">"));
-                STATION_Utils::updateLastHeard(Sender);
-                //STATION_Utils::updatePacketBuffer(packet);
-                Utils::typeOfPacket(packet.substring(3), "Digi");
-                if (Sender != Config.callsign) { 
+                if (Sender != Config.callsign) {
+                    STATION_Utils::updateLastHeard(Sender);
+                    //STATION_Utils::updatePacketBuffer(packet);
+                    Utils::typeOfPacket(packet.substring(3), "Digi");
                     AddresseeAndMessage = packet.substring(packet.indexOf("::")+2);  
                     Addressee = AddresseeAndMessage.substring(0,AddresseeAndMessage.indexOf(":"));
                     Addressee.trim();
@@ -81,9 +81,9 @@ namespace DIGI_Utils {
                         }
                     }      
                 }                      
-            } else {
+            } /*else {
                 Serial.println("   ---> LoRa Packet Ignored (first 3 bytes or NOGATE)\n");
-            }
+            }*/
         }
     }
 
