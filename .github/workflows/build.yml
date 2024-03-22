@@ -20,7 +20,8 @@ jobs:
                     - "ttgo-t-beam-v1"
                     - "ttgo-t-beam-v1_SX1268"
                     - "ttgo-t-beam-v1_2_SX1262"
-                    # - "heltec_wireless_stick_lite" # NOT FULLY TESTED
+                    - "heltec_wireless_stick"
+                    - "heltec_wireless_stick_lite"
         steps:
             - uses: actions/checkout@v3
 

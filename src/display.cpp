@@ -5,11 +5,14 @@
 #include "pins_config.h"
 #include "display.h"
 
+#ifdef HAS_DISPLAY
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RST);
+#endif
 
 extern Configuration Config;
 
 void setup_display() {
+    #ifdef HAS_DISPLAY
     Wire.begin(OLED_SDA, OLED_SCL);
 
     if(!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) { 
@@ -27,17 +30,21 @@ void setup_display() {
     display.ssd1306_command(1);
     display.display();
     delay(1000);
+    #endif
 }
 
 void display_toggle(bool toggle) {
+    #ifdef HAS_DISPLAY
     if (toggle) {
         display.ssd1306_command(SSD1306_DISPLAYON);
     } else {
         display.ssd1306_command(SSD1306_DISPLAYOFF);
     }
+    #endif
 }
 
 void show_display(String line1, int wait) {
+    #ifdef HAS_DISPLAY
     display.clearDisplay();
     display.setTextColor(WHITE);
     display.setTextSize(1);
@@ -47,9 +54,11 @@ void show_display(String line1, int wait) {
     display.ssd1306_command(1);
     display.display();
     delay(wait);
+    #endif
 }
 
 void show_display(String line1, String line2, int wait) {
+    #ifdef HAS_DISPLAY
     display.clearDisplay();
     display.setTextColor(WHITE);
     display.setTextSize(1);
@@ -61,9 +70,11 @@ void show_display(String line1, String line2, int wait) {
     display.ssd1306_command(1);
     display.display();
     delay(wait);
+    #endif
 }
 
 void show_display(String line1, String line2, String line3, int wait) {
+    #ifdef HAS_DISPLAY
     display.clearDisplay();
     display.setTextColor(WHITE);
     display.setTextSize(1);
@@ -77,9 +88,11 @@ void show_display(String line1, String line2, String line3, int wait) {
     display.ssd1306_command(1);
     display.display();
     delay(wait);
+    #endif
 }
 
 void show_display(String line1, String line2, String line3, String line4, int wait) {
+    #ifdef HAS_DISPLAY
     display.clearDisplay();
     display.setTextColor(WHITE);
     display.setTextSize(1);
@@ -95,9 +108,11 @@ void show_display(String line1, String line2, String line3, String line4, int wa
     display.ssd1306_command(1);
     display.display();
     delay(wait);
+    #endif
 }
 
 void show_display(String line1, String line2, String line3, String line4, String line5, int wait) {
+    #ifdef HAS_DISPLAY
     display.clearDisplay();
     display.setTextColor(WHITE);
     display.setTextSize(1);
@@ -115,9 +130,11 @@ void show_display(String line1, String line2, String line3, String line4, String
     display.ssd1306_command(1);
     display.display();
     delay(wait);
+    #endif
 }
 
 void show_display(String line1, String line2, String line3, String line4, String line5, String line6, int wait) {
+    #ifdef HAS_DISPLAY
     display.clearDisplay();
     display.setTextColor(WHITE);
     display.setTextSize(1);
@@ -137,9 +154,11 @@ void show_display(String line1, String line2, String line3, String line4, String
     display.ssd1306_command(1);
     display.display();
     delay(wait);
+    #endif
 }
 
 void show_display(String line1, String line2, String line3, String line4, String line5, String line6, String line7, int wait) {
+    #ifdef HAS_DISPLAY
     display.clearDisplay();
     display.setTextColor(WHITE);
     display.setTextSize(2);
@@ -162,4 +181,5 @@ void show_display(String line1, String line2, String line3, String line4, String
     display.ssd1306_command(1);
     display.display();
     delay(wait);
+    #endif
 }

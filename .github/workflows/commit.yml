@@ -1,0 +1,40 @@
+name: Commit Test Build
+
+on:
+    push:
+        branches:
+            - '*'
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        strategy:
+            fail-fast: false
+            matrix:
+                target:
+                    - "ttgo-lora32-v21"
+                    - "heltec-lora32-v2"
+                    - "heltec_wifi_lora_32_V3"
+                    - "ESP32_DIY_LoRa"
+                    - "ESP32_DIY_1W_LoRa"
+                    - "ttgo-t-beam-v1_2"
+                    - "ttgo-t-beam-v1"
+                    - "ttgo-t-beam-v1_SX1268"
+                    - "ttgo-t-beam-v1_2_SX1262"
+                    - "heltec_wireless_stick"
+                    - "heltec_wireless_stick_lite"
+        steps:
+            - uses: actions/checkout@v3
+
+            - uses: actions/setup-python@v4
+              with:
+                  python-version: "3.9"
+
+            - name: Install PlatformIO Core
+              run: pip install --upgrade platformio
+
+            - name: Build target
+              run: pio run -e ${{ matrix.target }}
+
+            - name: Build FS
+              run: pio run --target buildfs -e ${{ matrix.target }}

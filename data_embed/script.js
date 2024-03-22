@@ -86,7 +86,7 @@ function loadSettings(settings) {
     document.querySelector(".list-networks").innerHTML = "";
 
     // Networks
-    const wifiNetworks = settings.wifi.AP;
+    const wifiNetworks = settings.wifi.AP || [];
     const networksContainer = document.querySelector(".list-networks");
 
     let networkCount = 0;
@@ -150,6 +150,11 @@ function loadSettings(settings) {
     // document.getElementById("digi.longitude").value = settings.digi.longitude;
     document.getElementById("digi.mode").value = settings.digi.mode;
 
+    // TNC
+    document.getElementById("tnc.enableServer").checked = settings.tnc.enableServer;
+    document.getElementById("tnc.enableSerial").checked = settings.tnc.enableSerial;
+    document.getElementById("tnc.acceptOwn").checked = settings.tnc.acceptOwn;
+
     // OTA
     document.getElementById("ota.username").value = settings.ota.username;
     document.getElementById("ota.password").value = settings.ota.password;
@@ -162,6 +167,7 @@ function loadSettings(settings) {
         settings.other.sendBatteryVoltage;
     document.getElementById("other.externalVoltageMeasurement").checked =
         settings.other.externalVoltageMeasurement;
+
     document.getElementById("other.externalVoltagePin").value =
         settings.other.externalVoltagePin;
     // document.getElementById("beacon.igateSendsLoRaBeacon").value =
@@ -207,7 +213,32 @@ function loadSettings(settings) {
 
     updateImage();
     refreshSpeedStandard();
+    toggleFields();
 }
+
+function showToast(message) {
+    const el = document.querySelector('#toast');
+
+    el.querySelector('.toast-body').innerHTML = message;
+
+    (new bootstrap.Toast(el)).show();
+}
+
+document.getElementById('send-beacon').addEventListener('click', function (e) {
+    e.preventDefault();
+
+    fetch("/action?type=send-beacon", { method: "POST" });
+
+    showToast("Your beacon will be sent in a moment. <br> <u>This action will be ignored if you have APRSIS and LoRa TX disabled!</u>");
+});
+
+document.getElementById('reboot').addEventListener('click', function (e) {
+    e.preventDefault();
+
+    fetch("/action?type=reboot", { method: "POST" });
+
+    showToast("Your device will be rebooted in a while");
+});
 
 const bmeCheckbox = document.querySelector("input[name='bme.active']");
 
@@ -239,9 +270,6 @@ function updateImage() {
 }
 
 function toggleFields() {
-    const sendBatteryVoltageCheckbox = document.querySelector(
-        'input[name="other.sendBatteryVoltage"]'
-    );
     const externalVoltageMeasurementCheckbox = document.querySelector(
         'input[name="other.externalVoltageMeasurement"]'
     );
@@ -249,15 +277,10 @@ function toggleFields() {
         'input[name="other.externalVoltagePin"]'
     );
 
-    externalVoltageMeasurementCheckbox.disabled =
-        !sendBatteryVoltageCheckbox.checked;
     externalVoltagePinInput.disabled =
         !externalVoltageMeasurementCheckbox.checked;
 }
 
-const sendBatteryVoltageCheckbox = document.querySelector(
-    'input[name="other.sendBatteryVoltage"]'
-);
 const externalVoltageMeasurementCheckbox = document.querySelector(
     'input[name="other.externalVoltageMeasurement"]'
 );
@@ -265,10 +288,8 @@ const externalVoltagePinInput = document.querySelector(
     'input[name="other.externalVoltagePin"]'
 );
 
-sendBatteryVoltageCheckbox.addEventListener("change", function () {
-    externalVoltageMeasurementCheckbox.disabled = !this.checked;
-    externalVoltagePinInput.disabled =
-        !externalVoltageMeasurementCheckbox.checked;
+externalVoltageMeasurementCheckbox.addEventListener("change", function () {
+    externalVoltagePinInput.disabled = !this.checked;
 });
 
 document.querySelector(".new button").addEventListener("click", function () {
@@ -377,8 +398,6 @@ document.getElementById("action.speed").addEventListener("change", function () {
         document.getElementById("lora.spreadingFactor").value = sf;
     }
 });
-
-toggleFields();
 
 const form = document.querySelector("form");
 

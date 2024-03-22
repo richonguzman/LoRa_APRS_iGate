@@ -93,13 +93,15 @@ namespace Utils {
         uint32_t lastTx = millis() - lastBeaconTx;
         String beaconPacket, secondaryBeaconPacket;
 
-        if (lastTx >= Config.beacon.interval*60*1000) {
+        if (lastBeaconTx == 0 || lastTx >= Config.beacon.interval*60*1000) {
             beaconUpdate = true;    
         }
 
         if (beaconUpdate) {
             display_toggle(true);
-            Serial.println("-- Sending Beacon to APRSIS --");
+
+            Utils::println("-- Sending Beacon to APRSIS --");
+
             STATION_Utils::deleteNotHeard();
 
             activeStations();
@@ -113,15 +115,17 @@ namespace Utils {
                 secondaryBeaconPacket = iGateLoRaBeaconPacket + Config.beacon.comment;
             }
 
-            #if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2)
+            #if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2) || defined(HELTEC_WSL)
             if (Config.sendBatteryVoltage) {
-                beaconPacket += " (Batt=" + String(BATTERY_Utils::checkBattery(),2) + "V)";
+                beaconPacket += " Batt=" + String(BATTERY_Utils::checkBattery(),2) + "V";
+                secondaryBeaconPacket += " Batt=" + String(BATTERY_Utils::checkBattery(),2) + "V";
                 sixthLine = "     (Batt=" + String(BATTERY_Utils::checkBattery(),2) + "V)";
             }
             #endif
 
             if (Config.externalVoltageMeasurement) { 
-                beaconPacket += " (Ext V=" + String(BATTERY_Utils::checkExternalVoltage(),2) + "V)";
+                beaconPacket += " Ext=" + String(BATTERY_Utils::checkExternalVoltage(),2) + "V";
+                secondaryBeaconPacket += " Ext=" + String(BATTERY_Utils::checkExternalVoltage(),2) + "V";
                 sixthLine = "    (Ext V=" + String(BATTERY_Utils::checkExternalVoltage(),2) + "V)";
             }
 
@@ -229,6 +233,18 @@ namespace Utils {
         } else {
             sixthLine = sender + "> ??????????";
             seventhLine = "RSSI:" + String(rssi) + "dBm SNR: " + String(snr) + "dBm";
+        }
+    }
+
+    void print(String text) {
+        if (!Config.tnc.enableSerial) {
+            Serial.print(text);
+        }
+    }
+
+    void println(String text) {
+        if (!Config.tnc.enableSerial) {
+            Serial.println(text);
         }
     }
 

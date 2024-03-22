@@ -3,6 +3,7 @@
 #include "web_utils.h"
 
 extern Configuration        Config;
+extern uint32_t             lastBeaconTx;
 
 extern const char web_index_html[] asm("_binary_data_embed_index_html_gz_start");
 extern const char web_index_html_end[] asm("_binary_data_embed_index_html_gz_end");
@@ -84,6 +85,10 @@ namespace WEB_Utils {
         // Config.digi.latitude = request->getParam("digi.latitude", true)->value().toDouble();
         // Config.digi.longitude = request->getParam("digi.longitude", true)->value().toDouble();
 
+        Config.tnc.enableServer = request->hasParam("tnc.enableServer", true);
+        Config.tnc.enableSerial = request->hasParam("tnc.enableSerial", true);
+        Config.tnc.acceptOwn = request->hasParam("tnc.acceptOwn", true);
+
         Config.aprs_is.active = request->hasParam("aprs_is.active", true);
         Config.aprs_is.passcode = request->getParam("aprs_is.passcode", true)->value();
         Config.aprs_is.server = request->getParam("aprs_is.server", true)->value();
@@ -159,6 +164,20 @@ namespace WEB_Utils {
         ESP.restart();
     }
 
+    void handleAction(AsyncWebServerRequest *request) {
+        String type = request->getParam("type", false)->value();
+
+        if (type == "send-beacon") {
+            lastBeaconTx = 0;
+
+            request->send(200, "text/plain", "Beacon will be sent in a while");
+        } else if (type == "reboot") {
+            ESP.restart();
+        } else {
+            request->send(404, "text/plain", "Not Found");
+        }
+    }
+
     void handleStyle(AsyncWebServerRequest *request) {
         AsyncWebServerResponse *response = request->beginResponse_P(200, "text/css", (const uint8_t*)web_style_css, web_style_css_len);
         response->addHeader("Content-Encoding", "gzip");
@@ -190,6 +209,7 @@ namespace WEB_Utils {
         server.on("/status", HTTP_GET, handleStatus);
         server.on("/configuration.json", HTTP_GET, handleReadConfiguration);
         server.on("/configuration.json", HTTP_POST, handleWriteConfiguration);
+        server.on("/action", HTTP_POST, handleAction);
         server.on("/style.css", HTTP_GET, handleStyle);
         server.on("/script.js", HTTP_GET, handleScript);
         server.on("/bootstrap.css", HTTP_GET, handleBootstrapStyle);

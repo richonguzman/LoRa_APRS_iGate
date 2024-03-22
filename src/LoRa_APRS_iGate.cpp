@@ -14,10 +14,11 @@
 #include "gps_utils.h"
 #include "bme_utils.h"
 #include "web_utils.h"
+#include "tnc_utils.h"
 #include "display.h"
 #include "utils.h"
 #include <ElegantOTA.h>
-
+#include "battery_utils.h"
 
 Configuration   Config;
 WiFiClient      espClient;
@@ -41,6 +42,8 @@ bool            WiFiConnected         = false;
 bool            WiFiAutoAPStarted     = false;
 long            WiFiAutoAPTime        = false;
 
+uint32_t        lastBatteryCheck      = 0;
+
 uint32_t        bmeLastReading        = -60000;
 
 String          batteryVoltage;
@@ -55,7 +58,7 @@ String firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seven
 void setup() {
     Serial.begin(115200);
 
-    #if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2)
+    #if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2) || defined(HELTEC_WSL)
     pinMode(batteryPin, INPUT);
     #endif
     #ifdef HAS_INTERNAL_LED
@@ -82,6 +85,7 @@ void setup() {
     SYSLOG_Utils::setup();
     BME_Utils::setup();
     WEB_Utils::setup();
+    TNC_Utils::setup();
 }
 
 void loop() {
@@ -92,6 +96,10 @@ void loop() {
         return; // Don't process IGate and Digi during OTA update
     }
 
+    if (BATTERY_Utils::checkIfShouldSleep()) {
+        ESP.deepSleep(1800000000); // 30 min sleep (60s = 60e6)
+    }
+
     thirdLine = Utils::getLocalIP();
 
     WIFI_Utils::checkWiFi(); // Always use WiFi, not related to IGate/Digi mode
@@ -100,6 +108,8 @@ void loop() {
     if (Config.aprs_is.active && !espClient.connected()) {
         APRS_IS_Utils::connect();
     }
+
+    TNC_Utils::loop();
 
     Utils::checkDisplayInterval();
     Utils::checkBeaconInterval();
@@ -112,12 +122,22 @@ void loop() {
 
     APRS_IS_Utils::checkStatus(); // Need that to update display, maybe split this and send APRSIS status to display func?
 
-    if (Config.aprs_is.active) { // If APRSIS enabled
-        APRS_IS_Utils::loop(packet); // Send received packet to APRSIS
-    }
+    if (packet != "") {
+        if (Config.aprs_is.active) { // If APRSIS enabled
+            APRS_IS_Utils::loop(packet); // Send received packet to APRSIS
+        }
 
-    if (Config.digi.mode == 2) { // If Digi enabled
-        DIGI_Utils::loop(packet); // Send received packet to Digi
+        if (Config.digi.mode == 2) { // If Digi enabled
+            DIGI_Utils::loop(packet); // Send received packet to Digi
+        }
+
+        if (Config.tnc.enableServer) { // If TNC server enabled
+            TNC_Utils::sendToClients(packet); // Send received packet to TNC KISS
+        }
+
+        if (Config.tnc.enableSerial) { // If Serial KISS enabled
+            TNC_Utils::sendToSerial(packet); // Send received packet to Serial KISS
+        }
     }
 
     show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);

@@ -4,13 +4,6 @@
 #include <Arduino.h>
 
 
-//#define TextSerialOutputForApp
-/*  uncomment the previous line to get text from Serial-Output over USB into PC for:
-    - PinPoint App ( https://www.pinpointaprs.com )
-    - APRSIS32 App ( http://aprsisce.wikidot.com )
-*/
-
-
 namespace APRS_IS_Utils {
 
     void upload(String line);
