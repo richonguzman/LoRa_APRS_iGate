@@ -151,9 +151,11 @@ function loadSettings(settings) {
     document.getElementById("digi.mode").value = settings.digi.mode;
 
     // TNC
-    document.getElementById("tnc.enableServer").checked = settings.tnc.enableServer;
-    document.getElementById("tnc.enableSerial").checked = settings.tnc.enableSerial;
-    document.getElementById("tnc.acceptOwn").checked = settings.tnc.acceptOwn;
+    if (settings.tnc) {
+        document.getElementById("tnc.enableServer").checked = settings.tnc.enableServer;
+        document.getElementById("tnc.enableSerial").checked = settings.tnc.enableSerial;
+        document.getElementById("tnc.acceptOwn").checked = settings.tnc.acceptOwn;
+    }
 
     // OTA
     document.getElementById("ota.username").value = settings.ota.username;
