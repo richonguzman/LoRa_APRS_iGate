@@ -136,6 +136,11 @@ namespace LoRa_Utils {
 #ifdef HAS_SX126X
         int state = radio.transmit("\x3c\xff\x01" + newPacket);
         if (state == RADIOLIB_ERR_NONE) {
+            if (Config.syslog.active && WiFi.status() == WL_CONNECTED) {
+                SYSLOG_Utils::log("Tx", newPacket, 0, 0, 0);
+            }
+            Utils::print("---> LoRa Packet Tx    : ");
+            Utils::println(newPacket);
             //Serial.println(F("success!"));
         }
         else if (state == RADIOLIB_ERR_PACKET_TOO_LONG) {
@@ -152,11 +157,6 @@ namespace LoRa_Utils {
 #ifdef HAS_INTERNAL_LED
         digitalWrite(internalLedPin, LOW);
 #endif
-        SYSLOG_Utils::log("Tx", newPacket, 0, 0, 0);
-
-        Utils::print("---> LoRa Packet Tx    : ");
-        Utils::println(newPacket);
-
         if (Config.loramodule.txFreq != Config.loramodule.rxFreq) {
             changeFreqRx();
         }
@@ -195,6 +195,19 @@ namespace LoRa_Utils {
             rssi = LoRa.packetRssi();
             snr = LoRa.packetSnr();
             freqError = LoRa.packetFrequencyError();
+            if ((loraPacket.indexOf("\0") != -1) || (loraPacket.indexOf("\r") != -1) || (loraPacket.indexOf("\n") != -1)) {
+                loraPacket = packetSanitization(loraPacket);
+            }
+
+            if (loraPacket != "") {
+                Utils::println("<--- LoRa Packet Rx    : " + loraPacket);
+                Utils::println("(RSSI:" + String(rssi) + " / SNR:" + String(snr) + " / FreqErr:" + String(freqError) + ")");
+                if (Config.syslog.active && WiFi.status() == WL_CONNECTED && loraPacket != "") {
+                    SYSLOG_Utils::log("Rx", loraPacket, rssi, snr, freqError);
+                }
+                return loraPacket;
+            }
+            return loraPacket;
         }
 #endif
 #ifdef HAS_SX126X
@@ -203,36 +216,34 @@ namespace LoRa_Utils {
             radio.startReceive();
             int state = radio.readData(loraPacket);
             if (state == RADIOLIB_ERR_NONE) {
-                rssi = radio.getRSSI();
-                snr = radio.getSNR();
-                freqError = radio.getFrequencyError();
+                if (loraPacket != "") {
+                    rssi = radio.getRSSI();
+                    snr = radio.getSNR();
+                    freqError = radio.getFrequencyError();
+                    Utils::println("<--- LoRa Packet Rx    : " + loraPacket);
+                    Utils::println("(RSSI:" + String(rssi) + " / SNR:" + String(snr) + " / FreqErr:" + String(freqError) + ")");
+                    if (Config.syslog.active && WiFi.status() == WL_CONNECTED && loraPacket != "") {
+                        SYSLOG_Utils::log("Rx", loraPacket, rssi, snr, freqError);
+                    }
+                    return loraPacket;
+                }                
             }
             else if (state == RADIOLIB_ERR_RX_TIMEOUT) {
                 // timeout occurred while waiting for a packet
             }
             else if (state == RADIOLIB_ERR_CRC_MISMATCH) {
                 Serial.println(F("CRC error!"));
+                if (Config.syslog.active && WiFi.status() == WL_CONNECTED) {
+                    SYSLOG_Utils::log("Rx", "RADIOLIB_ERR_CRC_MISMATCH", 0,0,0);
+                }
             }
             else {
                 Serial.print(F("failed, code "));
                 Serial.println(state);
             }
         }
-#endif
-
-        if ((loraPacket.indexOf("\0") != -1) || (loraPacket.indexOf("\r") != -1) || (loraPacket.indexOf("\n") != -1)) {
-            loraPacket = packetSanitization(loraPacket);
-        }
-
-        if (loraPacket != "") {
-            Utils::println("<--- LoRa Packet Rx    : " + loraPacket);
-            Utils::println("(RSSI:" + String(rssi) + " / SNR:" + String(snr) + " / FreqErr:" + String(freqError) + ")");
-        }
-
-        if (Config.syslog.active && WiFi.status() == WL_CONNECTED && loraPacket != "") {
-            SYSLOG_Utils::log("Rx", loraPacket, rssi, snr, freqError);
-        }
         return loraPacket;
+#endif
     }
 
 }
