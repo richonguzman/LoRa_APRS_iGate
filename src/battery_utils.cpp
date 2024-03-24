@@ -2,10 +2,10 @@
 #include "configuration.h"
 #include "pins_config.h"
 
-// Uncomment if you want to monitor voltage and sleep if voltage is too low (<3.1V)
-#define LOW_VOLTAGE_CUTOFF
+// Uncomment if you want to monitor voltage and sleep if voltage is too low (<3.15V)
+//#define LOW_VOLTAGE_CUTOFF
 
-float cutOffVoltage = 3.1;
+float cutOffVoltage = 3.15;
 
 extern Configuration    Config;
 extern uint32_t         lastBatteryCheck;
