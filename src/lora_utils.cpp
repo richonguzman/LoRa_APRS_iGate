@@ -80,8 +80,7 @@ namespace LoRa_Utils {
 #endif
         if (state == RADIOLIB_ERR_NONE) {
             Serial.println("init : LoRa Module    ...     done!");
-        }
-        else {
+        } else {
             Serial.println("Starting LoRa failed!");
             while (true);
         }
@@ -125,8 +124,7 @@ namespace LoRa_Utils {
         LoRa.write('<');
         if (typeOfMessage == "APRS") {
             LoRa.write(0xFF);
-        }
-        else if (typeOfMessage == "LoRa") {
+        } else if (typeOfMessage == "LoRa") {
             LoRa.write(0xF8);
         }
         LoRa.write(0x01);
@@ -142,14 +140,11 @@ namespace LoRa_Utils {
             Utils::print("---> LoRa Packet Tx    : ");
             Utils::println(newPacket);
             //Serial.println(F("success!"));
-        }
-        else if (state == RADIOLIB_ERR_PACKET_TOO_LONG) {
+        } else if (state == RADIOLIB_ERR_PACKET_TOO_LONG) {
             Serial.println(F("too long!"));
-        }
-        else if (state == RADIOLIB_ERR_TX_TIMEOUT) {
+        } else if (state == RADIOLIB_ERR_TX_TIMEOUT) {
             Serial.println(F("timeout!"));
-        }
-        else {
+        } else {
             Serial.print(F("failed, code "));
             Serial.println(state);
         }
@@ -205,10 +200,9 @@ namespace LoRa_Utils {
                 if (Config.syslog.active && WiFi.status() == WL_CONNECTED && loraPacket != "") {
                     SYSLOG_Utils::log("Rx", loraPacket, rssi, snr, freqError);
                 }
-                return loraPacket;
             }
-            return loraPacket;
         }
+        return loraPacket;
 #endif
 #ifdef HAS_SX126X
         if (transmissionFlag) {
@@ -227,17 +221,14 @@ namespace LoRa_Utils {
                     }
                     return loraPacket;
                 }                
-            }
-            else if (state == RADIOLIB_ERR_RX_TIMEOUT) {
+            } else if (state == RADIOLIB_ERR_RX_TIMEOUT) {
                 // timeout occurred while waiting for a packet
-            }
-            else if (state == RADIOLIB_ERR_CRC_MISMATCH) {
+            } else if (state == RADIOLIB_ERR_CRC_MISMATCH) {
                 Serial.println(F("CRC error!"));
                 if (Config.syslog.active && WiFi.status() == WL_CONNECTED) {
                     SYSLOG_Utils::log("Rx", "RADIOLIB_ERR_CRC_MISMATCH", 0,0,0);
                 }
-            }
-            else {
+            } else {
                 Serial.print(F("failed, code "));
                 Serial.println(state);
             }
