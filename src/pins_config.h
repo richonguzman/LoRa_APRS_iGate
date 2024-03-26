@@ -7,21 +7,6 @@
 #undef OLED_SCL
 #undef OLED_RST
 
-#if defined(HELTEC_V3) || defined(HELTEC_WS) || defined(ESP32_DIY_1W_LoRa) || defined(TTGO_T_Beam_V1_0_SX1268) || defined(TTGO_T_Beam_V1_2_SX1262) || defined(OE5HWN_MeshCom) || defined(HELTEC_WSL)
-#define HAS_SX126X
-#endif
-
-#if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2) || defined(ESP32_DIY_LoRa) || defined(TTGO_T_Beam_V1_0) || defined(TTGO_T_Beam_V1_2)
-#define HAS_SX127X
-#endif
-
-#if defined(TTGO_T_Beam_V1_0) || defined(TTGO_T_Beam_V1_0_SX1268)
-#define HAS_AXP192
-#endif
-
-#if defined(TTGO_T_Beam_V1_2) || defined(TTGO_T_Beam_V1_2_SX1262)
-#define HAS_AXP2101
-#endif
 
 // LORA MODULES
 #if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2) || defined(ESP32_DIY_LoRa)
@@ -133,6 +118,18 @@
 #define internalLedPin  2
 #endif
 
+
+#ifdef ESP32_C3_DIY_LoRa
+#define OLED_SDA    8
+#define OLED_SCL    9
+#define OLED_RST    10
+#define LORA_SCK    4
+#define LORA_MISO   5
+#define LORA_MOSI   6
+#define LORA_CS     7
+#define LORA_RST    3
+#define LORA_IRQ    2
+#endif
 
 /* (Same pins for LILYGO LoRa32 and ESP32 Wroom Dev )
 SX1278-------------------> ESP32 ttgo-lora32-v21 and ESP32 WROOM Dev
