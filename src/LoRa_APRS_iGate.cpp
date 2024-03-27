@@ -96,9 +96,7 @@ void loop() {
         return; // Don't process IGate and Digi during OTA update
     }
 
-    if (BATTERY_Utils::checkIfShouldSleep()) {
-        ESP.deepSleep(1800000000); // 30 min sleep (60s = 60e6)
-    }
+    BATTERY_Utils::checkIfShouldSleep();
 
     thirdLine = Utils::getLocalIP();
 
