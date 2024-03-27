@@ -124,7 +124,7 @@ void loop() {
 
     if (packet != "") {
         if (Config.aprs_is.active) { // If APRSIS enabled
-            APRS_IS_Utils::loop(packet); // Send received packet to APRSIS
+            APRS_IS_Utils::processLoRaPacket(packet); // Send received packet to APRSIS
         }
 
         if (Config.digi.mode == 2) { // If Digi enabled
@@ -138,6 +138,10 @@ void loop() {
         if (Config.tnc.enableSerial) { // If Serial KISS enabled
             TNC_Utils::sendToSerial(packet); // Send received packet to Serial KISS
         }
+    }
+
+    if (Config.aprs_is.active) { // If APRSIS enabled
+        APRS_IS_Utils::listenAPRSIS(); // listen received packet from APRSIS
     }
 
     show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);

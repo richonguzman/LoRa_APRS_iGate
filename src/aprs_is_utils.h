@@ -13,7 +13,7 @@ namespace APRS_IS_Utils {
     bool processReceivedLoRaMessage(String sender, String packet);
     void processLoRaPacket(String packet);
     void processAPRSISPacket(String packet);
-    void loop(String packet);
+    void listenAPRSIS();
 
 }
 
