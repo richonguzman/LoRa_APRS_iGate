@@ -18,7 +18,7 @@ namespace GPS_Utils {
         int v = n;
         r += v;
         r += '.';
-        for (int i=0;i<ndec;i++) {
+        for (int i = 0; i < ndec; i++) {
             n -= v;
             n = 10 * abs(n);
             v = n;
@@ -158,7 +158,7 @@ namespace GPS_Utils {
     }
 
     String getDistance(String packet) {
-        int encodedBytePosition = 0;
+        uint8_t encodedBytePosition = 0;
         if (packet.indexOf(":!") > 10) {
             encodedBytePosition = packet.indexOf(":!") + 14;
         }

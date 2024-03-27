@@ -11,7 +11,6 @@
 
 extern Configuration  Config;
 extern WiFiClient     espClient;
-extern int            internalLedPin;
 extern uint32_t       lastScreenOn;
 extern String         firstLine;
 extern String         secondLine;
@@ -29,7 +28,7 @@ namespace APRS_IS_Utils {
     }
 
     void connect() {
-        int count = 0;
+        uint8_t count = 0;
         String aprsauth;
         Serial.print("Connecting to APRS-IS ...     ");
         while (!espClient.connect(Config.aprs_is.server.c_str(), Config.aprs_is.port) && count < 20) {

@@ -30,7 +30,7 @@ namespace BATTERY_Utils {
     float checkBattery() { 
         int sample;
         int sampleSum = 0;
-        for (int i=0; i<100; i++) {
+        for (int i = 0; i < 100; i++) {
             #if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2) || defined(HELTEC_WSL)
             sample = analogRead(batteryPin);
             #endif
@@ -51,7 +51,7 @@ namespace BATTERY_Utils {
     float checkExternalVoltage() {
         int sample;
         int sampleSum = 0;
-        for (int i=0; i<100; i++) {
+        for (int i = 0; i < 100; i++) {
             sample = analogRead(Config.externalVoltagePin);
             sampleSum += sample;
             delayMicroseconds(50); 

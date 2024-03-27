@@ -42,7 +42,7 @@ namespace WIFI_Utils {
         if (currentWiFi->ssid == "") {
             startAP = true;
         } else {
-            int wifiCounter = 0;
+            uint8_t wifiCounter = 0;
             WiFi.mode(WIFI_STA);
             WiFi.disconnect();
             delay(500);

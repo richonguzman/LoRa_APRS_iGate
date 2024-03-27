@@ -199,7 +199,7 @@ namespace Utils {
             fifthLine = "LoRa Rx ----> LoRa Tx";
             sender = packet.substring(3,packet.indexOf(">"));
         }
-        for (int i=sender.length();i<9;i++) {
+        for (int i = sender.length(); i < 9; i++) {
             sender += " ";
         }
         if (packet.indexOf("::") >= 10) {
