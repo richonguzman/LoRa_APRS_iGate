@@ -65,6 +65,7 @@
         "rememberStationTime": 30,
         "sendBatteryVoltage": false,
         "externalVoltageMeasurement": false,
-        "externalVoltagePin": 34
+        "externalVoltagePin": 34,
+        "lowPowerMode": false
     }
 }

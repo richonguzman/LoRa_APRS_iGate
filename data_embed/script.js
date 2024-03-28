@@ -213,6 +213,9 @@ function loadSettings(settings) {
         settings.lora.codingRate4;
     document.getElementById("lora.power").value = settings.lora.power;
 
+    // Experimental
+    document.getElementById("other.lowPowerMode").checked = settings.other.lowPowerMode;
+
     updateImage();
     refreshSpeedStandard();
     toggleFields();

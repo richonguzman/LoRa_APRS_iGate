@@ -13,6 +13,7 @@ namespace LoRa_Utils {
     String receivePacket();
     void changeFreqTx();
     void changeFreqRx();
+    void startReceive();
 
 }
 
