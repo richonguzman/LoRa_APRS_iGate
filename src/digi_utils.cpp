@@ -61,6 +61,7 @@ namespace DIGI_Utils {
         String loraPacket, Sender, AddresseeAndMessage, Addressee;
         if (packet != "") {
             if ((packet.substring(0, 3) == "\x3c\xff\x01") && (packet.indexOf("NOGATE") == -1)) {
+                Sender = packet.substring(3, packet.indexOf(">"));
                 if (Sender != Config.callsign) {
                     String sender = packet.substring(3, packet.indexOf(">"));
                     STATION_Utils::updateLastHeard(sender);
