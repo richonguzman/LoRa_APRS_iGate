@@ -115,6 +115,7 @@ public:
     bool                  externalVoltageMeasurement;
     int                   externalVoltagePin;
     bool                  lowPowerMode;
+    double                lowVoltageCutOff;
     std::vector<WiFi_AP>  wifiAPs;
     WiFi_Auto_AP          wifiAutoAP;
     Beacon                beacon; // new

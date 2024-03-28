@@ -1,12 +1,6 @@
 #include "battery_utils.h"
 #include "configuration.h"
 #include "pins_config.h"
-//#include "lora_utils.h"
-
-// Uncomment if you want to monitor voltage and sleep if voltage is too low (<3.15V)
-//#define LOW_VOLTAGE_CUTOFF
-
-float cutOffVoltage = 3.15;
 
 extern Configuration    Config;
 extern uint32_t         lastBatteryCheck;
@@ -65,24 +59,15 @@ namespace BATTERY_Utils {
     }
 
     void checkIfShouldSleep() {
-        #ifdef LOW_VOLTAGE_CUTOFF
         if (lastBatteryCheck == 0 || millis() - lastBatteryCheck >= 15 * 60 * 1000) {
             lastBatteryCheck = millis();
 
             float voltage = checkBattery();
             
-            if (voltage < cutOffVoltage) {
-                /*  Send message over APRS-IS or over LoRa???
-                
-                APRS_IS_Utils::upload("battery is low = sleeping")
-
-                LoRa_Utils::sendNewMessage("battery is low = sleeping");
-                
-                */
+            if (voltage < Config.lowVoltageCutOff) {
                 ESP.deepSleep(1800000000); // 30 min sleep (60s = 60e6)
             }
         }
-        #endif
     }
 
 }

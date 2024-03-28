@@ -215,6 +215,7 @@ function loadSettings(settings) {
 
     // Experimental
     document.getElementById("other.lowPowerMode").checked = settings.other.lowPowerMode;
+    document.getElementById("other.lowVoltageCutOff").value = settings.other.lowVoltageCutOff || 0
 
     updateImage();
     refreshSpeedStandard();

@@ -97,6 +97,7 @@ void Configuration::writeFile() {
     data["ota"]["password"] = ota.password;
 
     data["other"]["lowPowerMode"] = lowPowerMode;
+    data["other"]["lowVoltageCutOff"] = lowVoltageCutOff;
 
     serializeJson(data, configFile);
 
@@ -163,6 +164,7 @@ bool Configuration::readFile() {
         tnc.acceptOwn                   = data["tnc"]["acceptOwn"].as<bool>();
 
         lowPowerMode                    = data["other"]["lowPowerMode"].as<bool>();
+        lowVoltageCutOff                = data["other"]["lowVoltageCutOff"].as<double>();
 
         int stationMode                     = data["stationMode"].as<int>(); // deprecated but need to specify config version
 
@@ -336,6 +338,7 @@ void Configuration::init() {
     externalVoltagePin = 34;
 
     lowPowerMode = false;
+    lowVoltageCutOff = 0;
 
     Serial.println("todo escrito");
 }

@@ -66,6 +66,7 @@
         "sendBatteryVoltage": false,
         "externalVoltageMeasurement": false,
         "externalVoltagePin": 34,
-        "lowPowerMode": false
+        "lowPowerMode": false,
+        "lowVoltageCutOff": 0
     }
 }

@@ -154,7 +154,9 @@ void loop() {
         return; // Don't process IGate and Digi during OTA update
     }
 
-    BATTERY_Utils::checkIfShouldSleep();
+    if (Config.lowVoltageCutOff > 0) {
+        BATTERY_Utils::checkIfShouldSleep();
+    }
 
     thirdLine = Utils::getLocalIP();
 

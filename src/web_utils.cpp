@@ -156,6 +156,7 @@ namespace WEB_Utils {
         }
 
         Config.lowPowerMode = request->hasParam("other.lowPowerMode", true);
+        Config.lowVoltageCutOff = request->getParam("other.lowVoltageCutOff", true)->value().toDouble();
 
         Config.writeFile();
 
