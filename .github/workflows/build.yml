@@ -41,6 +41,7 @@ jobs:
             - name: Move Files
               run: |
                   mkdir -p installer/firmware
+                  cp .pio/build/${{ matrix.target }}/firmware.bin installer/ota_update.bin
                   cp .pio/build/${{ matrix.target }}/firmware.bin installer/firmware/
                   cp .pio/build/${{ matrix.target }}/bootloader.bin installer/firmware/
                   cp .pio/build/${{ matrix.target }}/partitions.bin installer/firmware/
