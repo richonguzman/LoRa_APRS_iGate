@@ -1,12 +1,6 @@
 #include "battery_utils.h"
 #include "configuration.h"
 #include "pins_config.h"
-//#include "lora_utils.h"
-
-// Uncomment if you want to monitor voltage and sleep if voltage is too low (<3.15V)
-//#define LOW_VOLTAGE_CUTOFF
-
-float cutOffVoltage = 3.15;
 
 extern Configuration    Config;
 extern uint32_t         lastBatteryCheck;
@@ -31,7 +25,7 @@ namespace BATTERY_Utils {
         int sample;
         int sampleSum = 0;
         for (int i = 0; i < 100; i++) {
-            #if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2) || defined(HELTEC_WSL)
+            #if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2) || defined(HELTEC_HTCT62)
             sample = analogRead(batteryPin);
             #endif
             #if defined(HELTEC_V3) || defined(ESP32_DIY_LoRa) || defined(ESP32_DIY_1W_LoRa)
@@ -65,24 +59,15 @@ namespace BATTERY_Utils {
     }
 
     void checkIfShouldSleep() {
-        #ifdef LOW_VOLTAGE_CUTOFF
         if (lastBatteryCheck == 0 || millis() - lastBatteryCheck >= 15 * 60 * 1000) {
             lastBatteryCheck = millis();
 
             float voltage = checkBattery();
             
-            if (voltage < cutOffVoltage) {
-                /*  Send message over APRS-IS or over LoRa???
-                
-                APRS_IS_Utils::upload("battery is low = sleeping")
-
-                LoRa_Utils::sendNewMessage("battery is low = sleeping");
-                
-                */
+            if (voltage < Config.lowVoltageCutOff) {
                 ESP.deepSleep(1800000000); // 30 min sleep (60s = 60e6)
             }
         }
-        #endif
     }
 
 }

@@ -10,7 +10,7 @@
 
 extern Configuration  Config;
 
-#if defined(HELTEC_V3) || defined(HELTEC_WS) || defined(TTGO_T_Beam_V1_2_SX1262) || defined(HELTEC_WSL)
+#if defined(HELTEC_V3) || defined(HELTEC_WS) || defined(TTGO_T_Beam_V1_2_SX1262) || defined(HELTEC_HTCT62)
 SX1262 radio = new Module(RADIO_CS_PIN, RADIO_DIO1_PIN, RADIO_RST_PIN, RADIO_BUSY_PIN);
 bool transmissionFlag = true;
 bool enableInterrupt = true;
@@ -63,7 +63,11 @@ namespace LoRa_Utils {
             Serial.println("Starting LoRa failed!");
             while (true);
         }
-        radio.setDio1Action(setFlag);
+        if (!Config.lowPowerMode) {
+            radio.setDio1Action(setFlag);
+        } else {
+            radio.setDIOMapping(1, RADIOLIB_SX126X_IRQ_RX_DONE);
+        }
         radio.setSpreadingFactor(Config.loramodule.spreadingFactor);
         float signalBandwidth = Config.loramodule.signalBandwidth/1000;
         radio.setBandwidth(signalBandwidth);
@@ -178,6 +182,12 @@ namespace LoRa_Utils {
         return packet;
     }
 
+    void startReceive() {
+#ifdef HAS_SX126X
+        radio.startReceive();
+#endif
+    }
+
     String receivePacket() {
         String loraPacket = "";
 #ifdef HAS_SX127X
@@ -205,7 +215,7 @@ namespace LoRa_Utils {
         return loraPacket;
 #endif
 #ifdef HAS_SX126X
-        if (transmissionFlag) {
+        if (transmissionFlag || Config.lowPowerMode) {
             transmissionFlag = false;
             radio.startReceive();
             int state = radio.readData(loraPacket);

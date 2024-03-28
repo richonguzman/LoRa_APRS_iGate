@@ -155,6 +155,9 @@ namespace WEB_Utils {
             Config.externalVoltagePin = request->getParam("other.externalVoltagePin", true)->value().toInt();
         }
 
+        Config.lowPowerMode = request->hasParam("other.lowPowerMode", true);
+        Config.lowVoltageCutOff = request->getParam("other.lowVoltageCutOff", true)->value().toDouble();
+
         Config.writeFile();
 
         AsyncWebServerResponse *response = request->beginResponse(302, "text/html", "");

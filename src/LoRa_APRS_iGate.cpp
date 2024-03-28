@@ -58,7 +58,7 @@ String firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seven
 void setup() {
     Serial.begin(115200);
 
-    #if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2) || defined(HELTEC_WSL)
+    #if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2) || defined(HELTEC_HTCT62)
     pinMode(batteryPin, INPUT);
     #endif
     #ifdef HAS_INTERNAL_LED
@@ -75,12 +75,70 @@ void setup() {
 
     Config.check();
 
-    WIFI_Utils::setup();
     LoRa_Utils::setup();
     Utils::validateFreqs();
 
     iGateBeaconPacket = GPS_Utils::generateBeacon();
     iGateLoRaBeaconPacket = GPS_Utils::generateiGateLoRaBeacon();
+
+#ifdef HELTEC_HTCT62
+    if (Config.lowPowerMode) {
+        gpio_wakeup_enable(GPIO_NUM_3, GPIO_INTR_HIGH_LEVEL);
+        esp_deep_sleep_enable_gpio_wakeup(GPIO_NUM_3, ESP_GPIO_WAKEUP_GPIO_HIGH);
+
+        long lastBeacon = 0;
+
+        LoRa_Utils::startReceive();
+
+        while (true) {
+            auto wakeup_reason = esp_sleep_get_wakeup_cause();
+
+            if (wakeup_reason == 7) { // packet received
+                Serial.println("Received packet");
+
+                String packet = LoRa_Utils::receivePacket();
+
+                Serial.println(packet);
+
+                if (Config.digi.mode == 2) { // If Digi enabled
+                    DIGI_Utils::loop(packet); // Send received packet to Digi
+                }
+
+                if (packet.indexOf(Config.callsign + ":STOP{") != -1) {
+                    Serial.println("Got STOP message, exiting from low power mode");
+                    break;
+                };
+            }
+
+            long time = esp_timer_get_time() / 1000000;
+
+            if (lastBeacon == 0 || time - lastBeacon >= Config.beacon.interval * 60) {
+                Serial.println("Sending beacon");
+
+                LoRa_Utils::sendNewPacket("APRS", iGateLoRaBeaconPacket + Config.beacon.comment + " Batt=" + String(BATTERY_Utils::checkBattery(),2) + "V");
+            
+                lastBeacon = time;
+            }
+
+            LoRa_Utils::startReceive();
+
+            Serial.println("Sleeping");
+
+            long sleep = (Config.beacon.interval * 60) - (time - lastBeacon);
+
+            Serial.flush();
+
+            esp_sleep_enable_timer_wakeup(sleep * 1000000);
+            esp_light_sleep_start();
+
+            Serial.println("Waked up");
+        }
+
+        Config.loramodule.rxActive = false;
+    }
+#endif
+
+    WIFI_Utils::setup();
 
     SYSLOG_Utils::setup();
     BME_Utils::setup();
@@ -96,7 +154,9 @@ void loop() {
         return; // Don't process IGate and Digi during OTA update
     }
 
-    BATTERY_Utils::checkIfShouldSleep();
+    if (Config.lowVoltageCutOff > 0) {
+        BATTERY_Utils::checkIfShouldSleep();
+    }
 
     thirdLine = Utils::getLocalIP();
 
