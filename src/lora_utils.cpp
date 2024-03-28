@@ -10,7 +10,7 @@
 
 extern Configuration  Config;
 
-#if defined(HELTEC_V3) || defined(HELTEC_WS) || defined(TTGO_T_Beam_V1_2_SX1262) || defined(HELTEC_WSL)
+#if defined(HELTEC_V3) || defined(HELTEC_WS) || defined(TTGO_T_Beam_V1_2_SX1262) || defined(HELTEC_HTCT62)
 SX1262 radio = new Module(RADIO_CS_PIN, RADIO_DIO1_PIN, RADIO_RST_PIN, RADIO_BUSY_PIN);
 bool transmissionFlag = true;
 bool enableInterrupt = true;

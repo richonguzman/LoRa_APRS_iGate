@@ -64,7 +64,7 @@
 #define RADIO_TXEN          13
 #endif
 
-#ifdef HELTEC_WSL
+#ifdef HELTEC_HTCT62
 #define RADIO_SCLK_PIN  10   // SX1262 SCK
 #define RADIO_MISO_PIN  6    // SX1262 MISO
 #define RADIO_MOSI_PIN  7    // SX1262 MOSI
@@ -94,7 +94,7 @@
 #define OLED_RST    21
 #endif
 
-#ifndef HELTEC_WSL
+#ifndef HELTEC_HTCT62
 #define HAS_DISPLAY
 #endif
 
@@ -104,7 +104,7 @@
 #define HAS_INTERNAL_LED
 #endif
 
-#ifdef HELTEC_WSL
+#ifdef HELTEC_HTCT62
 #define batteryPin      1
 #endif
 #if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2)

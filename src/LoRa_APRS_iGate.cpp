@@ -58,7 +58,7 @@ String firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seven
 void setup() {
     Serial.begin(115200);
 
-    #if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2) || defined(HELTEC_WSL)
+    #if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2) || defined(HELTEC_HTCT62)
     pinMode(batteryPin, INPUT);
     #endif
     #ifdef HAS_INTERNAL_LED
@@ -81,7 +81,7 @@ void setup() {
     iGateBeaconPacket = GPS_Utils::generateBeacon();
     iGateLoRaBeaconPacket = GPS_Utils::generateiGateLoRaBeacon();
 
-#ifdef HELTEC_WSL
+#ifdef HELTEC_HTCT62
     if (Config.lowPowerMode) {
         gpio_wakeup_enable(GPIO_NUM_3, GPIO_INTR_HIGH_LEVEL);
         esp_deep_sleep_enable_gpio_wakeup(GPIO_NUM_3, ESP_GPIO_WAKEUP_GPIO_HIGH);

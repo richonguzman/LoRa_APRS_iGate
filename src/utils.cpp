@@ -115,7 +115,7 @@ namespace Utils {
                 secondaryBeaconPacket = iGateLoRaBeaconPacket + Config.beacon.comment;
             }
 
-            #if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2) || defined(HELTEC_WSL)
+            #if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2) || defined(HELTEC_HTCT62)
             if (Config.sendBatteryVoltage) {
                 beaconPacket += " Batt=" + String(BATTERY_Utils::checkBattery(),2) + "V";
                 secondaryBeaconPacket += " Batt=" + String(BATTERY_Utils::checkBattery(),2) + "V";
