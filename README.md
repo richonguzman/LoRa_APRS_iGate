@@ -38,7 +38,7 @@ ____________________________________________________
 
 # WIKI
 
-### Supported Boards and buying link --> <a href="https://github.com/richonguzman/LoRa_APRS_iGate/wiki/Z.-------Supported-Boards-and-Buying-Links" target="_blank">here</a>.
+### Supported Boards and buying links --> <a href="https://github.com/richonguzman/LoRa_APRS_iGate/wiki/Z.-------Supported-Boards-and-Buying-Links" target="_blank">here</a>.
 
 ### Installation Guide --> <a href="https://github.com/richonguzman/LoRa_APRS_iGate/wiki/01.-Installation-Guide" target="_blank">here</a>.
 
