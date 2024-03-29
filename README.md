@@ -42,7 +42,7 @@ ____________________________________________________
 
 ### Installation Guide --> <a href="https://github.com/richonguzman/LoRa_APRS_iGate/wiki/01.-Installation-Guide" target="_blank">here</a>.
 
-## Wiki has all configuration explanation, supported boards list, adding BME/BMP Wx modules and more.
+*(Wiki has all configuration explanation, supported boards list, adding BME/BMP Wx modules and more)*
 
 ____________________________________________________
 ## Timeline (Versions):
