@@ -108,7 +108,7 @@ namespace APRS_IS_Utils {
             for (int i = sender.length(); i < 9; i++) {
                 sender += ' ';
             }
-            LoRa_Utils::sendNewPacket("APRS", Config.callsign + ">APLRG1,RFONLY,WIDE1-1::" + sender + ":" + ackMessage);
+            LoRa_Utils::sendNewPacket("APRS", Config.callsign + ">APLRG1," + Config.beacon.path + "::" + sender + ":" + ackMessage);
             receivedMessage = packet.substring(packet.indexOf(":") + 1, packet.indexOf("{"));
         }
         else {

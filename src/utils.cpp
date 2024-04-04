@@ -108,10 +108,11 @@ namespace Utils {
 
             if (Config.bme.active) {
                 String sensorData = BME_Utils::readDataSensor();
-                beaconPacket = iGateBeaconPacket.substring(0,iGateBeaconPacket.indexOf(":=")+20) + "_" + sensorData + iGateBeaconPacket.substring(iGateBeaconPacket.indexOf(":=")+21);
+                
+                beaconPacket = iGateBeaconPacket + sensorData + Config.beacon.comment;
                 secondaryBeaconPacket = iGateLoRaBeaconPacket + sensorData + Config.beacon.comment;
             } else {
-                beaconPacket = iGateBeaconPacket;
+                beaconPacket = iGateBeaconPacket + Config.beacon.comment;
                 secondaryBeaconPacket = iGateLoRaBeaconPacket + Config.beacon.comment;
             }
 
