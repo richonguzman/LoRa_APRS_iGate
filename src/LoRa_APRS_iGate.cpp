@@ -104,8 +104,8 @@ void setup() {
                     DIGI_Utils::loop(packet); // Send received packet to Digi
                 }
 
-                if (packet.indexOf(Config.callsign + ":STOP{") != -1) {
-                    Serial.println("Got STOP message, exiting from low power mode");
+                if (packet.indexOf(Config.callsign + ":?APRSELP{") != -1) { // Send `?APRSELP` to exit low power
+                    Serial.println("Got ?APRSELP message, exiting from low power mode");
                     break;
                 };
             }
@@ -115,7 +115,17 @@ void setup() {
             if (lastBeacon == 0 || time - lastBeacon >= Config.beacon.interval * 60) {
                 Serial.println("Sending beacon");
 
-                LoRa_Utils::sendNewPacket("APRS", iGateLoRaBeaconPacket + Config.beacon.comment + " Batt=" + String(BATTERY_Utils::checkBattery(),2) + "V");
+                String comment = Config.beacon.comment;
+
+                if (Config.sendBatteryVoltage) {
+                    comment += " Batt=" + String(BATTERY_Utils::checkBattery(),2) + "V";
+                }
+
+                if (Config.externalVoltageMeasurement) {
+                    comment += " Ext=" + String(BATTERY_Utils::checkExternalVoltage(),2) + "V";
+                }
+
+                LoRa_Utils::sendNewPacket("APRS", iGateLoRaBeaconPacket + comment);
             
                 lastBeacon = time;
             }
