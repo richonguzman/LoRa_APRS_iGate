@@ -20,6 +20,7 @@ String inputServerBuffer[INPUT_BUFFER_SIZE];
 String inputSerialBuffer = "";
 
 namespace TNC_Utils {
+    
     void setup() {
         if (Config.tnc.enableServer) {
             tncServer.stop();

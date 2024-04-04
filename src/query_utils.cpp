@@ -41,7 +41,11 @@ namespace QUERY_Utils {
         if (queryOrigin == "APRSIS") {
             return Config.callsign + ">APLRG1,TCPIP,qAC::" + station + ":" + answer;// + "\n";
         } else { //} if (queryOrigin == "LoRa") {
-            return Config.callsign + ">APLRG1," + Config.beacon.path + "::" + station + ":" + answer;
+            if (Config.beacon.path == "") {
+                return Config.callsign + ">APLRG1,RFONLY::" + station + ":" + answer;
+            } else {
+                return Config.callsign + ">APLRG1,RFONLY," + Config.beacon.path + "::" + station + ":" + answer;
+            }
         }
     }
 
