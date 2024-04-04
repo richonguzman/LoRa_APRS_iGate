@@ -158,6 +158,10 @@ namespace WEB_Utils {
         Config.lowPowerMode = request->hasParam("other.lowPowerMode", true);
         Config.lowVoltageCutOff = request->getParam("other.lowVoltageCutOff", true)->value().toDouble();
 
+        if (Config.bme.active) {
+            Config.beacon.symbol = "_";
+        }
+
         Config.writeFile();
 
         AsyncWebServerResponse *response = request->beginResponse(302, "text/html", "");

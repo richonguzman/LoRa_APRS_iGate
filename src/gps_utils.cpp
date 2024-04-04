@@ -87,7 +87,6 @@ namespace GPS_Utils {
         } else {}
 
         beaconPacket += ":=" + stationLatitude + Config.beacon.overlay + stationLongitude + Config.beacon.symbol;
-        beaconPacket += Config.beacon.comment;
 
         return beaconPacket;
     }
