@@ -111,7 +111,7 @@ namespace APRS_IS_Utils {
             if (Config.beacon.path == "") {
                 LoRa_Utils::sendNewPacket("APRS", Config.callsign + ">APLRG1,RFONLY::" + sender + ":" + ackMessage);
             } else {
-                LoRa_Utils::sendNewPacket("APRS", Config.callsign + ">APLRG1,RFONLY" + Config.beacon.path + "::" + sender + ":" + ackMessage);
+                LoRa_Utils::sendNewPacket("APRS", Config.callsign + ">APLRG1,RFONLY," + Config.beacon.path + "::" + sender + ":" + ackMessage);
             }
             receivedMessage = packet.substring(packet.indexOf(":") + 1, packet.indexOf("{"));
         }
