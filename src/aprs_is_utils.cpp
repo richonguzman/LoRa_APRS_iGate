@@ -176,7 +176,8 @@ namespace APRS_IS_Utils {
         if (!packet.isEmpty() && !packet.startsWith("#")) {
             Utils::print("---> APRSIS Packet Rx    :");
             Utils::println(packet);
-            if (packet.indexOf("::") > 0) {Sender = packet.substring(0,packet.indexOf(">"));
+            Sender = packet.substring(0,packet.indexOf(">"));
+            if (packet.indexOf("::") > 0) {
                 String AddresseeAndMessage = packet.substring(packet.indexOf("::")+2);
                 Addressee = AddresseeAndMessage.substring(0, AddresseeAndMessage.indexOf(":"));
                 Addressee.trim();
@@ -228,10 +229,11 @@ namespace APRS_IS_Utils {
             } else {
                 Addressee = packet.substring(0, packet.indexOf(":"));
                 Addressee.trim();
-                if (Addressee.indexOf("qAX") == -1 // Authorized login
-                && Addressee.indexOf("RFONLY") == -1 // RF allowed
-                && Addressee.indexOf("NOGATE") == -1  // RF allowed
-                && Addressee.indexOf("TCPXX") == -1) { // Packet is not for Internet
+                if (Sender != Config.callsign // It's not for me
+                    && Addressee.indexOf("qAX") == -1 // Authorized login
+                    && Addressee.indexOf("RFONLY") == -1 // RF allowed
+                    && Addressee.indexOf("NOGATE") == -1  // RF allowed
+                    && Addressee.indexOf("TCPXX") == -1) { // Packet is not for Internet
                     if (Config.aprs_is.toRF // TX to RF enabled
                         && (
                             (!Config.loramodule.rxActive && millis() - lastTxFromIs >= 30000) // LoRa RX disabled so we wait between 2 frames TX
