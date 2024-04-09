@@ -189,6 +189,7 @@ namespace LoRa_Utils {
                 if (Config.syslog.active && WiFi.status() == WL_CONNECTED) {
                     SYSLOG_Utils::log("Rx", "RADIOLIB_ERR_CRC_MISMATCH", 0,0,0);
                 }
+                loraPacket = "";
             } else {
                 Utils::print(F("failed, code "));
                 Utils::println(String(state));
@@ -202,7 +203,6 @@ namespace LoRa_Utils {
                 return "";
             }
         }
-
         return loraPacket;
     }
 
