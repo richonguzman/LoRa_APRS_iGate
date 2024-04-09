@@ -170,26 +170,28 @@ namespace APRS_IS_Utils {
     }
 
     void processAPRSISPacket(String packet) {
-        String Sender, AddresseeAndMessage, Addressee, receivedMessage;
-        if (!packet.startsWith("#")) {
-            if (packet.indexOf("::") > 0) {
-                Sender = packet.substring(0, packet.indexOf(">"));
-                AddresseeAndMessage = packet.substring(packet.indexOf("::") + 2);
+        String Sender, Addressee, receivedMessage;
+        if (!packet.isEmpty() && !packet.startsWith("#")) {
+            Utils::print("---> APRSIS Packet Rx    :");
+            Utils::println(packet);
+            if (packet.indexOf("::") > 0) {Sender = packet.substring(0,packet.indexOf(">"));
+                String AddresseeAndMessage = packet.substring(packet.indexOf("::")+2);
                 Addressee = AddresseeAndMessage.substring(0, AddresseeAndMessage.indexOf(":"));
                 Addressee.trim();
                 if (Addressee == Config.callsign) {             // its for me!
-                    if (AddresseeAndMessage.indexOf("{") > 0) {     // ack?
-                        String ackMessage = "ack" + AddresseeAndMessage.substring(AddresseeAndMessage.indexOf("{") + 1);
+                    if (AddresseeAndMessage.indexOf("{")>0) {     // ack?
+                        String ackMessage = "ack" + AddresseeAndMessage.substring(AddresseeAndMessage.indexOf("{")+1);
                         ackMessage.trim();
                         delay(4000);
-                        for (int i = Sender.length(); i < 9; i++) {
+                        //Serial.println(ackMessage);
+                        for(int i = Sender.length(); i < 9; i++) {
                             Sender += ' ';
                         }
-                        String ackPacket = Config.callsign + ">APLRG1,TCPIP,qAC::" + Sender + ":" + ackMessage;// + "\n";
-                        upload(ackPacket);
-                        receivedMessage = AddresseeAndMessage.substring(AddresseeAndMessage.indexOf(":") + 1, AddresseeAndMessage.indexOf("{"));
+                        String ackPacket = Config.callsign + ">APLRG1,TCPIP,qAC::" + Sender + ":" + ackMessage + "\n";
+                        espClient.write(ackPacket.c_str());
+                        receivedMessage = AddresseeAndMessage.substring(AddresseeAndMessage.indexOf(":")+1, AddresseeAndMessage.indexOf("{"));
                     } else {
-                        receivedMessage = AddresseeAndMessage.substring(AddresseeAndMessage.indexOf(":") + 1);
+                        receivedMessage = AddresseeAndMessage.substring(AddresseeAndMessage.indexOf(":")+1);
                     }
                     if (receivedMessage.indexOf("?") == 0) {
                         Utils::println("Received Query APRS-IS : " + packet);
@@ -214,13 +216,27 @@ namespace APRS_IS_Utils {
                     Utils::print("Received from APRS-IS  : " + packet);
 
                     if (Config.aprs_is.toRF && STATION_Utils::wasHeard(Addressee)) {
-                        LoRa_Utils::sendNewPacket("APRS", LoRa_Utils::generatePacket(packet));
+                        LoRa_Utils::sendNewPacket("APRS", LoRa_Utils::generatePacketMessage(packet));
                         display_toggle(true);
                         lastScreenOn = millis();
                         Utils::typeOfPacket(packet, "APRS-LoRa");
                     }
                 }
                 show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
+            } else {
+                Addressee = packet.substring(0, packet.indexOf(":"));
+                Addressee.trim();
+                if (Addressee.indexOf("qAX") == -1 // Authorized login
+                && Addressee.indexOf("RFONLY") == -1 // RF allowed
+                && Addressee.indexOf("NOGATE") == -1  // RF allowed
+                && Addressee.indexOf("TCPXX") == -1) { // Packet is not for Internet
+                    if (Config.aprs_is.toRF && (!Config.loramodule.rxActive || STATION_Utils::hasHeardSomeone())) {
+                        LoRa_Utils::sendNewPacket("APRS", LoRa_Utils::generatePacketSameContent(packet));
+                        display_toggle(true);
+                        lastScreenOn = millis();
+                        Utils::typeOfPacket(packet, "APRS-LoRa");
+                    }
+                }
             }
         }
     }
@@ -229,6 +245,7 @@ namespace APRS_IS_Utils {
         if (espClient.connected()) {
             if (espClient.available()) {
                 String aprsisPacket = espClient.readStringUntil('\r');
+                aprsisPacket.trim();
                 // Serial.println(aprsisPacket);
                 processAPRSISPacket(aprsisPacket);
             }

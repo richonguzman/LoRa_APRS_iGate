@@ -8,7 +8,8 @@ namespace LoRa_Utils {
 
     void setup();
     void sendNewPacket(const String &typeOfMessage, const String &newPacket);
-    String generatePacket(String aprsisPacket);
+    String generatePacketMessage(String aprsisPacket);
+    String generatePacketSameContent(String aprsisPacket);
     String packetSanitization(String packet);
     String receivePacket();
     void changeFreqTx();

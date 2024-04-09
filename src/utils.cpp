@@ -100,8 +100,6 @@ namespace Utils {
         if (beaconUpdate) {
             display_toggle(true);
 
-            Utils::println("-- Sending Beacon to APRSIS --");
-
             STATION_Utils::deleteNotHeard();
 
             activeStations();
@@ -135,6 +133,8 @@ namespace Utils {
                    
                 seventhLine = "     listening...";
 
+                Utils::println("-- Sending Beacon to APRSIS --");
+
                 APRS_IS_Utils::upload(beaconPacket);
             }
 
@@ -142,6 +142,8 @@ namespace Utils {
                 show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING DIGI BEACON", 0);
 
                 seventhLine = "     listening...";
+
+                Utils::println("-- Sending Beacon to RF --");
 
                 LoRa_Utils::sendNewPacket("APRS", secondaryBeaconPacket);
             }

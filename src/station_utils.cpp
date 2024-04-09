@@ -101,4 +101,9 @@ namespace STATION_Utils {
         }
     }
 
+    bool hasHeardSomeone() {
+        deleteNotHeard();
+        return !lastHeardStation.empty();
+    }
+
 }

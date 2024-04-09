@@ -11,7 +11,7 @@ namespace STATION_Utils {
     bool wasHeard(String station);
     void checkBuffer();
     void updatePacketBuffer(String packet);
-
+    bool hasHeardSomeone();
 }
 
 #endif
