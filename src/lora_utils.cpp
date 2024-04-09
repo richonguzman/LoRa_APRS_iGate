@@ -97,9 +97,9 @@ namespace LoRa_Utils {
             changeFreqTx();
         }
 
-    #ifdef HAS_INTERNAL_LED
+        #ifdef HAS_INTERNAL_LED
         digitalWrite(internalLedPin, HIGH);
-    #endif
+        #endif
         int state = radio.transmit("\x3c\xff\x01" + newPacket);
         transmissionFlag = true;
         if (state == RADIOLIB_ERR_NONE) {
@@ -116,9 +116,9 @@ namespace LoRa_Utils {
             Utils::print(F("failed, code "));
             Utils::println(String(state));
         }
-    #ifdef HAS_INTERNAL_LED
+        #ifdef HAS_INTERNAL_LED
         digitalWrite(internalLedPin, LOW);
-    #endif
+        #endif
         if (Config.loramodule.txFreq != Config.loramodule.rxFreq) {
             changeFreqRx();
         }
@@ -169,7 +169,7 @@ namespace LoRa_Utils {
                     freqError = radio.getFrequencyError();
                     Utils::println("<--- LoRa Packet Rx    : " + loraPacket);
                     Utils::println("(RSSI:" + String(rssi) + " / SNR:" + String(snr) + " / FreqErr:" + String(freqError) + ")");
-                    if (Config.syslog.active && WiFi.status() == WL_CONNECTED && loraPacket != "") {
+                    if (Config.syslog.active && WiFi.status() == WL_CONNECTED) {
                         SYSLOG_Utils::log("Rx", loraPacket, rssi, snr, freqError);
                     }
                     return loraPacket;
