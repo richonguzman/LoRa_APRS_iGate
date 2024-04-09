@@ -23,6 +23,8 @@ extern String         seventhLine;
 
 namespace APRS_IS_Utils {
 
+    uint32_t lastTxFromIs = 0;
+
     void upload(String line) {
         espClient.print(line + "\r\n");
     }
@@ -230,10 +232,15 @@ namespace APRS_IS_Utils {
                 && Addressee.indexOf("RFONLY") == -1 // RF allowed
                 && Addressee.indexOf("NOGATE") == -1  // RF allowed
                 && Addressee.indexOf("TCPXX") == -1) { // Packet is not for Internet
-                    if (Config.aprs_is.toRF && (!Config.loramodule.rxActive || STATION_Utils::hasHeardSomeone())) {
+                    if (Config.aprs_is.toRF // TX to RF enabled
+                        && (
+                            (!Config.loramodule.rxActive && millis() - lastTxFromIs >= 30000) // LoRa RX disabled so we wait between 2 frames TX
+                            || STATION_Utils::hasHeardSomeone() // Or we have heard someone
+                    )) {
                         LoRa_Utils::sendNewPacket("APRS", LoRa_Utils::generatePacketSameContent(packet));
                         display_toggle(true);
                         lastScreenOn = millis();
+                        lastTxFromIs = millis();
                         Utils::typeOfPacket(packet, "APRS-LoRa");
                     }
                 }
