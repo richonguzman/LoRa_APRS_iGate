@@ -101,6 +101,7 @@ namespace LoRa_Utils {
         digitalWrite(internalLedPin, HIGH);
     #endif
         int state = radio.transmit("\x3c\xff\x01" + newPacket);
+        transmissionFlag = true;
         if (state == RADIOLIB_ERR_NONE) {
             if (Config.syslog.active && WiFi.status() == WL_CONNECTED) {
                 SYSLOG_Utils::log("Tx", newPacket, 0, 0, 0);
@@ -121,8 +122,7 @@ namespace LoRa_Utils {
         if (Config.loramodule.txFreq != Config.loramodule.rxFreq) {
             changeFreqRx();
         }
-
-        ignorePacket = true;
+        //ignorePacket = true;
     }
 
     String generatePacket(String aprsisPacket) {
