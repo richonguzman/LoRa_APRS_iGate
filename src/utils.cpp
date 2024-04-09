@@ -43,20 +43,19 @@ namespace Utils {
     void processStatus() {
         String status = Config.callsign + ">APLRG1," + Config.beacon.path;
         
-        if (Config.aprs_is.active && Config.digi.mode == 0) { // If only IGate
+        if (WiFi.status() == WL_CONNECTED && Config.aprs_is.active && Config.beacon.sendViaAPRSIS) {
             delay(1000);
             status += ",qAC:>https://github.com/richonguzman/LoRa_APRS_iGate " + versionDate;
             APRS_IS_Utils::upload(status);
             SYSLOG_Utils::log("APRSIS Tx", status,0,0,0);
+            statusAfterBoot = false;
         }
-        // Comment this for now we will need this in the future
-        // } else if (Config.digi.mode == 2) {
-        //     delay(5000);
-        //     status += ":>https://github.com/richonguzman/LoRa_APRS_iGate " + versionDate;
-        //     LoRa_Utils::sendNewPacket("APRS", status); 
-        // }
-
-        statusAfterBoot = false;
+        if (statusAfterBoot && !Config.beacon.sendViaAPRSIS && Config.beacon.sendViaRF) {
+            delay(2000);
+            status += ":>https://github.com/richonguzman/LoRa_APRS_iGate " + versionDate;
+            LoRa_Utils::sendNewPacket("APRS", status);
+            statusAfterBoot = false;
+        }
     }
 
     String getLocalIP() {
@@ -91,9 +90,10 @@ namespace Utils {
 
     void checkBeaconInterval() {
         uint32_t lastTx = millis() - lastBeaconTx;
-        String beaconPacket, secondaryBeaconPacket;
+        String beaconPacket             = iGateBeaconPacket;
+        String secondaryBeaconPacket    = iGateLoRaBeaconPacket;
 
-        if (lastBeaconTx == 0 || lastTx >= Config.beacon.interval*60*1000) {
+        if (lastBeaconTx == 0 || lastTx >= Config.beacon.interval * 60 * 1000) {
             beaconUpdate = true;    
         }
 
@@ -108,13 +108,11 @@ namespace Utils {
 
             if (Config.bme.active) {
                 String sensorData = BME_Utils::readDataSensor();
-                
-                beaconPacket = iGateBeaconPacket + sensorData + Config.beacon.comment;
-                secondaryBeaconPacket = iGateLoRaBeaconPacket + sensorData + Config.beacon.comment;
-            } else {
-                beaconPacket = iGateBeaconPacket + Config.beacon.comment;
-                secondaryBeaconPacket = iGateLoRaBeaconPacket + Config.beacon.comment;
+                beaconPacket += sensorData + Config.beacon.comment;
+                secondaryBeaconPacket += sensorData + Config.beacon.comment;
             }
+            beaconPacket += Config.beacon.comment;
+            secondaryBeaconPacket += Config.beacon.comment;
 
             #if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2) || defined(HELTEC_HTCT62)
             if (Config.sendBatteryVoltage) {

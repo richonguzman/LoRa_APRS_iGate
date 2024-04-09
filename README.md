@@ -47,6 +47,7 @@ ____________________________________________________
 ____________________________________________________
 ## Timeline (Versions):
 
+- 2024.04.09 iGate/Digirepeater own GPS beacon is encoded (Base91) now.
 - 2024.03.18 OE5HWN MeshCom board support added.
 - 2024.02.25 New Web Configuration UI with WiFi AP (thanks Damian SQ2CPA).
 - 2023.01.28 Updated to ElegantOTA v.3 (AsyncElegantOTA was deprecated).
