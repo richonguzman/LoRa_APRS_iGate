@@ -198,7 +198,7 @@ namespace Utils {
             sender = packet.substring(0,packet.indexOf(">"));
         } else if (packetType == "Digi") {
             fifthLine = "LoRa Rx ----> LoRa Tx";
-            sender = packet.substring(3,packet.indexOf(">"));
+            sender = packet.substring(0,packet.indexOf(">"));
         }
         for (int i = sender.length(); i < 9; i++) {
             sender += " ";
