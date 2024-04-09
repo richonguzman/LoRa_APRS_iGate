@@ -10,94 +10,54 @@ String                distance;
 
 namespace GPS_Utils {
 
-    String double2string(double n, int ndec) {
-        String r = "";
-        if (n>-1 && n<0) {
-            r = "-";
-        }   
-        int v = n;
-        r += v;
-        r += '.';
-        for (int i = 0; i < ndec; i++) {
-            n -= v;
-            n = 10 * abs(n);
-            v = n;
-            r += v;
+    char *ax25_base91enc(char *s, uint8_t n, uint32_t v) {
+        for(s += n, *s = '\0'; n; n--) {
+            *(--s) = v % 91 + 33;
+            v /= 91;
         }
-        return r;
+        return(s);
     }
 
-    String processLatitudeAPRS(double lat) {
-        String degrees = double2string(lat,6);
-        String north_south, latitude, convDeg3;
-        float convDeg, convDeg2;
+    String encodeGPS(float latitude, float longitude, String overlay, String symbol) {
+        String encodedData = overlay;
+        uint32_t aprs_lat, aprs_lon;
+        aprs_lat = 900000000 - latitude * 10000000;
+        aprs_lat = aprs_lat / 26 - aprs_lat / 2710 + aprs_lat / 15384615;
+        aprs_lon = 900000000 + longitude * 10000000 / 2;
+        aprs_lon = aprs_lon / 26 - aprs_lon / 2710 + aprs_lon / 15384615;
 
-        if (abs(degrees.toFloat()) < 10) {
-            latitude += "0";
-        }
-        if (degrees.indexOf("-") == 0) {
-            north_south = "S";
-            latitude += degrees.substring(1,degrees.indexOf("."));
-        } else {
-            north_south = "N";
-            latitude += degrees.substring(0,degrees.indexOf("."));
-        }
-        convDeg = abs(degrees.toFloat()) - abs(int(degrees.toFloat()));
-        convDeg2 = (convDeg * 60)/100;
-        convDeg3 = String(convDeg2,6);
-        latitude += convDeg3.substring(convDeg3.indexOf(".")+1,convDeg3.indexOf(".")+3) + "." + convDeg3.substring(convDeg3.indexOf(".")+3,convDeg3.indexOf(".")+5);
-        latitude += north_south;
-        return latitude;
-    }
+        String Ns, Ew, helper;
+        if(latitude < 0) { Ns = "S"; } else { Ns = "N"; }
+        if(latitude < 0) { latitude= -latitude; }
 
-    String processLongitudeAPRS(double lon) {
-        String degrees = double2string(lon,6);
-        String east_west, longitude, convDeg3;
-        float convDeg, convDeg2;
-        
-        if (abs(degrees.toFloat()) < 100) {
-            longitude += "0";
+        if(longitude < 0) { Ew = "W"; } else { Ew = "E"; }
+        if(longitude < 0) { longitude= -longitude; }
+
+        char helper_base91[] = {"0000\0"};
+        int i;
+        ax25_base91enc(helper_base91, 4, aprs_lat);
+        for (i = 0; i < 4; i++) {
+            encodedData += helper_base91[i];
         }
-        if (abs(degrees.toFloat()) < 10) {
-            longitude += "0";
+        ax25_base91enc(helper_base91, 4, aprs_lon);
+        for (i = 0; i < 4; i++) {
+            encodedData += helper_base91[i];
         }
-        if (degrees.indexOf("-") == 0) {
-            east_west = "W";
-            longitude += degrees.substring(1,degrees.indexOf("."));
-        } else {
-            east_west = "E";
-            longitude += degrees.substring(0,degrees.indexOf("."));
-        }
-        convDeg = abs(degrees.toFloat()) - abs(int(degrees.toFloat()));
-        convDeg2 = (convDeg * 60)/100;
-        convDeg3 = String(convDeg2,6);
-        longitude += convDeg3.substring(convDeg3.indexOf(".")+1,convDeg3.indexOf(".")+3) + "." + convDeg3.substring(convDeg3.indexOf(".")+3,convDeg3.indexOf(".")+5);
-        longitude += east_west;
-        return longitude;
+        encodedData += symbol + " x" + "\x47";
+        return encodedData;
     }
 
     String generateBeacon() {
-        String stationLatitude = processLatitudeAPRS(Config.beacon.latitude);
-        String stationLongitude = processLongitudeAPRS(Config.beacon.longitude);
-
         String beaconPacket = Config.callsign + ">APLRG1," + Config.beacon.path;
 
         if (Config.aprs_is.active && Config.digi.mode == 0) { // If APRSIS enabled and Digi disabled
             beaconPacket += ",qAC";
-        } else {}
-
-        beaconPacket += ":=" + stationLatitude + Config.beacon.overlay + stationLongitude + Config.beacon.symbol;
-
-        return beaconPacket;
+        } 
+        return beaconPacket + ":!" + encodeGPS(Config.beacon.latitude, Config.beacon.longitude, Config.beacon.overlay, Config.beacon.symbol);;
     }
 
     String generateiGateLoRaBeacon() {
-        String stationLatitude = processLatitudeAPRS(Config.beacon.latitude);
-        String stationLongitude = processLongitudeAPRS(Config.beacon.longitude);
-        
-        String beaconPacket = Config.callsign + ">APLRG1," + Config.beacon.path + ":=" + stationLatitude + Config.beacon.overlay + stationLongitude + Config.beacon.symbol;
-
-        return beaconPacket;
+        return Config.callsign + ">APLRG1," + Config.beacon.path + ":!" + encodeGPS(Config.beacon.latitude, Config.beacon.longitude, Config.beacon.overlay, Config.beacon.symbol);
     }
 
     double calculateDistanceTo(double latitude, double longitude) {
