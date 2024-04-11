@@ -108,8 +108,8 @@ namespace Utils {
 
             if (Config.bme.active) {
                 String sensorData = BME_Utils::readDataSensor();
-                beaconPacket += sensorData + Config.beacon.comment;
-                secondaryBeaconPacket += sensorData + Config.beacon.comment;
+                beaconPacket += sensorData;
+                secondaryBeaconPacket += sensorData;
             }
             beaconPacket += Config.beacon.comment;
             secondaryBeaconPacket += Config.beacon.comment;
