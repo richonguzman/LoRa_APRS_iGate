@@ -23,7 +23,7 @@
 Configuration   Config;
 WiFiClient      espClient;
 
-String          versionDate           = "2024.03.28";
+String          versionDate           = "2024.04.09";
 uint8_t         myWiFiAPIndex         = 0;
 int             myWiFiAPSize          = Config.wifiAPs.size();
 WiFi_AP         *currentWiFi          = &Config.wifiAPs[myWiFiAPIndex];
@@ -182,13 +182,14 @@ void loop() {
     Utils::checkDisplayInterval();
     Utils::checkBeaconInterval();
 
-    String packet;
     
+    
+    APRS_IS_Utils::checkStatus(); // Need that to update display, maybe split this and send APRSIS status to display func?
+
+    String packet = "";
     if (Config.loramodule.rxActive) {
         packet = LoRa_Utils::receivePacket(); // We need to fetch LoRa packet above APRSIS and Digi
-    }
-
-    APRS_IS_Utils::checkStatus(); // Need that to update display, maybe split this and send APRSIS status to display func?
+    } 
 
     if (packet != "") {
         if (Config.aprs_is.active) { // If APRSIS enabled
