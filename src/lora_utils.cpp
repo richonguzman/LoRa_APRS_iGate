@@ -9,6 +9,8 @@
 
 extern Configuration  Config;
 
+extern std::vector<ReceivedPacket> receivedPackets;
+
 bool transmissionFlag = true;
 bool ignorePacket = false;
 bool operationDone = true;
@@ -169,6 +171,21 @@ namespace LoRa_Utils {
                     freqError = radio.getFrequencyError();
                     Utils::println("<--- LoRa Packet Rx    : " + loraPacket);
                     Utils::println("(RSSI:" + String(rssi) + " / SNR:" + String(snr) + " / FreqErr:" + String(freqError) + ")");
+
+                    if (!Config.lowPowerMode) {
+                        ReceivedPacket receivedPacket;
+                        receivedPacket.millis = millis();
+                        receivedPacket.packet = loraPacket.substring(3);
+                        receivedPacket.RSSI = rssi;
+                        receivedPacket.SNR = snr;
+
+                        if (receivedPackets.size() >= 20) {
+                            receivedPackets.erase(receivedPackets.begin());
+                        }
+
+                        receivedPackets.push_back(receivedPacket);
+                    }
+
                     if (Config.syslog.active && WiFi.status() == WL_CONNECTED) {
                         SYSLOG_Utils::log("Rx", loraPacket, rssi, snr, freqError);
                     }

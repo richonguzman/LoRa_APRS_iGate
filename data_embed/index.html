@@ -14,7 +14,7 @@
                 class="navbar bg-body-secondary shadow-sm border-bottom sticky-top navbar-expand-lg"
             >
                 <div class="container">
-                    <a class="navbar-brand"
+                    <a class="navbar-brand" href=""
                         >CA2RXU's LoRa</a
                     >
                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
@@ -22,6 +22,11 @@
                     </button>
                     <div class="collapse navbar-collapse" id="navbarColor01">
                         <ul class="navbar-nav me-auto">
+                            <li class="nav-item">
+                                <a class="nav-link" href="/">
+                                    Configuration
+                                </a>
+                            </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="/update">
                                     Update <small>OTA</small>
@@ -40,11 +45,11 @@
                                     <a class="dropdown-item" href="#" id="reboot">Reboot</a>
                                 </div>
                             </li>
-                            <!--  <li class="nav-item">
-                                <a class="nav-link" href="#" id="received-packets">
+                            <li class="nav-item">
+                                <a class="nav-link" href="/received-packets">
                                     Received packets
                                 </a>
-                            </li> -->
+                            </li>
                         </ul>
                         <div class="d-flex">
                             <button class="btn btn-success my-2 my-sm-0" type="submit">Save</button>
@@ -52,7 +57,32 @@
                     </div>
                 </div>
             </nav>
-            <div class="container">
+            
+            <div class="container d-none" id="received-packets">
+                <div class="row my-5 d-flex align-items-top">
+                    <div class="col-12">
+                        <h3>Last 20 received packets list</h3>
+                        <table class="table mt-4">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Time*</th>
+                                    <th scope="col">Frame</th>
+                                    <th scope="col">RSSI</th>
+                                    <th scope="col">SNR</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                
+                            </tbody>
+                        </table>
+                        <span>List refresh automatically every 15 seconds.</span><br>
+                        <small>* - For now time is measured from board boot up.</small>
+                    </div>
+                </div>
+                <hr />
+            </div>
+        
+            <div class="container" id="configuration">
                 <main>
                     <div class="col-10 my-5 mx-auto">
                         <div class="row my-5 d-flex align-items-top">
