@@ -53,6 +53,8 @@ std::vector<String> lastHeardStation_temp;
 std::vector<String> packetBuffer;
 std::vector<String> packetBuffer_temp;
 
+std::vector<ReceivedPacket> receivedPackets;
+
 String firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, iGateBeaconPacket, iGateLoRaBeaconPacket;
 
 void setup() {

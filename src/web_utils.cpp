@@ -1,9 +1,13 @@
+#include <ArduinoJson.h>
 #include "configuration.h"
 #include "ota_utils.h"
 #include "web_utils.h"
+#include "utils.h"
 
-extern Configuration        Config;
-extern uint32_t             lastBeaconTx;
+extern Configuration               Config;
+
+extern uint32_t                    lastBeaconTx;
+extern std::vector<ReceivedPacket> receivedPackets;
 
 extern const char web_index_html[] asm("_binary_data_embed_index_html_gz_start");
 extern const char web_index_html_end[] asm("_binary_data_embed_index_html_gz_end");
@@ -55,6 +59,23 @@ namespace WEB_Utils {
         }
 
         request->send(200, "application/json", fileContent);
+    }
+
+    void handleReceivedPackets(AsyncWebServerRequest *request) {
+        StaticJsonDocument<1536> data;
+
+        for (int i = 0; i < receivedPackets.size(); i++) {
+            data[i]["millis"] = receivedPackets[i].millis;
+            data[i]["packet"] = receivedPackets[i].packet;
+            data[i]["RSSI"] = receivedPackets[i].RSSI;
+            data[i]["SNR"] = receivedPackets[i].SNR;
+        }
+
+        String buffer;
+
+        serializeJson(data, buffer);
+
+        request->send(200, "application/json", buffer);
     }
 
     void handleWriteConfiguration(AsyncWebServerRequest *request) {
@@ -214,6 +235,7 @@ namespace WEB_Utils {
     void setup() {
         server.on("/", HTTP_GET, handleHome);
         server.on("/status", HTTP_GET, handleStatus);
+        server.on("/received-packets.json", HTTP_GET, handleReceivedPackets);
         server.on("/configuration.json", HTTP_GET, handleReadConfiguration);
         server.on("/configuration.json", HTTP_POST, handleWriteConfiguration);
         server.on("/action", HTTP_POST, handleAction);

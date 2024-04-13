@@ -3,6 +3,13 @@
 
 #include <Arduino.h>
 
+class ReceivedPacket {
+public:
+    long    millis;
+    String  packet;
+    int     RSSI;
+    float     SNR;
+};
 
 namespace Utils {
 
