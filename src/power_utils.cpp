@@ -125,6 +125,13 @@ namespace POWER_Utils {
         PMU.setChargerConstantCurr(XPOWERS_AXP2101_CHG_CUR_800MA);
         PMU.setSysPowerDownVoltage(2600);
         #endif
+
+        #if defined(HELTEC_V3)
+        pinMode(VExt_CTRL,OUTPUT); // this is for GPS and TFT screen on Wireless_Tracker and only for Oled in Heltec V3
+        digitalWrite(VExt_CTRL, HIGH);
+        pinMode(ADC_CTRL, OUTPUT);
+        digitalWrite(ADC_CTRL, HIGH);
+        #endif
     }
 
 }
