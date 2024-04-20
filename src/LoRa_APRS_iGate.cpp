@@ -105,7 +105,7 @@ void setup() {
                 Serial.println(packet);
 
                 if (Config.digi.mode == 2) { // If Digi enabled
-                    DIGI_Utils::loop(packet); // Send received packet to Digi
+                    DIGI_Utils::processLoRaPacket(packet); // Send received packet to Digi
                 }
 
                 if (packet.indexOf(Config.callsign + ":?APRSELP{") != -1) { // Send `?APRSELP` to exit low power
@@ -129,7 +129,8 @@ void setup() {
                     comment += " Ext=" + String(BATTERY_Utils::checkExternalVoltage(),2) + "V";
                 }
 
-                LoRa_Utils::sendNewPacket("APRS", iGateLoRaBeaconPacket + comment);
+                STATION_Utils::addToOutputPacketBuffer(iGateLoRaBeaconPacket + comment);
+                //LoRa_Utils::sendNewPacket("APRS", iGateLoRaBeaconPacket + comment);
             
                 lastBeacon = time;
             }
