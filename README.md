@@ -14,25 +14,11 @@ ___________________________________________________
 
 ____________________________________________________
 
-This next generation LoRa iGate can work as:
-- pure RX-iGate, 
-- Rx+Tx-iGate and distribute messages and weather forecasts to heard trackers, and 
-- Digipeater in simplex or split-frequency environment.
+# WEB INSTALLER
 
-In all configurations the display shows the current stationMode, heard packets and events the iGate is currently performing.
+follow this link for using our new <a href="https://sq2cpa.github.io/lora-flasher/ca2rxu.html" target="_blank">Web Installer</a> (thanks Damian SQ2CPA)
 
-But under the hood is much more:
-
-- Web Configuration UI.
-- Sending events to remote syslog server.
-- OTA update capability (for Firmware and Filesystem).
-- RX first, TX will only be done if there is no traffic on the frequency.
-- automatic update of the Lora symbol at APRS-IS, black "L" for pure RX, red "L" for TX capability, green star "L" for digipeater and blue round "L" for WX iGate.
-- support for multiple WLAN with corresponding coordinates.
-- support for BME/BMP280 and BME680 sensors, sending to WX data to APRS-IS.
-
-and more will come:
-- More Web UI Station Information
+[<img src="https://github.com/richonguzman/LoRa_APRS_Tracker/blob/main/images/WebFlasher.png">](https://sq2cpa.github.io/lora-flasher/ca2rxu.html)
 
 ____________________________________________________
 
