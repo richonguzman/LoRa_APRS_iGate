@@ -21,6 +21,7 @@ extern String               sixthLine;
 extern String               seventhLine;
 
 extern std::vector<String>  outputPacketBuffer;
+extern uint32_t             lastRxTime;
 
 
 namespace APRS_IS_Utils {
@@ -243,6 +244,7 @@ namespace APRS_IS_Utils {
                 String aprsisPacket = espClient.readStringUntil('\r');
                 // Serial.println(aprsisPacket);
                 processAPRSISPacket(aprsisPacket);
+                lastRxTime = millis();
             }
         }
     }

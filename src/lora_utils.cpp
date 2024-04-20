@@ -7,13 +7,15 @@
 #include "display.h"
 #include "utils.h"
 
-extern Configuration  Config;
+extern Configuration    Config;
+extern uint32_t         lastRxTime;
+
 
 extern std::vector<ReceivedPacket> receivedPackets;
 
-bool transmissionFlag = true;
-bool ignorePacket = false;
-bool operationDone = true;
+bool transmissionFlag   = true;
+bool ignorePacket       = false;
+bool operationDone      = true;
 
 #ifdef HAS_SX1262
 SX1262 radio = new Module(RADIO_CS_PIN, RADIO_DIO1_PIN, RADIO_RST_PIN, RADIO_BUSY_PIN);
@@ -181,6 +183,7 @@ namespace LoRa_Utils {
                     if (Config.syslog.active && WiFi.status() == WL_CONNECTED) {
                         SYSLOG_Utils::log("Rx", loraPacket, rssi, snr, freqError);
                     }
+                    lastRxTime = millis();
                     return loraPacket;
                 }                
             } else if (state == RADIOLIB_ERR_RX_TIMEOUT) {

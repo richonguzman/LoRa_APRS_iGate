@@ -52,6 +52,7 @@ std::vector<String> lastHeardStation;
 std::vector<String> lastHeardStation_temp;
 std::vector<String> outputPacketBuffer;
 uint32_t        lastTxTime              = millis();
+uint32_t        lastRxTime              = millis();
 
 std::vector<ReceivedPacket> receivedPackets;
 

@@ -10,6 +10,7 @@ extern std::vector<String>  lastHeardStation;
 extern std::vector<String>  lastHeardStation_temp;
 extern std::vector<String>  outputPacketBuffer;
 extern uint32_t             lastTxTime;
+extern uint32_t             lastRxTime;
 extern String               fourthLine;
 
 
@@ -63,8 +64,10 @@ namespace STATION_Utils {
     }
 
     void processOutputPacketBuffer() {
+        int timeToWait = 3 * 1000;      // 3 segs between packet Tx and also Rx ???
+        uint32_t lastRx = millis() - lastRxTime;
         uint32_t lastTx = millis() - lastTxTime;
-        if (outputPacketBuffer.size() == 0 || lastTx < 5 * 1000) {  // 5 segs between packet tx ???
+        if (outputPacketBuffer.size() == 0 || lastTx < timeToWait || lastRx < timeToWait) {
             return;
         } else {
             LoRa_Utils::sendNewPacket(outputPacketBuffer[0]);
