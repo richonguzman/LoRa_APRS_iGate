@@ -3,7 +3,7 @@
 #include "station_utils.h"
 #include "aprs_is_utils.h"
 #include "query_utils.h"
-#include "lora_utils.h"
+//#include "lora_utils.h"
 #include "digi_utils.h"
 #include "wifi_utils.h"
 #include "gps_utils.h"
@@ -20,6 +20,8 @@ extern String           fourthLine;
 extern String           fifthLine;
 extern String           sixthLine;
 extern String           seventhLine;
+
+extern std::vector<String>  outputPacketBuffer;
 
 
 namespace DIGI_Utils {
@@ -56,7 +58,7 @@ namespace DIGI_Utils {
         }
     }
 
-    void processPacket(String packet) {
+    void processLoRaPacket(String packet) {
         bool queryMessage = false;
         String loraPacket, Sender, AddresseeAndMessage, Addressee;
         if (packet != "") {
@@ -64,7 +66,6 @@ namespace DIGI_Utils {
                 Sender = packet.substring(3, packet.indexOf(">"));
                 if (Sender != Config.callsign) {
                     STATION_Utils::updateLastHeard(Sender);
-                    // STATION_Utils::updatePacketBuffer(packet);
                     Utils::typeOfPacket(packet.substring(3), "Digi");
                     AddresseeAndMessage = packet.substring(packet.indexOf("::") + 2);
                     Addressee = AddresseeAndMessage.substring(0, AddresseeAndMessage.indexOf(":"));
@@ -75,8 +76,9 @@ namespace DIGI_Utils {
                     if (!queryMessage && packet.indexOf("WIDE1-") > 10 && Config.digi.mode == 2) { // If should repeat packet (WIDE1 Digi)
                         loraPacket = generateDigiRepeatedPacket(packet.substring(3), Config.callsign);
                         if (loraPacket != "") {
-                            delay(500);
-                            LoRa_Utils::sendNewPacket("APRS", loraPacket);
+                            STATION_Utils::addToOutputPacketBuffer(loraPacket);
+                            //delay(500);
+                            //LoRa_Utils::sendNewPacket(loraPacket);
                             display_toggle(true);
                             lastScreenOn = millis();
                         }
@@ -84,10 +86,6 @@ namespace DIGI_Utils {
                 }
             }
         }
-    }
-
-    void loop(String packet) {
-        processPacket(packet);
     }
 
 }

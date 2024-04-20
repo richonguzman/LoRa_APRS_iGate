@@ -1,11 +1,13 @@
 #include <WiFi.h>
 #include "kiss_utils.h"
 #include "kiss_protocol.h"
-#include "lora_utils.h"
+//#include "lora_utils.h"
 #include "configuration.h"
+#include "station_utils.h"
 #include "utils.h"
 
 extern Configuration        Config;
+extern std::vector<String>  outputPacketBuffer;
 
 #define MAX_CLIENTS 4
 #define INPUT_BUFFER_SIZE (2 + MAX_CLIENTS)
@@ -74,7 +76,8 @@ namespace TNC_Utils {
                 String sender = frame.substring(0,frame.indexOf(">"));
 
                 if (Config.tnc.acceptOwn || sender != Config.callsign) {
-                    LoRa_Utils::sendNewPacket("APRS", frame);
+                    STATION_Utils::addToOutputPacketBuffer(frame);
+                    //LoRa_Utils::sendNewPacket(frame);
                 } else {
                     Utils::println("Ignored own frame from KISS");
                 }

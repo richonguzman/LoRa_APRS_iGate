@@ -23,35 +23,35 @@
 Configuration   Config;
 WiFiClient      espClient;
 
-String          versionDate           = "2024.04.13";
-uint8_t         myWiFiAPIndex         = 0;
-int             myWiFiAPSize          = Config.wifiAPs.size();
-WiFi_AP         *currentWiFi          = &Config.wifiAPs[myWiFiAPIndex];
+String          versionDate             = "2024.04.20";
+uint8_t         myWiFiAPIndex           = 0;
+int             myWiFiAPSize            = Config.wifiAPs.size();
+WiFi_AP         *currentWiFi            = &Config.wifiAPs[myWiFiAPIndex];
 
-bool            isUpdatingOTA         = false;
-bool            statusAfterBoot       = true;
-bool            beaconUpdate          = true;
-uint32_t        lastBeaconTx          = 0;
-uint32_t        previousWiFiMillis    = 0;
-uint32_t        lastScreenOn          = millis();
+bool            isUpdatingOTA           = false;
+bool            statusAfterBoot         = true;
+bool            beaconUpdate            = true;
+uint32_t        lastBeaconTx            = 0;
+uint32_t        previousWiFiMillis      = 0;
+uint32_t        lastScreenOn            = millis();
 
-uint32_t        lastWiFiCheck         = 0;
-bool            WiFiConnect           = true;
-bool            WiFiConnected         = false;
+uint32_t        lastWiFiCheck           = 0;
+bool            WiFiConnect             = true;
+bool            WiFiConnected           = false;
 
-bool            WiFiAutoAPStarted     = false;
-long            WiFiAutoAPTime        = false;
+bool            WiFiAutoAPStarted       = false;
+long            WiFiAutoAPTime          = false;
 
-uint32_t        lastBatteryCheck      = 0;
+uint32_t        lastBatteryCheck        = 0;
 
-uint32_t        bmeLastReading        = -60000;
+uint32_t        bmeLastReading          = -60000;
 
 String          batteryVoltage;
 
 std::vector<String> lastHeardStation;
 std::vector<String> lastHeardStation_temp;
-std::vector<String> packetBuffer;
-std::vector<String> packetBuffer_temp;
+std::vector<String> outputPacketBuffer;
+uint32_t        lastTxTime              = millis();
 
 std::vector<ReceivedPacket> receivedPackets;
 
@@ -199,7 +199,7 @@ void loop() {
         }
 
         if (Config.digi.mode == 2) { // If Digi enabled
-            DIGI_Utils::loop(packet); // Send received packet to Digi
+            DIGI_Utils::processLoRaPacket(packet); // Send received packet to Digi
         }
 
         if (Config.tnc.enableServer) { // If TNC server enabled
@@ -214,6 +214,8 @@ void loop() {
     if (Config.aprs_is.active) { // If APRSIS enabled
         APRS_IS_Utils::listenAPRSIS(); // listen received packet from APRSIS
     }
+
+    STATION_Utils::processOutputPacketBuffer();
 
     show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
 }

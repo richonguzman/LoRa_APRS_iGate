@@ -92,7 +92,7 @@ namespace LoRa_Utils {
         radio.setFrequency(freq);
     }
 
-    void sendNewPacket(const String& typeOfMessage, const String& newPacket) {
+    void sendNewPacket(const String& newPacket) {
         if (!Config.loramodule.txActive) return;
 
         if (Config.loramodule.txFreq != Config.loramodule.rxFreq) {
@@ -125,14 +125,6 @@ namespace LoRa_Utils {
             changeFreqRx();
         }
         //ignorePacket = true;
-    }
-
-    String generatePacket(String aprsisPacket) {
-        String firstPart, messagePart;
-        aprsisPacket.trim();
-        firstPart = aprsisPacket.substring(0, aprsisPacket.indexOf(","));
-        messagePart = aprsisPacket.substring(aprsisPacket.indexOf("::") + 2);
-        return firstPart + ",TCPIP,WIDE1-1," + Config.callsign + "::" + messagePart;
     }
 
     String packetSanitization(String packet) {

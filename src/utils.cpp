@@ -53,7 +53,7 @@ namespace Utils {
         if (statusAfterBoot && !Config.beacon.sendViaAPRSIS && Config.beacon.sendViaRF) {
             delay(2000);
             status += ":>https://github.com/richonguzman/LoRa_APRS_iGate " + versionDate;
-            LoRa_Utils::sendNewPacket("APRS", status);
+            LoRa_Utils::sendNewPacket(status);
             statusAfterBoot = false;
         }
     }
@@ -141,7 +141,7 @@ namespace Utils {
 
                 seventhLine = "     listening...";
 
-                LoRa_Utils::sendNewPacket("APRS", secondaryBeaconPacket);
+                LoRa_Utils::sendNewPacket(secondaryBeaconPacket);
             }
 
             lastBeaconTx = millis();
