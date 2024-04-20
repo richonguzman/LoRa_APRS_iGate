@@ -16,7 +16,7 @@ ____________________________________________________
 
 # WEB INSTALLER
 
-follow this link for using our new <a href="https://sq2cpa.github.io/lora-flasher/ca2rxu.html" target="_blank">Web Installer</a> (thanks Damian SQ2CPA)
+As easy as it gets, the new <a href="https://sq2cpa.github.io/lora-flasher/ca2rxu.html" target="_blank">Web Installer</a> (thanks Damian SQ2CPA)
 
 [<img src="https://github.com/richonguzman/LoRa_APRS_Tracker/blob/main/images/WebFlasher.png">](https://sq2cpa.github.io/lora-flasher/ca2rxu.html)
 
