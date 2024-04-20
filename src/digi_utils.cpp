@@ -3,7 +3,6 @@
 #include "station_utils.h"
 #include "aprs_is_utils.h"
 #include "query_utils.h"
-//#include "lora_utils.h"
 #include "digi_utils.h"
 #include "wifi_utils.h"
 #include "gps_utils.h"
@@ -77,8 +76,6 @@ namespace DIGI_Utils {
                         loraPacket = generateDigiRepeatedPacket(packet.substring(3), Config.callsign);
                         if (loraPacket != "") {
                             STATION_Utils::addToOutputPacketBuffer(loraPacket);
-                            //delay(500);
-                            //LoRa_Utils::sendNewPacket(loraPacket);
                             display_toggle(true);
                             lastScreenOn = millis();
                         }

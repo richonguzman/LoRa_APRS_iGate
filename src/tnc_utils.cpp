@@ -1,7 +1,6 @@
 #include <WiFi.h>
 #include "kiss_utils.h"
 #include "kiss_protocol.h"
-//#include "lora_utils.h"
 #include "configuration.h"
 #include "station_utils.h"
 #include "utils.h"
@@ -77,7 +76,6 @@ namespace TNC_Utils {
 
                 if (Config.tnc.acceptOwn || sender != Config.callsign) {
                     STATION_Utils::addToOutputPacketBuffer(frame);
-                    //LoRa_Utils::sendNewPacket(frame);
                 } else {
                     Utils::println("Ignored own frame from KISS");
                 }

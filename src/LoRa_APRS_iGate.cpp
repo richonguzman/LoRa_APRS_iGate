@@ -1,7 +1,9 @@
+#include <ElegantOTA.h>
 #include <Arduino.h>
 #include <WiFi.h>
 #include <vector>
 #include "configuration.h"
+#include "battery_utils.h"
 #include "aprs_is_utils.h"
 #include "station_utils.h"
 #include "syslog_utils.h"
@@ -17,8 +19,7 @@
 #include "tnc_utils.h"
 #include "display.h"
 #include "utils.h"
-#include <ElegantOTA.h>
-#include "battery_utils.h"
+
 
 Configuration   Config;
 WiFiClient      espClient;

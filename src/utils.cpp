@@ -6,7 +6,6 @@
 #include "syslog_utils.h"
 #include "pins_config.h"
 #include "wifi_utils.h"
-#include "lora_utils.h"
 #include "gps_utils.h"
 #include "bme_utils.h"
 #include "display.h"
@@ -53,7 +52,7 @@ namespace Utils {
         if (statusAfterBoot && !Config.beacon.sendViaAPRSIS && Config.beacon.sendViaRF) {
             delay(2000);
             status += ":>https://github.com/richonguzman/LoRa_APRS_iGate " + versionDate;
-            LoRa_Utils::sendNewPacket(status);
+            STATION_Utils::addToOutputPacketBuffer(status);
             statusAfterBoot = false;
         }
     }
@@ -130,18 +129,14 @@ namespace Utils {
 
             if (Config.aprs_is.active && Config.beacon.sendViaAPRSIS) {
                 show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING IGATE BEACON", 0); 
-                   
                 seventhLine = "     listening...";
-
                 APRS_IS_Utils::upload(beaconPacket);
             }
 
             if (Config.beacon.sendViaRF) {
                 show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING DIGI BEACON", 0);
-
                 seventhLine = "     listening...";
-
-                LoRa_Utils::sendNewPacket(secondaryBeaconPacket);
+                STATION_Utils::addToOutputPacketBuffer(secondaryBeaconPacket);
             }
 
             lastBeaconTx = millis();

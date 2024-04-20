@@ -4,7 +4,6 @@
 #include "station_utils.h"
 #include "syslog_utils.h"
 #include "query_utils.h"
-//#include "lora_utils.h"
 #include "digi_utils.h"
 #include "display.h"
 #include "utils.h"
@@ -120,10 +119,8 @@ namespace APRS_IS_Utils {
             }
             if (Config.beacon.path == "") {
                 STATION_Utils::addToOutputPacketBuffer(Config.callsign + ">APLRG1,RFONLY::" + sender + ":" + ackMessage);
-                //LoRa_Utils::sendNewPacket(Config.callsign + ">APLRG1,RFONLY::" + sender + ":" + ackMessage);
             } else {
                 STATION_Utils::addToOutputPacketBuffer(Config.callsign + ">APLRG1,RFONLY," + Config.beacon.path + "::" + sender + ":" + ackMessage);
-                //LoRa_Utils::sendNewPacket(Config.callsign + ">APLRG1,RFONLY," + Config.beacon.path + "::" + sender + ":" + ackMessage);
             }
 
             receivedMessage = packet.substring(packet.indexOf(":") + 1, packet.indexOf("{"));
@@ -136,7 +133,6 @@ namespace APRS_IS_Utils {
                 display_toggle(true);
             }
             STATION_Utils::addToOutputPacketBuffer(QUERY_Utils::process(receivedMessage, sender, "LoRa"));
-            //LoRa_Utils::sendNewPacket(QUERY_Utils::process(receivedMessage, sender, "LoRa"));
             lastScreenOn = millis();
             show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, "Callsign = " + sender, "TYPE --> QUERY", 0);
             return true;
@@ -227,7 +223,6 @@ namespace APRS_IS_Utils {
 
                     if (Config.aprs_is.toRF && STATION_Utils::wasHeard(Addressee)) {
                         STATION_Utils::addToOutputPacketBuffer(buildPacketToTx(packet));
-                        //LoRa_Utils::sendNewPacket(buildPacketToTx(packet));
                         display_toggle(true);
                         lastScreenOn = millis();
                         Utils::typeOfPacket(packet, "APRS-LoRa");
