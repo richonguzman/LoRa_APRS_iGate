@@ -67,9 +67,7 @@ namespace STATION_Utils {
         int timeToWait = 3 * 1000;      // 3 segs between packet Tx and also Rx ???
         uint32_t lastRx = millis() - lastRxTime;
         uint32_t lastTx = millis() - lastTxTime;
-        if (outputPacketBuffer.size() == 0 || lastTx < timeToWait || lastRx < timeToWait) {
-            return;
-        } else {
+        if (outputPacketBuffer.size() > 0 && lastTx > timeToWait && lastRx > timeToWait) {
             LoRa_Utils::sendNewPacket(outputPacketBuffer[0]);
             outputPacketBuffer.erase(outputPacketBuffer.begin());
             lastTxTime = millis();
