@@ -33,7 +33,7 @@ ____________________________________________________
 ____________________________________________________
 ## Timeline (Versions):
 
-- 2024.04.20 New Output Buffer process no more packets lost.
+- 2024.04.20 New Output Buffer process: no more packets lost.
 - 2024.04.13 Received Packets added on WebUI.
 - 2024.04.09 iGate/Digirepeater own GPS beacon is encoded (Base91) now.
 - 2024.03.18 OE5HWN MeshCom board support added.
