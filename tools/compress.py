@@ -9,6 +9,7 @@ files = [
   'data_embed/style.css',
   'data_embed/bootstrap.js',
   'data_embed/bootstrap.css',
+  'data_embed/favicon.png',
 ]
 
 for src in files:
