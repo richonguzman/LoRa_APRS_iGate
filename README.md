@@ -33,6 +33,7 @@ ____________________________________________________
 ____________________________________________________
 ## Timeline (Versions):
 
+- 2024.04.22 added Wemos Lolin32 OLED DIY LoRa support.
 - 2024.04.21 WEB INSTALLER (thanks Damian SQ2CPA).
 - 2024.04.20 New Output Buffer process: no more packets lost.
 - 2024.04.13 Received Packets added on WebUI.
