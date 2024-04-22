@@ -10,12 +10,12 @@
 
 // LORA MODULES
 #if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2) || defined(ESP32_DIY_LoRa) || defined(TTGO_T_Beam_V1_2) || defined(TTGO_T_Beam_V1_0)
-#define RADIO_SCLK_PIN    5      // GPIO5    - SX1278 SCK
-#define RADIO_MISO_PIN   19      // GPIO19   - SX1278 MISO
-#define RADIO_MOSI_PIN   27      // GPIO27   - SX1278 MOSI
-#define RADIO_CS_PIN     18      // GPIO18   - SX1278 CS ---> NSS
-#define RADIO_RST_PIN    14      // GPIO14   - SX1278 RST
-#define RADIO_BUSY_PIN   26      // GPIO26   - SX1278 IRQ ---->DIO0
+#define RADIO_SCLK_PIN  5      // GPIO5    - SX1278 SCK
+#define RADIO_MISO_PIN  19      // GPIO19   - SX1278 MISO
+#define RADIO_MOSI_PIN  27      // GPIO27   - SX1278 MOSI
+#define RADIO_CS_PIN    18      // GPIO18   - SX1278 CS ---> NSS
+#define RADIO_RST_PIN   14      // GPIO14   - SX1278 RST
+#define RADIO_BUSY_PIN  26      // GPIO26   - SX1278 IRQ ---->DIO0
 #endif
 
 #if defined(HELTEC_V3) || defined(HELTEC_WS)
@@ -38,6 +38,15 @@
 #define RADIO_BUSY_PIN  14
 #define RADIO_RXEN      32
 #define RADIO_TXEN      25
+#endif
+
+#ifdef WEMOS_LOLIN32_OLED_DIY_LoRa
+#define RADIO_SCLK_PIN  15
+#define RADIO_MISO_PIN  13
+#define RADIO_MOSI_PIN  12
+#define RADIO_CS_PIN    14
+#define RADIO_RST_PIN   2
+#define RADIO_BUSY_PIN  25
 #endif
 
 #if defined(TTGO_T_Beam_V1_0_SX1268) || defined(TTGO_T_Beam_V1_2_SX1262)
@@ -93,6 +102,12 @@
 #define OLED_RST    21
 #endif
 
+#ifdef WEMOS_LOLIN32_OLED_DIY_LoRa
+#define OLED_SDA    5
+#define OLED_SCL    4
+#define OLED_RST    -1
+#endif
+
 #ifndef HELTEC_HTCT62
 #define HAS_DISPLAY
 #endif
@@ -122,6 +137,8 @@
 #if defined(ESP32_DIY_LoRa) || defined(ESP32_DIY_1W_LoRa)
 #define internalLedPin  2
 #endif
+
+
 
 
 #ifdef ESP32_C3_DIY_LoRa
