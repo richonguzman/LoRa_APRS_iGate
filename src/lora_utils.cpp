@@ -48,10 +48,10 @@ namespace LoRa_Utils {
             Utils::println("Starting LoRa failed!");
             while (true);
         }
-        #ifdef HAS_SX127X        
+        #ifdef HAS_SX1278
         radio.setDio0Action(setFlag, RISING);
         #endif
-        #ifdef HAS_SX126X
+        #if defined(HAS_SX1262) || defined(HAS_SX1268)
         if (!Config.lowPowerMode) {
             radio.setDio1Action(setFlag);
         } else {
@@ -68,7 +68,7 @@ namespace LoRa_Utils {
         radio.setRfSwitchPins(RADIO_RXEN, RADIO_TXEN);
         #endif
 
-        #if defined(HAS_SX127X) || ESP32_DIY_1W_LoRa
+        #if defined(HAS_SX1278) || ESP32_DIY_1W_LoRa
         state = radio.setOutputPower(Config.loramodule.power); // max value 20dB for 400M30S as it has Low Noise Amp
         #endif   
         #if defined(HELTEC_V3)  || defined(HELTEC_WS) || defined(TTGO_T_Beam_V1_0_SX1268) || defined(TTGO_T_Beam_V1_2_SX1262)
