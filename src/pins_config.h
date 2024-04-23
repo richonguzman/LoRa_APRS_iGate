@@ -82,9 +82,22 @@
 #define RADIO_BUSY_PIN  4    // SX1262 BUSY
 #endif
 
+#ifdef ESP32_DIY_LoRa_A7670
+#define RADIO_SCLK_PIN  18
+#define RADIO_MISO_PIN  19
+#define RADIO_MOSI_PIN  23
+#define RADIO_CS_PIN    2
+#define RADIO_RST_PIN   0
+#define RADIO_BUSY_PIN  32
+#define A7670_PWR_PIN   4
+#define A7670_ResetPin  5
+#define A7670_TX_PIN    26
+#define A7670_RX_PIN    27
+#endif
+
 
 // OLED 
-#if defined(TTGO_T_LORA32_V2_1) || defined(ESP32_DIY_LoRa) || defined(ESP32_DIY_1W_LoRa) || defined(TTGO_T_Beam_V1_0) || defined(TTGO_T_Beam_V1_2) || defined(TTGO_T_Beam_V1_0_SX1268) || defined(TTGO_T_Beam_V1_2_SX1262) || defined(OE5HWN_MeshCom)
+#if defined(TTGO_T_LORA32_V2_1) || defined(ESP32_DIY_LoRa) || defined(ESP32_DIY_1W_LoRa) || defined(TTGO_T_Beam_V1_0) || defined(TTGO_T_Beam_V1_2) || defined(TTGO_T_Beam_V1_0_SX1268) || defined(TTGO_T_Beam_V1_2_SX1262) || defined(OE5HWN_MeshCom) || defined(ESP32_DIY_LoRa_A7670)
 #define OLED_SDA    21
 #define OLED_SCL    22
 #define OLED_RST    -1      // Reset pin # (or -1 if sharing Arduino reset pin)
@@ -137,8 +150,6 @@
 #if defined(ESP32_DIY_LoRa) || defined(ESP32_DIY_1W_LoRa)
 #define internalLedPin  2
 #endif
-
-
 
 
 #ifdef ESP32_C3_DIY_LoRa

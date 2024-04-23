@@ -25,7 +25,7 @@ extern std::vector<String>  outputPacketBuffer;
 
 namespace DIGI_Utils {
 
-    String generateDigiRepeatedPacket(String packet, String callsign) {
+    String generateDigiRepeatedPacket(String packet){
         String sender, temp0, tocall, path;
         sender = packet.substring(0, packet.indexOf(">"));
         temp0 = packet.substring(packet.indexOf(">") + 1, packet.indexOf(":"));
@@ -36,10 +36,10 @@ namespace DIGI_Utils {
                 String hop = path.substring(path.indexOf("WIDE1-") + 6, path.indexOf("WIDE1-") + 7);
                 if (hop.toInt() >= 1 && hop.toInt() <= 7) {
                     if (hop.toInt() == 1) {
-                        path.replace("WIDE1-1", callsign + "*");
+                        path.replace("WIDE1-1", Config.callsign + "*");
                     }
                     else {
-                        path.replace("WIDE1-" + hop, callsign + "*,WIDE1-" + String(hop.toInt() - 1));
+                        path.replace("WIDE1-" + hop, Config.callsign + "*,WIDE1-" + String(hop.toInt() - 1));
                     }
                     String repeatedPacket = sender + ">" + tocall + "," + path + packet.substring(packet.indexOf(":"));
                     return repeatedPacket;
@@ -73,7 +73,7 @@ namespace DIGI_Utils {
                         queryMessage = APRS_IS_Utils::processReceivedLoRaMessage(Sender, AddresseeAndMessage);
                     }
                     if (!queryMessage && packet.indexOf("WIDE1-") > 10 && Config.digi.mode == 2) { // If should repeat packet (WIDE1 Digi)
-                        loraPacket = generateDigiRepeatedPacket(packet.substring(3), Config.callsign);
+                        loraPacket = generateDigiRepeatedPacket(packet.substring(3));
                         if (loraPacket != "") {
                             STATION_Utils::addToOutputPacketBuffer(loraPacket);
                             display_toggle(true);
