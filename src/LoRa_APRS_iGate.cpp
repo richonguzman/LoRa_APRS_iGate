@@ -19,6 +19,9 @@
 #include "tnc_utils.h"
 #include "display.h"
 #include "utils.h"
+#ifdef ESP32_DIY_LoRa_A7670
+#include "A7670_utils.h"
+#endif
 
 
 Configuration   Config;
@@ -56,6 +59,10 @@ uint32_t        lastTxTime              = millis();
 uint32_t        lastRxTime              = millis();
 
 std::vector<ReceivedPacket> receivedPackets;
+
+#ifdef ESP32_DIY_LoRa_A7670
+bool            modemLoggedToAPRSIS     = false;
+#endif
 
 String firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, iGateBeaconPacket, iGateLoRaBeaconPacket;
 
@@ -154,11 +161,13 @@ void setup() {
 #endif
 
     WIFI_Utils::setup();
-
     SYSLOG_Utils::setup();
     BME_Utils::setup();
     WEB_Utils::setup();
     TNC_Utils::setup();
+#ifdef ESP32_DIY_LoRa_A7670
+    A7670_Utils::setup();
+#endif
 }
 
 void loop() {
@@ -178,16 +187,20 @@ void loop() {
     WIFI_Utils::checkWiFi(); // Always use WiFi, not related to IGate/Digi mode
     // Utils::checkWiFiInterval();
 
+    #ifdef ESP32_DIY_LoRa_A7670
+    if (Config.aprs_is.active && !modemLoggedToAPRSIS) {
+        A7670_Utils::APRS_IS_connect();
+    }
+    #else
     if (Config.aprs_is.active && !espClient.connected()) {
         APRS_IS_Utils::connect();
     }
+    #endif
 
     TNC_Utils::loop();
 
     Utils::checkDisplayInterval();
     Utils::checkBeaconInterval();
-
-    
     
     APRS_IS_Utils::checkStatus(); // Need that to update display, maybe split this and send APRSIS status to display func?
 
@@ -205,13 +218,14 @@ void loop() {
             DIGI_Utils::processLoRaPacket(packet); // Send received packet to Digi
         }
 
+        #ifndef ESP32_DIY_LoRa_A7670
         if (Config.tnc.enableServer) { // If TNC server enabled
             TNC_Utils::sendToClients(packet); // Send received packet to TNC KISS
         }
-
         if (Config.tnc.enableSerial) { // If Serial KISS enabled
             TNC_Utils::sendToSerial(packet); // Send received packet to Serial KISS
         }
+        #endif
     }
 
     if (Config.aprs_is.active) { // If APRSIS enabled
