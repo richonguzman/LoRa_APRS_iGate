@@ -69,7 +69,9 @@ namespace APRS_IS_Utils {
                 display_toggle(true);
             }
 
-            lastScreenOn = millis();
+            if (Config.display.alwaysOn) {
+                lastScreenOn = millis();
+            }
         }
 
         if (!Config.aprs_is.active) {
@@ -85,7 +87,9 @@ namespace APRS_IS_Utils {
                 display_toggle(true);
             }
 
-            lastScreenOn = millis();
+            if (Config.display.alwaysOn) {
+                lastScreenOn = millis();
+            }
         }
 
         secondLine = "WiFi: " + wifiState + " APRS-IS: " + aprsisState;
@@ -133,7 +137,9 @@ namespace APRS_IS_Utils {
                 display_toggle(true);
             }
             STATION_Utils::addToOutputPacketBuffer(QUERY_Utils::process(receivedMessage, sender, "LoRa"));
-            lastScreenOn = millis();
+            if (Config.display.alwaysOn) {
+                lastScreenOn = millis();
+            }
             show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, "Callsign = " + sender, "TYPE --> QUERY", 0);
             return true;
         }
@@ -164,7 +170,9 @@ namespace APRS_IS_Utils {
                             if (!Config.display.alwaysOn) {
                                 display_toggle(true);
                             }
-                            lastScreenOn = millis();
+                            if (Config.display.alwaysOn) {
+                                lastScreenOn = millis();
+                            }
                             upload(aprsPacket);
                             Utils::println("---> Uploaded to APRS-IS");
                             STATION_Utils::updateLastHeard(Sender);
@@ -206,7 +214,9 @@ namespace APRS_IS_Utils {
                         if (!Config.display.alwaysOn) {
                             display_toggle(true);
                         }
-                        lastScreenOn = millis();
+                        if (Config.display.alwaysOn) {
+                            lastScreenOn = millis();
+                        }
                         delay(500);
                         upload(queryAnswer);
                         SYSLOG_Utils::log("APRSIS Tx", queryAnswer, 0, 0, 0);
@@ -224,7 +234,9 @@ namespace APRS_IS_Utils {
                     if (Config.aprs_is.toRF && STATION_Utils::wasHeard(Addressee)) {
                         STATION_Utils::addToOutputPacketBuffer(buildPacketToTx(packet));
                         display_toggle(true);
-                        lastScreenOn = millis();
+                        if (Config.display.alwaysOn) {
+                            lastScreenOn = millis();
+                        }
                         Utils::typeOfPacket(packet, "APRS-LoRa");
                     }
                 }
