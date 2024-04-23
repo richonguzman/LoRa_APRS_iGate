@@ -77,7 +77,9 @@ namespace DIGI_Utils {
                         if (loraPacket != "") {
                             STATION_Utils::addToOutputPacketBuffer(loraPacket);
                             display_toggle(true);
-                            lastScreenOn = millis();
+                            if (Config.display.alwaysOn) {
+                                lastScreenOn = millis();
+                            }
                         }
                     }
                 }
