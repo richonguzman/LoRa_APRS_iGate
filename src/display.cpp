@@ -10,6 +10,7 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RST);
 #endif
 
 extern Configuration Config;
+extern bool                 displayState;
 
 void setup_display() {
     #ifdef HAS_DISPLAY
@@ -35,9 +36,10 @@ void setup_display() {
 
 void display_toggle(bool toggle) {
     #ifdef HAS_DISPLAY
-    if (toggle) {
+    if (toggle && displayState) {
         display.ssd1306_command(SSD1306_DISPLAYON);
-    } else {
+    } 
+    if (!toggle && !displayState) {
         display.ssd1306_command(SSD1306_DISPLAYOFF);
     }
     #endif
