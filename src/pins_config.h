@@ -152,7 +152,7 @@
 #endif
 #if defined(ESP32_DIY_LoRa_A7670)
 #define BATTERY_PIN     35
-#define internalLedPin  12
+#define internalLedPin  13      // 13 for V1.1 and 12 for V1.0
 #endif
 
 
