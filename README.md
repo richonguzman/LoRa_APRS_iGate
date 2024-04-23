@@ -33,6 +33,7 @@ ____________________________________________________
 ____________________________________________________
 ## Timeline (Versions):
 
+- 2024.04.23 ESP32 + 4G/LTE MODEM A7670SA + LoRa (SX1278) support added.
 - 2024.04.22 Wemos Lolin32 OLED DIY LoRa support added .
 - 2024.04.21 WEB INSTALLER (thanks Damian SQ2CPA).
 - 2024.04.20 New Output Buffer process: no more packets lost.

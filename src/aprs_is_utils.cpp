@@ -23,8 +23,9 @@ extern String               seventhLine;
 extern std::vector<String>  outputPacketBuffer;
 extern uint32_t             lastRxTime;
 
-#ifdef ESP32_DIY_LoRa_A7670
 extern bool                 modemLoggedToAPRSIS;
+
+#ifdef ESP32_DIY_LoRa_A7670
 extern bool                 stationBeacon;
 #endif
 

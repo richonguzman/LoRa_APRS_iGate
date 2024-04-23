@@ -60,9 +60,7 @@ uint32_t        lastRxTime              = millis();
 
 std::vector<ReceivedPacket> receivedPackets;
 
-#ifdef ESP32_DIY_LoRa_A7670
 bool            modemLoggedToAPRSIS     = false;
-#endif
 
 String firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, iGateBeaconPacket, iGateLoRaBeaconPacket;
 
