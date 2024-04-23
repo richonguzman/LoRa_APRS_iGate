@@ -150,6 +150,10 @@
 #if defined(ESP32_DIY_LoRa) || defined(ESP32_DIY_1W_LoRa)
 #define internalLedPin  2
 #endif
+#if defined(ESP32_DIY_LoRa_A7670)
+#define BATTERY_PIN     35
+#define internalLedPin  12
+#endif
 
 
 #ifdef ESP32_C3_DIY_LoRa
