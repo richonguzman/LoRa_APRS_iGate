@@ -5,6 +5,7 @@
 #include "aprs_is_utils.h"
 #include "syslog_utils.h"
 #include "pins_config.h"
+#include "A7670_utils.h"
 #include "wifi_utils.h"
 #include "gps_utils.h"
 #include "bme_utils.h"
@@ -130,7 +131,11 @@ namespace Utils {
             if (Config.aprs_is.active && Config.beacon.sendViaAPRSIS) {
                 show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING IGATE BEACON", 0); 
                 seventhLine = "     listening...";
+                #ifdef ESP32_DIY_LoRa_A7670
+                A7670_Utils::uploadToAPRSIS(beaconPacket);
+                #else
                 APRS_IS_Utils::upload(beaconPacket);
+                #endif
             }
 
             if (Config.beacon.sendViaRF) {

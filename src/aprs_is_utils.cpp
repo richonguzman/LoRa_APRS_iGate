@@ -151,7 +151,7 @@ namespace APRS_IS_Utils {
     }
 
     void processLoRaPacket(String packet) {
-        if (espClient.connected()) {
+        if (espClient.connected() || modemLoggedToAPRSIS) {
             bool queryMessage = false;
             String aprsPacket, Sender, AddresseeAndMessage, Addressee;
             if (packet != "") {

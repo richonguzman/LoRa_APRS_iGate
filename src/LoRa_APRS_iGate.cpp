@@ -218,14 +218,12 @@ void loop() {
             DIGI_Utils::processLoRaPacket(packet); // Send received packet to Digi
         }
 
-        #ifndef ESP32_DIY_LoRa_A7670
         if (Config.tnc.enableServer) { // If TNC server enabled
             TNC_Utils::sendToClients(packet); // Send received packet to TNC KISS
         }
         if (Config.tnc.enableSerial) { // If Serial KISS enabled
             TNC_Utils::sendToSerial(packet); // Send received packet to Serial KISS
         }
-        #endif
     }
 
     if (Config.aprs_is.active) { // If APRSIS enabled
