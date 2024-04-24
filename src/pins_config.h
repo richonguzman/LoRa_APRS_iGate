@@ -144,7 +144,7 @@
 #define ADC_CTRL            37
 #endif
 #if defined(ESP32_DIY_LoRa) || defined(ESP32_DIY_1W_LoRa)
-#define INTERNAL_LED_PIN     2
+#define INTERNAL_LED_PIN    2
 #endif
 #if defined(ESP32_DIY_LoRa_A7670)
 #define INTERNAL_LED_PIN    13      // 13 for V1.1 and 12 for V1.0
