@@ -70,8 +70,8 @@ void setup() {
     #ifdef BATTERY_PIN
     pinMode(BATTERY_PIN, INPUT);
     #endif
-    #ifdef HAS_INTERNAL_LED
-    pinMode(internalLedPin, OUTPUT);
+    #ifdef INTERNAL_LED_PIN
+    pinMode(INTERNAL_LED_PIN, OUTPUT);
     #endif
     if (Config.externalVoltageMeasurement) {
         pinMode(Config.externalVoltagePin, INPUT);

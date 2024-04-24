@@ -52,13 +52,13 @@ namespace WIFI_Utils {
             WiFi.begin(currentWiFi->ssid.c_str(), currentWiFi->password.c_str());
             while (WiFi.status() != WL_CONNECTED && wifiCounter<myWiFiAPSize) {
                 delay(500);
-                #ifdef HAS_INTERNAL_LED
-                digitalWrite(internalLedPin,HIGH);
+                #ifdef INTERNAL_LED_PIN
+                digitalWrite(INTERNAL_LED_PIN,HIGH);
                 #endif
                 Serial.print('.');
                 delay(500);
-                #ifdef HAS_INTERNAL_LED
-                digitalWrite(internalLedPin,LOW);
+                #ifdef INTERNAL_LED_PIN
+                digitalWrite(INTERNAL_LED_PIN,LOW);
                 #endif
                 if ((millis() - start) > 10000){
                     delay(1000);
@@ -78,8 +78,8 @@ namespace WIFI_Utils {
                 }
             }
         }
-        #ifdef HAS_INTERNAL_LED
-        digitalWrite(internalLedPin,LOW);
+        #ifdef INTERNAL_LED_PIN
+        digitalWrite(INTERNAL_LED_PIN,LOW);
         #endif
         if (WiFi.status() == WL_CONNECTED) {
             Serial.print("Connected as ");
