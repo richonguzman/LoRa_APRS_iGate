@@ -29,6 +29,10 @@ SX1268 radio = new Module(RADIO_CS_PIN, RADIO_DIO1_PIN, RADIO_RST_PIN, RADIO_BUS
 SX1278 radio = new Module(RADIO_CS_PIN, RADIO_BUSY_PIN, RADIO_RST_PIN);
 #endif
 
+#ifdef HAS_SX1276
+SX1276 radio = new Module(RADIO_CS_PIN, RADIO_BUSY_PIN, RADIO_RST_PIN);
+#endif
+
 int rssi, freqError;
 float snr;
 
@@ -48,10 +52,10 @@ namespace LoRa_Utils {
             Utils::println("Starting LoRa failed!");
             while (true);
         }
-        #ifdef HAS_SX127X        
+        #if defined(HAS_SX1278) || defined(HAS_SX1276)
         radio.setDio0Action(setFlag, RISING);
         #endif
-        #ifdef HAS_SX126X
+        #if defined(HAS_SX1262) || defined(HAS_SX1268)
         if (!Config.lowPowerMode) {
             radio.setDio1Action(setFlag);
         } else {
@@ -68,7 +72,7 @@ namespace LoRa_Utils {
         radio.setRfSwitchPins(RADIO_RXEN, RADIO_TXEN);
         #endif
 
-        #if defined(HAS_SX127X) || ESP32_DIY_1W_LoRa
+        #if defined(HAS_SX1278) || defined(HAS_SX1276) || ESP32_DIY_1W_LoRa
         state = radio.setOutputPower(Config.loramodule.power); // max value 20dB for 400M30S as it has Low Noise Amp
         #endif   
         #if defined(HELTEC_V3)  || defined(HELTEC_WS) || defined(TTGO_T_Beam_V1_0_SX1268) || defined(TTGO_T_Beam_V1_2_SX1262)
@@ -101,8 +105,8 @@ namespace LoRa_Utils {
             changeFreqTx();
         }
 
-        #ifdef HAS_INTERNAL_LED
-        digitalWrite(internalLedPin, HIGH);
+        #ifdef INTERNAL_LED_PIN
+        digitalWrite(INTERNAL_LED_PIN, HIGH);
         #endif
         int state = radio.transmit("\x3c\xff\x01" + newPacket);
         transmissionFlag = true;
@@ -120,8 +124,8 @@ namespace LoRa_Utils {
             Utils::print(F("failed, code "));
             Utils::println(String(state));
         }
-        #ifdef HAS_INTERNAL_LED
-        digitalWrite(internalLedPin, LOW);
+        #ifdef INTERNAL_LED_PIN
+        digitalWrite(INTERNAL_LED_PIN, LOW);
         #endif
         if (Config.loramodule.txFreq != Config.loramodule.rxFreq) {
             changeFreqRx();

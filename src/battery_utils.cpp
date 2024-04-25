@@ -25,7 +25,7 @@ namespace BATTERY_Utils {
         int sample;
         int sampleSum = 0;
         for (int i = 0; i < 100; i++) {
-            #if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2) || defined(HELTEC_HTCT62) || defined(HELTEC_V3)
+            #if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2) || defined(HELTEC_HTCT62) || defined(HELTEC_V3) || defined(ESP32_DIY_LoRa_A7670) || defined(TTGO_T_LORA32_V2_1_915)
             sample = analogRead(BATTERY_PIN);
             #endif
             #if defined(ESP32_DIY_LoRa) || defined(ESP32_DIY_1W_LoRa)

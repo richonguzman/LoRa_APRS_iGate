@@ -5,6 +5,7 @@
 #include "aprs_is_utils.h"
 #include "syslog_utils.h"
 #include "pins_config.h"
+#include "A7670_utils.h"
 #include "wifi_utils.h"
 #include "gps_utils.h"
 #include "bme_utils.h"
@@ -68,13 +69,13 @@ namespace Utils {
 
     void setupDisplay() {
         setup_display();
-        #ifdef HAS_INTERNAL_LED
-        digitalWrite(internalLedPin,HIGH);
+        #ifdef INTERNAL_LED_PIN
+        digitalWrite(INTERNAL_LED_PIN,HIGH);
         #endif
         Serial.println("\nStarting Station: " + Config.callsign + "   Version: " + versionDate);
         show_display(" LoRa APRS", "", "   ( iGATE & DIGI )", "", "", "Richonguzman / CA2RXU", "      " + versionDate, 4000);
-        #ifdef HAS_INTERNAL_LED
-        digitalWrite(internalLedPin,LOW);
+        #ifdef INTERNAL_LED_PIN
+        digitalWrite(INTERNAL_LED_PIN,LOW);
         #endif
         firstLine   = Config.callsign;
         seventhLine = "     listening...";
@@ -114,7 +115,7 @@ namespace Utils {
             beaconPacket += Config.beacon.comment;
             secondaryBeaconPacket += Config.beacon.comment;
 
-            #if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2) || defined(HELTEC_HTCT62) || defined(HELTEC_V3)
+            #if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2) || defined(HELTEC_HTCT62) || defined(HELTEC_V3) || defined(ESP32_DIY_LoRa_A7670) || defined(TTGO_T_LORA32_V2_1_915)
             if (Config.sendBatteryVoltage) {
                 beaconPacket += " Batt=" + String(BATTERY_Utils::checkBattery(),2) + "V";
                 secondaryBeaconPacket += " Batt=" + String(BATTERY_Utils::checkBattery(),2) + "V";
@@ -131,7 +132,11 @@ namespace Utils {
             if (Config.aprs_is.active && Config.beacon.sendViaAPRSIS) {
                 show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING IGATE BEACON", 0); 
                 seventhLine = "     listening...";
+                #ifdef ESP32_DIY_LoRa_A7670
+                A7670_Utils::uploadToAPRSIS(beaconPacket);
+                #else
                 APRS_IS_Utils::upload(beaconPacket);
+                #endif
             }
 
             if (Config.beacon.sendViaRF) {

@@ -9,7 +9,7 @@
 
 
 // LORA MODULES
-#if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2) || defined(ESP32_DIY_LoRa) || defined(TTGO_T_Beam_V1_2) || defined(TTGO_T_Beam_V1_0)
+#if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2) || defined(ESP32_DIY_LoRa) || defined(TTGO_T_Beam_V1_2) || defined(TTGO_T_Beam_V1_0) || defined(TTGO_T_LORA32_V2_1_915)
 #define RADIO_SCLK_PIN  5      // GPIO5    - SX1278 SCK
 #define RADIO_MISO_PIN  19      // GPIO19   - SX1278 MISO
 #define RADIO_MOSI_PIN  27      // GPIO27   - SX1278 MOSI
@@ -82,9 +82,22 @@
 #define RADIO_BUSY_PIN  4    // SX1262 BUSY
 #endif
 
+#ifdef ESP32_DIY_LoRa_A7670
+#define RADIO_SCLK_PIN  18
+#define RADIO_MISO_PIN  19
+#define RADIO_MOSI_PIN  23
+#define RADIO_CS_PIN    2
+#define RADIO_RST_PIN   0
+#define RADIO_BUSY_PIN  32
+#define A7670_PWR_PIN   4
+#define A7670_ResetPin  5
+#define A7670_TX_PIN    26
+#define A7670_RX_PIN    27
+#endif
+
 
 // OLED 
-#if defined(TTGO_T_LORA32_V2_1) || defined(ESP32_DIY_LoRa) || defined(ESP32_DIY_1W_LoRa) || defined(TTGO_T_Beam_V1_0) || defined(TTGO_T_Beam_V1_2) || defined(TTGO_T_Beam_V1_0_SX1268) || defined(TTGO_T_Beam_V1_2_SX1262) || defined(OE5HWN_MeshCom)
+#if defined(TTGO_T_LORA32_V2_1) || defined(ESP32_DIY_LoRa) || defined(ESP32_DIY_1W_LoRa) || defined(TTGO_T_Beam_V1_0) || defined(TTGO_T_Beam_V1_2) || defined(TTGO_T_Beam_V1_0_SX1268) || defined(TTGO_T_Beam_V1_2_SX1262) || defined(OE5HWN_MeshCom) || defined(ESP32_DIY_LoRa_A7670) || defined(TTGO_T_LORA32_V2_1_915)
 #define OLED_SDA    21
 #define OLED_SCL    22
 #define OLED_RST    -1      // Reset pin # (or -1 if sharing Arduino reset pin)
@@ -114,30 +127,29 @@
 
 
 // Leds and other stuff
-#if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2) || defined(HELTEC_V3) || defined(HELTEC_WS) || defined(ESP32_DIY_LoRa) || defined(ESP32_DIY_1W_LoRa)
-#define HAS_INTERNAL_LED
-#endif
-
 #ifdef HELTEC_HTCT62
-#define BATTERY_PIN      1
+#define BATTERY_PIN         1
 #endif
-#if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2)
-#define internalLedPin  25      // Green Led
-#define BATTERY_PIN     35
+#if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2) || defined(TTGO_T_LORA32_V2_1_915)
+#define INTERNAL_LED_PIN    25      // Green Led
+#define BATTERY_PIN         35
 #endif
 #if defined(HELTEC_WS)
-#define internalLedPin  35
+#define INTERNAL_LED_PIN    35
 #endif
 #if defined(HELTEC_V3)
-#define internalLedPin  35
-#define BATTERY_PIN     1
-#define VExt_CTRL       36
-#define ADC_CTRL        37
+#define INTERNAL_LED_PIN    35
+#define BATTERY_PIN         1
+#define VExt_CTRL           36
+#define ADC_CTRL            37
 #endif
 #if defined(ESP32_DIY_LoRa) || defined(ESP32_DIY_1W_LoRa)
-#define internalLedPin  2
+#define INTERNAL_LED_PIN    2
 #endif
-
+#if defined(ESP32_DIY_LoRa_A7670)
+#define INTERNAL_LED_PIN    13      // 13 for V1.1 and 12 for V1.0
+#define BATTERY_PIN         35
+#endif
 
 
 
