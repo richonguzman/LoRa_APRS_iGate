@@ -22,9 +22,26 @@ As easy as it gets, the new <a href="https://sq2cpa.github.io/lora-flasher/ca2rx
 
 ____________________________________________________
 
-# WIKI
+# SUPPORTED BOARDS
+
+- TTGO Lilygo LoRa32 v2.1 / v1.6 (they work the same)
+
+- TTGO T-Beam v1.0 , v1.1, v1.2 (also variations with SX1262 and SX1268 LoRa Modules)
+
+- HELTEC V2, V3 , Wireless Stick, HT-CT62
+
+- ESP32 Wroom + SX1278 LoRa Module or 400M30S 1W LoRa Module for a DIY Versions.
+
+- ESP32 + 4G/LTE A7670 Modem + SX1278 DIY Version.
+
+
+MUCH MORE BOARDS TO ADD!!!
 
 ### Supported Boards and buying links --> <a href="https://github.com/richonguzman/LoRa_APRS_iGate/wiki/Z.-------Supported-Boards-and-Buying-Links" target="_blank">here</a>.
+
+____________________________________________________
+
+# WIKI
 
 ### Installation Guide --> <a href="https://github.com/richonguzman/LoRa_APRS_iGate/wiki/01.-Installation-Guide" target="_blank">here</a>.
 
