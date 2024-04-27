@@ -35,9 +35,7 @@ ____________________________________________________
 - ESP32 + 4G/LTE A7670 Modem + SX1278 DIY Version.
 
 
-MUCH MORE BOARDS TO ADD!!!
-
-### Supported Boards and buying links --> <a href="https://github.com/richonguzman/LoRa_APRS_iGate/wiki/Z.-------Supported-Boards-and-Buying-Links" target="_blank">here</a>.
+### Buying links --> <a href="https://github.com/richonguzman/LoRa_APRS_iGate/wiki/Z.-------Supported-Boards-and-Buying-Links" target="_blank">here</a>.
 
 ____________________________________________________
 
