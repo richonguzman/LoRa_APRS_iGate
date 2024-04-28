@@ -156,10 +156,8 @@ namespace Utils {
 
     void checkDisplayInterval() {
         uint32_t lastDisplayTime = millis() - lastScreenOn;
-        if (!Config.display.alwaysOn) {
-            if (lastDisplayTime >= Config.display.timeout*1000) {
-                display_toggle(false);
-            }
+        if (!Config.display.alwaysOn && lastDisplayTime >= Config.display.timeout * 1000) {
+            display_toggle(false);
         }
     }
 
