@@ -193,9 +193,12 @@ namespace LoRa_Utils {
             } else if (state == RADIOLIB_ERR_RX_TIMEOUT) {
                 // timeout occurred while waiting for a packet
             } else if (state == RADIOLIB_ERR_CRC_MISMATCH) {
+                rssi = radio.getRSSI();
+                snr = radio.getSNR();
+                freqError = radio.getFrequencyError();
                 Utils::println(F("CRC error!"));
                 if (Config.syslog.active && WiFi.status() == WL_CONNECTED) {
-                    SYSLOG_Utils::log("Rx", "RADIOLIB_ERR_CRC_MISMATCH", 0,0,0);
+                    SYSLOG_Utils::log("CRC", loraPacket, rssi, snr, freqError);
                 }
                 loraPacket = "";
             } else {
