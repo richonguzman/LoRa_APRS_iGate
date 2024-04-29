@@ -70,7 +70,7 @@ namespace APRS_IS_Utils {
             wifiState = "OK";
         } else {
             wifiState = "AP";
-            if (!Config.display.alwaysOn) {
+            if (!Config.display.alwaysOn && Config.display.timeout != 0) {
                 display_toggle(true);
             }
             lastScreenOn = millis();
@@ -92,7 +92,7 @@ namespace APRS_IS_Utils {
                 aprsisState = "--";
             }
             #endif
-            if(aprsisState == "--" && !Config.display.alwaysOn) {
+            if(aprsisState == "--" && !Config.display.alwaysOn && Config.display.timeout != 0) {
                 display_toggle(true);
                 lastScreenOn = millis();
             }            
@@ -138,7 +138,7 @@ namespace APRS_IS_Utils {
         }
         if (receivedMessage.indexOf("?") == 0) {
             delay(2000);
-            if (!Config.display.alwaysOn) {
+            if (!Config.display.alwaysOn && Config.display.timeout != 0) {
                 display_toggle(true);
             }
             STATION_Utils::addToOutputPacketBuffer(QUERY_Utils::process(receivedMessage, sender, "LoRa"));
@@ -170,7 +170,7 @@ namespace APRS_IS_Utils {
                         }
                         if (!queryMessage) {
                             aprsPacket = buildPacketToUpload(packet);
-                            if (!Config.display.alwaysOn) {
+                            if (!Config.display.alwaysOn && Config.display.timeout != 0) {
                                 display_toggle(true);
                             }
                             lastScreenOn = millis();
@@ -222,7 +222,7 @@ namespace APRS_IS_Utils {
                         Utils::println("Received Query APRS-IS : " + packet);
                         String queryAnswer = QUERY_Utils::process(receivedMessage, Sender, "APRSIS");
                         //Serial.println("---> QUERY Answer : " + queryAnswer.substring(0,queryAnswer.indexOf("\n")));
-                        if (!Config.display.alwaysOn) {
+                        if (!Config.display.alwaysOn && Config.display.timeout != 0) {
                             display_toggle(true);
                         }
                         lastScreenOn = millis();

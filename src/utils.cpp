@@ -98,8 +98,9 @@ namespace Utils {
         }
 
         if (beaconUpdate) {
-            display_toggle(true);
-
+            if (!Config.display.alwaysOn && Config.display.timeout != 0) {
+                display_toggle(true);
+            }
             Utils::println("-- Sending Beacon to APRSIS --");
 
             STATION_Utils::deleteNotHeard();
