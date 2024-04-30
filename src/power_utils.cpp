@@ -130,7 +130,6 @@ namespace POWER_Utils {
         pinMode(VExt_CTRL,OUTPUT); // this is for GPS and TFT screen on Wireless_Tracker and only for Oled in Heltec V3
         digitalWrite(VExt_CTRL, HIGH);
         pinMode(ADC_CTRL, OUTPUT);
-        digitalWrite(ADC_CTRL, HIGH);
         #endif
     }
 
