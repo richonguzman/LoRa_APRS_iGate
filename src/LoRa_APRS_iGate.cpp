@@ -76,7 +76,7 @@ void setup() {
     if (Config.externalVoltageMeasurement) {
         pinMode(Config.externalVoltagePin, INPUT);
     }
-    #if defined(TTGO_T_Beam_V1_0) || defined(TTGO_T_Beam_V1_0_SX1268) || defined(TTGO_T_Beam_V1_2) || defined(TTGO_T_Beam_V1_2_SX1262)
+    #if defined(TTGO_T_Beam_V1_0) || defined(TTGO_T_Beam_V1_0_SX1268) || defined(TTGO_T_Beam_V1_2) || defined(TTGO_T_Beam_V1_2_SX1262) || defined(HELTEC_V3)
     POWER_Utils::setup();
     #endif
     delay(1000);
