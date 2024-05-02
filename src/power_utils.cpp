@@ -94,7 +94,6 @@ namespace POWER_Utils {
 
 
     void setup() {
-        Wire.end();
         #ifdef HAS_AXP192
         Wire.begin(SDA, SCL);
         if (begin(Wire)) {
@@ -126,11 +125,27 @@ namespace POWER_Utils {
         PMU.setSysPowerDownVoltage(2600);
         #endif
 
-        #if defined(HELTEC_V3)
-        pinMode(VExt_CTRL,OUTPUT); // this is for GPS and TFT screen on Wireless_Tracker and only for Oled in Heltec V3
-        digitalWrite(VExt_CTRL, HIGH);
+        #ifdef BATTERY_PIN
+        pinMode(BATTERY_PIN, INPUT);
+        #endif
+
+        #ifdef INTERNAL_LED_PIN
+        pinMode(INTERNAL_LED_PIN, OUTPUT);
+        #endif
+
+        if (Config.externalVoltageMeasurement) {
+            pinMode(Config.externalVoltagePin, INPUT);
+        }
+
+        #if defined(VEXT_CTRL)
+        pinMode(VEXT_CTRL,OUTPUT); // this is for GPS and TFT screen on Wireless_Tracker and only for Oled in Heltec V3
+        digitalWrite(VEXT_CTRL, HIGH);
+        #endif
+        
+        #if defined(ADC_CTRL)
         pinMode(ADC_CTRL, OUTPUT);
         #endif
+        delay(1000);
     }
 
 }

@@ -140,7 +140,7 @@
 #if defined(HELTEC_V3)
 #define INTERNAL_LED_PIN    35
 #define BATTERY_PIN         1
-#define VExt_CTRL           36
+#define VEXT_CTRL           36
 #define ADC_CTRL            37
 #endif
 #if defined(ESP32_DIY_LoRa) || defined(ESP32_DIY_1W_LoRa)

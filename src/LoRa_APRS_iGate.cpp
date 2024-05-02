@@ -66,27 +66,11 @@ String firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seven
 
 void setup() {
     Serial.begin(115200);
-
-    #ifdef BATTERY_PIN
-    pinMode(BATTERY_PIN, INPUT);
-    #endif
-    #ifdef INTERNAL_LED_PIN
-    pinMode(INTERNAL_LED_PIN, OUTPUT);
-    #endif
-    if (Config.externalVoltageMeasurement) {
-        pinMode(Config.externalVoltagePin, INPUT);
-    }
-    #if defined(TTGO_T_Beam_V1_0) || defined(TTGO_T_Beam_V1_0_SX1268) || defined(TTGO_T_Beam_V1_2) || defined(TTGO_T_Beam_V1_2_SX1262) || defined(HELTEC_V3)
     POWER_Utils::setup();
-    #endif
-    delay(1000);
     Utils::setupDisplay();
-
     Config.check();
-
     LoRa_Utils::setup();
     Utils::validateFreqs();
-
     iGateBeaconPacket = GPS_Utils::generateBeacon();
     iGateLoRaBeaconPacket = GPS_Utils::generateiGateLoRaBeacon();
 
