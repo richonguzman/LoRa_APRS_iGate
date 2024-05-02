@@ -137,12 +137,12 @@ namespace POWER_Utils {
             pinMode(Config.externalVoltagePin, INPUT);
         }
 
-        #if defined(VEXT_CTRL)
+        #ifdef VEXT_CTRL
         pinMode(VEXT_CTRL,OUTPUT); // this is for GPS and TFT screen on Wireless_Tracker and only for Oled in Heltec V3
         digitalWrite(VEXT_CTRL, HIGH);
         #endif
         
-        #if defined(ADC_CTRL)
+        #ifdef ADC_CTRL
         pinMode(ADC_CTRL, OUTPUT);
         #endif
         delay(1000);
