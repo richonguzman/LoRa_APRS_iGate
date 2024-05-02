@@ -134,10 +134,7 @@
 #define INTERNAL_LED_PIN    25      // Green Led
 #define BATTERY_PIN         35
 #endif
-#if defined(HELTEC_WS)
-#define INTERNAL_LED_PIN    35
-#endif
-#if defined(HELTEC_V3)
+#if defined(HELTEC_V3) || defined(HELTEC_WS)
 #define INTERNAL_LED_PIN    35
 #define BATTERY_PIN         1
 #define VEXT_CTRL           36
