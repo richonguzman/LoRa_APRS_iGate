@@ -53,7 +53,6 @@ uint32_t        bmeLastReading          = -60000;
 String          batteryVoltage;
 
 std::vector<String> lastHeardStation;
-std::vector<String> lastHeardStation_temp;
 std::vector<String> outputPacketBuffer;
 uint32_t        lastTxTime              = millis();
 uint32_t        lastRxTime              = millis();
@@ -172,7 +171,7 @@ void loop() {
     #ifdef ESP32_DIY_LoRa_A7670
     if (Config.aprs_is.active && !modemLoggedToAPRSIS) {
         A7670_Utils::APRS_IS_connect();
-    }
+    } 
     #else
     if (Config.aprs_is.active && !espClient.connected()) {
         APRS_IS_Utils::connect();

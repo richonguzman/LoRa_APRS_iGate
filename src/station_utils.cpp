@@ -7,7 +7,6 @@
 
 extern Configuration        Config;
 extern std::vector<String>  lastHeardStation;
-extern std::vector<String>  lastHeardStation_temp;
 extern std::vector<String>  outputPacketBuffer;
 extern uint32_t             lastTxTime;
 extern uint32_t             lastRxTime;
@@ -17,6 +16,7 @@ extern String               fourthLine;
 namespace STATION_Utils {
 
     void deleteNotHeard() {
+        std::vector<String>  lastHeardStation_temp;
         for (int i = 0; i < lastHeardStation.size(); i++) {
             String deltaTimeString = lastHeardStation[i].substring(lastHeardStation[i].indexOf(",") + 1);
             uint32_t deltaTime = deltaTimeString.toInt();
