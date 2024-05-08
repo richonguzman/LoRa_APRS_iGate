@@ -6,9 +6,8 @@
 
 namespace DIGI_Utils {
 
-    String generateDigiRepeatedPacket(String packet, String callsign);
-    void processPacket(String packet);
-    void loop(String packet);
+    String generateDigiRepeatedPacket(String packet);
+    void processLoRaPacket(String packet);
 
 }
 

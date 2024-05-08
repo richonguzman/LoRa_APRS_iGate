@@ -456,3 +456,58 @@ form.addEventListener("submit", async (event) => {
 });
 
 fetchSettings();
+
+function loadReceivedPackets(packets) {
+    if (packets) {
+        document.querySelector('#received-packets tbody').innerHTML = '';
+
+        const container = document.querySelector("#received-packets tbody");
+
+        container.innerHTML = '';
+
+        const date = new Date();
+
+        packets.forEach((packet) => {
+            const element = document.createElement("tr");
+
+            date.setTime(packet.millis);
+
+            const p = date.toUTCString().split(' ')
+        
+            element.innerHTML = `
+                        <td>${p[p.length-2]}</td>
+                        <td>${packet.packet}</td>
+                        <td>${packet.RSSI}</td>
+                        <td>${packet.SNR}</td>
+                    `;
+
+            container.appendChild(element);
+        })
+    }
+
+    setTimeout(fetchReceivedPackets, 15000);
+}
+
+function fetchReceivedPackets() {
+    fetch("/received-packets.json")
+    .then((response) => response.json())
+    .then((packets) => {
+        loadReceivedPackets(packets);
+    })
+    .catch((err) => {
+        console.error(err);
+
+        console.error(`Failed to load received packets`);
+    });
+}
+
+document.querySelector('a[href="/received-packets"]').addEventListener('click', function (e) {
+    e.preventDefault();
+
+    document.getElementById('received-packets').classList.remove('d-none');
+    document.getElementById('configuration').classList.add('d-none');
+    
+    document.querySelector('button[type=submit]').remove();
+
+    fetchReceivedPackets();
+})

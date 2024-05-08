@@ -47,6 +47,11 @@ jobs:
                   cp .pio/build/${{ matrix.target }}/partitions.bin installer/firmware/
                   cp .pio/build/${{ matrix.target }}/spiffs.bin installer/firmware/
                   cp ~/.platformio/packages/framework-arduinoespressif32/tools/partitions/boot_app0.bin installer/firmware/
+            
+            - name: Merge for web flashing
+              run: |
+                  python installer/bin/esptool/esptool.py --chip esp32 merge_bin -o installer/web_upgrade.bin --flash_mode dio --flash_freq 40m --flash_size 4MB 0x1000 installer/firmware/bootloader.bin 0x8000 installer/firmware/partitions.bin 0xe000 installer/firmware/boot_app0.bin 0x10000 installer/firmware/firmware.bin
+                  python installer/bin/esptool/esptool.py --chip esp32 merge_bin -o installer/web_factory.bin --flash_mode dio --flash_freq 40m --flash_size 4MB 0x1000 installer/firmware/bootloader.bin 0x8000 installer/firmware/partitions.bin 0xe000 installer/firmware/boot_app0.bin 0x10000 installer/firmware/firmware.bin 2686976 installer/firmware/spiffs.bin
 
             - name: Install Zip
               run: sudo apt-get install zip

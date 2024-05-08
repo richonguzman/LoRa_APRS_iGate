@@ -1,7 +1,9 @@
+#include <ElegantOTA.h>
 #include <Arduino.h>
 #include <WiFi.h>
 #include <vector>
 #include "configuration.h"
+#include "battery_utils.h"
 #include "aprs_is_utils.h"
 #include "station_utils.h"
 #include "syslog_utils.h"
@@ -17,67 +19,57 @@
 #include "tnc_utils.h"
 #include "display.h"
 #include "utils.h"
-#include <ElegantOTA.h>
-#include "battery_utils.h"
+#ifdef ESP32_DIY_LoRa_A7670
+#include "A7670_utils.h"
+#endif
+
 
 Configuration   Config;
 WiFiClient      espClient;
 
-String          versionDate           = "2024.04.09";
-uint8_t         myWiFiAPIndex         = 0;
-int             myWiFiAPSize          = Config.wifiAPs.size();
-WiFi_AP         *currentWiFi          = &Config.wifiAPs[myWiFiAPIndex];
+String          versionDate             = "2024.05.05";
+uint8_t         myWiFiAPIndex           = 0;
+int             myWiFiAPSize            = Config.wifiAPs.size();
+WiFi_AP         *currentWiFi            = &Config.wifiAPs[myWiFiAPIndex];
 
-bool            isUpdatingOTA         = false;
-bool            statusAfterBoot       = true;
-bool            beaconUpdate          = true;
-uint32_t        lastBeaconTx          = 0;
-uint32_t        previousWiFiMillis    = 0;
-uint32_t        lastScreenOn          = millis();
+bool            isUpdatingOTA           = false;
+bool            statusAfterBoot         = true;
+bool            beaconUpdate            = true;
+uint32_t        lastBeaconTx            = 0;
+uint32_t        previousWiFiMillis      = 0;
+uint32_t        lastScreenOn            = millis();
 
-uint32_t        lastWiFiCheck         = 0;
-bool            WiFiConnect           = true;
-bool            WiFiConnected         = false;
+uint32_t        lastWiFiCheck           = 0;
+bool            WiFiConnect             = true;
+bool            WiFiConnected           = false;
 
-bool            WiFiAutoAPStarted     = false;
-long            WiFiAutoAPTime        = false;
+bool            WiFiAutoAPStarted       = false;
+long            WiFiAutoAPTime          = false;
 
-uint32_t        lastBatteryCheck      = 0;
+uint32_t        lastBatteryCheck        = 0;
 
-uint32_t        bmeLastReading        = -60000;
+uint32_t        bmeLastReading          = -60000;
 
 String          batteryVoltage;
 
 std::vector<String> lastHeardStation;
-std::vector<String> lastHeardStation_temp;
-std::vector<String> packetBuffer;
-std::vector<String> packetBuffer_temp;
+std::vector<String> outputPacketBuffer;
+uint32_t        lastTxTime              = millis();
+uint32_t        lastRxTime              = millis();
+
+std::vector<ReceivedPacket> receivedPackets;
+
+bool            modemLoggedToAPRSIS     = false;
 
 String firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, iGateBeaconPacket, iGateLoRaBeaconPacket;
 
 void setup() {
     Serial.begin(115200);
-
-    #if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2) || defined(HELTEC_HTCT62)
-    pinMode(batteryPin, INPUT);
-    #endif
-    #ifdef HAS_INTERNAL_LED
-    pinMode(internalLedPin, OUTPUT);
-    #endif
-    if (Config.externalVoltageMeasurement) {
-        pinMode(Config.externalVoltagePin, INPUT);
-    }
-    #if defined(TTGO_T_Beam_V1_0) || defined(TTGO_T_Beam_V1_0_SX1268) || defined(TTGO_T_Beam_V1_2) || defined(TTGO_T_Beam_V1_2_SX1262)
     POWER_Utils::setup();
-    #endif
-    delay(1000);
     Utils::setupDisplay();
-
     Config.check();
-
     LoRa_Utils::setup();
     Utils::validateFreqs();
-
     iGateBeaconPacket = GPS_Utils::generateBeacon();
     iGateLoRaBeaconPacket = GPS_Utils::generateiGateLoRaBeacon();
 
@@ -101,7 +93,7 @@ void setup() {
                 Serial.println(packet);
 
                 if (Config.digi.mode == 2) { // If Digi enabled
-                    DIGI_Utils::loop(packet); // Send received packet to Digi
+                    DIGI_Utils::processLoRaPacket(packet); // Send received packet to Digi
                 }
 
                 if (packet.indexOf(Config.callsign + ":?APRSELP{") != -1) { // Send `?APRSELP` to exit low power
@@ -125,7 +117,8 @@ void setup() {
                     comment += " Ext=" + String(BATTERY_Utils::checkExternalVoltage(),2) + "V";
                 }
 
-                LoRa_Utils::sendNewPacket("APRS", iGateLoRaBeaconPacket + comment);
+                STATION_Utils::addToOutputPacketBuffer(iGateLoRaBeaconPacket + comment);
+                //LoRa_Utils::sendNewPacket("APRS", iGateLoRaBeaconPacket + comment);
             
                 lastBeacon = time;
             }
@@ -149,11 +142,13 @@ void setup() {
 #endif
 
     WIFI_Utils::setup();
-
     SYSLOG_Utils::setup();
     BME_Utils::setup();
     WEB_Utils::setup();
     TNC_Utils::setup();
+#ifdef ESP32_DIY_LoRa_A7670
+    A7670_Utils::setup();
+#endif
 }
 
 void loop() {
@@ -173,16 +168,20 @@ void loop() {
     WIFI_Utils::checkWiFi(); // Always use WiFi, not related to IGate/Digi mode
     // Utils::checkWiFiInterval();
 
+    #ifdef ESP32_DIY_LoRa_A7670
+    if (Config.aprs_is.active && !modemLoggedToAPRSIS) {
+        A7670_Utils::APRS_IS_connect();
+    }
+    #else
     if (Config.aprs_is.active && !espClient.connected()) {
         APRS_IS_Utils::connect();
     }
+    #endif
 
     TNC_Utils::loop();
 
     Utils::checkDisplayInterval();
     Utils::checkBeaconInterval();
-
-    
     
     APRS_IS_Utils::checkStatus(); // Need that to update display, maybe split this and send APRSIS status to display func?
 
@@ -197,13 +196,12 @@ void loop() {
         }
 
         if (Config.digi.mode == 2) { // If Digi enabled
-            DIGI_Utils::loop(packet); // Send received packet to Digi
+            DIGI_Utils::processLoRaPacket(packet); // Send received packet to Digi
         }
 
         if (Config.tnc.enableServer) { // If TNC server enabled
             TNC_Utils::sendToClients(packet); // Send received packet to TNC KISS
         }
-
         if (Config.tnc.enableSerial) { // If Serial KISS enabled
             TNC_Utils::sendToSerial(packet); // Send received packet to Serial KISS
         }
@@ -212,6 +210,8 @@ void loop() {
     if (Config.aprs_is.active) { // If APRSIS enabled
         APRS_IS_Utils::listenAPRSIS(); // listen received packet from APRSIS
     }
+
+    STATION_Utils::processOutputPacketBuffer();
 
     show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
 }

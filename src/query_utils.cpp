@@ -3,7 +3,6 @@
 
 extern Configuration        Config;
 extern std::vector<String>  lastHeardStation;
-extern std::vector<String>  lastHeardStation_temp;
 extern String               versionDate;
 
 

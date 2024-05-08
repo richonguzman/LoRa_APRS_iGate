@@ -3,7 +3,6 @@
 #include "station_utils.h"
 #include "aprs_is_utils.h"
 #include "query_utils.h"
-#include "lora_utils.h"
 #include "digi_utils.h"
 #include "wifi_utils.h"
 #include "gps_utils.h"
@@ -21,10 +20,12 @@ extern String           fifthLine;
 extern String           sixthLine;
 extern String           seventhLine;
 
+extern std::vector<String>  outputPacketBuffer;
+
 
 namespace DIGI_Utils {
 
-    String generateDigiRepeatedPacket(String packet, String callsign) {
+    String generateDigiRepeatedPacket(String packet){
         String sender, temp0, tocall, path;
         sender = packet.substring(0, packet.indexOf(">"));
         temp0 = packet.substring(packet.indexOf(">") + 1, packet.indexOf(":"));
@@ -35,10 +36,10 @@ namespace DIGI_Utils {
                 String hop = path.substring(path.indexOf("WIDE1-") + 6, path.indexOf("WIDE1-") + 7);
                 if (hop.toInt() >= 1 && hop.toInt() <= 7) {
                     if (hop.toInt() == 1) {
-                        path.replace("WIDE1-1", callsign + "*");
+                        path.replace("WIDE1-1", Config.callsign + "*");
                     }
                     else {
-                        path.replace("WIDE1-" + hop, callsign + "*,WIDE1-" + String(hop.toInt() - 1));
+                        path.replace("WIDE1-" + hop, Config.callsign + "*,WIDE1-" + String(hop.toInt() - 1));
                     }
                     String repeatedPacket = sender + ">" + tocall + "," + path + packet.substring(packet.indexOf(":"));
                     return repeatedPacket;
@@ -56,7 +57,7 @@ namespace DIGI_Utils {
         }
     }
 
-    void processPacket(String packet) {
+    void processLoRaPacket(String packet) {
         bool queryMessage = false;
         String loraPacket, Sender, AddresseeAndMessage, Addressee;
         if (packet != "") {
@@ -64,7 +65,6 @@ namespace DIGI_Utils {
                 Sender = packet.substring(3, packet.indexOf(">"));
                 if (Sender != Config.callsign) {
                     STATION_Utils::updateLastHeard(Sender);
-                    // STATION_Utils::updatePacketBuffer(packet);
                     Utils::typeOfPacket(packet.substring(3), "Digi");
                     AddresseeAndMessage = packet.substring(packet.indexOf("::") + 2);
                     Addressee = AddresseeAndMessage.substring(0, AddresseeAndMessage.indexOf(":"));
@@ -73,10 +73,9 @@ namespace DIGI_Utils {
                         queryMessage = APRS_IS_Utils::processReceivedLoRaMessage(Sender, AddresseeAndMessage);
                     }
                     if (!queryMessage && packet.indexOf("WIDE1-") > 10 && Config.digi.mode == 2) { // If should repeat packet (WIDE1 Digi)
-                        loraPacket = generateDigiRepeatedPacket(packet.substring(3), Config.callsign);
+                        loraPacket = generateDigiRepeatedPacket(packet.substring(3));
                         if (loraPacket != "") {
-                            delay(500);
-                            LoRa_Utils::sendNewPacket("APRS", loraPacket);
+                            STATION_Utils::addToOutputPacketBuffer(loraPacket);
                             display_toggle(true);
                             lastScreenOn = millis();
                         }
@@ -84,10 +83,6 @@ namespace DIGI_Utils {
                 }
             }
         }
-    }
-
-    void loop(String packet) {
-        processPacket(packet);
     }
 
 }

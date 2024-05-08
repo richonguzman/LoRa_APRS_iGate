@@ -5,8 +5,8 @@
 #include "aprs_is_utils.h"
 #include "syslog_utils.h"
 #include "pins_config.h"
+#include "A7670_utils.h"
 #include "wifi_utils.h"
-#include "lora_utils.h"
 #include "gps_utils.h"
 #include "bme_utils.h"
 #include "display.h"
@@ -53,7 +53,7 @@ namespace Utils {
         if (statusAfterBoot && !Config.beacon.sendViaAPRSIS && Config.beacon.sendViaRF) {
             delay(2000);
             status += ":>https://github.com/richonguzman/LoRa_APRS_iGate " + versionDate;
-            LoRa_Utils::sendNewPacket("APRS", status);
+            STATION_Utils::addToOutputPacketBuffer(status);
             statusAfterBoot = false;
         }
     }
@@ -68,13 +68,13 @@ namespace Utils {
 
     void setupDisplay() {
         setup_display();
-        #ifdef HAS_INTERNAL_LED
-        digitalWrite(internalLedPin,HIGH);
+        #ifdef INTERNAL_LED_PIN
+        digitalWrite(INTERNAL_LED_PIN,HIGH);
         #endif
         Serial.println("\nStarting Station: " + Config.callsign + "   Version: " + versionDate);
         show_display(" LoRa APRS", "", "   ( iGATE & DIGI )", "", "", "Richonguzman / CA2RXU", "      " + versionDate, 4000);
-        #ifdef HAS_INTERNAL_LED
-        digitalWrite(internalLedPin,LOW);
+        #ifdef INTERNAL_LED_PIN
+        digitalWrite(INTERNAL_LED_PIN,LOW);
         #endif
         firstLine   = Config.callsign;
         seventhLine = "     listening...";
@@ -98,7 +98,10 @@ namespace Utils {
         }
 
         if (beaconUpdate) {
-            display_toggle(true);
+            if (!Config.display.alwaysOn && Config.display.timeout != 0) {
+                display_toggle(true);
+            }
+            Utils::println("-- Sending Beacon to APRSIS --");
 
             STATION_Utils::deleteNotHeard();
 
@@ -112,7 +115,7 @@ namespace Utils {
             beaconPacket += Config.beacon.comment;
             secondaryBeaconPacket += Config.beacon.comment;
 
-            #if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2) || defined(HELTEC_HTCT62)
+            #ifdef BATTERY_PIN
             if (Config.sendBatteryVoltage) {
                 beaconPacket += " Batt=" + String(BATTERY_Utils::checkBattery(),2) + "V";
                 secondaryBeaconPacket += " Batt=" + String(BATTERY_Utils::checkBattery(),2) + "V";
@@ -127,23 +130,21 @@ namespace Utils {
             }
 
             if (Config.aprs_is.active && Config.beacon.sendViaAPRSIS) {
-                show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING IGATE BEACON", 0); 
-                   
+                show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING IGATE BEACON", 0);
                 seventhLine = "     listening...";
-
+                #ifdef ESP32_DIY_LoRa_A7670
+                A7670_Utils::uploadToAPRSIS(beaconPacket);
+                #else
                 Utils::println("-- Sending Beacon to APRSIS --");
-
                 APRS_IS_Utils::upload(beaconPacket);
+                #endif
             }
 
             if (Config.beacon.sendViaRF) {
                 show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING DIGI BEACON", 0);
-
                 seventhLine = "     listening...";
-
                 Utils::println("-- Sending Beacon to RF --");
-
-                LoRa_Utils::sendNewPacket("APRS", secondaryBeaconPacket);
+                STATION_Utils::addToOutputPacketBuffer(secondaryBeaconPacket);
             }
 
             lastBeaconTx = millis();
@@ -158,10 +159,8 @@ namespace Utils {
 
     void checkDisplayInterval() {
         uint32_t lastDisplayTime = millis() - lastScreenOn;
-        if (!Config.display.alwaysOn) {
-            if (lastDisplayTime >= Config.display.timeout*1000) {
-                display_toggle(false);
-            }
+        if (!Config.display.alwaysOn && lastDisplayTime >= Config.display.timeout * 1000) {
+            display_toggle(false);
         }
     }
 

@@ -1,20 +1,22 @@
 #include "station_utils.h"
 #include "aprs_is_utils.h"
 #include "configuration.h"
+#include "lora_utils.h"
 #include "utils.h"
 #include <vector>
 
 extern Configuration        Config;
 extern std::vector<String>  lastHeardStation;
-extern std::vector<String>  lastHeardStation_temp;
-extern std::vector<String>  packetBuffer;
-extern std::vector<String>  packetBuffer_temp;
+extern std::vector<String>  outputPacketBuffer;
+extern uint32_t             lastTxTime;
+extern uint32_t             lastRxTime;
 extern String               fourthLine;
 
 
 namespace STATION_Utils {
 
     void deleteNotHeard() {
+        std::vector<String>  lastHeardStation_temp;
         for (int i = 0; i < lastHeardStation.size(); i++) {
             String deltaTimeString = lastHeardStation[i].substring(lastHeardStation[i].indexOf(",") + 1);
             uint32_t deltaTime = deltaTimeString.toInt();
@@ -47,13 +49,6 @@ namespace STATION_Utils {
             fourthLine += " ";
         }
         fourthLine += String(lastHeardStation.size());
-
-        // DEBUG ONLY
-        // Serial.print("Stations Near (last " + String(Config.rememberStationTime) + " minutes): ");
-        // for (int k=0; k<lastHeardStation.size(); k++) {
-        //     Serial.print(lastHeardStation[k].substring(0,lastHeardStation[k].indexOf(","))); Serial.print(" ");
-        // }
-        // Serial.println("");
     }
 
     bool wasHeard(String station) {
@@ -68,37 +63,19 @@ namespace STATION_Utils {
         return false;
     }
 
-    void checkBuffer() {
-        for (int i = 0; i < packetBuffer.size(); i++) {
-            String deltaTimeString = packetBuffer[i].substring(0, packetBuffer[i].indexOf(","));
-            uint32_t deltaTime = deltaTimeString.toInt();
-            if ((millis() - deltaTime) < 60 * 1000) { // cambiar a 15 segundos?
-                packetBuffer_temp.push_back(packetBuffer[i]);
-            }
+    void processOutputPacketBuffer() {
+        int timeToWait = 3 * 1000;      // 3 segs between packet Tx and also Rx ???
+        uint32_t lastRx = millis() - lastRxTime;
+        uint32_t lastTx = millis() - lastTxTime;
+        if (outputPacketBuffer.size() > 0 && lastTx > timeToWait && lastRx > timeToWait) {
+            LoRa_Utils::sendNewPacket(outputPacketBuffer[0]);
+            outputPacketBuffer.erase(outputPacketBuffer.begin());
+            lastTxTime = millis();
         }
-        packetBuffer.clear();
-        for (int j = 0; j < packetBuffer_temp.size(); j++) {
-            packetBuffer.push_back(packetBuffer_temp[j]);
-        }
-        packetBuffer_temp.clear();
-
-        // DEBUG ONLY
-        // for (int i=0; i<packetBuffer.size(); i++) {
-        //     Serial.println(packetBuffer[i]);
-        // }
     }
 
-    void updatePacketBuffer(String packet) {
-        if ((packet.indexOf(":!") == -1) && (packet.indexOf(":=") == -1) && (packet.indexOf(":>") == -1) && (packet.indexOf(":`") == -1)) {
-            String sender = packet.substring(3, packet.indexOf(">"));
-            String tempAddressee = packet.substring(packet.indexOf("::") + 2);
-            String addressee = tempAddressee.substring(0, tempAddressee.indexOf(":"));
-            addressee.trim();
-            String message = tempAddressee.substring(tempAddressee.indexOf(":") + 1);
-            //Serial.println(String(millis()) + "," + sender + "," + addressee + "," + message);
-            packetBuffer.push_back(String(millis()) + "," + sender + "," + addressee + "," + message);
-            checkBuffer();
-        }
+    void addToOutputPacketBuffer(String packet) {
+        outputPacketBuffer.push_back(packet);
     }
 
     bool hasHeardSomeone() {
