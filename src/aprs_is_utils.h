@@ -10,7 +10,8 @@ namespace APRS_IS_Utils {
     void connect();
     void checkStatus();
     String buildPacketToUpload(String unprocessedPacket);
-    String buildPacketToTx(String aprsisPacket);
+    String buildPacketMessageToTx(String aprsisPacket);
+    String buildPacketSameContentToTx(String aprsisPacket);
     bool processReceivedLoRaMessage(String sender, String packet);
     void processLoRaPacket(String packet);
     void processAPRSISPacket(String packet);

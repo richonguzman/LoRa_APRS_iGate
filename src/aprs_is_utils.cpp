@@ -32,6 +32,8 @@ extern bool                 stationBeacon;
 
 namespace APRS_IS_Utils {
 
+    uint32_t lastTxFromIs = 0;
+
     void upload(String line) {
         espClient.print(line + "\r\n");
     }
@@ -109,12 +111,20 @@ namespace APRS_IS_Utils {
         }
     }
 
-    String buildPacketToTx(String aprsisPacket) {
+    String buildPacketMessageToTx(String aprsisPacket) {
         String firstPart, messagePart;
         aprsisPacket.trim();
         firstPart = aprsisPacket.substring(0, aprsisPacket.indexOf(","));
         messagePart = aprsisPacket.substring(aprsisPacket.indexOf("::") + 2);
         return firstPart + ",TCPIP,WIDE1-1," + Config.callsign + "::" + messagePart;
+    }
+
+    String buildPacketSameContentToTx(String aprsisPacket) {
+        String firstPart, messagePart;
+        aprsisPacket.trim();
+        firstPart = aprsisPacket.substring(0, aprsisPacket.indexOf(","));
+        messagePart = aprsisPacket.substring(aprsisPacket.indexOf(":"));
+        return firstPart + ",TCPIP," + Config.callsign + messagePart;
     }
 
     bool processReceivedLoRaMessage(String sender, String packet) {
@@ -244,7 +254,7 @@ namespace APRS_IS_Utils {
                     Utils::print("Received from APRS-IS  : " + packet);
 
                     if (Config.aprs_is.toRF && STATION_Utils::wasHeard(Addressee)) {
-                        STATION_Utils::addToOutputPacketBuffer(buildPacketToTx(packet));
+                        STATION_Utils::addToOutputPacketBuffer(buildPacketMessageToTx(packet));
                         display_toggle(true);
                         lastScreenOn = millis();
                         Utils::typeOfPacket(packet, "APRS-LoRa");
@@ -264,7 +274,7 @@ namespace APRS_IS_Utils {
                             (!Config.loramodule.rxActive && millis() - lastTxFromIs >= 30000) // LoRa RX disabled so we wait between 2 frames TX
                             || STATION_Utils::hasHeardSomeone() // Or we have heard someone
                     )) {
-                        LoRa_Utils::sendNewPacket("APRS", LoRa_Utils::generatePacketSameContent(packet));
+                        STATION_Utils::addToOutputPacketBuffer(buildPacketSameContentToTx(packet));
                         display_toggle(true);
                         lastScreenOn = millis();
                         lastTxFromIs = millis();
