@@ -121,9 +121,10 @@ namespace Utils {
 
             #ifdef BATTERY_PIN
             if (Config.sendBatteryVoltage) {
-                beaconPacket += " Batt=" + String(BATTERY_Utils::checkBattery(),2) + "V";
-                secondaryBeaconPacket += " Batt=" + String(BATTERY_Utils::checkBattery(),2) + "V";
-                sixthLine = "     (Batt=" + String(BATTERY_Utils::checkBattery(),2) + "V)";
+                String batteryInfo = "Batt=" + String(BATTERY_Utils::checkBattery(),2) + "V";
+                beaconPacket += (" " + batteryInfo);
+                secondaryBeaconPacket += (" " + batteryInfo);
+                sixthLine = "     ( " + batteryInfo + ")";
             }
             #endif
 
