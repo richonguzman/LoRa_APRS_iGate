@@ -132,7 +132,7 @@
 #endif
 #if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2) || defined(TTGO_T_LORA32_V2_1_915)
 #define INTERNAL_LED_PIN    25      // Green Led
-#define BATTERY_PIN         35
+#define BATTERY_PIN         35      // es 35 el led y 1 bateria?
 #endif
 #if defined(HELTEC_V3) || defined(HELTEC_WS)
 #define INTERNAL_LED_PIN    35
