@@ -160,7 +160,7 @@ namespace APRS_IS_Utils {
                     Sender = packet.substring(3, packet.indexOf(">"));
                     if (Sender != Config.callsign) {   // avoid listening yourself by digirepeating
                         STATION_Utils::updateLastHeard(Sender);
-                        Utils::typeOfPacket(aprsPacket, "LoRa-APRS");
+                        Utils::typeOfPacket(packet, "LoRa-APRS");
                         AddresseeAndMessage = packet.substring(packet.indexOf("::") + 2);
                         Addressee = AddresseeAndMessage.substring(0, AddresseeAndMessage.indexOf(":"));
                         Addressee.trim();
