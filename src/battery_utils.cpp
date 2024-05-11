@@ -25,25 +25,36 @@ namespace BATTERY_Utils {
         int sample;
         int sampleSum = 0;
         #ifdef ADC_CTRL
-        digitalWrite(ADC_CTRL, LOW);
+            #ifdef HELTEC_WIRELESS_TRACKER
+                digitalWrite(ADC_CTRL, HIGH);
+            #endif
+            #ifdef HELTEC_V3
+                digitalWrite(ADC_CTRL, LOW);
+            #endif
         #endif
+
         for (int i = 0; i < 100; i++) {
             #ifdef BATTERY_PIN
-            sample = analogRead(BATTERY_PIN);
+                sample = analogRead(BATTERY_PIN);
             #endif
             #if defined(ESP32_DIY_LoRa) || defined(ESP32_DIY_1W_LoRa)
-            sample = 0;
+                sample = 0;
             #endif
             sampleSum += sample;
             delayMicroseconds(50); 
         }
 
         #ifdef ADC_CTRL
-        digitalWrite(ADC_CTRL, HIGH);
-        double inputDivider = (1.0 / (390.0 + 100.0)) * 100.0;  // The voltage divider is a 390k + 100k resistor in series, 100k on the low side.
-        return (((sampleSum/100) * adcReadingTransformation) / inputDivider) + 0.285; // Yes, this offset is excessive, but the ADC on the ESP32s3 is quite inaccurate and noisy. Adjust to own measurements.
+            #ifdef HELTEC_WIRELESS_TRACKER
+                digitalWrite(ADC_CTRL, LOW);
+            #endif
+            #ifdef HELTEC_V3_GPS
+                digitalWrite(ADC_CTRL, HIGH);
+            #endif
+            double inputDivider = (1.0 / (390.0 + 100.0)) * 100.0;  // The voltage divider is a 390k + 100k resistor in series, 100k on the low side.
+            return (((sampleSum/100) * adcReadingTransformation) / inputDivider) + 0.285; // Yes, this offset is excessive, but the ADC on the ESP32s3 is quite inaccurate and noisy. Adjust to own measurements.
         #else
-        return (2 * (sampleSum/100) * adcReadingTransformation) + voltageDividerCorrection; // raw voltage without mapping
+            return (2 * (sampleSum/100) * adcReadingTransformation) + voltageDividerCorrection; // raw voltage without mapping
         #endif
 
         // return mapVoltage(voltage, 3.34, 4.71, 3.0, 4.2); // mapped voltage
