@@ -9,13 +9,13 @@
 //#define BME680Sensor
 
 #ifdef BME280Sensor
-#include <Adafruit_BME280.h>
+    #include <Adafruit_BME280.h>
 #endif
 #ifdef BMP280Sensor
-#include <Adafruit_BMP280.h>
+    #include <Adafruit_BMP280.h>
 #endif
 #ifdef BME680Sensor
-#include <Adafruit_BME680.h>
+    #include <Adafruit_BME680.h>
 #endif
 
 

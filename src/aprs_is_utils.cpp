@@ -26,7 +26,7 @@ extern uint32_t             lastRxTime;
 extern bool                 modemLoggedToAPRSIS;
 
 #ifdef ESP32_DIY_LoRa_A7670
-extern bool                 stationBeacon;
+    extern bool                 stationBeacon;
 #endif
 
 
@@ -80,17 +80,17 @@ namespace APRS_IS_Utils {
             aprsisState = "OFF";
         } else {
             #ifdef ESP32_DIY_LoRa_A7670
-            if (modemLoggedToAPRSIS) {
-                aprsisState = "OK";
-            } else {
-                aprsisState = "--";
-            }
+                if (modemLoggedToAPRSIS) {
+                    aprsisState = "OK";
+                } else {
+                    aprsisState = "--";
+                }
             #else
-            if (espClient.connected()) {
-                aprsisState = "OK";
-            } else {
-                aprsisState = "--";
-            }
+                if (espClient.connected()) {
+                    aprsisState = "OK";
+                } else {
+                    aprsisState = "--";
+                }
             #endif
             if(aprsisState == "--" && !Config.display.alwaysOn && Config.display.timeout != 0) {
                 display_toggle(true);
@@ -174,11 +174,11 @@ namespace APRS_IS_Utils {
                             }
                             lastScreenOn = millis();
                             #ifdef ESP32_DIY_LoRa_A7670
-                            stationBeacon = true;
-                            A7670_Utils::uploadToAPRSIS(aprsPacket);
-                            stationBeacon = false;
+                                stationBeacon = true;
+                                A7670_Utils::uploadToAPRSIS(aprsPacket);
+                                stationBeacon = false;
                             #else
-                            upload(aprsPacket);
+                                upload(aprsPacket);
                             #endif
                             Utils::println("---> Uploaded to APRS-IS");
                             show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
@@ -207,9 +207,9 @@ namespace APRS_IS_Utils {
                         }
                         String ackPacket = Config.callsign + ">APLRG1,TCPIP,qAC::" + Sender + ":" + ackMessage;
                         #ifdef ESP32_DIY_LoRa_A7670
-                        A7670_Utils::uploadToAPRSIS(ackPacket);
+                            A7670_Utils::uploadToAPRSIS(ackPacket);
                         #else
-                        upload(ackPacket);
+                            upload(ackPacket);
                         #endif                        
                         receivedMessage = AddresseeAndMessage.substring(AddresseeAndMessage.indexOf(":") + 1, AddresseeAndMessage.indexOf("{"));
                     } else {
@@ -225,9 +225,9 @@ namespace APRS_IS_Utils {
                         lastScreenOn = millis();
                         delay(500);
                         #ifdef ESP32_DIY_LoRa_A7670
-                        A7670_Utils::uploadToAPRSIS(queryAnswer);
+                            A7670_Utils::uploadToAPRSIS(queryAnswer);
                         #else
-                        upload(queryAnswer);
+                            upload(queryAnswer);
                         #endif                        
                         SYSLOG_Utils::log("APRSIS Tx", queryAnswer, 0, 0, 0);
                         fifthLine = "APRS-IS ----> APRS-IS";
@@ -255,16 +255,16 @@ namespace APRS_IS_Utils {
 
     void listenAPRSIS() {
         #ifdef ESP32_DIY_LoRa_A7670
-        A7670_Utils::listenAPRSIS();
+            A7670_Utils::listenAPRSIS();
         #else
-        if (espClient.connected()) {
-            if (espClient.available()) {
-                String aprsisPacket = espClient.readStringUntil('\r');
-                // Serial.println(aprsisPacket);
-                processAPRSISPacket(aprsisPacket);
-                lastRxTime = millis();
+            if (espClient.connected()) {
+                if (espClient.available()) {
+                    String aprsisPacket = espClient.readStringUntil('\r');
+                    // Serial.println(aprsisPacket);
+                    processAPRSISPacket(aprsisPacket);
+                    lastRxTime = millis();
+                }
             }
-        }
         #endif
     }
 

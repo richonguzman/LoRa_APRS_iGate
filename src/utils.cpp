@@ -70,12 +70,12 @@ namespace Utils {
     void setupDisplay() {
         setup_display();
         #ifdef INTERNAL_LED_PIN
-        digitalWrite(INTERNAL_LED_PIN,HIGH);
+            digitalWrite(INTERNAL_LED_PIN,HIGH);
         #endif
         Serial.println("\nStarting Station: " + Config.callsign + "   Version: " + versionDate);
         show_display(" LoRa APRS", "", "   ( iGATE & DIGI )", "", "", "Richonguzman / CA2RXU", "      " + versionDate, 4000);
         #ifdef INTERNAL_LED_PIN
-        digitalWrite(INTERNAL_LED_PIN,LOW);
+            digitalWrite(INTERNAL_LED_PIN,LOW);
         #endif
         firstLine   = Config.callsign;
         seventhLine = "     listening...";
@@ -120,12 +120,12 @@ namespace Utils {
             secondaryBeaconPacket += Config.beacon.comment;
 
             #ifdef BATTERY_PIN
-            if (Config.sendBatteryVoltage) {
-                String batteryInfo = "Batt=" + String(BATTERY_Utils::checkBattery(),2) + "V";
-                beaconPacket += (" " + batteryInfo);
-                secondaryBeaconPacket += (" " + batteryInfo);
-                sixthLine = "     ( " + batteryInfo + ")";
-            }
+                if (Config.sendBatteryVoltage) {
+                    String batteryInfo = "Batt=" + String(BATTERY_Utils::checkBattery(),2) + "V";
+                    beaconPacket += (" " + batteryInfo);
+                    secondaryBeaconPacket += (" " + batteryInfo);
+                    sixthLine = "     ( " + batteryInfo + ")";
+                }
             #endif
 
             if (Config.externalVoltageMeasurement) { 
@@ -138,9 +138,9 @@ namespace Utils {
                 show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING IGATE BEACON", 0); 
                 seventhLine = "     listening...";
                 #ifdef ESP32_DIY_LoRa_A7670
-                A7670_Utils::uploadToAPRSIS(beaconPacket);
+                    A7670_Utils::uploadToAPRSIS(beaconPacket);
                 #else
-                APRS_IS_Utils::upload(beaconPacket);
+                    APRS_IS_Utils::upload(beaconPacket);
                 #endif
             }
 

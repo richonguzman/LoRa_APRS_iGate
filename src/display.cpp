@@ -11,9 +11,9 @@
         TFT_eSPI tft = TFT_eSPI(); 
 
         #ifdef HELTEC_WIRELESS_TRACKER
-        #define bigSizeFont     2
-        #define smallSizeFont   1
-        #define lineSpacing     9
+            #define bigSizeFont     2
+            #define smallSizeFont   1
+            #define lineSpacing     9
         #endif
     #else
         #include <Adafruit_GFX.h>
@@ -74,19 +74,19 @@ void setup_display() {
 
 void display_toggle(bool toggle) {
     #ifdef HAS_DISPLAY
-    if (toggle) {
-        #ifdef HAS_TFT
-            digitalWrite(TFT_BL, HIGH);
-        #else
-            display.ssd1306_command(SSD1306_DISPLAYON);
-        #endif
-    } else {
-        #ifdef HAS_TFT
-            digitalWrite(TFT_BL, LOW);
-        #else
-            display.ssd1306_command(SSD1306_DISPLAYOFF);
-        #endif
-    }
+        if (toggle) {
+            #ifdef HAS_TFT
+                digitalWrite(TFT_BL, HIGH);
+            #else
+                display.ssd1306_command(SSD1306_DISPLAYON);
+            #endif
+        } else {
+            #ifdef HAS_TFT
+                digitalWrite(TFT_BL, LOW);
+            #else
+                display.ssd1306_command(SSD1306_DISPLAYOFF);
+            #endif
+        }
     #endif
 }
 

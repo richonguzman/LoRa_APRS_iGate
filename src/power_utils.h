@@ -3,9 +3,9 @@
 
 #include <Arduino.h>
 #if defined(HAS_AXP192) || defined(HAS_AXP2101)
-#include "XPowersLib.h"
+    #include "XPowersLib.h"
 #else
-#include <Wire.h>
+    #include <Wire.h>
 #endif
 
 

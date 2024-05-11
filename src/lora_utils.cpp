@@ -18,19 +18,19 @@ bool ignorePacket       = false;
 bool operationDone      = true;
 
 #ifdef HAS_SX1262
-SX1262 radio = new Module(RADIO_CS_PIN, RADIO_DIO1_PIN, RADIO_RST_PIN, RADIO_BUSY_PIN);
+    SX1262 radio = new Module(RADIO_CS_PIN, RADIO_DIO1_PIN, RADIO_RST_PIN, RADIO_BUSY_PIN);
 #endif
 
 #ifdef HAS_SX1268
-SX1268 radio = new Module(RADIO_CS_PIN, RADIO_DIO1_PIN, RADIO_RST_PIN, RADIO_BUSY_PIN);
+    SX1268 radio = new Module(RADIO_CS_PIN, RADIO_DIO1_PIN, RADIO_RST_PIN, RADIO_BUSY_PIN);
 #endif
 
 #ifdef HAS_SX1278
-SX1278 radio = new Module(RADIO_CS_PIN, RADIO_BUSY_PIN, RADIO_RST_PIN);
+    SX1278 radio = new Module(RADIO_CS_PIN, RADIO_BUSY_PIN, RADIO_RST_PIN);
 #endif
 
 #ifdef HAS_SX1276
-SX1276 radio = new Module(RADIO_CS_PIN, RADIO_BUSY_PIN, RADIO_RST_PIN);
+    SX1276 radio = new Module(RADIO_CS_PIN, RADIO_BUSY_PIN, RADIO_RST_PIN);
 #endif
 
 int rssi, freqError;
@@ -53,14 +53,14 @@ namespace LoRa_Utils {
             while (true);
         }
         #if defined(HAS_SX1278) || defined(HAS_SX1276)
-        radio.setDio0Action(setFlag, RISING);
+            radio.setDio0Action(setFlag, RISING);
         #endif
         #if defined(HAS_SX1262) || defined(HAS_SX1268)
-        if (!Config.lowPowerMode) {
-            radio.setDio1Action(setFlag);
-        } else {
-            radio.setDIOMapping(1, RADIOLIB_SX126X_IRQ_RX_DONE);
-        }
+            if (!Config.lowPowerMode) {
+                radio.setDio1Action(setFlag);
+            } else {
+                radio.setDIOMapping(1, RADIOLIB_SX126X_IRQ_RX_DONE);
+            }
         #endif
         radio.setSpreadingFactor(Config.loramodule.spreadingFactor);
         float signalBandwidth = Config.loramodule.signalBandwidth/1000;
@@ -69,17 +69,17 @@ namespace LoRa_Utils {
         radio.setCRC(true);
 
         #if defined(ESP32_DIY_1W_LoRa)
-        radio.setRfSwitchPins(RADIO_RXEN, RADIO_TXEN);
+            radio.setRfSwitchPins(RADIO_RXEN, RADIO_TXEN);
         #endif
 
         #if defined(HAS_SX1278) || defined(HAS_SX1276) || ESP32_DIY_1W_LoRa
-        state = radio.setOutputPower(Config.loramodule.power); // max value 20dB for 400M30S as it has Low Noise Amp
+            state = radio.setOutputPower(Config.loramodule.power); // max value 20dB for 400M30S as it has Low Noise Amp
         #endif   
         #if defined(HELTEC_V3)  || defined(HELTEC_WS) || defined(TTGO_T_Beam_V1_0_SX1268) || defined(TTGO_T_Beam_V1_2_SX1262)
-        state = radio.setOutputPower(Config.loramodule.power + 2); // values available: 10, 17, 22 --> if 20 in tracker_conf.json it will be updated to 22.
+            state = radio.setOutputPower(Config.loramodule.power + 2); // values available: 10, 17, 22 --> if 20 in tracker_conf.json it will be updated to 22.
         #endif
         #if defined(HAS_SX1262) || defined(HAS_SX1268)
-        radio.setRxBoostedGainMode(true);
+            radio.setRxBoostedGainMode(true);
         #endif
         if (state == RADIOLIB_ERR_NONE) {
             Utils::println("init : LoRa Module    ...     done!");
@@ -109,7 +109,7 @@ namespace LoRa_Utils {
         }
 
         #ifdef INTERNAL_LED_PIN
-        digitalWrite(INTERNAL_LED_PIN, HIGH);
+            digitalWrite(INTERNAL_LED_PIN, HIGH);
         #endif
         int state = radio.transmit("\x3c\xff\x01" + newPacket);
         transmissionFlag = true;
@@ -128,7 +128,7 @@ namespace LoRa_Utils {
             Utils::println(String(state));
         }
         #ifdef INTERNAL_LED_PIN
-        digitalWrite(INTERNAL_LED_PIN, LOW);
+            digitalWrite(INTERNAL_LED_PIN, LOW);
         #endif
         if (Config.loramodule.txFreq != Config.loramodule.rxFreq) {
             changeFreqRx();
