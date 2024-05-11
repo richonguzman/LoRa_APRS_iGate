@@ -78,6 +78,9 @@ namespace LoRa_Utils {
         #if defined(HELTEC_V3)  || defined(HELTEC_WS) || defined(TTGO_T_Beam_V1_0_SX1268) || defined(TTGO_T_Beam_V1_2_SX1262)
         state = radio.setOutputPower(Config.loramodule.power + 2); // values available: 10, 17, 22 --> if 20 in tracker_conf.json it will be updated to 22.
         #endif
+        #if defined(HAS_SX1262) || defined(HAS_SX1268)
+        radio.setRxBoostedGainMode(true);
+        #endif
         if (state == RADIOLIB_ERR_NONE) {
             Utils::println("init : LoRa Module    ...     done!");
         } else {
