@@ -47,7 +47,7 @@ namespace WIFI_Utils {
             WiFi.disconnect();
             delay(500);
             unsigned long start = millis();
-            show_display("", "", "Connecting to Wifi:", "", currentWiFi->ssid + " ...", 0);
+            show_display("", "Connecting to Wifi:", "", currentWiFi->ssid + " ...", 0);
             Serial.print("\nConnecting to WiFi '"); Serial.print(currentWiFi->ssid); Serial.println("' ...");
             WiFi.begin(currentWiFi->ssid.c_str(), currentWiFi->password.c_str());
             while (WiFi.status() != WL_CONNECTED && wifiCounter<myWiFiAPSize) {
@@ -72,7 +72,7 @@ namespace WIFI_Utils {
                     currentWiFi = &Config.wifiAPs[myWiFiAPIndex];
                     start = millis();
                     Serial.print("\nConnecting to WiFi '"); Serial.print(currentWiFi->ssid); Serial.println("' ...");
-                    show_display("", "", "Connecting to Wifi:", "", currentWiFi->ssid + " ...", 0);
+                    show_display("", "Connecting to Wifi:", "", currentWiFi->ssid + " ...", 0);
                     WiFi.disconnect();
                     WiFi.begin(currentWiFi->ssid.c_str(), currentWiFi->password.c_str());
                 }
@@ -84,17 +84,17 @@ namespace WIFI_Utils {
         if (WiFi.status() == WL_CONNECTED) {
             Serial.print("Connected as ");
             Serial.println(WiFi.localIP());
-            show_display("", "", "     Connected!!", "" , "     loading ...", 1000);
+            show_display("", "     Connected!!", "" , "     loading ...", 1000);
         } else if (WiFi.status() != WL_CONNECTED) {
             startAP = true;
 
             Serial.println("\nNot connected to WiFi! Starting Auto AP");
-            show_display("", "", " WiFi Not Connected!", "" , "     loading ...", 1000);
+            show_display("", " WiFi Not Connected!", "" , "     loading ...", 1000);
         }
         WiFiConnected = !startAP;
         if (startAP) {
             Serial.println("\nNot connected to WiFi! Starting Auto AP");
-            show_display("", "", "   Starting Auto AP", " Please connect to it " , "     loading ...", 1000);
+            show_display("", "   Starting Auto AP", " Please connect to it " , "     loading ...", 1000);
 
             startAutoAP();
         }

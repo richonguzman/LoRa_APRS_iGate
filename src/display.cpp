@@ -1,185 +1,367 @@
-#include <Adafruit_SSD1306.h>
-#include <Adafruit_GFX.h>
 #include <Wire.h>
 #include "configuration.h"
 #include "pins_config.h"
 #include "display.h"
 
+
 #ifdef HAS_DISPLAY
-Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RST);
+    #ifdef HAS_TFT
+        #include <TFT_eSPI.h>
+
+        TFT_eSPI tft = TFT_eSPI(); 
+
+        #ifdef HELTEC_WIRELESS_TRACKER
+        #define bigSizeFont     2
+        #define smallSizeFont   1
+        #define lineSpacing     9
+        #endif
+    #else
+        #include <Adafruit_GFX.h>
+        #include <Adafruit_SSD1306.h>
+        #if defined(HELTEC_V3)
+            #define OLED_DISPLAY_HAS_RST_PIN
+        #endif
+        Adafruit_SSD1306 display(128, 64, &Wire, OLED_RST);
+    #endif
 #endif
 
 extern Configuration Config;
 
+String oldHeader, oldFirstLine, oldSecondLine, oldThirdLine, oldFourthLine, oldFifthLine, oldSixthLine;
+
+void cleanTFT() {
+    #ifdef HAS_TFT
+        tft.fillScreen(TFT_BLACK);
+    #endif
+}
+
+bool shouldCleanTFT3(String header, String line1, String line2, String line3) {
+    if (oldHeader != header || oldFirstLine != line1 || oldSecondLine != line2 || oldThirdLine != line3) {
+        oldHeader       = header;
+        oldFirstLine    = line1;
+        oldSecondLine   = line2;
+        oldThirdLine    = line3;
+        return true;
+    } else {
+        return false;
+    }
+}
+
+bool shouldCleanTFT6(String header, String line1, String line2, String line3, String line4, String line5, String line6) {
+    if (oldHeader != header || oldFirstLine != line1 || oldSecondLine != line2 || oldThirdLine != line3 || oldFourthLine != line4 || oldFifthLine != line5 || oldSixthLine != line6) {
+        oldHeader       = header;
+        oldFirstLine    = line1;
+        oldSecondLine   = line2;
+        oldThirdLine    = line3;
+        oldFourthLine   = line4;
+        oldFifthLine    = line5;
+        oldSixthLine    = line6;
+        return true;
+    } else {
+        return false;
+    }
+}
+
 void setup_display() {
     #ifdef HAS_DISPLAY
-    Wire.begin(OLED_SDA, OLED_SCL);
+        delay(500);
+        #ifdef HAS_TFT
+            tft.init();
+            tft.begin();
+            tft.setRotation(1);
+            tft.setTextFont(0);
+            tft.fillScreen(TFT_BLACK);
+        #else    
+            #ifdef OLED_DISPLAY_HAS_RST_PIN
+                pinMode(OLED_RST, OUTPUT);
+                digitalWrite(OLED_RST, LOW);
+                delay(20);
+                digitalWrite(OLED_RST, HIGH);
+            #endif
+            Wire.begin(OLED_SDA, OLED_SCL);
 
-    if(!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) { 
-        Serial.println(F("SSD1306 allocation failed"));
-        for(;;); // Don't proceed, loop forever
-    }
-    if (Config.display.turn180) {
-        display.setRotation(2);
-    }
-    display.clearDisplay();
-    display.setTextColor(WHITE);
-    display.setTextSize(1);
-    display.setCursor(0, 0);
-    display.ssd1306_command(SSD1306_SETCONTRAST);
-    display.ssd1306_command(1);
-    display.display();
-    delay(1000);
+            if(!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) { 
+                Serial.println(F("SSD1306 allocation failed"));
+                for(;;); // Don't proceed, loop forever
+            }
+            if (Config.display.turn180) {
+                display.setRotation(2);
+            }
+            display.clearDisplay();
+            display.setTextColor(WHITE);
+            display.setTextSize(1);
+            display.setCursor(0, 0);
+            display.ssd1306_command(SSD1306_SETCONTRAST);
+            display.ssd1306_command(1);
+            display.display();
+        #endif
+        delay(1000);
     #endif
 }
 
 void display_toggle(bool toggle) {
     #ifdef HAS_DISPLAY
     if (toggle) {
-        display.ssd1306_command(SSD1306_DISPLAYON);
+        #ifdef HAS_TFT
+            digitalWrite(TFT_BL, HIGH);
+        #else
+            display.ssd1306_command(SSD1306_DISPLAYON);
+        #endif
     } else {
-        display.ssd1306_command(SSD1306_DISPLAYOFF);
+        #ifdef HAS_TFT
+            digitalWrite(TFT_BL, LOW);
+        #else
+            display.ssd1306_command(SSD1306_DISPLAYOFF);
+        #endif
     }
     #endif
 }
 
-void show_display(String line1, int wait) {
+void show_display(String header, int wait) {
     #ifdef HAS_DISPLAY
-    display.clearDisplay();
-    display.setTextColor(WHITE);
-    display.setTextSize(1);
-    display.setCursor(0, 0);
-    display.println(line1);
-    display.ssd1306_command(SSD1306_SETCONTRAST);
-    display.ssd1306_command(1);
-    display.display();
-    delay(wait);
+        #ifdef HAS_TFT
+            cleanTFT();
+            tft.setTextColor(TFT_WHITE,TFT_BLACK);
+            tft.setTextSize(bigSizeFont);
+            tft.setCursor(0, 0);
+            tft.print(header);
+        #else
+            display.clearDisplay();
+            display.setTextColor(WHITE);
+            display.setTextSize(1);
+            display.setCursor(0, 0);
+            display.println(header);
+            display.ssd1306_command(SSD1306_SETCONTRAST);
+            display.ssd1306_command(1);
+            display.display();
+        #endif
+        delay(wait);
     #endif
 }
 
-void show_display(String line1, String line2, int wait) {
+void show_display(String header, String line1, int wait) {
     #ifdef HAS_DISPLAY
-    display.clearDisplay();
-    display.setTextColor(WHITE);
-    display.setTextSize(1);
-    display.setCursor(0, 0);
-    display.println(line1);
-    display.setCursor(0, 8);
-    display.println(line2);
-    display.ssd1306_command(SSD1306_SETCONTRAST);
-    display.ssd1306_command(1);
-    display.display();
-    delay(wait);
+        #ifdef HAS_TFT
+            cleanTFT();
+            tft.setTextColor(TFT_WHITE,TFT_BLACK);
+            tft.setTextSize(bigSizeFont);
+            tft.setCursor(0, 0);
+            tft.print(header);
+            tft.setTextSize(smallSizeFont);
+            tft.setCursor(0, ((lineSpacing * 2) - 2));
+            tft.print(header);
+        #else
+            display.clearDisplay();
+            display.setTextColor(WHITE);
+            display.setTextSize(1);
+            display.setCursor(0, 0);
+            display.println(header);
+            display.setCursor(0, 8);
+            display.println(line1);
+            display.ssd1306_command(SSD1306_SETCONTRAST);
+            display.ssd1306_command(1);
+            display.display();
+        #endif
+        delay(wait);
     #endif
 }
 
-void show_display(String line1, String line2, String line3, int wait) {
+void show_display(String header, String line1, String line2, int wait) {
     #ifdef HAS_DISPLAY
-    display.clearDisplay();
-    display.setTextColor(WHITE);
-    display.setTextSize(1);
-    display.setCursor(0, 0);
-    display.println(line1);
-    display.setCursor(0, 8);
-    display.println(line2);
-    display.setCursor(0, 16);
-    display.println(line3);
-    display.ssd1306_command(SSD1306_SETCONTRAST);
-    display.ssd1306_command(1);
-    display.display();
-    delay(wait);
+        #ifdef HAS_TFT
+            cleanTFT();
+            tft.setTextColor(TFT_WHITE,TFT_BLACK);
+            tft.setTextSize(bigSizeFont);
+            tft.setCursor(0, 0);
+            tft.print(header);
+            tft.setTextSize(smallSizeFont);
+            tft.setCursor(0, ((lineSpacing * 2) - 2));
+            tft.print(line1);
+            tft.setCursor(0, ((lineSpacing * 3) - 2));
+            tft.print(line2);
+        #else
+            display.clearDisplay();
+            display.setTextColor(WHITE);
+            display.setTextSize(1);
+            display.setCursor(0, 0);
+            display.println(header);
+            display.setCursor(0, 8);
+            display.println(line1);
+            display.setCursor(0, 16);
+            display.println(line2);
+            display.ssd1306_command(SSD1306_SETCONTRAST);
+            display.ssd1306_command(1);
+            display.display();
+        #endif
+        delay(wait);
     #endif
 }
 
-void show_display(String line1, String line2, String line3, String line4, int wait) {
+void show_display(String header, String line1, String line2, String line3, int wait) {
     #ifdef HAS_DISPLAY
-    display.clearDisplay();
-    display.setTextColor(WHITE);
-    display.setTextSize(1);
-    display.setCursor(0, 0);
-    display.println(line1);
-    display.setCursor(0, 8);
-    display.println(line2);
-    display.setCursor(0, 16);
-    display.println(line3);
-    display.setCursor(0, 24);
-    display.println(line4);
-    display.ssd1306_command(SSD1306_SETCONTRAST);
-    display.ssd1306_command(1);
-    display.display();
-    delay(wait);
+        #ifdef HAS_TFT
+            if (shouldCleanTFT3(header, line1, line2, line3)) {
+                cleanTFT();
+            }
+            tft.setTextColor(TFT_WHITE,TFT_BLACK);
+            tft.setTextSize(bigSizeFont);
+            tft.setCursor(0, 0);
+            tft.print(header);
+            tft.setTextSize(smallSizeFont);
+            tft.setCursor(0, ((lineSpacing * 2) - 2));
+            tft.print(line1);
+            tft.setCursor(0, ((lineSpacing * 3) - 2));
+            tft.print(line2);
+            tft.setCursor(0, ((lineSpacing * 4) - 2));
+            tft.print(line3);
+        #else
+            display.clearDisplay();
+            display.setTextColor(WHITE);
+            display.setTextSize(1);
+            display.setCursor(0, 0);
+            display.println(header);
+            display.setCursor(0, 8);
+            display.println(line1);
+            display.setCursor(0, 16);
+            display.println(line2);
+            display.setCursor(0, 24);
+            display.println(line3);
+            display.ssd1306_command(SSD1306_SETCONTRAST);
+            display.ssd1306_command(1);
+            display.display();
+        #endif
+        delay(wait);
     #endif
 }
 
-void show_display(String line1, String line2, String line3, String line4, String line5, int wait) {
+void show_display(String header, String line1, String line2, String line3, String line4, int wait) {
     #ifdef HAS_DISPLAY
-    display.clearDisplay();
-    display.setTextColor(WHITE);
-    display.setTextSize(1);
-    display.setCursor(0, 0);
-    display.println(line1);
-    display.setCursor(0, 8);
-    display.println(line2);
-    display.setCursor(0, 16);
-    display.println(line3);
-    display.setCursor(0, 24);
-    display.println(line4);
-    display.setCursor(0, 32);
-    display.println(line5);
-    display.ssd1306_command(SSD1306_SETCONTRAST);
-    display.ssd1306_command(1);
-    display.display();
-    delay(wait);
+        #ifdef HAS_TFT
+            cleanTFT();
+            tft.setTextColor(TFT_WHITE,TFT_BLACK);
+            tft.setTextSize(bigSizeFont);
+            tft.setCursor(0, 0);
+            tft.print(header);
+            tft.setTextSize(smallSizeFont);
+            tft.setCursor(0, ((lineSpacing * 2) - 2));
+            tft.print(line1);
+            tft.setCursor(0, ((lineSpacing * 3) - 2));
+            tft.print(line2);
+            tft.setCursor(0, ((lineSpacing * 4) - 2));
+            tft.print(line3);
+            tft.setCursor(0, ((lineSpacing * 5) - 2));
+            tft.print(line4);
+        #else
+            display.clearDisplay();
+            display.setTextColor(WHITE);
+            display.setTextSize(1);
+            display.setCursor(0, 0);
+            display.println(header);
+            display.setCursor(0, 8);
+            display.println(line1);
+            display.setCursor(0, 16);
+            display.println(line2);
+            display.setCursor(0, 24);
+            display.println(line3);
+            display.setCursor(0, 32);
+            display.println(line4);
+            display.ssd1306_command(SSD1306_SETCONTRAST);
+            display.ssd1306_command(1);
+            display.display();
+        #endif
+        delay(wait);
     #endif
 }
 
-void show_display(String line1, String line2, String line3, String line4, String line5, String line6, int wait) {
+void show_display(String header, String line1, String line2, String line3, String line4, String line5, int wait) {
     #ifdef HAS_DISPLAY
-    display.clearDisplay();
-    display.setTextColor(WHITE);
-    display.setTextSize(1);
-    display.setCursor(0, 0);
-    display.println(line1);
-    display.setCursor(0, 8);
-    display.println(line2);
-    display.setCursor(0, 16);
-    display.println(line3);
-    display.setCursor(0, 24);
-    display.println(line4);
-    display.setCursor(0, 32);
-    display.println(line5);
-    display.setCursor(0, 40);
-    display.println(line6);
-    display.ssd1306_command(SSD1306_SETCONTRAST);
-    display.ssd1306_command(1);
-    display.display();
-    delay(wait);
+        #ifdef HAS_TFT
+            cleanTFT();
+            tft.setTextColor(TFT_WHITE,TFT_BLACK);
+            tft.setTextSize(bigSizeFont);
+            tft.setCursor(0, 0);
+            tft.print(header);
+            tft.setTextSize(smallSizeFont);
+            tft.setCursor(0, ((lineSpacing * 2) - 2));
+            tft.print(line1);
+            tft.setCursor(0, ((lineSpacing * 3) - 2));
+            tft.print(line2);
+            tft.setCursor(0, ((lineSpacing * 4) - 2));
+            tft.print(line3);
+            tft.setCursor(0, ((lineSpacing * 5) - 2));
+            tft.print(line4);
+            tft.setCursor(0, ((lineSpacing * 6) - 2));
+            tft.print(line5);
+        #else
+            display.clearDisplay();
+            display.setTextColor(WHITE);
+            display.setTextSize(1);
+            display.setCursor(0, 0);
+            display.println(header);
+            display.setCursor(0, 8);
+            display.println(line1);
+            display.setCursor(0, 16);
+            display.println(line2);
+            display.setCursor(0, 24);
+            display.println(line3);
+            display.setCursor(0, 32);
+            display.println(line4);
+            display.setCursor(0, 40);
+            display.println(line5);
+            display.ssd1306_command(SSD1306_SETCONTRAST);
+            display.ssd1306_command(1);
+            display.display();
+        #endif
+        delay(wait);
     #endif
 }
 
-void show_display(String line1, String line2, String line3, String line4, String line5, String line6, String line7, int wait) {
+void show_display(String header, String line1, String line2, String line3, String line4, String line5, String line6, int wait) {
     #ifdef HAS_DISPLAY
-    display.clearDisplay();
-    display.setTextColor(WHITE);
-    display.setTextSize(2);
-    display.setCursor(0, 0);
-    display.println(line1);
-    display.setTextSize(1);
-    display.setCursor(0, 16);
-    display.println(line2);
-    display.setCursor(0, 24);
-    display.println(line3);
-    display.setCursor(0, 32);
-    display.println(line4);
-    display.setCursor(0, 40);
-    display.println(line5);
-    display.setCursor(0, 48);
-    display.println(line6);
-    display.setCursor(0, 56);
-    display.println(line7);
-    display.ssd1306_command(SSD1306_SETCONTRAST);
-    display.ssd1306_command(1);
-    display.display();
-    delay(wait);
+        #ifdef HAS_TFT
+            if (shouldCleanTFT6(header, line1, line2, line3, line4, line5, line6)) {
+                cleanTFT();
+            }
+            tft.setTextColor(TFT_WHITE,TFT_BLACK);
+            tft.setTextSize(bigSizeFont);
+            tft.setCursor(0, 0);
+            tft.print(header);
+            tft.setTextSize(smallSizeFont);
+            tft.setCursor(0, ((lineSpacing * 2) - 2));
+            tft.print(line1);
+            tft.setCursor(0, ((lineSpacing * 3) - 2));
+            tft.print(line2);
+            tft.setCursor(0, ((lineSpacing * 4) - 2));
+            tft.print(line3);
+            tft.setCursor(0, ((lineSpacing * 5) - 2));
+            tft.print(line4);
+            tft.setCursor(0, ((lineSpacing * 6) - 2));
+            tft.print(line5);
+            tft.setCursor(0, ((lineSpacing * 7) - 2));
+            tft.print(line6);
+        #else
+            display.clearDisplay();
+            display.setTextColor(WHITE);
+            display.setTextSize(2);
+            display.setCursor(0, 0);
+            display.println(header);
+            display.setTextSize(1);
+            display.setCursor(0, 16);
+            display.println(line1);
+            display.setCursor(0, 24);
+            display.println(line2);
+            display.setCursor(0, 32);
+            display.println(line3);
+            display.setCursor(0, 40);
+            display.println(line4);
+            display.setCursor(0, 48);
+            display.println(line5);
+            display.setCursor(0, 56);
+            display.println(line6);
+            display.ssd1306_command(SSD1306_SETCONTRAST);
+            display.ssd1306_command(1);
+            display.display();
+        #endif
+        delay(wait);
     #endif
 }

@@ -34,7 +34,7 @@ namespace BME_Utils {
             status = bme.begin(0x76);  // Don't forget to join pins for righ direction on BME280!
             if (!status) {
                 Serial.println("Could not find a valid BME280 or BMP280 sensor, check wiring!");
-                show_display("ERROR", "", "BME/BMP sensor active", "but no sensor found...", "", 2000);
+                show_display("ERROR", "", "BME/BMP sensor active", "but no sensor found...", 2000);
             } else {
                 #ifdef BME280Sensor
                 bme.setSampling(Adafruit_BME280::MODE_FORCED,

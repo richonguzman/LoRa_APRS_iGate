@@ -145,6 +145,11 @@ namespace POWER_Utils {
         #ifdef ADC_CTRL
         pinMode(ADC_CTRL, OUTPUT);
         #endif
+
+        #ifdef HELTEC_WIRELESS_TRACKER
+        Wire.begin(BOARD_I2C_SDA, BOARD_I2C_SCL);
+        #endif
+        
         delay(1000);
     }
 

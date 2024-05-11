@@ -95,6 +95,16 @@
 #define A7670_RX_PIN    27
 #endif
 
+#ifdef HELTEC_WIRELESS_TRACKER
+#define RADIO_SCLK_PIN      9
+#define RADIO_MISO_PIN      11
+#define RADIO_MOSI_PIN      10
+#define RADIO_CS_PIN        8
+#define RADIO_RST_PIN       12
+#define RADIO_DIO1_PIN      14  // SX1262 IRQ
+#define RADIO_BUSY_PIN      13  // SX1262 BUSY
+#endif
+
 
 // OLED 
 #if defined(TTGO_T_LORA32_V2_1) || defined(ESP32_DIY_LoRa) || defined(ESP32_DIY_1W_LoRa) || defined(TTGO_T_Beam_V1_0) || defined(TTGO_T_Beam_V1_2) || defined(TTGO_T_Beam_V1_0_SX1268) || defined(TTGO_T_Beam_V1_2_SX1262) || defined(OE5HWN_MeshCom) || defined(ESP32_DIY_LoRa_A7670) || defined(TTGO_T_LORA32_V2_1_915)
@@ -125,7 +135,6 @@
 #define HAS_DISPLAY
 #endif
 
-
 // Leds and other stuff
 #ifdef HELTEC_HTCT62
 #define BATTERY_PIN         1
@@ -140,6 +149,7 @@
 #define VEXT_CTRL           36
 #define ADC_CTRL            37
 #endif
+
 #if defined(ESP32_DIY_LoRa) || defined(ESP32_DIY_1W_LoRa)
 #define INTERNAL_LED_PIN    2
 #endif
@@ -148,7 +158,14 @@
 #define BATTERY_PIN         35
 #endif
 
-
+#ifdef HELTEC_WIRELESS_TRACKER
+#define INTERNAL_LED_PIN    18
+#define BATTERY_PIN         1
+#define ADC_CTRL            2   // HELTEC Wireless Tracker ADC_CTRL = HIGH powers the voltage divider to read BatteryPin. Only on V05 = V1.1
+#define VEXT_CTRL           3   // To turn on GPS and TFT
+#define BOARD_I2C_SDA       7
+#define BOARD_I2C_SCL       6
+#endif
 
 #ifdef ESP32_C3_DIY_LoRa
 #define OLED_SDA         8
