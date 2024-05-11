@@ -48,6 +48,7 @@ ____________________________________________________
 ____________________________________________________
 ## Timeline (Versions):
 
+- 2024.05.11 HELTEC Wireless Tracker support added.
 - 2024.04.23 T-LoRa32 v1.6/v2.1 with 915MHz support added.
 - 2024.04.23 ESP32 + 4G/LTE MODEM A7670SA + LoRa (SX1278) support added.
 - 2024.04.22 Wemos Lolin32 OLED DIY LoRa support added .
