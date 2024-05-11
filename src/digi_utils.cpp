@@ -65,7 +65,7 @@ namespace DIGI_Utils {
                 Sender = packet.substring(3, packet.indexOf(">"));
                 if (Sender != Config.callsign) {
                     STATION_Utils::updateLastHeard(Sender);
-                    Utils::typeOfPacket(packet, "Digi");
+                    Utils::typeOfPacket(packet.substring(3), "Digi");
                     AddresseeAndMessage = packet.substring(packet.indexOf("::") + 2);
                     Addressee = AddresseeAndMessage.substring(0, AddresseeAndMessage.indexOf(":"));
                     Addressee.trim();
