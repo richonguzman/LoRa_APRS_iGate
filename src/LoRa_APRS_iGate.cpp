@@ -34,7 +34,7 @@ ________________________________________________________________________________
 #include "display.h"
 #include "utils.h"
 #ifdef ESP32_DIY_LoRa_A7670
-#include "A7670_utils.h"
+    #include "A7670_utils.h"
 #endif
 
 
@@ -87,82 +87,82 @@ void setup() {
     iGateBeaconPacket = GPS_Utils::generateBeacon();
     iGateLoRaBeaconPacket = GPS_Utils::generateiGateLoRaBeacon();
 
-#ifdef HELTEC_HTCT62
-    if (Config.lowPowerMode) {
-        gpio_wakeup_enable(GPIO_NUM_3, GPIO_INTR_HIGH_LEVEL);
-        esp_deep_sleep_enable_gpio_wakeup(GPIO_NUM_3, ESP_GPIO_WAKEUP_GPIO_HIGH);
+    #ifdef HELTEC_HTCT62
+        if (Config.lowPowerMode) {
+            gpio_wakeup_enable(GPIO_NUM_3, GPIO_INTR_HIGH_LEVEL);
+            esp_deep_sleep_enable_gpio_wakeup(GPIO_NUM_3, ESP_GPIO_WAKEUP_GPIO_HIGH);
 
-        long lastBeacon = 0;
-
-        LoRa_Utils::startReceive();
-
-        while (true) {
-            auto wakeup_reason = esp_sleep_get_wakeup_cause();
-
-            if (wakeup_reason == 7) { // packet received
-                Serial.println("Received packet");
-
-                String packet = LoRa_Utils::receivePacket();
-
-                Serial.println(packet);
-
-                if (Config.digi.mode == 2) { // If Digi enabled
-                    DIGI_Utils::processLoRaPacket(packet); // Send received packet to Digi
-                }
-
-                if (packet.indexOf(Config.callsign + ":?APRSELP{") != -1) { // Send `?APRSELP` to exit low power
-                    Serial.println("Got ?APRSELP message, exiting from low power mode");
-                    break;
-                };
-            }
-
-            long time = esp_timer_get_time() / 1000000;
-
-            if (lastBeacon == 0 || time - lastBeacon >= Config.beacon.interval * 60) {
-                Serial.println("Sending beacon");
-
-                String comment = Config.beacon.comment;
-
-                if (Config.sendBatteryVoltage) {
-                    comment += " Batt=" + String(BATTERY_Utils::checkBattery(),2) + "V";
-                }
-
-                if (Config.externalVoltageMeasurement) {
-                    comment += " Ext=" + String(BATTERY_Utils::checkExternalVoltage(),2) + "V";
-                }
-
-                STATION_Utils::addToOutputPacketBuffer(iGateLoRaBeaconPacket + comment);
-                //LoRa_Utils::sendNewPacket("APRS", iGateLoRaBeaconPacket + comment);
-            
-                lastBeacon = time;
-            }
+            long lastBeacon = 0;
 
             LoRa_Utils::startReceive();
 
-            Serial.println("Sleeping");
+            while (true) {
+                auto wakeup_reason = esp_sleep_get_wakeup_cause();
 
-            long sleep = (Config.beacon.interval * 60) - (time - lastBeacon);
+                if (wakeup_reason == 7) { // packet received
+                    Serial.println("Received packet");
 
-            Serial.flush();
+                    String packet = LoRa_Utils::receivePacket();
 
-            esp_sleep_enable_timer_wakeup(sleep * 1000000);
-            esp_light_sleep_start();
+                    Serial.println(packet);
 
-            Serial.println("Waked up");
+                    if (Config.digi.mode == 2) { // If Digi enabled
+                        DIGI_Utils::processLoRaPacket(packet); // Send received packet to Digi
+                    }
+
+                    if (packet.indexOf(Config.callsign + ":?APRSELP{") != -1) { // Send `?APRSELP` to exit low power
+                        Serial.println("Got ?APRSELP message, exiting from low power mode");
+                        break;
+                    };
+                }
+
+                long time = esp_timer_get_time() / 1000000;
+
+                if (lastBeacon == 0 || time - lastBeacon >= Config.beacon.interval * 60) {
+                    Serial.println("Sending beacon");
+
+                    String comment = Config.beacon.comment;
+
+                    if (Config.sendBatteryVoltage) {
+                        comment += " Batt=" + String(BATTERY_Utils::checkBattery(),2) + "V";
+                    }
+
+                    if (Config.externalVoltageMeasurement) {
+                        comment += " Ext=" + String(BATTERY_Utils::checkExternalVoltage(),2) + "V";
+                    }
+
+                    STATION_Utils::addToOutputPacketBuffer(iGateLoRaBeaconPacket + comment);
+                    //LoRa_Utils::sendNewPacket("APRS", iGateLoRaBeaconPacket + comment);
+                
+                    lastBeacon = time;
+                }
+
+                LoRa_Utils::startReceive();
+
+                Serial.println("Sleeping");
+
+                long sleep = (Config.beacon.interval * 60) - (time - lastBeacon);
+
+                Serial.flush();
+
+                esp_sleep_enable_timer_wakeup(sleep * 1000000);
+                esp_light_sleep_start();
+
+                Serial.println("Waked up");
+            }
+
+            Config.loramodule.rxActive = false;
         }
-
-        Config.loramodule.rxActive = false;
-    }
-#endif
+    #endif
 
     WIFI_Utils::setup();
     SYSLOG_Utils::setup();
     BME_Utils::setup();
     WEB_Utils::setup();
     TNC_Utils::setup();
-#ifdef ESP32_DIY_LoRa_A7670
-    A7670_Utils::setup();
-#endif
+    #ifdef ESP32_DIY_LoRa_A7670
+        A7670_Utils::setup();
+    #endif
 }
 
 void loop() {
@@ -183,13 +183,13 @@ void loop() {
     // Utils::checkWiFiInterval();
 
     #ifdef ESP32_DIY_LoRa_A7670
-    if (Config.aprs_is.active && !modemLoggedToAPRSIS) {
-        A7670_Utils::APRS_IS_connect();
-    }
+        if (Config.aprs_is.active && !modemLoggedToAPRSIS) {
+            A7670_Utils::APRS_IS_connect();
+        }
     #else
-    if (Config.aprs_is.active && !espClient.connected()) {
-        APRS_IS_Utils::connect();
-    }
+        if (Config.aprs_is.active && !espClient.connected()) {
+            APRS_IS_Utils::connect();
+        }
     #endif
 
     TNC_Utils::loop();
