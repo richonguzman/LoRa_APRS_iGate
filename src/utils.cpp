@@ -113,8 +113,8 @@ namespace Utils {
                 beaconPacket += sensorData;
                 secondaryBeaconPacket += sensorData;
             } else if (Config.bme.active && !bmeSensorFound) {
-                beaconPacket += ".../...g...t...r...p...P...h..b.....BME MODULE NOT FOUND! ";
-                secondaryBeaconPacket += ".../...g...t...r...p...P...h..b.....BME MODULE NOT FOUND! ";
+                beaconPacket += ".../...g...t...r...p...P...h..b.....";
+                secondaryBeaconPacket += ".../...g...t...r...p...P...h..b.....";
             }
             beaconPacket += Config.beacon.comment;
             secondaryBeaconPacket += Config.beacon.comment;
