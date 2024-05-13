@@ -77,6 +77,9 @@ function loadSettings(settings) {
     document.getElementById("callsign").value = settings.callsign;
     // document.getElementById("stationMode").value = settings.stationMode;
     document.getElementById("bme.active").checked = settings.bme.active;
+    document.getElementById("bme.heightCorrection").value = settings.bme.heightCorrection;
+    document.getElementById("bme.temperatureCorrection").value = settings.bme.temperatureCorrection;
+    
     document.getElementById("beacon.comment").value = settings.beacon.comment;
     document.getElementById("beacon.symbol").value = settings.beacon.symbol;
     document.getElementById("beacon.overlay").value = settings.beacon.overlay;
