@@ -41,7 +41,11 @@ void setup_display() {
         #ifdef HAS_TFT
             tft.init();
             tft.begin();
-            tft.setRotation(1);
+            if (Config.display.turn180) {
+                    tft.setRotation(3);
+            } else {
+                tft.setRotation(1);
+            }
             tft.setTextFont(0);
             tft.fillScreen(TFT_BLACK);
         #else    
