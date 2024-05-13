@@ -41,7 +41,7 @@ ________________________________________________________________________________
 Configuration   Config;
 WiFiClient      espClient;
 
-String          versionDate             = "2024.05.11";
+String          versionDate             = "2024.05.13";
 uint8_t         myWiFiAPIndex           = 0;
 int             myWiFiAPSize            = Config.wifiAPs.size();
 WiFi_AP         *currentWiFi            = &Config.wifiAPs[myWiFiAPIndex];
@@ -61,8 +61,6 @@ bool            WiFiAutoAPStarted       = false;
 long            WiFiAutoAPTime          = false;
 
 uint32_t        lastBatteryCheck        = 0;
-
-uint32_t        bmeLastReading          = -60000;
 
 String          batteryVoltage;
 

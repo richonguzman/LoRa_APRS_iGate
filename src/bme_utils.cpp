@@ -4,66 +4,118 @@
 #include "display.h"
 
 #define SEALEVELPRESSURE_HPA (1013.25)
-#define HEIGHT_CORRECTION 0             // in meters
 #define CORRECTION_FACTOR (8.2296)      // for meters
 
 extern Configuration    Config;
 extern String           fifthLine;
-extern uint32_t         bmeLastReading;
 
 float newHum, newTemp, newPress, newGas;
 
-bool bmeSensorFound     = false;
+int         wxModuleType        = 0;
+uint8_t     wxModuleAddress     = 0x00;
+
+Adafruit_BME280     bme280;
+Adafruit_BME680     bme680;
+#ifdef HELTEC_V3_GPS
+Adafruit_BMP280     bmp280(&Wire1);
+#else
+Adafruit_BMP280     bmp280;
+#endif
+
 
 
 namespace BME_Utils {
 
-    #ifdef BME280Sensor
-        Adafruit_BME280   bme;
-    #endif
-    #ifdef BMP280Sensor
-        Adafruit_BMP280   bme;
-    #endif
-    #ifdef BME680Sensor
-        Adafruit_BME680 bme; 
-    #endif
+    void getWxModuleAddres() {
+        uint8_t err, addr;
+        for(addr = 1; addr < 0x7F; addr++) {
+            #ifdef HELTEC_V3
+            Wire1.beginTransmission(addr);
+            err = Wire1.endTransmission();
+            #else
+            Wire.beginTransmission(addr);
+            err = Wire.endTransmission();
+            #endif
+            if (err == 0) {
+                if (addr == 0x76 || addr == 0x77) {
+                    wxModuleAddress = addr;
+                    return;
+                }
+            }
+        }
+    }
 
     void setup() {
         if (Config.bme.active) {
-            bool status;
-            status = bme.begin(0x76);  // Don't forget to join pins for righ direction on BME280!
-            if (!status) {
-                Serial.println("Could not find a valid BME280 or BMP280 sensor, check wiring!");
-                show_display("ERROR", "", "BME/BMP sensor active", "but no sensor found...", 2000);
-            } else {
-                #ifdef BME280Sensor
-                    bme.setSampling(Adafruit_BME280::MODE_FORCED,
-                                    Adafruit_BME280::SAMPLING_X1,
-                                    Adafruit_BME280::SAMPLING_X1,
-                                    Adafruit_BME280::SAMPLING_X1,
-                                    Adafruit_BME280::FILTER_OFF
-                                    );
-                    Serial.println("init : BME280 Module  ...     done!");
+            getWxModuleAddres();
+            if (wxModuleAddress != 0x00) {
+                bool wxModuleFound = false;
+                #ifdef HELTEC_V3
+                    if (bme280.begin(wxModuleAddress, &Wire1)) {
+                        Serial.println("BME280 sensor found");
+                        wxModuleType = 1;
+                        wxModuleFound = true;
+                    } 
+                    if (!wxModuleFound) {
+                        if (bme680.begin(wxModuleAddress, &Wire1)) {
+                            Serial.println("BME680 sensor found");
+                            wxModuleType = 3;
+                            wxModuleFound = true;
+                        }
+                    }
+                #else
+                    if (bme280.begin(wxModuleAddress)) {
+                        Serial.println("BME280 sensor found");
+                        wxModuleType = 1;
+                        wxModuleFound = true;
+                    }
+                    if (!wxModuleFound) {
+                        if (bme680.begin(wxModuleAddress)) {
+                            Serial.println("BME680 sensor found");
+                            wxModuleType = 3;
+                            wxModuleFound = true;
+                        }
+                    }
                 #endif
-                #ifdef BMP280Sensor
-                    bme.setSampling(Adafruit_BMP280::MODE_FORCED,
-                                    Adafruit_BMP280::SAMPLING_X1,
-                                    Adafruit_BMP280::SAMPLING_X1,
-                                    Adafruit_BMP280::FILTER_OFF
-                                    ); 
-                    Serial.println("init : BMP280 Module  ...     done!");
-                #endif
-                #ifdef BME680Sensor
-                    bme.setTemperatureOversampling(BME680_OS_1X);
-                    bme.setHumidityOversampling(BME680_OS_1X);
-                    bme.setPressureOversampling(BME680_OS_1X);
-                    bme.setIIRFilterSize(BME680_FILTER_SIZE_0);
-                    Serial.println("init : BME680 Module  ...     done!");
-                #endif
-                bmeSensorFound = true;
-            }
-        } else {
-            Serial.println("(BME/BMP sensor not 'active' in 'igate_conf.json')");
+                if (!wxModuleFound) {
+                    if (bmp280.begin(wxModuleAddress)) {
+                        Serial.println("BMP280 sensor found");
+                        wxModuleType = 2;
+                        wxModuleFound = true;
+                    }
+                }
+                if (!wxModuleFound) {
+                    show_display("ERROR", "", "BME/BMP sensor active", "but no sensor found...", 2000);
+                    Serial.println("BME/BMP sensor Active in config but not found! Check Wiring");
+                } else {
+                    switch (wxModuleType) {
+                        case 1:
+                            bme280.setSampling(Adafruit_BME280::MODE_FORCED,
+                                        Adafruit_BME280::SAMPLING_X1,
+                                        Adafruit_BME280::SAMPLING_X1,
+                                        Adafruit_BME280::SAMPLING_X1,
+                                        Adafruit_BME280::FILTER_OFF
+                                        );
+                            Serial.println("BME280 Module init done!");
+                            break;
+                        case 2:
+                            bmp280.setSampling(Adafruit_BMP280::MODE_FORCED,
+                                        Adafruit_BMP280::SAMPLING_X1,
+                                        Adafruit_BMP280::SAMPLING_X1,
+                                        Adafruit_BMP280::FILTER_OFF
+                                        ); 
+                            Serial.println("BMP280 Module init done!");
+                            break;
+                        case 3:
+                            bme680.setTemperatureOversampling(BME680_OS_1X);
+                            bme680.setHumidityOversampling(BME680_OS_1X);
+                            bme680.setPressureOversampling(BME680_OS_1X);
+                            bme680.setIIRFilterSize(BME680_FILTER_SIZE_0);
+                            Serial.println("BMP680 Module init done!");
+                            break;
+                    }
+                }
+            }            
         }
     }
 
@@ -133,34 +185,31 @@ namespace BME_Utils {
 
     String readDataSensor() {
         String wx, tempStr, humStr, presStr;
-
-        uint32_t lastReading = millis() - bmeLastReading;
-        if (lastReading > 60*1000) {
-            #if defined(BME280Sensor) || defined(BMP280Sensor)
-                bme.takeForcedMeasurement();
-                newTemp   = bme.readTemperature();
-                newPress  = (bme.readPressure() / 100.0F);
-                #ifdef BME280Sensor
-                    newHum = bme.readHumidity();
-                #endif
-                #ifdef BMP280Sensor
-                    newHum = 0;
-                #endif
-            #endif
-
-            #ifdef BME680Sensor
-                bme.performReading();
+        switch (wxModuleType) {
+            case 1: // BME280
+                bme280.takeForcedMeasurement();
+                newTemp     = bme280.readTemperature();
+                newPress    = (bme280.readPressure() / 100.0F);
+                newHum      = bme280.readHumidity();
+                break;
+            case 2: // BMP280
+                bmp280.takeForcedMeasurement();
+                newTemp     = bmp280.readTemperature();
+                newPress    = (bmp280.readPressure() / 100.0F);
+                newHum      = 0;
+                break;
+            case 3: // BME680
+                bme680.performReading();
                 delay(50);
-                if (bme.endReading()) {
-                    newTemp     = bme.temperature;
-                    newPress    = (bme.pressure / 100.0F);
-                    newHum      = bme.humidity;
-                    newGas      = bme.gas_resistance / 1000.0; // in Kilo ohms
+                if (bme680.endReading()) {
+                    newTemp     = bme680.temperature;
+                    newPress    = (bme680.pressure / 100.0F);
+                    newHum      = bme680.humidity;
+                    newGas      = bme680.gas_resistance / 1000.0; // in Kilo ohms
                 }
-            #endif
-            bmeLastReading = millis();
-        }
-    
+                break;
+        }    
+
         if (isnan(newTemp) || isnan(newHum) || isnan(newPress)) {
             Serial.println("BME/BMP Module data failed");
             wx = ".../...g...t...r...p...P...h..b.....";
@@ -168,18 +217,17 @@ namespace BME_Utils {
             return wx;
         } else {
             tempStr = generateTempString((newTemp * 1.8) + 32);
-            #if defined(BME280Sensor) || defined(BME680Sensor)
+            if (wxModuleType == 1 || wxModuleType == 3) {
                 humStr  = generateHumString(newHum);
-            #endif
-            #ifdef BMP280Sensor
+            } else if (wxModuleType == 2) {
                 humStr  = "..";
-            #endif
-            presStr = generatePresString(newPress + (HEIGHT_CORRECTION/CORRECTION_FACTOR));
+            }
+            presStr = generatePresString(newPress + (Config.bme.heightCorrection/CORRECTION_FACTOR));
             fifthLine = "BME-> " + String(int(newTemp))+"C " + humStr + "% " + presStr.substring(0,4) + "hPa";
             wx = ".../...g...t" + tempStr + "r...p...P...h" + humStr + "b" + presStr;
-            #ifdef BME680Sensor
-                wx += "Gas: " + String(newGas) + "Kohms ";
-            #endif
+            if (wxModuleType == 3) {
+                wx += "Gas: " + String(newGas) + "Kohms";
+            }
             return wx;
         }
     }

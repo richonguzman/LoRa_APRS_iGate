@@ -90,6 +90,8 @@ public:
 class BME {
 public:
     bool    active;
+    int     heightCorrection;
+    float   temperatureCorrection;
 };
 
 class OTA {

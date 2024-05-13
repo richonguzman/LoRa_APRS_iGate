@@ -36,7 +36,7 @@ extern String               distance;
 extern uint32_t             lastWiFiCheck;
 extern bool                 WiFiConnect;
 extern bool                 WiFiConnected;
-extern bool                 bmeSensorFound;
+extern int                  wxModuleType;
 
 
 namespace Utils {
@@ -108,11 +108,11 @@ namespace Utils {
 
             activeStations();
 
-            if (Config.bme.active && bmeSensorFound) {
+            if (Config.bme.active && wxModuleType != 0) {
                 String sensorData = BME_Utils::readDataSensor();
                 beaconPacket += sensorData;
                 secondaryBeaconPacket += sensorData;
-            } else if (Config.bme.active && !bmeSensorFound) {
+            } else if (Config.bme.active && wxModuleType == 0) {
                 beaconPacket += ".../...g...t...r...p...P...h..b.....";
                 secondaryBeaconPacket += ".../...g...t...r...p...P...h..b.....";
             }

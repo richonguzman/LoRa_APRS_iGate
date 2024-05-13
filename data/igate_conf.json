@@ -55,8 +55,10 @@
         "port": 514
     },
     "bme": {
-        "active": false
-    },
+		"active": false,
+		"heightCorrection": 0,
+		"temperatureCorrection": 0.0
+	},
     "ota": {
         "username": "",
         "password": ""
