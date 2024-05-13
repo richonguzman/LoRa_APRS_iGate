@@ -90,7 +90,7 @@ void setup() {
     iGateLoRaBeaconPacket = GPS_Utils::generateiGateLoRaBeacon();
 
     #ifdef STARTUP_DELAY    // (TEST) just to wait for WiFi init of Routers
-    show_display("", "STARTUP DELAY ...", "", "", 0);
+    show_display("", "  STARTUP DELAY ...", "", "", 0);
     delay(STARTUP_DELAY * 60 * 1000);
     #endif
 
