@@ -216,18 +216,12 @@ namespace BME_Utils {
             fifthLine = "";
             return wx;
         } else {
-            //
-            Serial.print("correccion temperatura: "); Serial.println(Config.bme.temperatureCorrection);
-            //
             tempStr = generateTempString(((newTemp + Config.bme.temperatureCorrection) * 1.8) + 32);
             if (wxModuleType == 1 || wxModuleType == 3) {
                 humStr  = generateHumString(newHum);
             } else if (wxModuleType == 2) {
                 humStr  = "..";
             }
-            //
-            Serial.print("correccion altura: "); Serial.println(Config.bme.heightCorrection);
-            //
             presStr = generatePresString(newPress + (Config.bme.heightCorrection/CORRECTION_FACTOR));
             fifthLine = "BME-> " + String(int(newTemp))+"C " + humStr + "% " + presStr.substring(0,4) + "hPa";
             wx = ".../...g...t" + tempStr + "r...p...P...h" + humStr + "b" + presStr;

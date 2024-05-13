@@ -78,7 +78,7 @@ function loadSettings(settings) {
     // document.getElementById("stationMode").value = settings.stationMode;
     document.getElementById("bme.active").checked = settings.bme.active;
     document.getElementById("bme.heightCorrection").value = settings.bme.heightCorrection;
-    document.getElementById("bme.temperatureCorrection").value = settings.bme.temperatureCorrection;
+    document.getElementById("bme.temperatureCorrection").value = settings.bme.temperatureCorrection.toFixed(1);
     
     document.getElementById("beacon.comment").value = settings.beacon.comment;
     document.getElementById("beacon.symbol").value = settings.beacon.symbol;
