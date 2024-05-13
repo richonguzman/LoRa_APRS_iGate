@@ -183,13 +183,9 @@ void loop() {
     // Utils::checkWiFiInterval();
 
     #ifdef ESP32_DIY_LoRa_A7670
-        if (Config.aprs_is.active && !modemLoggedToAPRSIS) {
-            A7670_Utils::APRS_IS_connect();
-        }
+        if (Config.aprs_is.active && !modemLoggedToAPRSIS) A7670_Utils::APRS_IS_connect();
     #else
-        if (Config.aprs_is.active && !espClient.connected()) {
-            APRS_IS_Utils::connect();
-        }
+        if (Config.aprs_is.active && !espClient.connected()) APRS_IS_Utils::connect();
     #endif
 
     TNC_Utils::loop();
