@@ -77,6 +77,8 @@ bool            modemLoggedToAPRSIS     = false;
 
 String firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, iGateBeaconPacket, iGateLoRaBeaconPacket;
 
+//#define STARTUP_DELAY 5 //min
+
 void setup() {
     Serial.begin(115200);
     POWER_Utils::setup();
@@ -86,6 +88,11 @@ void setup() {
     Utils::validateFreqs();
     iGateBeaconPacket = GPS_Utils::generateBeacon();
     iGateLoRaBeaconPacket = GPS_Utils::generateiGateLoRaBeacon();
+
+    #ifdef STARTUP_DELAY    // (TEST) just to wait for WiFi init of Routers
+    show_display("", "STARTUP DELAY ...", "", "", 0);
+    delay(STARTUP_DELAY * 60 * 1000);
+    #endif
 
     #ifdef HELTEC_HTCT62
         if (Config.lowPowerMode) {
