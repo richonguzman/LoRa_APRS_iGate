@@ -5,7 +5,7 @@
 
 extern Configuration  Config;
 extern WiFiClient     espClient;
-String                distance;
+String                distance, iGateBeaconPacket, iGateLoRaBeaconPacket;
 
 
 namespace GPS_Utils {
@@ -47,17 +47,14 @@ namespace GPS_Utils {
         return encodedData;
     }
 
-    String generateBeacon() {
-        String beaconPacket = Config.callsign + ">APLRG1," + Config.beacon.path;
-
-        if (Config.aprs_is.active && Config.digi.mode == 0) { // If APRSIS enabled and Digi disabled
-            beaconPacket += ",qAC";
-        } 
-        return beaconPacket + ":!" + encodeGPS(Config.beacon.latitude, Config.beacon.longitude, Config.beacon.overlay, Config.beacon.symbol);;
-    }
-
-    String generateiGateLoRaBeacon() {
-        return Config.callsign + ">APLRG1," + Config.beacon.path + ":!" + encodeGPS(Config.beacon.latitude, Config.beacon.longitude, Config.beacon.overlay, Config.beacon.symbol);
+    void generateBeacons() {
+        String beaconPacket = Config.callsign + ">APLRG1";
+        if (Config.beacon.path != "") {
+            beaconPacket += "," + Config.beacon.path;
+        }
+        String encodedGPS = encodeGPS(Config.beacon.latitude, Config.beacon.longitude, Config.beacon.overlay, Config.beacon.symbol);
+        iGateBeaconPacket = beaconPacket + ",qAC:!" + encodedGPS;
+        iGateLoRaBeaconPacket = beaconPacket + ":!" + encodedGPS;
     }
 
     double calculateDistanceTo(double latitude, double longitude) {

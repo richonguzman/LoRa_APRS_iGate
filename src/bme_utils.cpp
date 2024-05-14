@@ -6,13 +6,14 @@
 #define SEALEVELPRESSURE_HPA (1013.25)
 #define CORRECTION_FACTOR (8.2296)      // for meters
 
-extern Configuration    Config;
-extern String           fifthLine;
-
-float newHum, newTemp, newPress, newGas;
+extern Configuration            Config;
+extern String                   fifthLine;
 
 int         wxModuleType        = 0;
 uint8_t     wxModuleAddress     = 0x00;
+
+float newHum, newTemp, newPress, newGas;
+
 
 Adafruit_BME280     bme280;
 Adafruit_BME680     bme680;
@@ -21,7 +22,6 @@ Adafruit_BMP280     bmp280(&Wire1);
 #else
 Adafruit_BMP280     bmp280;
 #endif
-
 
 
 namespace BME_Utils {

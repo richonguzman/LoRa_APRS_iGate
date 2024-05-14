@@ -20,8 +20,6 @@ extern String           fifthLine;
 extern String           sixthLine;
 extern String           seventhLine;
 
-extern std::vector<String>  outputPacketBuffer;
-
 
 namespace DIGI_Utils {
 

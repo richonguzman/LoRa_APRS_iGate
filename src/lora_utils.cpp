@@ -10,7 +10,6 @@
 extern Configuration    Config;
 extern uint32_t         lastRxTime;
 
-
 extern std::vector<ReceivedPacket> receivedPackets;
 
 bool transmissionFlag   = true;

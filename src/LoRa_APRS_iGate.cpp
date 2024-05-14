@@ -37,41 +37,31 @@ ________________________________________________________________________________
     #include "A7670_utils.h"
 #endif
 
-
+String          versionDate             = "2024.05.14";
 Configuration   Config;
 WiFiClient      espClient;
-
-String          versionDate             = "2024.05.13";
 uint8_t         myWiFiAPIndex           = 0;
 int             myWiFiAPSize            = Config.wifiAPs.size();
 WiFi_AP         *currentWiFi            = &Config.wifiAPs[myWiFiAPIndex];
 
 bool            isUpdatingOTA           = false;
-bool            statusAfterBoot         = true;
-bool            beaconUpdate            = true;
-uint32_t        lastBeaconTx            = 0;
 uint32_t        previousWiFiMillis      = 0;
 uint32_t        lastScreenOn            = millis();
 
 uint32_t        lastWiFiCheck           = 0;
 bool            WiFiConnect             = true;
 bool            WiFiConnected           = false;
-
 bool            WiFiAutoAPStarted       = false;
 long            WiFiAutoAPTime          = false;
 
 uint32_t        lastBatteryCheck        = 0;
-
 String          batteryVoltage;
-
-uint32_t        lastTxTime              = millis();
-uint32_t        lastRxTime              = millis();
 
 std::vector<ReceivedPacket> receivedPackets;
 
 bool            modemLoggedToAPRSIS     = false;
 
-String firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, iGateBeaconPacket, iGateLoRaBeaconPacket;
+String firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine;
 
 //#define STARTUP_DELAY 5 //min
 
@@ -82,8 +72,7 @@ void setup() {
     Config.check();
     LoRa_Utils::setup();
     Utils::validateFreqs();
-    iGateBeaconPacket = GPS_Utils::generateBeacon();
-    iGateLoRaBeaconPacket = GPS_Utils::generateiGateLoRaBeacon();
+    GPS_Utils::generateBeacons();
 
     #ifdef STARTUP_DELAY    // (TEST) just to wait for WiFi init of Routers
     show_display("", "  STARTUP DELAY ...", "", "", 0);

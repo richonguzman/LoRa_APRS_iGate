@@ -3,6 +3,7 @@
 #include "configuration.h"
 #include "display.h"
 
+
 void Configuration::check() {
     if (reload) {
         show_display("------- UPDATE ------", "config is old", "device will update", "and then reboot", 1000);

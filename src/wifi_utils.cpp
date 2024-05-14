@@ -18,7 +18,7 @@ extern bool           WiFiAutoAPStarted;
 namespace WIFI_Utils {
 
     void checkWiFi() {
-        if ((WiFi.status() != WL_CONNECTED) && ((millis() - previousWiFiMillis) >= 30*1000) && !WiFiAutoAPStarted) {
+        if ((WiFi.status() != WL_CONNECTED) && ((millis() - previousWiFiMillis) >= 30 * 1000) && !WiFiAutoAPStarted) {
             Serial.print(millis());
             Serial.println("Reconnecting to WiFi...");
             WiFi.disconnect();

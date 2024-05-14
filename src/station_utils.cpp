@@ -5,11 +5,11 @@
 #include "utils.h"
 #include <vector>
 
-extern Configuration        Config;
-extern uint32_t             lastTxTime;
-extern uint32_t             lastRxTime;
-extern String               fourthLine;
+extern Configuration            Config;
+extern uint32_t                 lastRxTime;
+extern String                   fourthLine;
 
+uint32_t lastTxTime             = millis();
 std::vector<String>             lastHeardStation;
 std::vector<String>             outputPacketBuffer;
 std::vector<String>             packet25SegBuffer;
@@ -70,7 +70,6 @@ namespace STATION_Utils {
             String deltaTimeString = packet25SegBuffer[0].substring(0, packet25SegBuffer[0].indexOf(","));
             uint32_t deltaTime = deltaTimeString.toInt();
             if ((millis() - deltaTime) >  25 * 1000) {
-                //Serial.print("Borrando : "); Serial.println(packet25SegBuffer[0]);
                 packet25SegBuffer.erase(packet25SegBuffer.begin());
             }
         }

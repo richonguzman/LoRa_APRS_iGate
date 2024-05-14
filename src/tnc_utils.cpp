@@ -6,7 +6,6 @@
 #include "utils.h"
 
 extern Configuration        Config;
-extern std::vector<String>  outputPacketBuffer;
 
 #define MAX_CLIENTS 4
 #define INPUT_BUFFER_SIZE (2 + MAX_CLIENTS)

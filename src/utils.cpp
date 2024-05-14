@@ -12,10 +12,9 @@
 #include "display.h"
 #include "utils.h"
 
-extern WiFiClient           espClient;
 extern Configuration        Config;
+extern WiFiClient           espClient;
 extern String               versionDate;
-extern bool                 statusAfterBoot;
 extern String               firstLine;
 extern String               secondLine;
 extern String               thirdLine;
@@ -23,9 +22,7 @@ extern String               fourthLine;
 extern String               fifthLine;
 extern String               sixthLine;
 extern String               seventhLine;
-extern uint32_t             lastBeaconTx;
 extern uint32_t             lastScreenOn;
-extern bool                 beaconUpdate;
 extern String               iGateBeaconPacket;
 extern String               iGateLoRaBeaconPacket;
 extern std::vector<String>  lastHeardStation;
@@ -37,6 +34,10 @@ extern uint32_t             lastWiFiCheck;
 extern bool                 WiFiConnect;
 extern bool                 WiFiConnected;
 extern int                  wxModuleType;
+
+bool        statusAfterBoot     = true;
+bool        beaconUpdate        = true;
+uint32_t    lastBeaconTx        = 0;
 
 
 namespace Utils {
@@ -169,14 +170,14 @@ namespace Utils {
 
     void checkWiFiInterval() {
         uint32_t WiFiCheck = millis() - lastWiFiCheck;
-        if (WiFi.status() != WL_CONNECTED && WiFiCheck >= 15*60*1000) {
-        WiFiConnect = true;
+        if (WiFi.status() != WL_CONNECTED && WiFiCheck >= 15 * 60 * 1000) {
+            WiFiConnect = true;
         }
         if (WiFiConnect) {
-        Serial.println("\nConnecting to WiFi ...");
-        WIFI_Utils::startWiFi();
-        lastWiFiCheck = millis();
-        WiFiConnect = false;
+            Serial.println("\nConnecting to WiFi ...");
+            WIFI_Utils::startWiFi();
+            lastWiFiCheck = millis();
+            WiFiConnect = false;
         }
     }
 
