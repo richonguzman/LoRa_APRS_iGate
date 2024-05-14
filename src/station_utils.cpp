@@ -6,12 +6,12 @@
 #include <vector>
 
 extern Configuration        Config;
-extern std::vector<String>  lastHeardStation;
-extern std::vector<String>  outputPacketBuffer;
 extern uint32_t             lastTxTime;
 extern uint32_t             lastRxTime;
 extern String               fourthLine;
 
+std::vector<String>             lastHeardStation;
+std::vector<String>             outputPacketBuffer;
 std::vector<String>             packet25SegBuffer;
 std::vector<uint32_t>           packet25SegTimeBuffer;
 
@@ -69,6 +69,7 @@ namespace STATION_Utils {
     void clean25SegBuffer() {
         if (!packet25SegTimeBuffer.empty()) {
             if (millis() - packet25SegTimeBuffer[0] > 25 * 1000) {
+                Serial.print("Borrando : "); Serial.println(packet25SegBuffer[0]);
                 packet25SegTimeBuffer.erase(packet25SegTimeBuffer.begin());
                 packet25SegBuffer.erase(packet25SegBuffer.begin());
             }

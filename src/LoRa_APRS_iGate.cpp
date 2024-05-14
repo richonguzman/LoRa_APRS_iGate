@@ -64,8 +64,6 @@ uint32_t        lastBatteryCheck        = 0;
 
 String          batteryVoltage;
 
-std::vector<String> lastHeardStation;
-std::vector<String> outputPacketBuffer;
 uint32_t        lastTxTime              = millis();
 uint32_t        lastRxTime              = millis();
 
