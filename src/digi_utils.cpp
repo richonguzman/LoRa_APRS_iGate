@@ -64,20 +64,22 @@ namespace DIGI_Utils {
             if ((packet.substring(0, 3) == "\x3c\xff\x01") && (packet.indexOf("NOGATE") == -1)) {
                 Sender = packet.substring(3, packet.indexOf(">"));
                 if (Sender != Config.callsign) {
-                    STATION_Utils::updateLastHeard(Sender);
-                    Utils::typeOfPacket(packet.substring(3), "Digi");
-                    AddresseeAndMessage = packet.substring(packet.indexOf("::") + 2);
-                    Addressee = AddresseeAndMessage.substring(0, AddresseeAndMessage.indexOf(":"));
-                    Addressee.trim();
-                    if (packet.indexOf("::") > 10 && Addressee == Config.callsign) {      // its a message for me!
-                        queryMessage = APRS_IS_Utils::processReceivedLoRaMessage(Sender, AddresseeAndMessage);
-                    }
-                    if (!queryMessage && packet.indexOf("WIDE1-") > 10 && Config.digi.mode == 2) { // If should repeat packet (WIDE1 Digi)
-                        loraPacket = generateDigiRepeatedPacket(packet.substring(3));
-                        if (loraPacket != "") {
-                            STATION_Utils::addToOutputPacketBuffer(loraPacket);
-                            display_toggle(true);
-                            lastScreenOn = millis();
+                    if (STATION_Utils::check25SegBuffer(Sender, packet.substring(packet.indexOf(":")+2))) {
+                        STATION_Utils::updateLastHeard(Sender);
+                        Utils::typeOfPacket(packet.substring(3), "Digi");
+                        AddresseeAndMessage = packet.substring(packet.indexOf("::") + 2);
+                        Addressee = AddresseeAndMessage.substring(0, AddresseeAndMessage.indexOf(":"));
+                        Addressee.trim();
+                        if (packet.indexOf("::") > 10 && Addressee == Config.callsign) {      // its a message for me!
+                            queryMessage = APRS_IS_Utils::processReceivedLoRaMessage(Sender, AddresseeAndMessage);
+                        }
+                        if (!queryMessage && packet.indexOf("WIDE1-") > 10 && Config.digi.mode == 2) { // If should repeat packet (WIDE1 Digi)
+                            loraPacket = generateDigiRepeatedPacket(packet.substring(3));
+                            if (loraPacket != "") {
+                                STATION_Utils::addToOutputPacketBuffer(loraPacket);
+                                display_toggle(true);
+                                lastScreenOn = millis();
+                            }
                         }
                     }
                 }
