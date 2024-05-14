@@ -81,7 +81,7 @@ namespace STATION_Utils {
             for (int i = 0; i < packet25SegBuffer.size(); i++) {
                 String temp = packet25SegBuffer[i].substring(packet25SegBuffer[i].indexOf(",") + 1);
                 String bufferStation = temp.substring(0, temp.indexOf(","));
-                String bufferMessage = temp.substring(0, temp.indexOf(",") + 1);
+                String bufferMessage = temp.substring(temp.indexOf(",") + 1);
                 if (bufferStation == station && bufferMessage == textMessage) {
                     shouldBeIgnored = true;
                 }
