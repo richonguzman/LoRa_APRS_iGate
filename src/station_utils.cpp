@@ -12,6 +12,9 @@ extern uint32_t             lastTxTime;
 extern uint32_t             lastRxTime;
 extern String               fourthLine;
 
+std::vector<String>             packet25SegBuffer;
+std::vector<uint32_t>           packet25SegTimeBuffer;
+
 
 namespace STATION_Utils {
 
@@ -61,6 +64,37 @@ namespace STATION_Utils {
         }
         Utils::println(" ---> Station not Heard for last 30 min (Not Tx)\n");
         return false;
+    }
+
+    void clean25SegBuffer() {
+        if (!packet25SegTimeBuffer.empty()) {
+            if (millis() - packet25SegTimeBuffer[0] > 25 * 1000) {
+                packet25SegTimeBuffer.erase(packet25SegTimeBuffer.begin());
+                packet25SegBuffer.erase(packet25SegBuffer.begin());
+            }
+        }
+    }
+
+    bool check25SegBuffer(String station, String textMessage) {
+        if (!packet25SegBuffer.empty()) {
+            bool shouldBeIgnored = false;
+            for (int i = 0; i < packet25SegBuffer.size(); i++) {
+                if (packet25SegBuffer[i].substring(0, packet25SegBuffer[i].indexOf(",")) == station && packet25SegBuffer[i].substring(packet25SegBuffer[i].indexOf(",") + 1) == textMessage) {
+                    shouldBeIgnored = true;
+                }
+            }
+            if (shouldBeIgnored) {
+                return false;
+            } else {
+                packet25SegBuffer.push_back(station + "," + textMessage);
+                packet25SegTimeBuffer.push_back(millis());
+                return true;
+            }
+        } else {
+            packet25SegBuffer.push_back(station + "," + textMessage);
+            packet25SegTimeBuffer.push_back(millis());
+            return true;
+        }    
     }
 
     void processOutputPacketBuffer() {

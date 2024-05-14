@@ -227,6 +227,7 @@ void loop() {
     }
 
     STATION_Utils::processOutputPacketBuffer();
+    STATION_Utils::clean25SegBuffer();
 
     show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
 }

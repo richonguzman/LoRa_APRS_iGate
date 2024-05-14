@@ -9,6 +9,8 @@ namespace STATION_Utils {
     void deleteNotHeard();
     void updateLastHeard(String station);
     bool wasHeard(String station);
+    void clean25SegBuffer();
+    bool check25SegBuffer(String station, String textMessage);
     void processOutputPacketBuffer();
     void addToOutputPacketBuffer(String packet);
 
