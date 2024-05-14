@@ -16,7 +16,7 @@ float newHum, newTemp, newPress, newGas;
 
 
 Adafruit_BME280     bme280;
-//Adafruit_BME680     bme680;
+Adafruit_BME680     bme680;
 #ifdef HELTEC_V3
 Adafruit_BMP280     bmp280(&Wire1);
 #else
