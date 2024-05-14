@@ -28,11 +28,13 @@ ____________________________________________________
 
 - TTGO T-Beam v1.0 , v1.1, v1.2 (also variations with SX1262 and SX1268 LoRa Modules)
 
-- HELTEC V2, V3 , Wireless Stick, HT-CT62
+- HELTEC V2, V3 , Wireless Stick, HT-CT62, Wireless Tracker
 
 - ESP32 Wroom + SX1278 LoRa Module or 400M30S 1W LoRa Module for a DIY Versions.
 
 - ESP32 + 4G/LTE A7670 Modem + SX1278 DIY Version.
+
+- Wemos Lolin32 Oled + SX1278 DIY Version.
 
 
 ### Buying links --> <a href="https://github.com/richonguzman/LoRa_APRS_iGate/wiki/Z.-------Supported-Boards-and-Buying-Links" target="_blank">here</a>.
