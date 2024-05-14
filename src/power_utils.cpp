@@ -145,6 +145,10 @@ namespace POWER_Utils {
         #ifdef HELTEC_WIRELESS_TRACKER
             Wire.begin(BOARD_I2C_SDA, BOARD_I2C_SCL);
         #endif
+
+        #ifdef HELTEC_V3_GPS
+            Wire1.begin(BOARD_I2C_SDA, BOARD_I2C_SCL);
+        #endif
         
         delay(1000);
     }

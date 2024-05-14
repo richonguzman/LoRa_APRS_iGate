@@ -2,7 +2,6 @@
 #include "configuration.h"
 #include "gps_utils.h"
 #include "display.h"
-#include <Wire.h>
 
 #define SEALEVELPRESSURE_HPA (1013.25)
 #define CORRECTION_FACTOR (8.2296)      // for meters
@@ -17,12 +16,11 @@ float newHum, newTemp, newPress, newGas;
 
 
 Adafruit_BME280     bme280;
+//Adafruit_BME680     bme680;
 #ifdef HELTEC_V3
 Adafruit_BMP280     bmp280(&Wire1);
-Adafruit_BME680     bme680(&Wire1);
 #else
 Adafruit_BMP280     bmp280;
-Adafruit_BME680     bme680;
 #endif
 
 
@@ -59,24 +57,30 @@ namespace BME_Utils {
                         wxModuleType = 1;
                         wxModuleFound = true;
                     }
+                    /*if (!wxModuleFound) {
+                        if (bme680.begin(wxModuleAddress, &Wire1)) {
+                            Serial.println("BME680 sensor found");
+                            wxModuleType = 3;
+                            wxModuleFound = true;
+                        }
+                    }*/
                 #else
                     if (bme280.begin(wxModuleAddress)) {
                         Serial.println("BME280 sensor found");
                         wxModuleType = 1;
                         wxModuleFound = true;
                     }
+                    /*if (!wxModuleFound) {
+                    if (bme680.begin(wxModuleAddress)) {
+                        Serial.println("BME680 sensor found");
+                        wxModuleType = 3;
+                        wxModuleFound = true;
+                    }*/
                 #endif
                 if (!wxModuleFound) {
                     if (bmp280.begin(wxModuleAddress)) {
                         Serial.println("BMP280 sensor found");
                         wxModuleType = 2;
-                        wxModuleFound = true;
-                    }
-                }
-                if (!wxModuleFound) {
-                    if (bme680.begin(wxModuleAddress)) {
-                        Serial.println("BME680 sensor found");
-                        wxModuleType = 3;
                         wxModuleFound = true;
                     }
                 }
@@ -102,13 +106,13 @@ namespace BME_Utils {
                                         ); 
                             Serial.println("BMP280 Module init done!");
                             break;
-                        case 3:
+                        /*case 3:
                             bme680.setTemperatureOversampling(BME680_OS_1X);
                             bme680.setHumidityOversampling(BME680_OS_1X);
                             bme680.setPressureOversampling(BME680_OS_1X);
                             bme680.setIIRFilterSize(BME680_FILTER_SIZE_0);
                             Serial.println("BMP680 Module init done!");
-                            break;
+                            break;*/
                     }
                 }
             }            
@@ -194,7 +198,7 @@ namespace BME_Utils {
                 newPress    = (bmp280.readPressure() / 100.0F);
                 newHum      = 0;
                 break;
-            case 3: // BME680
+            /*case 3: // BME680
                 bme680.performReading();
                 delay(50);
                 if (bme680.endReading()) {
@@ -203,7 +207,7 @@ namespace BME_Utils {
                     newHum      = bme680.humidity;
                     newGas      = bme680.gas_resistance / 1000.0; // in Kilo ohms
                 }
-                break;
+                break;*/
         }    
 
         if (isnan(newTemp) || isnan(newHum) || isnan(newPress)) {
