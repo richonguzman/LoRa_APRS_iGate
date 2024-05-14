@@ -146,7 +146,7 @@ namespace POWER_Utils {
             Wire.begin(BOARD_I2C_SDA, BOARD_I2C_SCL);
         #endif
 
-        #ifdef HELTEC_V3_GPS
+        #ifdef HELTEC_V3
             Wire1.begin(BOARD_I2C_SDA, BOARD_I2C_SCL);
         #endif
         
