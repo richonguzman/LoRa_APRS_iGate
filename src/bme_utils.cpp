@@ -2,6 +2,7 @@
 #include "configuration.h"
 #include "gps_utils.h"
 #include "display.h"
+#include <Wire.h>
 
 #define SEALEVELPRESSURE_HPA (1013.25)
 #define CORRECTION_FACTOR (8.2296)      // for meters
@@ -20,9 +21,10 @@ Adafruit_BME280     bme280;
 Adafruit_BMP280     bmp280(&Wire1);
 Adafruit_BME680     bme680(&Wire1);
 #else
-Adafruit_BME680     bme680;
 Adafruit_BMP280     bmp280;
+Adafruit_BME680     bme680;
 #endif
+
 
 
 namespace BME_Utils {
@@ -65,16 +67,16 @@ namespace BME_Utils {
                     }
                 #endif
                 if (!wxModuleFound) {
-                    if (bme680.begin(wxModuleAddress)) {
-                        Serial.println("BME680 sensor found");
-                        wxModuleType = 3;
+                    if (bmp280.begin(wxModuleAddress)) {
+                        Serial.println("BMP280 sensor found");
+                        wxModuleType = 2;
                         wxModuleFound = true;
                     }
                 }
                 if (!wxModuleFound) {
-                    if (bmp280.begin(wxModuleAddress)) {
-                        Serial.println("BMP280 sensor found");
-                        wxModuleType = 2;
+                    if (bme680.begin(wxModuleAddress)) {
+                        Serial.println("BME680 sensor found");
+                        wxModuleType = 3;
                         wxModuleFound = true;
                     }
                 }
