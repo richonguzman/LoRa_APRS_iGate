@@ -13,7 +13,6 @@ extern String               fourthLine;
 std::vector<String>             lastHeardStation;
 std::vector<String>             outputPacketBuffer;
 std::vector<String>             packet25SegBuffer;
-std::vector<uint32_t>           packet25SegTimeBuffer;
 
 
 namespace STATION_Utils {
@@ -67,10 +66,11 @@ namespace STATION_Utils {
     }
 
     void clean25SegBuffer() {
-        if (!packet25SegTimeBuffer.empty()) {
-            if (millis() - packet25SegTimeBuffer[0] > 25 * 1000) {
-                Serial.print("Borrando : "); Serial.println(packet25SegBuffer[0]);
-                packet25SegTimeBuffer.erase(packet25SegTimeBuffer.begin());
+        if (!packet25SegBuffer.empty()) {
+            String deltaTimeString = packet25SegBuffer[0].substring(0, packet25SegBuffer[0].indexOf(","));
+            uint32_t deltaTime = deltaTimeString.toInt();
+            if ((millis() - deltaTime) >  25 * 1000) {
+                //Serial.print("Borrando : "); Serial.println(packet25SegBuffer[0]);
                 packet25SegBuffer.erase(packet25SegBuffer.begin());
             }
         }
@@ -80,20 +80,21 @@ namespace STATION_Utils {
         if (!packet25SegBuffer.empty()) {
             bool shouldBeIgnored = false;
             for (int i = 0; i < packet25SegBuffer.size(); i++) {
-                if (packet25SegBuffer[i].substring(0, packet25SegBuffer[i].indexOf(",")) == station && packet25SegBuffer[i].substring(packet25SegBuffer[i].indexOf(",") + 1) == textMessage) {
+                String temp = packet25SegBuffer[i].substring(packet25SegBuffer[i].indexOf(",") + 1);
+                String bufferStation = temp.substring(0, temp.indexOf(","));
+                String bufferMessage = temp.substring(0, temp.indexOf(",") + 1);
+                if (bufferStation == station && bufferMessage == textMessage) {
                     shouldBeIgnored = true;
                 }
             }
             if (shouldBeIgnored) {
                 return false;
             } else {
-                packet25SegBuffer.push_back(station + "," + textMessage);
-                packet25SegTimeBuffer.push_back(millis());
+                packet25SegBuffer.push_back(String(millis()) + "," + station + "," + textMessage);
                 return true;
             }
         } else {
-            packet25SegBuffer.push_back(station + "," + textMessage);
-            packet25SegTimeBuffer.push_back(millis());
+            packet25SegBuffer.push_back(String(millis()) + "," + station + "," + textMessage);
             return true;
         }    
     }
