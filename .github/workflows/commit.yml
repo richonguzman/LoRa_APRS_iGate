@@ -21,8 +21,16 @@ jobs:
                     - "ttgo-t-beam-v1"
                     - "ttgo-t-beam-v1_SX1268"
                     - "ttgo-t-beam-v1_2_SX1262"
+                    - "heltec_wireless_tracker"
                     - "heltec_wireless_stick"
                     - "heltec_ht-ct62"
+                    - "ESP32_DIY_LoRa_A7670"
+                    - "ttgo-lora32-v21-915"
+                    - "OE5HWN_MeshCom"
+                    - "WEMOS-LOLIN32-OLED-DIY"
+                board_type:
+                    - "esp32"
+                    - "esp32s3"
         steps:
             - uses: actions/checkout@v3
 
@@ -32,6 +40,16 @@ jobs:
 
             - name: Install PlatformIO Core
               run: pip install --upgrade platformio
+
+            - name: Determine board type
+              id: determine-board
+              run: |
+                if [[ "${{ matrix.board_type }}" == "esp32s3" ]]; then
+                  echo "BOARD_ENV=esp32s3" >> $GITHUB_ENV
+                else
+                  echo "BOARD_ENV=esp32" >> $GITHUB_ENV
+                fi
+              shell: bash
 
             - name: Build target
               run: pio run -e ${{ matrix.target }}

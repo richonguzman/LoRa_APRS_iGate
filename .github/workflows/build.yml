@@ -20,8 +20,16 @@ jobs:
                     - "ttgo-t-beam-v1"
                     - "ttgo-t-beam-v1_SX1268"
                     - "ttgo-t-beam-v1_2_SX1262"
+                    - "heltec_wireless_tracker"
                     - "heltec_wireless_stick"
                     - "heltec_ht-ct62"
+                    - "ESP32_DIY_LoRa_A7670"
+                    - "ttgo-lora32-v21-915"
+                    - "OE5HWN_MeshCom"
+                    - "WEMOS-LOLIN32-OLED-DIY"
+                board_type:
+                    - "esp32"
+                    - "esp32s3"
         steps:
             - uses: actions/checkout@v3
 
@@ -32,11 +40,23 @@ jobs:
             - name: Install PlatformIO Core
               run: pip install --upgrade platformio
 
+            - name: Determine board type
+              run: |
+                if [[ "${{ matrix.board_type }}" == "esp32s3" ]]; then
+                  export BOARD_ENV="esp32s3"
+                else
+                  export BOARD_ENV="esp32"
+                fi
+              shell: bash
+
             - name: Build target
-              run: pio run -e ${{ matrix.target }}
+              run: |
+                  pio run -e ${{ matrix.target }} --environment $BOARD_ENV
 
             - name: Build FS
-              run: pio run --target buildfs -e ${{ matrix.target }}
+              run: |
+                  pio run --target buildfs -e ${{ matrix.target }} --environment $BOARD_ENV
+      
 
             - name: Move Files
               run: |
@@ -48,10 +68,16 @@ jobs:
                   cp .pio/build/${{ matrix.target }}/spiffs.bin installer/firmware/
                   cp ~/.platformio/packages/framework-arduinoespressif32/tools/partitions/boot_app0.bin installer/firmware/
             
+            #- name: Merge for web flashing
+            #  run: |
+            #      python installer/bin/esptool/esptool.py --chip esp32 merge_bin -o installer/web_upgrade.bin --flash_mode dio --flash_freq 40m --flash_size 4MB 0x1000 installer/firmware/bootloader.bin 0x8000 installer/firmware/partitions.bin 0xe000 installer/firmware/boot_app0.bin 0x10000 installer/firmware/firmware.bin
+            #      python installer/bin/esptool/esptool.py --chip esp32 merge_bin -o installer/web_factory.bin --flash_mode dio --flash_freq 40m --flash_size 4MB 0x1000 installer/firmware/bootloader.bin 0x8000 installer/firmware/partitions.bin 0xe000 installer/firmware/boot_app0.bin 0x10000 installer/firmware/firmware.bin 2686976 installer/firmware/spiffs.bin
+            
             - name: Merge for web flashing
               run: |
-                  python installer/bin/esptool/esptool.py --chip esp32 merge_bin -o installer/web_upgrade.bin --flash_mode dio --flash_freq 40m --flash_size 4MB 0x1000 installer/firmware/bootloader.bin 0x8000 installer/firmware/partitions.bin 0xe000 installer/firmware/boot_app0.bin 0x10000 installer/firmware/firmware.bin
-                  python installer/bin/esptool/esptool.py --chip esp32 merge_bin -o installer/web_factory.bin --flash_mode dio --flash_freq 40m --flash_size 4MB 0x1000 installer/firmware/bootloader.bin 0x8000 installer/firmware/partitions.bin 0xe000 installer/firmware/boot_app0.bin 0x10000 installer/firmware/firmware.bin 2686976 installer/firmware/spiffs.bin
+                  python3 -m pip install esptool
+                  python3 -m esptool --chip $BOARD_ENV merge_bin -o installer/web_upgrade.bin --flash_mode dio --flash_freq 40m --flash_size 4MB 0x1000 installer/firmware/bootloader.bin 0x9000 installer/firmware/partitions.bin 0xe000 installer/firmware/boot_app0.bin 0x10000 installer/firmware/firmware.bin
+                  python3 -m esptool --chip $BOARD_ENV merge_bin -o installer/web_factory.bin --flash_mode dio --flash_freq 40m --flash_size 4MB 0x1000 installer/firmware/bootloader.bin 0x9000 installer/firmware/partitions.bin 0xe000 installer/firmware/boot_app0.bin 0x10000 installer/firmware/firmware.bin 0x3D0000 installer/firmware/spiffs.bin
 
             - name: Install Zip
               run: sudo apt-get install zip
