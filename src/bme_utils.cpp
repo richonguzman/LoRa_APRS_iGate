@@ -16,10 +16,11 @@ float newHum, newTemp, newPress, newGas;
 
 
 Adafruit_BME280     bme280;
-Adafruit_BME680     bme680;
-#ifdef HELTEC_V3_GPS
+#ifdef HELTEC_V3
 Adafruit_BMP280     bmp280(&Wire1);
+Adafruit_BME680     bme680(&Wire1);
 #else
+Adafruit_BME680     bme680;
 Adafruit_BMP280     bmp280;
 #endif
 
@@ -55,13 +56,6 @@ namespace BME_Utils {
                         Serial.println("BME280 sensor found");
                         wxModuleType = 1;
                         wxModuleFound = true;
-                    } 
-                    if (!wxModuleFound) {
-                        if (bme680.begin(wxModuleAddress, &Wire1)) {
-                            Serial.println("BME680 sensor found");
-                            wxModuleType = 3;
-                            wxModuleFound = true;
-                        }
                     }
                 #else
                     if (bme280.begin(wxModuleAddress)) {
@@ -69,14 +63,14 @@ namespace BME_Utils {
                         wxModuleType = 1;
                         wxModuleFound = true;
                     }
-                    if (!wxModuleFound) {
-                        if (bme680.begin(wxModuleAddress)) {
-                            Serial.println("BME680 sensor found");
-                            wxModuleType = 3;
-                            wxModuleFound = true;
-                        }
-                    }
                 #endif
+                if (!wxModuleFound) {
+                    if (bme680.begin(wxModuleAddress)) {
+                        Serial.println("BME680 sensor found");
+                        wxModuleType = 3;
+                        wxModuleFound = true;
+                    }
+                }
                 if (!wxModuleFound) {
                     if (bmp280.begin(wxModuleAddress)) {
                         Serial.println("BMP280 sensor found");
@@ -149,9 +143,9 @@ namespace BME_Utils {
                 break;
             case 3:
                 if ((int)bmeHum == 100) {
-                return "00";
+                    return "00";
                 } else {
-                return "-99";
+                    return "-99";
                 }
                 break;
             default:
