@@ -10,6 +10,10 @@ String                distance, iGateBeaconPacket, iGateLoRaBeaconPacket;
 
 namespace GPS_Utils {
 
+    String getiGateLoRaBeaconPacket() {
+        return iGateLoRaBeaconPacket;
+    }
+
     char *ax25_base91enc(char *s, uint8_t n, uint32_t v) {
         for(s += n, *s = '\0'; n; n--) {
             *(--s) = v % 91 + 33;
