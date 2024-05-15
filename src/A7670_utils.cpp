@@ -83,7 +83,7 @@
             }
         }
 
-        bool checkATResponse(String ATMessage) {
+        bool checkATResponse(const String& ATMessage) {
             int delayATMessage = 3000;
             bool validAT = false;
             //Serial.println(ATMessage);
@@ -170,7 +170,7 @@
             }
         }
 
-        void uploadToAPRSIS(String packet) {
+        void uploadToAPRSIS(const String& packet) {
             beaconBytesSended = checkATResponse("AT+CIPSEND=0," + String(packet.length()+1));
             delay(2000);
             if (beaconBytesSended) {
