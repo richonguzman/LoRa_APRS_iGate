@@ -8,8 +8,8 @@ namespace TNC_Utils {
     void setup();
     void loop();
     
-    void sendToClients(String packet);
-    void sendToSerial(String packet);
+    void sendToClients(const String& packet);
+    void sendToSerial(const String& packet);
 
 }
 

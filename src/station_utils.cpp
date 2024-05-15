@@ -33,7 +33,7 @@ namespace STATION_Utils {
         lastHeardStation_temp.clear();
     }
 
-    void updateLastHeard(String station) {
+    void updateLastHeard(const String& station) {
         deleteNotHeard();
         bool stationHeard = false;
         for (int i = 0; i < lastHeardStation.size(); i++) {
@@ -53,7 +53,7 @@ namespace STATION_Utils {
         fourthLine += String(lastHeardStation.size());
     }
 
-    bool wasHeard(String station) {
+    bool wasHeard(const String& station) {
         deleteNotHeard();
         for (int i = 0; i < lastHeardStation.size(); i++) {
             if (lastHeardStation[i].substring(0, lastHeardStation[i].indexOf(",")) == station) {
@@ -75,7 +75,7 @@ namespace STATION_Utils {
         }
     }
 
-    bool check25SegBuffer(String station, String textMessage) {
+    bool check25SegBuffer(const String& station, const String& textMessage) {
         if (!packet25SegBuffer.empty()) {
             bool shouldBeIgnored = false;
             for (int i = 0; i < packet25SegBuffer.size(); i++) {
@@ -109,7 +109,7 @@ namespace STATION_Utils {
         }
     }
 
-    void addToOutputPacketBuffer(String packet) {
+    void addToOutputPacketBuffer(const String& packet) {
         outputPacketBuffer.push_back(packet);
     }
 

@@ -7,12 +7,12 @@
 namespace STATION_Utils {
 
     void deleteNotHeard();
-    void updateLastHeard(String station);
-    bool wasHeard(String station);
+    void updateLastHeard(const String& station);
+    bool wasHeard(const String& station);
     void clean25SegBuffer();
-    bool check25SegBuffer(String station, String textMessage);
+    bool check25SegBuffer(const String& station, const String& textMessage);
     void processOutputPacketBuffer();
-    void addToOutputPacketBuffer(String packet);
+    void addToOutputPacketBuffer(const String& packet);
 
 }
 

@@ -105,10 +105,10 @@ namespace TNC_Utils {
         }
     }
 
-    void sendToClients(String packet) {
-        packet = packet.substring(3);
+    void sendToClients(const String& packet) {
+        String cleanPacket = packet.substring(3);
 
-        const String kissEncoded = encodeKISS(packet);
+        const String kissEncoded = encodeKISS(cleanPacket);
 
         for (int i = 0; i < MAX_CLIENTS; i++) {
             auto client = clients[i];
@@ -123,12 +123,12 @@ namespace TNC_Utils {
             }
         }
         Utils::print("---> Sent to TNC       : ");
-        Utils::println(packet);
+        Utils::println(cleanPacket);
     }
 
-    void sendToSerial(String packet) {
-        packet = packet.substring(3);
-        Serial.print(encodeKISS(packet));
+    void sendToSerial(const String& packet) {
+        String cleanPacket = packet.substring(3);
+        Serial.print(encodeKISS(cleanPacket));
         Serial.flush();
     }
 
