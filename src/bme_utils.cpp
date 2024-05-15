@@ -38,6 +38,7 @@ namespace BME_Utils {
             err = Wire.endTransmission();
             #endif
             if (err == 0) {
+                //Serial.println(addr); this shows any connected board to I2C
                 if (addr == 0x76 || addr == 0x77) {
                     wxModuleAddress = addr;
                     return;
@@ -156,20 +157,20 @@ namespace BME_Utils {
     }
 
     String generatePresString(float bmePress) {
-        String strPress;
-        strPress = String((int)bmePress);
+        String strPress = String((int)bmePress);
+        String decPress = String(int((bmePress - int(bmePress)) * 10));
         switch (strPress.length()) {
             case 1:
-                return "000" + strPress + "0";
+                return "000" + strPress + decPress;
                 break;
             case 2:
-                return "00" + strPress + "0";
+                return "00" + strPress + decPress;
                 break;
             case 3:
-                return "0" + strPress + "0";
+                return "0" + strPress + decPress;
                 break;
             case 4:
-                return strPress + "0";
+                return strPress + decPress;
                 break;
             case 5:
                 return strPress;
@@ -221,7 +222,7 @@ namespace BME_Utils {
                 humStr  = "..";
             }
             presStr = generatePresString(newPress + (Config.bme.heightCorrection/CORRECTION_FACTOR));
-            fifthLine = "BME-> " + String(int(newTemp))+"C " + humStr + "% " + presStr.substring(0,4) + "hPa";
+            fifthLine = "BME-> " + String(int(newTemp + Config.bme.temperatureCorrection))+"C " + humStr + "% " + presStr.substring(0,4) + "hPa";
             wx = ".../...g...t" + tempStr + "r...p...P...h" + humStr + "b" + presStr;
             if (wxModuleType == 3) {
                 wx += "Gas: " + String(newGas) + "Kohms";
