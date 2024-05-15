@@ -22,7 +22,7 @@ namespace GPS_Utils {
         return(s);
     }
 
-    String encodeGPS(float latitude, float longitude, String overlay, String symbol) {
+    String encodeGPS(float latitude, float longitude, const String& overlay, const String& symbol) {
         String encodedData = overlay;
         uint32_t aprs_lat, aprs_lon;
         aprs_lat = 900000000 - latitude * 10000000;
@@ -65,7 +65,7 @@ namespace GPS_Utils {
         return TinyGPSPlus::distanceBetween(Config.beacon.latitude,Config.beacon.longitude, latitude, longitude) / 1000.0;
     }
 
-    String decodeEncodedGPS(String packet) {
+    String decodeEncodedGPS(const String& packet) {
         String GPSPacket = packet.substring(packet.indexOf(":!")+3);
         String encodedLatitude    = GPSPacket.substring(0,4);
         String encodedLongtitude  = GPSPacket.substring(4,8);
@@ -85,7 +85,7 @@ namespace GPS_Utils {
         return String(decodedLatitude,5) + "N / " + String(decodedLongitude,5) + "E / " + distance + "km";
     }
 
-    String getReceivedGPS(String packet) {
+    String getReceivedGPS(const String& packet) {
         String infoGPS;
         if (packet.indexOf(":!") > 10) {
             infoGPS = packet.substring(packet.indexOf(":!")+2);
@@ -117,7 +117,7 @@ namespace GPS_Utils {
         return String(convertedLatitude,5) + "N / " + String(convertedLongitude,5) + "E / " + distance + "km";
     }
 
-    String getDistance(String packet) {
+    String getDistance(const String& packet) {
         uint8_t encodedBytePosition = 0;
         if (packet.indexOf(":!") > 10) {
             encodedBytePosition = packet.indexOf(":!") + 14;

@@ -6,7 +6,7 @@
 
 namespace SYSLOG_Utils {
 
-    void log(String type ,String packet, int rssi, float snr, int freqError);
+    void log(uint8_t type ,const String& packet, int rssi, float snr, int freqError);
     void setup();
 
 }

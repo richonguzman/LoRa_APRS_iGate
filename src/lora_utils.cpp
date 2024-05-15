@@ -114,7 +114,7 @@ namespace LoRa_Utils {
         transmissionFlag = true;
         if (state == RADIOLIB_ERR_NONE) {
             if (Config.syslog.active && WiFi.status() == WL_CONNECTED) {
-                SYSLOG_Utils::log("Tx", newPacket, 0, 0, 0);
+                SYSLOG_Utils::log(3, newPacket, 0, 0, 0);    // TX
             }
             Utils::print("---> LoRa Packet Tx    : ");
             Utils::println(newPacket);
@@ -131,17 +131,18 @@ namespace LoRa_Utils {
         //ignorePacket = true;
     }
 
-    String packetSanitization(String packet) {
+    String packetSanitization(const String& packet) {
+        String sanitizedPacket = packet;
         if (packet.indexOf("\0") > 0) {
-            packet.replace("\0", "");
+            sanitizedPacket.replace("\0", "");
         }
         if (packet.indexOf("\r") > 0) {
-            packet.replace("\r", "");
+            sanitizedPacket.replace("\r", "");
         }
         if (packet.indexOf("\n") > 0) {
-            packet.replace("\n", "");
+            sanitizedPacket.replace("\n", "");
         }
-        return packet;
+        return sanitizedPacket;
     }
 
     void startReceive() {
@@ -183,7 +184,7 @@ namespace LoRa_Utils {
                     }
 
                     if (Config.syslog.active && WiFi.status() == WL_CONNECTED) {
-                        SYSLOG_Utils::log("Rx", loraPacket, rssi, snr, freqError);
+                        SYSLOG_Utils::log(1, loraPacket, rssi, snr, freqError); // RX
                     }
                     lastRxTime = millis();
                     return loraPacket;
@@ -194,7 +195,7 @@ namespace LoRa_Utils {
                 freqError = radio.getFrequencyError();
                 Utils::println(F("CRC error!"));
                 if (Config.syslog.active && WiFi.status() == WL_CONNECTED) {
-                    SYSLOG_Utils::log("CRC", loraPacket, rssi, snr, freqError);
+                    SYSLOG_Utils::log(0, loraPacket, rssi, snr, freqError); // CRC
                 }
                 loraPacket = "";
             } else {

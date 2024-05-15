@@ -23,7 +23,7 @@ extern String           seventhLine;
 
 namespace DIGI_Utils {
 
-    String generateDigiRepeatedPacket(String packet){
+    String generateDigiRepeatedPacket(const String& packet){
         String sender, temp0, tocall, path;
         sender = packet.substring(0, packet.indexOf(">"));
         temp0 = packet.substring(packet.indexOf(">") + 1, packet.indexOf(":"));
@@ -55,7 +55,7 @@ namespace DIGI_Utils {
         }
     }
 
-    void processLoRaPacket(String packet) {
+    void processLoRaPacket(const String& packet) {
         bool queryMessage = false;
         String loraPacket, Sender, AddresseeAndMessage, Addressee;
         if (packet != "") {
@@ -64,7 +64,7 @@ namespace DIGI_Utils {
                 if (Sender != Config.callsign) {
                     if (STATION_Utils::check25SegBuffer(Sender, packet.substring(packet.indexOf(":")+2))) {
                         STATION_Utils::updateLastHeard(Sender);
-                        Utils::typeOfPacket(packet.substring(3), "Digi");
+                        Utils::typeOfPacket(packet.substring(3), 2);    // Digi
                         AddresseeAndMessage = packet.substring(packet.indexOf("::") + 2);
                         Addressee = AddresseeAndMessage.substring(0, AddresseeAndMessage.indexOf(":"));
                         Addressee.trim();

@@ -49,7 +49,7 @@ namespace Utils {
             delay(1000);
             status += ",qAC:>https://github.com/richonguzman/LoRa_APRS_iGate " + versionDate;
             APRS_IS_Utils::upload(status);
-            SYSLOG_Utils::log("APRSIS Tx", status,0,0,0);
+            SYSLOG_Utils::log(2, status,0,0,0);   // APRSIS TX
             statusAfterBoot = false;
         }
         if (statusAfterBoot && !Config.beacon.sendViaAPRSIS && Config.beacon.sendViaRF) {
@@ -191,17 +191,21 @@ namespace Utils {
         }
     }
 
-    void typeOfPacket(String packet, String packetType) {
+    void typeOfPacket(const String& packet, uint8_t packetType) {
         String sender;
-        if (packetType == "LoRa-APRS") {
-            fifthLine = "LoRa Rx ----> APRS-IS";
-            sender = packet.substring(0,packet.indexOf(">"));
-        } else if (packetType == "APRS-LoRa") {
-            fifthLine = "APRS-IS ----> LoRa Tx";
-            sender = packet.substring(0,packet.indexOf(">"));
-        } else if (packetType == "Digi") {
-            fifthLine = "LoRa Rx ----> LoRa Tx";
-            sender = packet.substring(0,packet.indexOf(">"));
+        switch (packetType) {
+            case 0: // LoRa-APRS
+                fifthLine = "LoRa Rx ----> APRS-IS";
+                sender = packet.substring(0,packet.indexOf(">"));
+                break;
+            case 1: // APRS-LoRa
+                fifthLine = "APRS-IS ----> LoRa Tx";
+                sender = packet.substring(0,packet.indexOf(">"));
+                break;
+            case 2: // Digi
+                fifthLine = "LoRa Rx ----> LoRa Tx";
+                sender = packet.substring(0,packet.indexOf(">"));
+                break;
         }
         for (int i = sender.length(); i < 9; i++) {
             sender += " ";
@@ -240,13 +244,13 @@ namespace Utils {
         }
     }
 
-    void print(String text) {
+    void print(const String& text) {
         if (!Config.tnc.enableSerial) {
             Serial.print(text);
         }
     }
 
-    void println(String text) {
+    void println(const String& text) {
         if (!Config.tnc.enableSerial) {
             Serial.println(text);
         }

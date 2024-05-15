@@ -8,7 +8,7 @@ extern String               versionDate;
 
 namespace QUERY_Utils {
 
-    String process(String query, String station, String queryOrigin) {
+    String process(const String& query, const String& station, uint8_t queryOrigin) {
         String answer;
         if (query=="?APRS?" || query=="?aprs?" || query=="?Aprs?" || query=="H" || query=="h" || query=="HELP" || query=="Help" || query=="help" || query=="?") {
             answer = "?APRSV ?APRSP ?APRSL ?APRSH ?WHERE callsign";
@@ -34,16 +34,17 @@ namespace QUERY_Utils {
             Serial.println("estaciones escuchadas directo (ultimos 30 min)");
             answer = "?WHERE on development 73!";
         }
+        String processedStation = station;
         for(int i = station.length(); i < 9; i++) {
-            station += ' ';
+            processedStation += ' ';
         }
-        if (queryOrigin == "APRSIS") {
-            return Config.callsign + ">APLRG1,TCPIP,qAC::" + station + ":" + answer;// + "\n";
-        } else { //} if (queryOrigin == "LoRa") {
+        if (queryOrigin == 1) { // from APRS-IS
+            return Config.callsign + ">APLRG1,TCPIP,qAC::" + processedStation + ":" + answer;
+        } else { // else == 0 , from LoRa
             if (Config.beacon.path == "") {
-                return Config.callsign + ">APLRG1,RFONLY::" + station + ":" + answer;
+                return Config.callsign + ">APLRG1,RFONLY::" + processedStation + ":" + answer;
             } else {
-                return Config.callsign + ">APLRG1,RFONLY," + Config.beacon.path + "::" + station + ":" + answer;
+                return Config.callsign + ">APLRG1,RFONLY," + Config.beacon.path + "::" + processedStation + ":" + answer;
             }
         }
     }

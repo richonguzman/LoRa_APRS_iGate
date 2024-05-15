@@ -94,7 +94,7 @@ void display_toggle(bool toggle) {
     #endif
 }
 
-bool shouldCleanTFT(String header, String line1, String line2, String line3) {
+bool shouldCleanTFT(const String& header, const String& line1, const String& line2, const String& line3) {
     if (oldHeader != header || oldFirstLine != line1 || oldSecondLine != line2 || oldThirdLine != line3) {
         oldHeader       = header;
         oldFirstLine    = line1;
@@ -106,7 +106,7 @@ bool shouldCleanTFT(String header, String line1, String line2, String line3) {
     }
 }
 
-bool shouldCleanTFT(String header, String line1, String line2, String line3, String line4, String line5, String line6) {
+bool shouldCleanTFT(const String& header, const String& line1, const String& line2, const String& line3, const String& line4, const String& line5, const String& line6) {
     if (oldHeader != header || oldFirstLine != line1 || oldSecondLine != line2 || oldThirdLine != line3 || oldFourthLine != line4 || oldFifthLine != line5 || oldSixthLine != line6) {
         oldHeader       = header;
         oldFirstLine    = line1;
@@ -121,7 +121,7 @@ bool shouldCleanTFT(String header, String line1, String line2, String line3, Str
     }
 }
 
-void show_display(String header, String line1, String line2, String line3, int wait) {
+void show_display(const String& header, const String& line1, const String& line2, const String& line3, int wait) {
     #ifdef HAS_DISPLAY
         #ifdef HAS_TFT
             if (shouldCleanTFT(header, line1, line2, line3)) {
@@ -158,7 +158,7 @@ void show_display(String header, String line1, String line2, String line3, int w
     #endif
 }
 
-void show_display(String header, String line1, String line2, String line3, String line4, String line5, String line6, int wait) {
+void show_display(const String& header, const String& line1, const String& line2, const String& line3, const String& line4, const String& line5, const String& line6, int wait) {
     #ifdef HAS_DISPLAY
         #ifdef HAS_TFT
             if (shouldCleanTFT(header, line1, line2, line3, line4, line5, line6)) {

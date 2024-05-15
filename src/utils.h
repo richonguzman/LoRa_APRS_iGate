@@ -21,9 +21,9 @@ namespace Utils {
     void checkDisplayInterval();
     void checkWiFiInterval();
     void validateFreqs();
-    void typeOfPacket(String packet, String packetType);
-    void print(String text);
-    void println(String text);
+    void typeOfPacket(const String& packet, uint8_t packetType);
+    void print(const String& text);
+    void println(const String& text);
 
 }
 
