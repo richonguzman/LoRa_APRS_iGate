@@ -25,7 +25,7 @@ namespace BATTERY_Utils {
         int sample;
         int sampleSum = 0;
         #ifdef ADC_CTRL
-            #ifdef HELTEC_WIRELESS_TRACKER
+            #if defined(HELTEC_WSL_V3) || defined(HELTEC_WIRELESS_TRACKER)
                 digitalWrite(ADC_CTRL, HIGH);
             #endif
             #ifdef HELTEC_V3
@@ -45,7 +45,7 @@ namespace BATTERY_Utils {
         }
 
         #ifdef ADC_CTRL
-            #ifdef HELTEC_WIRELESS_TRACKER
+            #if defined(HELTEC_WSL_V3) || defined(HELTEC_WIRELESS_TRACKER)
                 digitalWrite(ADC_CTRL, LOW);
             #endif
             #ifdef HELTEC_V3_GPS

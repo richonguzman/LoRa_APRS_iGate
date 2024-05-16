@@ -18,7 +18,7 @@
     #define RADIO_BUSY_PIN  26      // GPIO26   - SX1278 IRQ ---->DIO0
 #endif
 
-#if defined(HELTEC_V3) || defined(HELTEC_WS)
+#if defined(HELTEC_V3) || defined(HELTEC_WSL_V3) || defined(HELTEC_WIRELESS_TRACKER) || defined(HELTEC_WS)
     #define RADIO_SCLK_PIN  9   // SX1262 SCK
     #define RADIO_MISO_PIN  11  // SX1262 MISO
     #define RADIO_MOSI_PIN  10  // SX1262 MOSI
@@ -95,17 +95,6 @@
     #define A7670_RX_PIN    27
 #endif
 
-#ifdef HELTEC_WIRELESS_TRACKER
-    #define RADIO_SCLK_PIN      9
-    #define RADIO_MISO_PIN      11
-    #define RADIO_MOSI_PIN      10
-    #define RADIO_CS_PIN        8
-    #define RADIO_RST_PIN       12
-    #define RADIO_DIO1_PIN      14  // SX1262 IRQ
-    #define RADIO_BUSY_PIN      13  // SX1262 BUSY
-#endif
-
-
 // OLED 
 #if defined(TTGO_T_LORA32_V2_1) || defined(ESP32_DIY_LoRa) || defined(ESP32_DIY_1W_LoRa) || defined(TTGO_T_Beam_V1_0) || defined(TTGO_T_Beam_V1_2) || defined(TTGO_T_Beam_V1_0_SX1268) || defined(TTGO_T_Beam_V1_2_SX1262) || defined(OE5HWN_MeshCom) || defined(ESP32_DIY_LoRa_A7670) || defined(TTGO_T_LORA32_V2_1_915)
     #define OLED_SDA    21
@@ -131,8 +120,8 @@
     #define OLED_RST    -1
 #endif
 
-#ifndef HELTEC_HTCT62
-    #define HAS_DISPLAY
+#if !defined(HELTEC_HTCT62) && !defined(HELTEC_WSL_V3)
+        #define HAS_DISPLAY
 #endif
 
 // Leds and other stuff
@@ -143,11 +132,11 @@
     #define INTERNAL_LED_PIN    25      // Green Led
     #define BATTERY_PIN         35      // es 35 el led y 1 bateria?
 #endif
-#if defined(HELTEC_V3) || defined(HELTEC_WS)
+#if defined(HELTEC_V3) || defined(HELTEC_WSL_V3) || defined(HELTEC_WS)
     #define INTERNAL_LED_PIN    35
     #define BATTERY_PIN         1
     #define VEXT_CTRL           36
-    #define ADC_CTRL            37
+    #define ADC_CTRL            37 // Heltec WSL_V3 just like Heltec WT
     #define BOARD_I2C_SDA       41
     #define BOARD_I2C_SCL       42
 #endif

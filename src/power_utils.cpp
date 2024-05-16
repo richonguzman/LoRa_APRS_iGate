@@ -88,7 +88,6 @@ namespace POWER_Utils {
         #endif
     }
 
-
     void setup() {
         #ifdef HAS_AXP192
             Wire.begin(SDA, SCL);
@@ -135,7 +134,9 @@ namespace POWER_Utils {
 
         #ifdef VEXT_CTRL
             pinMode(VEXT_CTRL,OUTPUT); // GPS + TFT on HELTEC Wireless_Tracker and only for Oled in HELTEC V3
-            digitalWrite(VEXT_CTRL, HIGH);
+            #ifndef HELTEC_WSL_V3
+                digitalWrite(VEXT_CTRL, HIGH);
+            #endif
         #endif
         
         #ifdef ADC_CTRL
