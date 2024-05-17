@@ -16,6 +16,7 @@ jobs:
                     - "heltec-lora32-v2"
                     - "heltec_wifi_lora_32_V3"
                     - "heltec_wireless_stick"
+                    - "heltec_wireless_stick_lite_v3"
                     - "heltec_ht-ct62"
                     - "ESP32_DIY_LoRa"
                     - "ESP32_DIY_1W_LoRa"
