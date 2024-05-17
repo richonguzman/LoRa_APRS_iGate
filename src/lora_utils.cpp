@@ -12,8 +12,8 @@ extern uint32_t         lastRxTime;
 
 extern std::vector<ReceivedPacket> receivedPackets;
 
-bool operationDone   = false;
-bool transmitFlag    = false;
+bool operationDone   = true;
+bool transmitFlag    = true;
 
 #ifdef HAS_SX1262
     SX1262 radio = new Module(RADIO_CS_PIN, RADIO_DIO1_PIN, RADIO_RST_PIN, RADIO_BUSY_PIN);
@@ -66,15 +66,18 @@ namespace LoRa_Utils {
         radio.setCodingRate(Config.loramodule.codingRate4);
         radio.setCRC(true);
 
-        #if defined(ESP32_DIY_1W_LoRa)
+        #if defined(ESP32_DIY_1W_LoRa) || defined(OE5HWN_MeshCom)
             radio.setRfSwitchPins(RADIO_RXEN, RADIO_TXEN);
-        #endif
-
-        #if defined(HAS_SX1278) || defined(HAS_SX1276) || ESP32_DIY_1W_LoRa
             state = radio.setOutputPower(Config.loramodule.power); // max value 20dB for 400M30S as it has Low Noise Amp
-        #endif   
+            radio.setCurrentLimit(140); // to be validated (100 , 120, 140)?
+        #endif
+        #if defined(HAS_SX1278) || defined(HAS_SX1276)
+            state = radio.setOutputPower(Config.loramodule.power); // max value 20dB for 400M30S as it has Low Noise Amp
+            radio.setCurrentLimit(100); // to be validated (80 , 100)?
+        #endif
         #if defined(HELTEC_V3)  || defined(HELTEC_WSL_V3) || defined(HELTEC_WS) || defined(TTGO_T_Beam_V1_0_SX1268) || defined(TTGO_T_Beam_V1_2_SX1262)
             state = radio.setOutputPower(Config.loramodule.power + 2); // values available: 10, 17, 22 --> if 20 in tracker_conf.json it will be updated to 22.
+            radio.setCurrentLimit(140);
         #endif
 
         #if defined(HAS_SX1262) || defined(HAS_SX1268)
@@ -83,7 +86,6 @@ namespace LoRa_Utils {
 
         if (state == RADIOLIB_ERR_NONE) {
             Utils::println("init : LoRa Module    ...     done!");
-            radio.startReceive();
         } else {
             Utils::println("Starting LoRa failed!");
             while (true);
