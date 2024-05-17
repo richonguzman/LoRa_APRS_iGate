@@ -37,9 +37,6 @@ float snr;
 namespace LoRa_Utils {
 
     void setFlag(void) {
-        /*if(!enableInterrupt) {
-            return;
-        }*/
         operationDone = true;
     }
 
@@ -106,36 +103,33 @@ namespace LoRa_Utils {
     }
 
     void sendNewPacket(const String& newPacket) {
-        //if (operationDone) {
-          //  operationDone = false;
-            if (!Config.loramodule.txActive) return;
+        if (!Config.loramodule.txActive) return;
 
-            if (Config.loramodule.txFreq != Config.loramodule.rxFreq) {
-                changeFreqTx();
-            }
+        if (Config.loramodule.txFreq != Config.loramodule.rxFreq) {
+            changeFreqTx();
+        }
 
-            #ifdef INTERNAL_LED_PIN
-                digitalWrite(INTERNAL_LED_PIN, HIGH);
-            #endif
-            int state = radio.transmit("\x3c\xff\x01" + newPacket);
-            transmitFlag = true;
-            if (state == RADIOLIB_ERR_NONE) {
-                if (Config.syslog.active && WiFi.status() == WL_CONNECTED) {
-                    SYSLOG_Utils::log(3, newPacket, 0, 0, 0);    // TX
-                }
-                Utils::print("---> LoRa Packet Tx    : ");
-                Utils::println(newPacket);
-            } else {
-                Utils::print(F("failed, code "));
-                Utils::println(String(state));
+        #ifdef INTERNAL_LED_PIN
+            digitalWrite(INTERNAL_LED_PIN, HIGH);
+        #endif
+        int state = radio.transmit("\x3c\xff\x01" + newPacket);
+        transmitFlag = true;
+        if (state == RADIOLIB_ERR_NONE) {
+            if (Config.syslog.active && WiFi.status() == WL_CONNECTED) {
+                SYSLOG_Utils::log(3, newPacket, 0, 0, 0);    // TX
             }
-            #ifdef INTERNAL_LED_PIN
-                digitalWrite(INTERNAL_LED_PIN, LOW);
-            #endif
-            if (Config.loramodule.txFreq != Config.loramodule.rxFreq) {
-                changeFreqRx();
-            }
-        //}
+            Utils::print("---> LoRa Packet Tx    : ");
+            Utils::println(newPacket);
+        } else {
+            Utils::print(F("failed, code "));
+            Utils::println(String(state));
+        }
+        #ifdef INTERNAL_LED_PIN
+            digitalWrite(INTERNAL_LED_PIN, LOW);
+        #endif
+        if (Config.loramodule.txFreq != Config.loramodule.rxFreq) {
+            changeFreqRx();
+        }
     }
 
     String packetSanitization(const String& packet) {
@@ -199,10 +193,6 @@ namespace LoRa_Utils {
                     if (Config.syslog.active && WiFi.status() == WL_CONNECTED) {
                         SYSLOG_Utils::log(0, packet, rssi, snr, freqError); // CRC
                     }
-                    //
-                    Utils::print("Error CRC: ");
-                    Utils::println(packet);
-                    //
                     packet = "";
                 } else {
                     Utils::print(F("failed, code "));
