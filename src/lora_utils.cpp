@@ -12,8 +12,8 @@ extern uint32_t         lastRxTime;
 
 extern std::vector<ReceivedPacket> receivedPackets;
 
-bool transmissionFlag   = true;
-bool enableInterrupt    = true;
+bool operationDone   = false;
+bool transmitFlag    = false;
 
 #ifdef HAS_SX1262
     SX1262 radio = new Module(RADIO_CS_PIN, RADIO_DIO1_PIN, RADIO_RST_PIN, RADIO_BUSY_PIN);
@@ -37,10 +37,10 @@ float snr;
 namespace LoRa_Utils {
 
     void setFlag(void) {
-        if(!enableInterrupt) {
+        /*if(!enableInterrupt) {
             return;
-        }
-        transmissionFlag = true;
+        }*/
+        operationDone = true;
     }
 
     void setup() {
@@ -86,7 +86,6 @@ namespace LoRa_Utils {
 
         if (state == RADIOLIB_ERR_NONE) {
             Utils::println("init : LoRa Module    ...     done!");
-            delay(500);
             radio.startReceive();
         } else {
             Utils::println("Starting LoRa failed!");
@@ -107,35 +106,36 @@ namespace LoRa_Utils {
     }
 
     void sendNewPacket(const String& newPacket) {
-        if (!Config.loramodule.txActive) return;
+        //if (operationDone) {
+          //  operationDone = false;
+            if (!Config.loramodule.txActive) return;
 
-        if (Config.loramodule.txFreq != Config.loramodule.rxFreq) {
-            changeFreqTx();
-        }
-
-        #ifdef INTERNAL_LED_PIN
-            digitalWrite(INTERNAL_LED_PIN, HIGH);
-        #endif
-        enableInterrupt = false;
-        int state = radio.transmit("\x3c\xff\x01" + newPacket);
-        if (state == RADIOLIB_ERR_NONE) {
-            if (Config.syslog.active && WiFi.status() == WL_CONNECTED) {
-                SYSLOG_Utils::log(3, newPacket, 0, 0, 0);    // TX
+            if (Config.loramodule.txFreq != Config.loramodule.rxFreq) {
+                changeFreqTx();
             }
-            Utils::print("---> LoRa Packet Tx    : ");
-            Utils::println(newPacket);
-        } else {
-            Utils::print(F("failed, code "));
-            Utils::println(String(state));
-        }
-        #ifdef INTERNAL_LED_PIN
-            digitalWrite(INTERNAL_LED_PIN, LOW);
-        #endif
-        if (Config.loramodule.txFreq != Config.loramodule.rxFreq) {
-            changeFreqRx();
-        }
-        enableInterrupt = true;
-        radio.startReceive();
+
+            #ifdef INTERNAL_LED_PIN
+                digitalWrite(INTERNAL_LED_PIN, HIGH);
+            #endif
+            int state = radio.transmit("\x3c\xff\x01" + newPacket);
+            transmitFlag = true;
+            if (state == RADIOLIB_ERR_NONE) {
+                if (Config.syslog.active && WiFi.status() == WL_CONNECTED) {
+                    SYSLOG_Utils::log(3, newPacket, 0, 0, 0);    // TX
+                }
+                Utils::print("---> LoRa Packet Tx    : ");
+                Utils::println(newPacket);
+            } else {
+                Utils::print(F("failed, code "));
+                Utils::println(String(state));
+            }
+            #ifdef INTERNAL_LED_PIN
+                digitalWrite(INTERNAL_LED_PIN, LOW);
+            #endif
+            if (Config.loramodule.txFreq != Config.loramodule.rxFreq) {
+                changeFreqRx();
+            }
+        //}
     }
 
     String packetSanitization(const String& packet) {
@@ -158,49 +158,57 @@ namespace LoRa_Utils {
 
     String receivePacket() {
         String packet = "";
-        if (transmissionFlag) {
-            transmissionFlag = false;
-            int state = radio.readData(packet);
-            if (state == RADIOLIB_ERR_NONE) {
-                if (packet != "") {
-                    rssi        = radio.getRSSI();
-                    snr         = radio.getSNR();
-                    freqError   = radio.getFrequencyError();
-                    Utils::println("<--- LoRa Packet Rx    : " + packet);
-                    Utils::println("(RSSI:" + String(rssi) + " / SNR:" + String(snr) + " / FreqErr:" + String(freqError) + ")");
-
-                    if (!Config.lowPowerMode) {
-                        ReceivedPacket receivedPacket;
-                        receivedPacket.millis   = millis();
-                        receivedPacket.packet   = packet.substring(3);
-                        receivedPacket.RSSI     = rssi;
-                        receivedPacket.SNR      = snr;
-                        if (receivedPackets.size() >= 20) {
-                            receivedPackets.erase(receivedPackets.begin());
-                        }
-                        receivedPackets.push_back(receivedPacket);
-                    }
-
-                    if (Config.syslog.active && WiFi.status() == WL_CONNECTED) {
-                        SYSLOG_Utils::log(1, packet, rssi, snr, freqError); // RX
-                    }
-                    lastRxTime = millis();
-                    return packet;
-                }                
-            } else if (state == RADIOLIB_ERR_CRC_MISMATCH) {
-                rssi = radio.getRSSI();
-                snr = radio.getSNR();
-                freqError = radio.getFrequencyError();
-                Utils::println(F("CRC error!"));
-                if (Config.syslog.active && WiFi.status() == WL_CONNECTED) {
-                    SYSLOG_Utils::log(0, packet, rssi, snr, freqError); // CRC
-                }
-                //packet = "";
-                Utils::println(packet);
+        if (operationDone) {
+            operationDone = false;
+            if (transmitFlag) {
+                radio.startReceive();
+                transmitFlag = false;
             } else {
-                Utils::print(F("failed, code "));
-                Utils::println(String(state));
-                packet = "";
+                int state = radio.readData(packet);
+                if (state == RADIOLIB_ERR_NONE) {
+                    if (packet != "") {
+                        rssi        = radio.getRSSI();
+                        snr         = radio.getSNR();
+                        freqError   = radio.getFrequencyError();
+                        Utils::println("<--- LoRa Packet Rx    : " + packet.substring(3));
+                        Utils::println("(RSSI:" + String(rssi) + " / SNR:" + String(snr) + " / FreqErr:" + String(freqError) + ")");
+
+                        if (!Config.lowPowerMode) {
+                            ReceivedPacket receivedPacket;
+                            receivedPacket.millis   = millis();
+                            receivedPacket.packet   = packet.substring(3);
+                            receivedPacket.RSSI     = rssi;
+                            receivedPacket.SNR      = snr;
+                            if (receivedPackets.size() >= 20) {
+                                receivedPackets.erase(receivedPackets.begin());
+                            }
+                            receivedPackets.push_back(receivedPacket);
+                        }
+
+                        if (Config.syslog.active && WiFi.status() == WL_CONNECTED) {
+                            SYSLOG_Utils::log(1, packet, rssi, snr, freqError); // RX
+                        }
+                        lastRxTime = millis();
+                        return packet;
+                    }                
+                } else if (state == RADIOLIB_ERR_CRC_MISMATCH) {
+                    rssi = radio.getRSSI();
+                    snr = radio.getSNR();
+                    freqError = radio.getFrequencyError();
+                    Utils::println(F("CRC error!"));
+                    if (Config.syslog.active && WiFi.status() == WL_CONNECTED) {
+                        SYSLOG_Utils::log(0, packet, rssi, snr, freqError); // CRC
+                    }
+                    //
+                    Utils::print("Error CRC: ");
+                    Utils::println(packet);
+                    //
+                    packet = "";
+                } else {
+                    Utils::print(F("failed, code "));
+                    Utils::println(String(state));
+                    packet = "";
+                }
             }
         }
         return packet;
