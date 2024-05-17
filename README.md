@@ -50,7 +50,10 @@ ____________________________________________________
 ____________________________________________________
 ## Timeline (Versions):
 
+
 - 2024.05.17 HELTEC Wireless Stick Lite v3 support added.
+- 2024.05.14 BME modules will be autodetected (I2C Address and if it is BME280/BMP280/BME680).
+- 2024.05.13 PacketBuffer for Rx (25 Seg).
 - 2024.05.11 HELTEC Wireless Tracker support added.
 - 2024.04.23 T-LoRa32 v1.6/v2.1 with 915MHz support added.
 - 2024.04.23 ESP32 + 4G/LTE MODEM A7670SA + LoRa (SX1278) support added.
