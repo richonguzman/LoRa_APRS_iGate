@@ -28,6 +28,7 @@ jobs:
                     - "heltec_wireless_tracker"
                     - "OE5HWN_MeshCom"
                     - "WEMOS-LOLIN32-OLED-DIY"
+                    - "WEMOS-D1-R32-RA02"
                     - "ttgo-lora32-v21-915"
                 board_type:
                     - "esp32"
