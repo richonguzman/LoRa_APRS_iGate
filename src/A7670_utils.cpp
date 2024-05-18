@@ -1,7 +1,7 @@
 #include "configuration.h"
 #include "aprs_is_utils.h"
+#include "boards_pinout.h"
 #include "A7670_utils.h"
-#include "pins_config.h"
 #include "lora_utils.h"
 #include "display.h"
 #include "utils.h"

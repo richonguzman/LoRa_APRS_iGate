@@ -1,6 +1,6 @@
 #include "battery_utils.h"
 #include "configuration.h"
-#include "pins_config.h"
+#include "boards_pinout.h"
 
 extern Configuration    Config;
 extern uint32_t         lastBatteryCheck;

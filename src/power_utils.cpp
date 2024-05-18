@@ -1,6 +1,6 @@
 #include "configuration.h"
+#include "boards_pinout.h"
 #include "power_utils.h"
-#include "pins_config.h"
 
 #if defined(HAS_AXP192) || defined(HAS_AXP2101)
     #define I2C_SDA 21
