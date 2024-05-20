@@ -30,7 +30,7 @@ namespace SYSLOG_Utils {
                         } else {
                             syslogPacket += packet.substring(packet.indexOf(">")+1,packet.indexOf(":")) + " / - / ";
                         }
-                        syslogPacket += String(rssi) + "dBm / " + String(snr) + "dB / " + String(freqError) + "Hz / " +  GPS_Utils::getDistance(packet);
+                        syslogPacket += String(rssi) + "dBm / " + String(snr) + "dB / " + String(freqError) + "Hz / " +  GPS_Utils::getDistanceAndComment(packet);
                     } else if (packet.indexOf(":>") > 10) {
                         syslogPacket += type + " / STATUS / " + packet.substring(3,packet.indexOf(">")) + " ---> " + packet.substring(packet.indexOf(":>")+2);
                         syslogPacket += " / " + String(rssi) + "dBm / " + String(snr) + "dB / " + String(freqError) + "Hz";

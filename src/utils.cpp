@@ -218,7 +218,9 @@ namespace Utils {
             seventhLine = "RSSI:" + String(rssi) + "dBm SNR: " + String(snr) + "dBm";
         } else if (packet.indexOf(":!") >= 10 || packet.indexOf(":=") >= 10) {
             sixthLine = sender + "> GPS BEACON";
-            GPS_Utils::getDistance(packet);
+            if (!Config.syslog.active) {
+                GPS_Utils::getDistanceAndComment(packet);       // to be checked!!!
+            }            
             seventhLine = "RSSI:" + String(rssi) + "dBm";
             if (rssi <= -100) {
                 seventhLine += " ";

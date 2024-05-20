@@ -13,7 +13,7 @@ namespace GPS_Utils {
     double calculateDistanceCourse(double latitude, double longitude);
     String decodeEncodedGPS(const String& packet);
     String getReceivedGPS(const String& packet);
-    String getDistance(const String& packet);
+    String getDistanceAndComment(const String& packet);
 
 }
 
