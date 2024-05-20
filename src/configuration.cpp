@@ -59,6 +59,9 @@ void Configuration::writeFile() {
     data["aprs_is"]["port"] = aprs_is.port;
     data["aprs_is"]["filter"] = aprs_is.filter;
     data["aprs_is"]["toRF"] = aprs_is.toRF;
+    data["aprs_is"]["messagesToRF"] = aprs_is.messagesToRF;
+    data["aprs_is"]["objectsToRF"] = aprs_is.objectsToRF;
+    
 
     data["beacon"]["comment"] = beacon.comment;
     // data["beacon"]["igateRepeatsLoRaPackets"] = beacon.igateRepeatsLoRaPackets;
@@ -193,6 +196,8 @@ bool Configuration::readFile() {
             aprs_is.active                    = data["aprs_is"]["active"].as<bool>();
             aprs_is.filter                    = data["aprs_is"]["filter"].as<String>();
             aprs_is.toRF                      = data["aprs_is"]["toRF"].as<bool>();
+            aprs_is.messagesToRF              = data["aprs_is"]["messagesToRF"].as<bool>();
+            aprs_is.objectsToRF               = data["aprs_is"]["objectsToRF"].as<bool>();
 
             loramodule.txFreq                 = data["lora"]["txFreq"].as<long>();
             loramodule.rxFreq                 = data["lora"]["rxFreq"].as<long>();
@@ -268,84 +273,86 @@ void Configuration::init() {
     reload = false;
 
     WiFi_AP wifiap;
-    wifiap.ssid                   = "";
-    wifiap.password               = "";
+    wifiap.ssid                 = "";
+    wifiap.password             = "";
     // wifiap.latitude               = 0.0; // deprecated
     // wifiap.longitude              = 0.0; // deprecated
     wifiAPs.push_back(wifiap);
 
-    wifiAutoAP.password = "1234567890";
-    wifiAutoAP.powerOff = 15;
+    wifiAutoAP.password         = "1234567890";
+    wifiAutoAP.powerOff         = 15;
 
-    callsign = "N0CALL";
+    callsign                    = "N0CALL";
     // stationMode = 1; // deprecated
     // iGateComment = "LoRa_APRS_iGate Development"; // deprecated
 
-    beacon.comment = "LoRa APRS"; // new
-    beacon.latitude = 0.0; // new
-    beacon.longitude = 0.0; // new
-    beacon.interval = 15; // new
+    beacon.comment              = "LoRa APRS"; // new
+    beacon.latitude             = 0.0; // new
+    beacon.longitude            = 0.0; // new
+    beacon.interval             = 15; // new
     // beacon.igateRepeatsLoRaPackets = false; // new
     // beacon.igateSendsLoRaBeacons = false; // new
-    beacon.overlay = "L"; // new
-    beacon.symbol = "#"; // new
-    beacon.sendViaAPRSIS = true; // new
-    beacon.sendViaRF = false; // new
-    beacon.path = "WIDE1-1"; // new
+    beacon.overlay              = "L"; // new
+    beacon.symbol               = "#"; // new
+    beacon.sendViaAPRSIS        = true; // new
+    beacon.sendViaRF            = false; // new
+    beacon.path                 = "WIDE1-1"; // new
     
     digi.mode = 0; // new
     // digi.comment = "LoRa_APRS_iGate Development"; // deprecated
     // digi.latitude = 0.0; // deprecated
     // digi.longitude = 0.0; // deprecated
 
-    tnc.enableServer = false;
-    tnc.enableSerial = false;
-    tnc.acceptOwn = false;
+    tnc.enableServer            = false;
+    tnc.enableSerial            = false;
+    tnc.acceptOwn               = false;
 
-    aprs_is.active = false; // new
-    aprs_is.passcode = "XYZVW";
-    aprs_is.server = "rotate.aprs2.net";
-    aprs_is.port = 14580;
-    aprs_is.filter = "m/10"; // new
-    aprs_is.toRF = false; // new
+    aprs_is.active              = false; // new
+    aprs_is.passcode            = "XYZVW";
+    aprs_is.server              = "rotate.aprs2.net";
+    aprs_is.port                = 14580;
+    aprs_is.filter              = "m/10"; // new
+    aprs_is.toRF                = false; // new
+    aprs_is.messagesToRF        = false;
+    aprs_is.objectsToRF         = false;
 
     // loramodule.iGateFreq = 433775000; // deprecated
     // loramodule.digirepeaterTxFreq = 433775000; // deprecated
     // loramodule.digirepeaterRxFreq = 433900000; // deprecated
-    loramodule.txFreq = 433775000; // new
-    loramodule.rxFreq = 433775000; // new
-    loramodule.spreadingFactor = 12;
-    loramodule.signalBandwidth = 125000;
-    loramodule.codingRate4 = 5;
-    loramodule.power = 20;
-    loramodule.txActive = false; // new
-    loramodule.rxActive = true; // new
+    loramodule.txFreq           = 433775000; // new
+    loramodule.rxFreq           = 433775000; // new
+    loramodule.spreadingFactor  = 12;
+    loramodule.signalBandwidth  = 125000;
+    loramodule.codingRate4      = 5;
+    loramodule.power            = 20;
+    loramodule.txActive         = false; // new
+    loramodule.rxActive         = true; // new
 
-    display.alwaysOn = true;
-    display.timeout = 4;
-    display.turn180 = false;
+    display.alwaysOn            = true;
+    display.timeout             = 4;
+    display.turn180             = false;
 
-    syslog.active = false;
-    syslog.server = "192.168.0.100";
-    syslog.port = 514;
+    syslog.active               = false;
+    syslog.server               = "192.168.0.100";
+    syslog.port                 = 514;
 
-    bme.active = false;
-    bme.heightCorrection = 0;
-    bme.temperatureCorrection = 0.0;
+    bme.active                  = false;
+    bme.heightCorrection        = 0;
+    bme.temperatureCorrection   = 0.0;
 
-    ota.username = "";
-    ota.password = "";
+    ota.username                = "";
+    ota.password                = "";
 
     // beaconInterval = 15; // deprecated
     // igateSendsLoRaBeacons = false; // deprecated
     // igateRepeatsLoRaPackets = false; // deprecated
-    rememberStationTime = 30;
-    sendBatteryVoltage = false;
-    externalVoltageMeasurement = false;
-    externalVoltagePin = 34;
+    rememberStationTime         = 30;
+    sendBatteryVoltage          = false;
+    externalVoltageMeasurement  = false;
+    externalVoltagePin          = 34;
 
-    lowPowerMode = false;
-    lowVoltageCutOff = 0;
+    lowPowerMode                = false;
+    lowVoltageCutOff            = 0;
 
     Serial.println("todo escrito");
 }

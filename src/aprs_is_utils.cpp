@@ -193,7 +193,7 @@ namespace APRS_IS_Utils {
     void processAPRSISPacket(const String& packet) {
         String Sender, AddresseeAndMessage, Addressee, receivedMessage;
         if (!packet.startsWith("#")) {
-            if (packet.indexOf("::") > 0) {
+            if (Config.aprs_is.messagesToRF && packet.indexOf("::") > 0) {
                 Sender = packet.substring(0, packet.indexOf(">"));
                 AddresseeAndMessage = packet.substring(packet.indexOf("::") + 2);
                 Addressee = AddresseeAndMessage.substring(0, AddresseeAndMessage.indexOf(":"));
@@ -250,7 +250,9 @@ namespace APRS_IS_Utils {
                     }
                 }
                 show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
-            }
+            } else if (Config.aprs_is.objectsToRF && packet.indexOf(":;") > 0) {
+                Serial.print("Object : "); Serial.println(packet);
+            } 
         }
     }
 

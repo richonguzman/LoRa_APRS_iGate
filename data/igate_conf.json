@@ -32,7 +32,9 @@
         "server": "rotate.aprs2.net",
         "port": 14580,
         "filter": "m/10",
-        "toRF": false
+        "toRF": false,
+        "messagesToRF": false,
+        "objectsToRF": false
     },
     "lora": {
         "txFreq": 433775000,
