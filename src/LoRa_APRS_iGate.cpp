@@ -9,7 +9,7 @@
 
                                           Ricardo Guzman - CA2RXU 
                               https://github.com/richonguzman/LoRa_APRS_Tracker
-                                 (donations : http://paypal.me/richonguzman)                                                                       
+                                 (donations : http://paypal.me/richonguzman)
 ______________________________________________________________________________________________________________*/
 
 #include <ElegantOTA.h>
