@@ -141,9 +141,14 @@
 #ifdef HELTEC_HTCT62
     #define BATTERY_PIN         1
 #endif
-#if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2) || defined(TTGO_T_LORA32_V2_1_915)
+#if defined(TTGO_T_LORA32_V2_1) || defined(TTGO_T_LORA32_V2_1_915)
     #define INTERNAL_LED_PIN    25      // Green Led
     #define BATTERY_PIN         35      // es 35 el led y 1 bateria?
+#endif
+#if defined(HELTEC_V2)
+    #define INTERNAL_LED_PIN    25
+    #define BATTERY_PIN         37
+    #define ADC_CTRL            21
 #endif
 #if defined(HELTEC_V3) || defined(HELTEC_WSL_V3) || defined(HELTEC_WS)
     #define INTERNAL_LED_PIN    35

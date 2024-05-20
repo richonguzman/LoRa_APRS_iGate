@@ -28,7 +28,7 @@ namespace BATTERY_Utils {
             #if defined(HELTEC_WSL_V3) || defined(HELTEC_WIRELESS_TRACKER)
                 digitalWrite(ADC_CTRL, HIGH);
             #endif
-            #ifdef HELTEC_V3
+            #if defined(HELTEC_V3) || defined(HELTEC_V2)
                 digitalWrite(ADC_CTRL, LOW);
             #endif
         #endif
@@ -48,7 +48,7 @@ namespace BATTERY_Utils {
             #if defined(HELTEC_WSL_V3) || defined(HELTEC_WIRELESS_TRACKER)
                 digitalWrite(ADC_CTRL, LOW);
             #endif
-            #ifdef HELTEC_V3_GPS
+            #if defined(HELTEC_V3) || defined(HELTEC_V2)
                 digitalWrite(ADC_CTRL, HIGH);
             #endif
             double inputDivider = (1.0 / (390.0 + 100.0)) * 100.0;  // The voltage divider is a 390k + 100k resistor in series, 100k on the low side.
