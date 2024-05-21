@@ -242,7 +242,7 @@ namespace APRS_IS_Utils {
                 } else {
                     Utils::print("Received from APRS-IS  : " + packet);
 
-                    if (Config.aprs_is.toRF && STATION_Utils::wasHeard(Addressee)) {
+                    if (/*Config.aprs_is.toRF && */STATION_Utils::wasHeard(Addressee)) {
                         STATION_Utils::addToOutputPacketBuffer(buildPacketToTx(packet));
                         display_toggle(true);
                         lastScreenOn = millis();

@@ -195,7 +195,9 @@ bool Configuration::readFile() {
 
             aprs_is.active                    = data["aprs_is"]["active"].as<bool>();
             aprs_is.filter                    = data["aprs_is"]["filter"].as<String>();
+            //
             aprs_is.toRF                      = data["aprs_is"]["toRF"].as<bool>();
+            //
             aprs_is.messagesToRF              = data["aprs_is"]["messagesToRF"].as<bool>();
             aprs_is.objectsToRF               = data["aprs_is"]["objectsToRF"].as<bool>();
 
@@ -312,7 +314,9 @@ void Configuration::init() {
     aprs_is.server              = "rotate.aprs2.net";
     aprs_is.port                = 14580;
     aprs_is.filter              = "m/10"; // new
+    //
     aprs_is.toRF                = false; // new
+    //
     aprs_is.messagesToRF        = false;
     aprs_is.objectsToRF         = false;
 
