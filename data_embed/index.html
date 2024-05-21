@@ -266,82 +266,6 @@
                                             d="M8.5 5.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0"
                                         />
                                     </svg>
-                                    Auto AP
-                                </h5>
-                                <small
-                                    >Add your password and power off timeout to
-                                    auto access point. Auto AP will start if
-                                    there is no WiFi connection. Timeout will
-                                    count from startup or last client
-                                    disconnected.</small
-                                >
-                            </div>
-                            <div class="col-lg-9 col-sm-12">
-                                <div class="col-12">
-                                    <label
-                                        for="wifi.autoAP.password"
-                                        class="form-label"
-                                        >Password</label
-                                    >
-                                    <input
-                                        type="password"
-                                        name="wifi.autoAP.password"
-                                        id="wifi.autoAP.password"
-                                        class="form-control"
-                                        placeholder="1234567890"
-                                        required=""
-                                    />
-                                </div>
-                                <div class="col-12 mt-3">
-                                    <label
-                                        for="wifi.autoAP.powerOff"
-                                        class="form-label"
-                                        >Power off timeout
-                                        <small>(in minutes)</small></label
-                                    >
-                                    <input
-                                        type="number"
-                                        name="wifi.autoAP.powerOff"
-                                        id="wifi.autoAP.powerOff"
-                                        class="form-control"
-                                        placeholder="15"
-                                        required=""
-                                        step="1"
-                                        min="0"
-                                    />
-                                    <div class="form-text">
-                                        Set to <strong>0</strong> if you don't
-                                        want this option.
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <hr />
-
-                        <div class="row my-5 d-flex align-items-top">
-                            <div class="col-lg-3 col-sm-12">
-                                <h5>
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        width="20"
-                                        height="20"
-                                        fill="currentColor"
-                                        class="bi bi-router-fill"
-                                        viewBox="0 0 16 16"
-                                    >
-                                        <path
-                                            d="M5.525 3.025a3.5 3.5 0 0 1 4.95 0 .5.5 0 1 0 .707-.707 4.5 4.5 0 0 0-6.364 0 .5.5 0 0 0 .707.707"
-                                        />
-                                        <path
-                                            d="M6.94 4.44a1.5 1.5 0 0 1 2.12 0 .5.5 0 0 0 .708-.708 2.5 2.5 0 0 0-3.536 0 .5.5 0 0 0 .707.707Z"
-                                        />
-                                        <path
-                                            d="M2.974 2.342a.5.5 0 1 0-.948.316L3.806 8H1.5A1.5 1.5 0 0 0 0 9.5v2A1.5 1.5 0 0 0 1.5 13H2a.5.5 0 0 0 .5.5h2A.5.5 0 0 0 5 13h6a.5.5 0 0 0 .5.5h2a.5.5 0 0 0 .5-.5h.5a1.5 1.5 0 0 0 1.5-1.5v-2A1.5 1.5 0 0 0 14.5 8h-2.306l1.78-5.342a.5.5 0 1 0-.948-.316L11.14 8H4.86zM2.5 11a.5.5 0 1 1 0-1 .5.5 0 0 1 0 1m4.5-.5a.5.5 0 1 1 1 0 .5.5 0 0 1-1 0m2.5.5a.5.5 0 1 1 0-1 .5.5 0 0 1 0 1m1.5-.5a.5.5 0 1 1 1 0 .5.5 0 0 1-1 0m2 0a.5.5 0 1 1 1 0 .5.5 0 0 1-1 0"
-                                        />
-                                        <path
-                                            d="M8.5 5.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0"
-                                        />
-                                    </svg>
                                     WiFi Access
                                 </h5>
                                 <small
@@ -511,6 +435,182 @@
                                             name="aprs_is.filter"
                                             id="aprs_is.filter"
                                         />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr />
+
+                        <div class="row my-5 d-flex align-items-top">
+                            <div class="col-lg-3 col-sm-12">
+                                <h5>
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="20"
+                                        height="20"
+                                        fill="currentColor"
+                                        class="bi bi-heart-pulse-fill"
+                                        viewBox="0 0 16 16"
+                                    >
+                                        <path
+                                            d="M1.475 9C2.702 10.84 4.779 12.871 8 15c3.221-2.129 5.298-4.16 6.525-6H12a.5.5 0 0 1-.464-.314l-1.457-3.642-1.598 5.593a.5.5 0 0 1-.945.049L5.889 6.568l-1.473 2.21A.5.5 0 0 1 4 9z"
+                                        />
+                                        <path
+                                            d="M.88 8C-2.427 1.68 4.41-2 7.823 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C11.59-2 18.426 1.68 15.12 8h-2.783l-1.874-4.686a.5.5 0 0 0-.945.049L7.921 8.956 6.464 5.314a.5.5 0 0 0-.88-.091L3.732 8z"
+                                        />
+                                    </svg>
+                                    Beaconing
+                                </h5>
+                                <small>Set APRS beacon attributes.</small>
+                            </div>
+                            <div class="col-lg-9 col-sm-12">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="form-check form-switch">
+                                            <input
+                                                type="checkbox"
+                                                name="beacon.sendViaAPRSIS"
+                                                id="beacon.sendViaAPRSIS"
+                                                class="form-check-input"
+                                            />
+                                            <label
+                                                for="beacon.sendViaAPRSIS"
+                                                class="form-label"
+                                                >Send our beacon to
+                                                APRS-IS</label
+                                            >
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="form-check form-switch">
+                                            <input
+                                                type="checkbox"
+                                                name="beacon.sendViaRF"
+                                                id="beacon.sendViaRF"
+                                                class="form-check-input"
+                                            />
+                                            <label
+                                                for="beacon.sendViaRF"
+                                                class="form-label"
+                                                >Send beacon via RF</label
+                                            >
+                                        </div>
+                                    </div>
+                                    <div class="col-6 d-grid gap-2">
+                                        <button class="btn btn-primary" id="send-beacon">Send beacon now</button>
+                                    </div>
+                                </div>
+                                <div class="row mt-3">
+                                    <div class="col-12">
+                                        <label
+                                            for="beacon.interval"
+                                            class="form-label"
+                                            >Interval</label
+                                        >
+                                        <div class="input-group">
+                                            <input
+                                                type="number"
+                                                name="beacon.interval"
+                                                id="beacon.interval"
+                                                placeholder="15"
+                                                class="form-control"
+                                                required=""
+                                                step="1"
+                                                min="1"
+                                            />
+                                            <span class="input-group-text"
+                                                >minutes</span
+                                            >
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row mt-3">
+                                    <div class="col-6">
+                                        <div class="form-check form-switch">
+                                            <input
+                                                type="checkbox"
+                                                name="other.sendBatteryVoltage"
+                                                id="other.sendBatteryVoltage"
+                                                class="form-check-input"
+                                            />
+                                            <label
+                                                for="other.sendBatteryVoltage"
+                                                class="form-label"
+                                                >Send Battery Telemetry</label
+                                            >
+                                        </div>
+                                        <div
+                                            class="form-check form-switch mt-1"
+                                        >
+                                            <input
+                                                type="checkbox"
+                                                name="other.externalVoltageMeasurement"
+                                                id="other.externalVoltageMeasurement"
+                                                class="form-check-input"
+                                            />
+                                            <label
+                                                for="other.externalVoltageMeasurement"
+                                                class="form-label"
+                                                >Measure External Voltage</label
+                                            >
+                                        </div>
+                                    </div>
+                                    <div class="form-floating col-6 p-1">
+                                        <input
+                                            type="text"
+                                            name="other.externalVoltagePin"
+                                            id="other.externalVoltagePin"
+                                            value="34"
+                                            class="form-control"
+                                        />
+                                        <label
+                                            for="other.externalVoltagePin"
+                                            class="form-label"
+                                            >External Voltage Pin</label
+                                        >
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr />
+
+                        <div class="row my-5 d-flex align-items-top">
+                            <div class="col-lg-3 col-sm-12">
+                                <h5>
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="20"
+                                        height="20"
+                                        fill="currentColor"
+                                        class="bi bi-broadcast-pin"
+                                        viewBox="0 0 16 16"
+                                    >
+                                        <path
+                                            d="M3.05 3.05a7 7 0 0 0 0 9.9.5.5 0 0 1-.707.707 8 8 0 0 1 0-11.314.5.5 0 0 1 .707.707m2.122 2.122a4 4 0 0 0 0 5.656.5.5 0 1 1-.708.708 5 5 0 0 1 0-7.072.5.5 0 0 1 .708.708m5.656-.708a.5.5 0 0 1 .708 0 5 5 0 0 1 0 7.072.5.5 0 1 1-.708-.708 4 4 0 0 0 0-5.656.5.5 0 0 1 0-.708m2.122-2.12a.5.5 0 0 1 .707 0 8 8 0 0 1 0 11.313.5.5 0 0 1-.707-.707 7 7 0 0 0 0-9.9.5.5 0 0 1 0-.707zM6 8a2 2 0 1 1 2.5 1.937V15.5a.5.5 0 0 1-1 0V9.937A2 2 0 0 1 6 8"
+                                        />
+                                    </svg>
+                                    Digipeating
+                                </h5>
+                                <small>Define the Digipeater mode</small>
+                            </div>
+                            <div class="col-9 mt-2">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <label
+                                            for="digi.mode"
+                                            class="form-label"
+                                            >Repeater Mode</label
+                                        >
+                                        <select
+                                            class="form-select form-select"
+                                            name="digi.mode"
+                                            id="digi.mode"
+                                        >
+                                            <option value="0">off</option>
+                                            <option value="2">
+                                                WIDE1 (fill-in) Digi
+                                            </option>
+                                        </select>
                                     </div>
                                 </div>
                             </div>
@@ -718,99 +818,6 @@
                                             d="M3.05 3.05a7 7 0 0 0 0 9.9.5.5 0 0 1-.707.707 8 8 0 0 1 0-11.314.5.5 0 0 1 .707.707m2.122 2.122a4 4 0 0 0 0 5.656.5.5 0 1 1-.708.708 5 5 0 0 1 0-7.072.5.5 0 0 1 .708.708m5.656-.708a.5.5 0 0 1 .708 0 5 5 0 0 1 0 7.072.5.5 0 1 1-.708-.708 4 4 0 0 0 0-5.656.5.5 0 0 1 0-.708m2.122-2.12a.5.5 0 0 1 .707 0 8 8 0 0 1 0 11.313.5.5 0 0 1-.707-.707 7 7 0 0 0 0-9.9.5.5 0 0 1 0-.707zM6 8a2 2 0 1 1 2.5 1.937V15.5a.5.5 0 0 1-1 0V9.937A2 2 0 0 1 6 8"
                                         />
                                     </svg>
-                                    Digipeating
-                                </h5>
-                                <small>Define the Digipeater mode</small>
-                            </div>
-                            <div class="col-9 mt-2">
-                                <div class="row">
-                                    <div class="col-12">
-                                        <label
-                                            for="digi.mode"
-                                            class="form-label"
-                                            >Repeater Mode</label
-                                        >
-                                        <select
-                                            class="form-select form-select"
-                                            name="digi.mode"
-                                            id="digi.mode"
-                                        >
-                                            <option value="0">off</option>
-                                            <option value="2">
-                                                WIDE1 (fill-in) Digi
-                                            </option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <hr />
-
-                        <div class="row my-5 d-flex align-items-top">
-                            <div class="col-lg-3 col-sm-12">
-                                <h5>
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        width="20"
-                                        height="20"
-                                        fill="currentColor"
-                                        class="bi bi-cloud-upload-fill"
-                                        viewBox="0 0 16 16"
-                                    >
-                                        <path
-                                            fill-rule="evenodd"
-                                            d="M8 0a5.53 5.53 0 0 0-3.594 1.342c-.766.66-1.321 1.52-1.464 2.383C1.266 4.095 0 5.555 0 7.318 0 9.366 1.708 11 3.781 11H7.5V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V11h4.188C14.502 11 16 9.57 16 7.773c0-1.636-1.242-2.969-2.834-3.194C12.923 1.999 10.69 0 8 0m-.5 14.5V11h1v3.5a.5.5 0 0 1-1 0"
-                                        />
-                                    </svg>
-                                    OTA
-                                </h5>
-                                <small
-                                    >Set your username and password to allow
-                                    firmware updating over-the-air.</small
-                                >
-                            </div>
-                            <div class="col-lg-9 col-sm-12">
-                                <div class="col-12">
-                                    <label for="ota.username" class="form-label"
-                                        >Username</label
-                                    >
-                                    <input
-                                        type="text"
-                                        name="ota.username"
-                                        id="ota.username"
-                                        class="form-control"
-                                    />
-                                </div>
-                                <div class="col-12 mt-3">
-                                    <label for="ota.password" class="form-label"
-                                        >Password</label
-                                    >
-                                    <input
-                                        type="password"
-                                        name="ota.password"
-                                        id="ota.password"
-                                        class="form-control"
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                        <hr />
-
-                        <div class="row my-5 d-flex align-items-top">
-                            <div class="col-lg-3 col-sm-12">
-                                <h5>
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        width="20"
-                                        height="20"
-                                        fill="currentColor"
-                                        class="bi bi-broadcast-pin"
-                                        viewBox="0 0 16 16"
-                                    >
-                                        <path
-                                            d="M3.05 3.05a7 7 0 0 0 0 9.9.5.5 0 0 1-.707.707 8 8 0 0 1 0-11.314.5.5 0 0 1 .707.707m2.122 2.122a4 4 0 0 0 0 5.656.5.5 0 1 1-.708.708 5 5 0 0 1 0-7.072.5.5 0 0 1 .708.708m5.656-.708a.5.5 0 0 1 .708 0 5 5 0 0 1 0 7.072.5.5 0 1 1-.708-.708 4 4 0 0 0 0-5.656.5.5 0 0 1 0-.708m2.122-2.12a.5.5 0 0 1 .707 0 8 8 0 0 1 0 11.313.5.5 0 0 1-.707-.707 7 7 0 0 0 0-9.9.5.5 0 0 1 0-.707zM6 8a2 2 0 1 1 2.5 1.937V15.5a.5.5 0 0 1-1 0V9.937A2 2 0 0 1 6 8"
-                                        />
-                                    </svg>
                                     Telemetry
                                 </h5>
                                 <small>Define the telemetry</small>
@@ -877,139 +884,6 @@
                                                 >C°</span
                                             >
                                         </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <hr />
-
-                        <div class="row my-5 d-flex align-items-top">
-                            <div class="col-lg-3 col-sm-12">
-                                <h5>
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        width="20"
-                                        height="20"
-                                        fill="currentColor"
-                                        class="bi bi-heart-pulse-fill"
-                                        viewBox="0 0 16 16"
-                                    >
-                                        <path
-                                            d="M1.475 9C2.702 10.84 4.779 12.871 8 15c3.221-2.129 5.298-4.16 6.525-6H12a.5.5 0 0 1-.464-.314l-1.457-3.642-1.598 5.593a.5.5 0 0 1-.945.049L5.889 6.568l-1.473 2.21A.5.5 0 0 1 4 9z"
-                                        />
-                                        <path
-                                            d="M.88 8C-2.427 1.68 4.41-2 7.823 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C11.59-2 18.426 1.68 15.12 8h-2.783l-1.874-4.686a.5.5 0 0 0-.945.049L7.921 8.956 6.464 5.314a.5.5 0 0 0-.88-.091L3.732 8z"
-                                        />
-                                    </svg>
-                                    Beaconing
-                                </h5>
-                                <small>Set APRS beacon attributes.</small>
-                            </div>
-                            <div class="col-lg-9 col-sm-12">
-                                <div class="row">
-                                    <div class="col-6">
-                                        <div class="form-check form-switch">
-                                            <input
-                                                type="checkbox"
-                                                name="beacon.sendViaAPRSIS"
-                                                id="beacon.sendViaAPRSIS"
-                                                class="form-check-input"
-                                            />
-                                            <label
-                                                for="beacon.sendViaAPRSIS"
-                                                class="form-label"
-                                                >Send our beacon to
-                                                APRS-IS</label
-                                            >
-                                        </div>
-                                    </div>
-                                    <div class="col-6">
-                                        <div class="form-check form-switch">
-                                            <input
-                                                type="checkbox"
-                                                name="beacon.sendViaRF"
-                                                id="beacon.sendViaRF"
-                                                class="form-check-input"
-                                            />
-                                            <label
-                                                for="beacon.sendViaRF"
-                                                class="form-label"
-                                                >Send beacon via RF</label
-                                            >
-                                        </div>
-                                    </div>
-                                    <div class="col-6 d-grid gap-2">
-                                        <button class="btn btn-primary" id="send-beacon">Send beacon now</button>
-                                    </div>
-                                </div>
-                                <div class="row mt-3">
-                                    <div class="col-12">
-                                        <label
-                                            for="beacon.interval"
-                                            class="form-label"
-                                            >Interval</label
-                                        >
-                                        <div class="input-group">
-                                            <input
-                                                type="number"
-                                                name="beacon.interval"
-                                                id="beacon.interval"
-                                                placeholder="15"
-                                                class="form-control"
-                                                required=""
-                                                step="1"
-                                                min="1"
-                                            />
-                                            <span class="input-group-text"
-                                                >minutes</span
-                                            >
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row mt-3">
-                                    <div class="col-6">
-                                        <div class="form-check form-switch">
-                                            <input
-                                                type="checkbox"
-                                                name="other.sendBatteryVoltage"
-                                                id="other.sendBatteryVoltage"
-                                                class="form-check-input"
-                                            />
-                                            <label
-                                                for="other.sendBatteryVoltage"
-                                                class="form-label"
-                                                >Send Battery Telemetry</label
-                                            >
-                                        </div>
-                                        <div
-                                            class="form-check form-switch mt-1"
-                                        >
-                                            <input
-                                                type="checkbox"
-                                                name="other.externalVoltageMeasurement"
-                                                id="other.externalVoltageMeasurement"
-                                                class="form-check-input"
-                                            />
-                                            <label
-                                                for="other.externalVoltageMeasurement"
-                                                class="form-label"
-                                                >Measure External Voltage</label
-                                            >
-                                        </div>
-                                    </div>
-                                    <div class="form-floating col-6 p-1">
-                                        <input
-                                            type="text"
-                                            name="other.externalVoltagePin"
-                                            id="other.externalVoltagePin"
-                                            value="34"
-                                            class="form-control"
-                                        />
-                                        <label
-                                            for="other.externalVoltagePin"
-                                            class="form-label"
-                                            >External Voltage Pin</label
-                                        >
                                     </div>
                                 </div>
                             </div>
@@ -1319,6 +1193,132 @@
                                             >
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr />
+
+                        <div class="row my-5 d-flex align-items-top">
+                            <div class="col-lg-3 col-sm-12">
+                                <h5>
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="20"
+                                        height="20"
+                                        fill="currentColor"
+                                        class="bi bi-router-fill"
+                                        viewBox="0 0 16 16"
+                                    >
+                                        <path
+                                            d="M5.525 3.025a3.5 3.5 0 0 1 4.95 0 .5.5 0 1 0 .707-.707 4.5 4.5 0 0 0-6.364 0 .5.5 0 0 0 .707.707"
+                                        />
+                                        <path
+                                            d="M6.94 4.44a1.5 1.5 0 0 1 2.12 0 .5.5 0 0 0 .708-.708 2.5 2.5 0 0 0-3.536 0 .5.5 0 0 0 .707.707Z"
+                                        />
+                                        <path
+                                            d="M2.974 2.342a.5.5 0 1 0-.948.316L3.806 8H1.5A1.5 1.5 0 0 0 0 9.5v2A1.5 1.5 0 0 0 1.5 13H2a.5.5 0 0 0 .5.5h2A.5.5 0 0 0 5 13h6a.5.5 0 0 0 .5.5h2a.5.5 0 0 0 .5-.5h.5a1.5 1.5 0 0 0 1.5-1.5v-2A1.5 1.5 0 0 0 14.5 8h-2.306l1.78-5.342a.5.5 0 1 0-.948-.316L11.14 8H4.86zM2.5 11a.5.5 0 1 1 0-1 .5.5 0 0 1 0 1m4.5-.5a.5.5 0 1 1 1 0 .5.5 0 0 1-1 0m2.5.5a.5.5 0 1 1 0-1 .5.5 0 0 1 0 1m1.5-.5a.5.5 0 1 1 1 0 .5.5 0 0 1-1 0m2 0a.5.5 0 1 1 1 0 .5.5 0 0 1-1 0"
+                                        />
+                                        <path
+                                            d="M8.5 5.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0"
+                                        />
+                                    </svg>
+                                    Auto AP
+                                </h5>
+                                <small
+                                    >Add your password and power off timeout to
+                                    auto access point. Auto AP will start if
+                                    there is no WiFi connection. Timeout will
+                                    count from startup or last client
+                                    disconnected.</small
+                                >
+                            </div>
+                            <div class="col-lg-9 col-sm-12">
+                                <div class="col-12">
+                                    <label
+                                        for="wifi.autoAP.password"
+                                        class="form-label"
+                                        >Password</label
+                                    >
+                                    <input
+                                        type="password"
+                                        name="wifi.autoAP.password"
+                                        id="wifi.autoAP.password"
+                                        class="form-control"
+                                        placeholder="1234567890"
+                                        required=""
+                                    />
+                                </div>
+                                <div class="col-12 mt-3">
+                                    <label
+                                        for="wifi.autoAP.powerOff"
+                                        class="form-label"
+                                        >Power off timeout
+                                        <small>(in minutes)</small></label
+                                    >
+                                    <input
+                                        type="number"
+                                        name="wifi.autoAP.powerOff"
+                                        id="wifi.autoAP.powerOff"
+                                        class="form-control"
+                                        placeholder="15"
+                                        required=""
+                                        step="1"
+                                        min="0"
+                                    />
+                                    <div class="form-text">
+                                        Set to <strong>0</strong> if you don't
+                                        want this option.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr />
+
+                        <div class="row my-5 d-flex align-items-top">
+                            <div class="col-lg-3 col-sm-12">
+                                <h5>
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="20"
+                                        height="20"
+                                        fill="currentColor"
+                                        class="bi bi-cloud-upload-fill"
+                                        viewBox="0 0 16 16"
+                                    >
+                                        <path
+                                            fill-rule="evenodd"
+                                            d="M8 0a5.53 5.53 0 0 0-3.594 1.342c-.766.66-1.321 1.52-1.464 2.383C1.266 4.095 0 5.555 0 7.318 0 9.366 1.708 11 3.781 11H7.5V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V11h4.188C14.502 11 16 9.57 16 7.773c0-1.636-1.242-2.969-2.834-3.194C12.923 1.999 10.69 0 8 0m-.5 14.5V11h1v3.5a.5.5 0 0 1-1 0"
+                                        />
+                                    </svg>
+                                    OTA
+                                </h5>
+                                <small
+                                    >Set your username and password to allow
+                                    firmware updating over-the-air.</small
+                                >
+                            </div>
+                            <div class="col-lg-9 col-sm-12">
+                                <div class="col-12">
+                                    <label for="ota.username" class="form-label"
+                                        >Username</label
+                                    >
+                                    <input
+                                        type="text"
+                                        name="ota.username"
+                                        id="ota.username"
+                                        class="form-control"
+                                    />
+                                </div>
+                                <div class="col-12 mt-3">
+                                    <label for="ota.password" class="form-label"
+                                        >Password</label
+                                    >
+                                    <input
+                                        type="password"
+                                        name="ota.password"
+                                        id="ota.password"
+                                        class="form-control"
+                                    />
                                 </div>
                             </div>
                         </div>
