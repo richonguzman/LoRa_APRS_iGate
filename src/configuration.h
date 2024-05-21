@@ -48,7 +48,7 @@ public:
     int     port;
     // int     reportingDistance; // deprecated
     String  filter; // new
-    bool    toRF; // new
+    //bool    toRF; // new
     bool    messagesToRF;
     bool    objectsToRF;
 };

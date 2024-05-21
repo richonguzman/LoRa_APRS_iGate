@@ -115,7 +115,7 @@ namespace WEB_Utils {
         Config.aprs_is.port             = request->getParam("aprs_is.port", true)->value().toInt();
         // Config.aprs_is.reportingDistance = request->getParam("aprs_is.reportingDistance", true)->value().toInt();
         Config.aprs_is.filter           = request->getParam("aprs_is.filter", true)->value();
-        Config.aprs_is.toRF             = request->hasParam("aprs_is.toRF", true);
+        //Config.aprs_is.toRF             = request->hasParam("aprs_is.toRF", true);
         Config.aprs_is.messagesToRF     = request->hasParam("aprs_is.messagesToRF", true);
         Config.aprs_is.objectsToRF      = request->hasParam("aprs_is.objectsToRF", true);
         

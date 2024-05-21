@@ -240,9 +240,9 @@ namespace APRS_IS_Utils {
                         seventhLine = "QUERY = " + receivedMessage;
                     }
                 } else {
-                    Utils::print("Received from APRS-IS  : " + packet);
+                    Utils::print("Received Message from APRS-IS  : " + packet);
 
-                    if (/*Config.aprs_is.toRF && */STATION_Utils::wasHeard(Addressee)) {
+                    if (STATION_Utils::wasHeard(Addressee)) {
                         STATION_Utils::addToOutputPacketBuffer(buildPacketToTx(packet));
                         display_toggle(true);
                         lastScreenOn = millis();
@@ -251,7 +251,13 @@ namespace APRS_IS_Utils {
                 }
                 show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
             } else if (Config.aprs_is.objectsToRF && packet.indexOf(":;") > 0) {
-                Serial.print("Object : "); Serial.println(packet);
+                Utils::println("Received Object from APRS-IS  : " + packet);
+                //
+                // revisar que se enviara del output buffer!!!
+                //STATION_Utils::addToOutputPacketBuffer(buildPacketToTx(packet));
+                display_toggle(true);
+                lastScreenOn = millis();
+                Utils::typeOfPacket(packet, 1); // APRS-LoRa
             } 
         }
     }
