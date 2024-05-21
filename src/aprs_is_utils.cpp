@@ -107,12 +107,39 @@ namespace APRS_IS_Utils {
         }
     }
 
-    String buildPacketToTx(const String& aprsisPacket) {
+    String buildPacketToTx(const String& aprsisPacket, uint8_t packetType) {
         String packet = aprsisPacket;
         packet.trim();
-        String firstPart = packet.substring(0, packet.indexOf(","));
-        String messagePart = packet.substring(packet.indexOf("::") + 2);
-        return firstPart + ",TCPIP,WIDE1-1," + Config.callsign + "::" + messagePart;
+        String outputPacket = packet.substring(0, packet.indexOf(",")) + ",TCPIP,WIDE1-1," + Config.callsign;
+        switch (packetType) {
+            case 0: // gps
+                if (packet.indexOf(":=") > 0) {
+                    outputPacket += packet.substring(packet.indexOf(":="));
+                } else {
+                    outputPacket += packet.substring(packet.indexOf(":!"));
+                }
+                break;
+            case 1: // messages
+                outputPacket += packet.substring(packet.indexOf("::"));
+                break;
+            case 2: // status
+                outputPacket += packet.substring(packet.indexOf(":>"));
+                break;
+            case 3: // telemetry
+                outputPacket += packet.substring(packet.indexOf("::"));
+                break;
+            case 4: // mic-e
+                if (packet.indexOf(":`") > 0) {
+                    outputPacket += packet.substring(packet.indexOf(":`"));
+                } else {
+                    outputPacket += packet.substring(packet.indexOf(":'"));
+                }
+                break;
+            case 5: // object
+                outputPacket += packet.substring(packet.indexOf(":;"));
+                break;
+        }
+        return outputPacket;
     }
 
     bool processReceivedLoRaMessage(const String& sender, const String& packet) {
@@ -243,7 +270,7 @@ namespace APRS_IS_Utils {
                     Utils::print("Received Message from APRS-IS  : " + packet);
 
                     if (STATION_Utils::wasHeard(Addressee)) {
-                        STATION_Utils::addToOutputPacketBuffer(buildPacketToTx(packet));
+                        STATION_Utils::addToOutputPacketBuffer(buildPacketToTx(packet, 1));
                         display_toggle(true);
                         lastScreenOn = millis();
                         Utils::typeOfPacket(packet, 1); // APRS-LoRa
@@ -252,9 +279,7 @@ namespace APRS_IS_Utils {
                 show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
             } else if (Config.aprs_is.objectsToRF && packet.indexOf(":;") > 0) {
                 Utils::println("Received Object from APRS-IS  : " + packet);
-                //
-                // revisar que se enviara del output buffer!!!
-                //STATION_Utils::addToOutputPacketBuffer(buildPacketToTx(packet));
+                STATION_Utils::addToOutputPacketBuffer(buildPacketToTx(packet, 5));
                 display_toggle(true);
                 lastScreenOn = millis();
                 Utils::typeOfPacket(packet, 1); // APRS-LoRa
