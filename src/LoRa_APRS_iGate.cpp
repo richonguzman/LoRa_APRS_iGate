@@ -40,19 +40,9 @@ ________________________________________________________________________________
 String          versionDate             = "2024.05.20";
 Configuration   Config;
 WiFiClient      espClient;
-uint8_t         myWiFiAPIndex           = 0;
-int             myWiFiAPSize            = Config.wifiAPs.size();
-WiFi_AP         *currentWiFi            = &Config.wifiAPs[myWiFiAPIndex];
 
 bool            isUpdatingOTA           = false;
-uint32_t        previousWiFiMillis      = 0;
 uint32_t        lastScreenOn            = millis();
-
-uint32_t        lastWiFiCheck           = 0;
-bool            WiFiConnect             = true;
-bool            WiFiConnected           = false;
-bool            WiFiAutoAPStarted       = false;
-long            WiFiAutoAPTime          = false;
 
 uint32_t        lastBatteryCheck        = 0;
 String          batteryVoltage;
@@ -62,6 +52,18 @@ std::vector<ReceivedPacket> receivedPackets;
 bool            modemLoggedToAPRSIS     = false;
 
 String firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine;
+
+/*uint8_t         myWiFiAPIndex           = 0;
+int             myWiFiAPSize            = Config.wifiAPs.size();
+WiFi_AP         *currentWiFi            = &Config.wifiAPs[myWiFiAPIndex];*/
+//uint32_t        previousWiFiMillis      = 0;
+//uint32_t        lastWiFiCheck           = 0;
+//bool            WiFiConnect             = true;
+//bool            WiFiConnected           = false;
+//bool            WiFiAutoAPStarted       = false;
+//long            WiFiAutoAPTime          = false;
+
+
 
 //#define STARTUP_DELAY 5 //min
 

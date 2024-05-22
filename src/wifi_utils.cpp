@@ -6,14 +6,21 @@
 #include "utils.h"
 
 extern Configuration  Config;
-extern WiFi_AP        *currentWiFi;
-extern uint8_t        myWiFiAPIndex;
-extern int            myWiFiAPSize;
-extern uint32_t       previousWiFiMillis;
-extern bool           WiFiConnected;
-extern long           WiFiAutoAPTime;
-extern bool           WiFiAutoAPStarted;
 
+//extern WiFi_AP        *currentWiFi;
+//extern uint8_t        myWiFiAPIndex;
+//extern int            myWiFiAPSize;
+//extern uint32_t       previousWiFiMillis;
+
+uint8_t     myWiFiAPIndex       = 0;
+int         myWiFiAPSize        = Config.wifiAPs.size();
+WiFi_AP     *currentWiFi        = &Config.wifiAPs[myWiFiAPIndex];
+
+uint8_t     wifiCounter         = 0;
+bool        WiFiConnected       = false;
+uint32_t    WiFiAutoAPTime      = millis();
+bool        WiFiAutoAPStarted   = false;
+uint32_t    previousWiFiMillis  = 0;
 
 namespace WIFI_Utils {
 
@@ -24,8 +31,26 @@ namespace WIFI_Utils {
             WiFi.disconnect();
             WiFi.reconnect();
             previousWiFiMillis = millis();
+            wifiCounter++;
+        } else if (WiFi.status() == WL_CONNECTED) {
+            wifiCounter = 0;
+            Serial.println(wifiCounter);
         }
     }
+
+    /*void checkWiFiInterval() {
+        uint32_t WiFiCheck = millis() - lastWiFiCheck;
+        if (WiFi.status() != WL_CONNECTED && WiFiCheck >= 15 * 60 * 1000) {
+            WiFiConnect = true;
+        }
+        if (WiFiConnect) {
+            Serial.println("\nConnecting to WiFi ...");
+            WIFI_Utils::startWiFi();
+            lastWiFiCheck = millis();
+            WiFiConnect = false;
+        }
+    }*/
+
 
     void startAutoAP() {
         WiFi.mode(WIFI_MODE_NULL);
