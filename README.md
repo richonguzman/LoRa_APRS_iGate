@@ -50,6 +50,7 @@ ____________________________________________________
 ____________________________________________________
 ## Timeline (Versions):
 
+- 2024.05.23 Forced Reboot Mode added.
 - 2024.05.22 Experimental backup-Digirepeater-Mode when "only" iGate mode loses WiFi connection added.
 - 2024.05.20 WebConfig update to control wheter Messages and Objects should be Tx to RF.
 - 2024.05.17 HELTEC Wireless Stick Lite v3 support added.
