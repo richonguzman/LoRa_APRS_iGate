@@ -65,7 +65,7 @@ namespace Utils {
         if (!WiFiConnected) {
             return "IP :  192.168.4.1";
         } else if (backUpDigiMode) {
-            return "- BackUp Digi Mode -";
+            return "- BACKUP DIGI MODE -";
         } else {
             return "IP :  " + String(WiFi.localIP()[0]) + "." + String(WiFi.localIP()[1]) + "." + String(WiFi.localIP()[2]) + "." + String(WiFi.localIP()[3]);
         }        

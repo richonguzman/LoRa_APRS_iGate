@@ -69,7 +69,7 @@ namespace APRS_IS_Utils {
             wifiState = "OK";
         } else {
             if (backUpDigiMode) {
-                wifiState = "DI";
+                wifiState = "--";
             } else {
                 wifiState = "AP";
             }            
