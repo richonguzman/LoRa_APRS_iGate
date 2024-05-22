@@ -179,6 +179,9 @@ namespace WEB_Utils {
             Config.externalVoltagePin   = request->getParam("other.externalVoltagePin", true)->value().toInt();
         }
 
+        Config.rebootMode                   = request->hasParam("other.rebootMode", true);
+        Config.rebootModeTime               = request->getParam("other.rebootModeTime", true)->value().toInt();
+
         Config.lowPowerMode                 = request->hasParam("other.lowPowerMode", true);
         Config.lowVoltageCutOff             = request->getParam("other.lowVoltageCutOff", true)->value().toDouble();
 

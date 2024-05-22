@@ -119,6 +119,7 @@ void setup() {
     #ifdef ESP32_DIY_LoRa_A7670
         A7670_Utils::setup();
     #endif
+    Utils::checkRebootMode();
 }
 
 void loop() {
@@ -181,4 +182,5 @@ void loop() {
     STATION_Utils::clean25SegBuffer();
 
     show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
+    Utils::checkRebootTime();
 }

@@ -167,10 +167,8 @@ function loadSettings(settings) {
     document.getElementById("other.sendBatteryVoltage").checked = settings.other.sendBatteryVoltage;
     document.getElementById("other.externalVoltageMeasurement").checked = settings.other.externalVoltageMeasurement;
     document.getElementById("other.externalVoltagePin").value   = settings.other.externalVoltagePin;
-    // document.getElementById("beacon.igateSendsLoRaBeacon").value =
-    //     settings.beacon.igateSendsLoRaBeacon;
-    // document.getElementById("beacon.igateRepeatLoRaPackets").value =
-    //     settings.beacon.igateRepeatLoRaPackets;
+    // document.getElementById("beacon.igateSendsLoRaBeacon").value = settings.beacon.igateSendsLoRaBeacon;
+    // document.getElementById("beacon.igateRepeatLoRaPackets").value = settings.beacon.igateRepeatLoRaPackets;
     document.getElementById("beacon.path").value            = settings.beacon.path;
     document.getElementById("beacon.latitude").value        = settings.beacon.latitude;
     document.getElementById("beacon.longitude").value       = settings.beacon.longitude;
@@ -188,11 +186,9 @@ function loadSettings(settings) {
     }
 
     // LoRa
-    // document.getElementById("lora.digirepeaterTxFreq").value =
-    //     settings.lora.digirepeaterTxFreq;
+    // document.getElementById("lora.digirepeaterTxFreq").value = settings.lora.digirepeaterTxFreq;
     // document.getElementById("lora.iGateFreq").value = settings.lora.iGateFreq;
-    // document.getElementById("lora.digirepeaterRxFreq").value =
-    //     settings.lora.digirepeaterRxFreq;
+    // document.getElementById("lora.digirepeaterRxFreq").value = settings.lora.digirepeaterRxFreq;
     document.getElementById("lora.txFreq").value            = settings.lora.txFreq;
     document.getElementById("lora.rxFreq").value            = settings.lora.rxFreq;
     document.getElementById("lora.txActive").checked        = settings.lora.txActive;
@@ -201,6 +197,10 @@ function loadSettings(settings) {
     document.getElementById("lora.signalBandwidth").value   = settings.lora.signalBandwidth;
     document.getElementById("lora.codingRate4").value       = settings.lora.codingRate4;
     document.getElementById("lora.power").value             = settings.lora.power;
+
+    // Reboot
+    document.getElementById("other.rebootMode").checked     = settings.other.rebootMode;
+    document.getElementById("other.rebootModeTime").value   = settings.other.rebootModeTime;
 
     // Experimental
     document.getElementById("other.backupDigiMode").checked = settings.other.backupDigiMode;

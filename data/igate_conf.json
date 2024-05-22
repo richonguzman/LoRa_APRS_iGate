@@ -72,6 +72,8 @@
         "externalVoltagePin": 34,
         "lowPowerMode": false,
         "lowVoltageCutOff": 0,
-        "backupDigiMode": false
+        "backupDigiMode": false,
+        "rebootMode": false,
+        "rebootModeTime": 0
     }
 }

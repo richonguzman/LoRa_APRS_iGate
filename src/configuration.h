@@ -121,6 +121,8 @@ public:
     bool                    lowPowerMode;
     double                  lowVoltageCutOff;
     bool                    backupDigiMode;
+    bool                    rebootMode;
+    int                     rebootModeTime;
     std::vector<WiFi_AP>    wifiAPs;
     WiFi_Auto_AP            wifiAutoAP;
     Beacon                  beacon; // new

@@ -29,83 +29,86 @@ void Configuration::writeFile() {
         }
     }
 
-    data["wifi"]["autoAP"]["password"] = wifiAutoAP.password;
-    data["wifi"]["autoAP"]["powerOff"] = wifiAutoAP.powerOff;
+    data["wifi"]["autoAP"]["password"]      = wifiAutoAP.password;
+    data["wifi"]["autoAP"]["powerOff"]      = wifiAutoAP.powerOff;
 
-    data["callsign"] = callsign;
+    data["callsign"]                        = callsign;
     // data["stationMode"] = stationMode; // only check for config version
     // data["iGateComment"] = iGateComment;
 
     // data["other"]["beaconInterval"] = beaconInterval;
     // data["other"]["igateSendsLoRaBeacons"] = igateSendsLoRaBeacons;
     // data["other"]["igateRepeatsLoRaPackets"] = igateRepeatsLoRaPackets;
-    data["other"]["rememberStationTime"] = rememberStationTime;
-    data["other"]["sendBatteryVoltage"] = sendBatteryVoltage;
+    data["other"]["rememberStationTime"]    = rememberStationTime;
+    data["other"]["sendBatteryVoltage"]     = sendBatteryVoltage;
     data["other"]["externalVoltageMeasurement"] = externalVoltageMeasurement;
-    data["other"]["externalVoltagePin"] = externalVoltagePin;
+    data["other"]["externalVoltagePin"]     = externalVoltagePin;
 
-    data["digi"]["mode"] = digi.mode;
+    data["digi"]["mode"]                    = digi.mode;
     // data["digi"]["comment"] = digi.comment;
     // data["digi"]["latitude"] = digi.latitude;
     // data["digi"]["longitude"] = digi.longitude;
 
-    data["tnc"]["enableServer"] = tnc.enableServer;
-    data["tnc"]["enableSerial"] = tnc.enableSerial;
-    data["tnc"]["acceptOwn"] = tnc.acceptOwn;
+    data["tnc"]["enableServer"]             = tnc.enableServer;
+    data["tnc"]["enableSerial"]             = tnc.enableSerial;
+    data["tnc"]["acceptOwn"]                = tnc.acceptOwn;
 
-    data["aprs_is"]["active"] = aprs_is.active;
-    data["aprs_is"]["passcode"] = aprs_is.passcode;
-    data["aprs_is"]["server"] = aprs_is.server;
-    data["aprs_is"]["port"] = aprs_is.port;
-    data["aprs_is"]["filter"] = aprs_is.filter;
+    data["aprs_is"]["active"]               = aprs_is.active;
+    data["aprs_is"]["passcode"]             = aprs_is.passcode;
+    data["aprs_is"]["server"]               = aprs_is.server;
+    data["aprs_is"]["port"]                 = aprs_is.port;
+    data["aprs_is"]["filter"]               = aprs_is.filter;
     //data["aprs_is"]["toRF"] = aprs_is.toRF;
-    data["aprs_is"]["messagesToRF"] = aprs_is.messagesToRF;
-    data["aprs_is"]["objectsToRF"] = aprs_is.objectsToRF;
+    data["aprs_is"]["messagesToRF"]         = aprs_is.messagesToRF;
+    data["aprs_is"]["objectsToRF"]          = aprs_is.objectsToRF;
     
 
-    data["beacon"]["comment"] = beacon.comment;
+    data["beacon"]["comment"]               = beacon.comment;
     // data["beacon"]["igateRepeatsLoRaPackets"] = beacon.igateRepeatsLoRaPackets;
     // data["beacon"]["igateSendsLoRaBeacons"] = beacon.igateSendsLoRaBeacons;
-    data["beacon"]["interval"] = beacon.interval;
-    data["beacon"]["latitude"] = beacon.latitude;
-    data["beacon"]["longitude"] = beacon.longitude;
-    data["beacon"]["overlay"] = beacon.overlay;
-    data["beacon"]["symbol"] = beacon.symbol;
-    data["beacon"]["sendViaAPRSIS"] = beacon.sendViaAPRSIS;
-    data["beacon"]["sendViaRF"] = beacon.sendViaRF;
-    data["beacon"]["path"] = beacon.path;
+    data["beacon"]["interval"]              = beacon.interval;
+    data["beacon"]["latitude"]              = beacon.latitude;
+    data["beacon"]["longitude"]             = beacon.longitude;
+    data["beacon"]["overlay"]               = beacon.overlay;
+    data["beacon"]["symbol"]                = beacon.symbol;
+    data["beacon"]["sendViaAPRSIS"]         = beacon.sendViaAPRSIS;
+    data["beacon"]["sendViaRF"]             = beacon.sendViaRF;
+    data["beacon"]["path"]                  = beacon.path;
 
     // data["lora"]["iGateFreq"] = loramodule.iGateFreq;
     // data["lora"]["digirepeaterTxFreq"] = loramodule.digirepeaterTxFreq;
     // data["lora"]["digirepeaterRxFreq"] = loramodule.digirepeaterRxFreq;
-    data["lora"]["rxFreq"] = loramodule.rxFreq;
-    data["lora"]["txFreq"] = loramodule.txFreq;
-    data["lora"]["spreadingFactor"] = loramodule.spreadingFactor;
-    data["lora"]["signalBandwidth"] = loramodule.signalBandwidth;
-    data["lora"]["codingRate4"] = loramodule.codingRate4;
-    data["lora"]["power"] = loramodule.power;
-    data["lora"]["txActive"] = loramodule.txActive;
-    data["lora"]["rxActive"] = loramodule.rxActive;
+    data["lora"]["rxFreq"]                  = loramodule.rxFreq;
+    data["lora"]["txFreq"]                  = loramodule.txFreq;
+    data["lora"]["spreadingFactor"]         = loramodule.spreadingFactor;
+    data["lora"]["signalBandwidth"]         = loramodule.signalBandwidth;
+    data["lora"]["codingRate4"]             = loramodule.codingRate4;
+    data["lora"]["power"]                   = loramodule.power;
+    data["lora"]["txActive"]                = loramodule.txActive;
+    data["lora"]["rxActive"]                = loramodule.rxActive;
 
-    data["display"]["alwaysOn"] = display.alwaysOn;
-    data["display"]["timeout"] = display.timeout;
-    data["display"]["turn180"] = display.turn180;
+    data["display"]["alwaysOn"]             = display.alwaysOn;
+    data["display"]["timeout"]              = display.timeout;
+    data["display"]["turn180"]              = display.turn180;
 
-    data["syslog"]["active"] = syslog.active;
-    data["syslog"]["server"] = syslog.server;
-    data["syslog"]["port"] = syslog.port;
+    data["syslog"]["active"]                = syslog.active;
+    data["syslog"]["server"]                = syslog.server;
+    data["syslog"]["port"]                  = syslog.port;
 
-    data["bme"]["active"] = bme.active;
-    data["bme"]["heightCorrection"] = bme.heightCorrection;
-    data["bme"]["temperatureCorrection"] = bme.temperatureCorrection;
+    data["bme"]["active"]                   = bme.active;
+    data["bme"]["heightCorrection"]         = bme.heightCorrection;
+    data["bme"]["temperatureCorrection"]    = bme.temperatureCorrection;
 
-    data["ota"]["username"] = ota.username;
-    data["ota"]["password"] = ota.password;
+    data["ota"]["username"]                 = ota.username;
+    data["ota"]["password"]                 = ota.password;
 
-    data["other"]["lowPowerMode"] = lowPowerMode;
-    data["other"]["lowVoltageCutOff"] = lowVoltageCutOff;
+    data["other"]["lowPowerMode"]           = lowPowerMode;
+    data["other"]["lowVoltageCutOff"]       = lowVoltageCutOff;
 
-    data["other"]["backupDigiMode"] = backupDigiMode;
+    data["other"]["backupDigiMode"]         = backupDigiMode;
+
+    data["other"]["rebootMode"]             = rebootMode;
+    data["other"]["rebootModeTime"]         = rebootModeTime;
 
     serializeJson(data, configFile);
 
@@ -178,7 +181,10 @@ bool Configuration::readFile() {
 
         backupDigiMode                  = data["other"]["backupDigiMode"].as<bool>();
 
-        int stationMode                     = data["stationMode"].as<int>(); // deprecated but need to specify config version
+        rebootMode                      = data["other"]["rebootMode"].as<bool>();
+        rebootModeTime                  = data["other"]["rebootModeTime"].as<int>();
+
+        int stationMode                 = data["stationMode"].as<int>(); // deprecated but need to specify config version
 
         if (stationMode == 0) {
             // Load new settings 
@@ -359,6 +365,9 @@ void Configuration::init() {
     lowVoltageCutOff            = 0;
 
     backupDigiMode              = false;
+
+    rebootMode                  = false;
+    rebootModeTime              = 0;
 
     Serial.println("All is Written!");
 }

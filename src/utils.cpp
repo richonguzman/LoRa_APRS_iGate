@@ -262,4 +262,19 @@ namespace Utils {
         }
     }
 
+    void checkRebootMode() {
+        if (Config.rebootMode && Config.rebootModeTime > 0) {
+            Serial.println("(Reboot Time Set to " + String(Config.rebootModeTime) + " hours)");
+        }
+    }
+
+    void checkRebootTime() {
+        if (Config.rebootMode && Config.rebootModeTime > 0) {
+            if (millis() > Config.rebootModeTime * 60 * 60 * 1000) {
+                Serial.println("\n*** Automatic Reboot Time Restart! ****\n");
+                ESP.restart();
+            }
+        }
+    }
+
 }

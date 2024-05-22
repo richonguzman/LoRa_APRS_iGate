@@ -24,6 +24,8 @@ namespace Utils {
     void typeOfPacket(const String& packet, uint8_t packetType);
     void print(const String& text);
     void println(const String& text);
+    void checkRebootMode();
+    void checkRebootTime();
 
 }
 
