@@ -203,6 +203,8 @@ function loadSettings(settings) {
     document.getElementById("lora.power").value             = settings.lora.power;
 
     // Experimental
+    document.getElementById("other.backupDigiMode").checked = settings.other.backupDigiMode;
+
     document.getElementById("other.lowPowerMode").checked   = settings.other.lowPowerMode;
     document.getElementById("other.lowVoltageCutOff").value = settings.other.lowVoltageCutOff || 0
 
