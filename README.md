@@ -50,7 +50,7 @@ ____________________________________________________
 ____________________________________________________
 ## Timeline (Versions):
 
-
+- 2024.05.22 Experimental backup-Digirepeater-Mode when "only" iGate mode loses WiFi connection added.
 - 2024.05.17 HELTEC Wireless Stick Lite v3 support added.
 - 2024.05.14 BME modules will be autodetected (I2C Address and if it is BME280/BMP280/BME680).
 - 2024.05.13 PacketBuffer for Rx (25 Seg).
