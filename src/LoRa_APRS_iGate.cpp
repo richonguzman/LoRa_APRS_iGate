@@ -37,9 +37,13 @@ ________________________________________________________________________________
     #include "A7670_utils.h"
 #endif
 
-String          versionDate             = "2024.05.20";
+String          versionDate             = "2024.05.22";
 Configuration   Config;
 WiFiClient      espClient;
+
+uint8_t         myWiFiAPIndex           = 0;
+int             myWiFiAPSize            = Config.wifiAPs.size();
+WiFi_AP         *currentWiFi            = &Config.wifiAPs[myWiFiAPIndex];
 
 bool            isUpdatingOTA           = false;
 uint32_t        lastScreenOn            = millis();
@@ -49,21 +53,10 @@ String          batteryVoltage;
 
 std::vector<ReceivedPacket> receivedPackets;
 
+bool            backUpDigiMode          = false;
 bool            modemLoggedToAPRSIS     = false;
 
 String firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine;
-
-/*uint8_t         myWiFiAPIndex           = 0;
-int             myWiFiAPSize            = Config.wifiAPs.size();
-WiFi_AP         *currentWiFi            = &Config.wifiAPs[myWiFiAPIndex];*/
-//uint32_t        previousWiFiMillis      = 0;
-//uint32_t        lastWiFiCheck           = 0;
-//bool            WiFiConnect             = true;
-//bool            WiFiConnected           = false;
-//bool            WiFiAutoAPStarted       = false;
-//long            WiFiAutoAPTime          = false;
-
-
 
 //#define STARTUP_DELAY 5 //min
 
@@ -121,7 +114,6 @@ void setup() {
             Config.loramodule.rxActive = false;
         }
     #endif
-
     WIFI_Utils::setup();
     SYSLOG_Utils::setup();
     BME_Utils::setup();
@@ -152,7 +144,7 @@ void loop() {
     #ifdef ESP32_DIY_LoRa_A7670
         if (Config.aprs_is.active && !modemLoggedToAPRSIS) A7670_Utils::APRS_IS_connect();
     #else
-        if (Config.aprs_is.active && !espClient.connected()) APRS_IS_Utils::connect();
+        if (Config.aprs_is.active && (WiFi.status() == WL_CONNECTED) && !espClient.connected()) APRS_IS_Utils::connect();
     #endif
 
     TNC_Utils::loop();
@@ -172,7 +164,7 @@ void loop() {
             APRS_IS_Utils::processLoRaPacket(packet); // Send received packet to APRSIS
         }
 
-        if (Config.digi.mode == 2) { // If Digi enabled
+        if (Config.digi.mode == 2 || backUpDigiMode) { // If Digi enabled
             DIGI_Utils::processLoRaPacket(packet); // Send received packet to Digi
         }
 

@@ -19,6 +19,7 @@ extern String           fourthLine;
 extern String           fifthLine;
 extern String           sixthLine;
 extern String           seventhLine;
+extern bool             backUpDigiMode;
 
 
 namespace DIGI_Utils {
@@ -71,7 +72,7 @@ namespace DIGI_Utils {
                         if (packet.indexOf("::") > 10 && Addressee == Config.callsign) {      // its a message for me!
                             queryMessage = APRS_IS_Utils::processReceivedLoRaMessage(Sender, AddresseeAndMessage);
                         }
-                        if (!queryMessage && packet.indexOf("WIDE1-") > 10 && Config.digi.mode == 2) { // If should repeat packet (WIDE1 Digi)
+                        if (!queryMessage && packet.indexOf("WIDE1-") > 10 && (Config.digi.mode == 2 || backUpDigiMode)) { // If should repeat packet (WIDE1 Digi)
                             loraPacket = generateDigiRepeatedPacket(packet.substring(3));
                             if (loraPacket != "") {
                                 STATION_Utils::addToOutputPacketBuffer(loraPacket);

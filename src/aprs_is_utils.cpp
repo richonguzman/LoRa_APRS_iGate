@@ -20,6 +20,7 @@ extern String               fifthLine;
 extern String               sixthLine;
 extern String               seventhLine;
 extern bool                 modemLoggedToAPRSIS;
+extern bool                 backUpDigiMode;
 
 uint32_t lastRxTime         = millis();
 
@@ -67,7 +68,11 @@ namespace APRS_IS_Utils {
         if (WiFi.status() == WL_CONNECTED) {
             wifiState = "OK";
         } else {
-            wifiState = "AP";
+            if (backUpDigiMode) {
+                wifiState = "DI";
+            } else {
+                wifiState = "AP";
+            }            
             if (!Config.display.alwaysOn && Config.display.timeout != 0) {
                 display_toggle(true);
             }

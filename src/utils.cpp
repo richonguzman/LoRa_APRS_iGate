@@ -34,6 +34,7 @@ extern uint32_t             lastWiFiCheck;
 extern bool                 WiFiConnect;
 extern bool                 WiFiConnected;
 extern int                  wxModuleType;
+extern bool                 backUpDigiMode;
 
 bool        statusAfterBoot     = true;
 bool        beaconUpdate        = true;
@@ -63,6 +64,8 @@ namespace Utils {
     String getLocalIP() {
         if (!WiFiConnected) {
             return "IP :  192.168.4.1";
+        } else if (backUpDigiMode) {
+            return "- BackUp Digi Mode -";
         } else {
             return "IP :  " + String(WiFi.localIP()[0]) + "." + String(WiFi.localIP()[1]) + "." + String(WiFi.localIP()[2]) + "." + String(WiFi.localIP()[3]);
         }        
@@ -136,7 +139,7 @@ namespace Utils {
                 sixthLine = "    (Ext V=" + externalVoltage;
             }
 
-            if (Config.aprs_is.active && Config.beacon.sendViaAPRSIS) {
+            if (Config.aprs_is.active && Config.beacon.sendViaAPRSIS && !backUpDigiMode) {
                 show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING IGATE BEACON", 0); 
                 seventhLine = "     listening...";
                 #ifdef ESP32_DIY_LoRa_A7670
@@ -146,7 +149,7 @@ namespace Utils {
                 #endif
             }
 
-            if (Config.beacon.sendViaRF) {
+            if (Config.beacon.sendViaRF || backUpDigiMode) {
                 show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING DIGI BEACON", 0);
                 seventhLine = "     listening...";
                 STATION_Utils::addToOutputPacketBuffer(secondaryBeaconPacket);
