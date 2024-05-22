@@ -123,16 +123,17 @@ namespace Utils {
             #ifdef BATTERY_PIN
                 if (Config.sendBatteryVoltage) {
                     String batteryInfo = "Batt=" + String(BATTERY_Utils::checkBattery(),2) + "V";
-                    beaconPacket += (" " + batteryInfo);
-                    secondaryBeaconPacket += (" " + batteryInfo);
+                    beaconPacket += " " + batteryInfo;
+                    secondaryBeaconPacket += " " + batteryInfo;
                     sixthLine = "     ( " + batteryInfo + ")";
                 }
             #endif
 
-            if (Config.externalVoltageMeasurement) { 
-                beaconPacket += " Ext=" + String(BATTERY_Utils::checkExternalVoltage(),2) + "V";
-                secondaryBeaconPacket += " Ext=" + String(BATTERY_Utils::checkExternalVoltage(),2) + "V";
-                sixthLine = "    (Ext V=" + String(BATTERY_Utils::checkExternalVoltage(),2) + "V)";
+            if (Config.externalVoltageMeasurement) {
+                String externalVoltage = String(BATTERY_Utils::checkExternalVoltage(),2) + "V";
+                beaconPacket += " Ext=" + externalVoltage;
+                secondaryBeaconPacket += " Ext=" + externalVoltage;
+                sixthLine = "    (Ext V=" + externalVoltage;
             }
 
             if (Config.aprs_is.active && Config.beacon.sendViaAPRSIS) {
