@@ -71,6 +71,7 @@
         "externalVoltageMeasurement": false,
         "externalVoltagePin": 34,
         "lowPowerMode": false,
-        "lowVoltageCutOff": 0
+        "lowVoltageCutOff": 0,
+        "backupDigiMode": false
     }
 }

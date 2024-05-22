@@ -107,30 +107,31 @@ public:
 
 class Configuration {
 public:
-    bool                  reload;
-    String                callsign;  
+    bool                    reload;
+    String                  callsign;  
     // int                   stationMode; // deprecated
     // String                iGateComment; // deprecated
     // int                   beaconInterval; // deprecated
     // bool                  igateSendsLoRaBeacons; // deprecated
     // bool                  igateRepeatsLoRaPackets; // deprecated
-    int                   rememberStationTime;
-    bool                  sendBatteryVoltage;
-    bool                  externalVoltageMeasurement;
-    int                   externalVoltagePin;
-    bool                  lowPowerMode;
-    double                lowVoltageCutOff;
-    std::vector<WiFi_AP>  wifiAPs;
-    WiFi_Auto_AP          wifiAutoAP;
-    Beacon                beacon; // new
-    DIGI                  digi;
-    TNC                   tnc; // new
-    APRS_IS               aprs_is;
-    LoraModule            loramodule;
-    Display               display;
-    SYSLOG                syslog;
-    BME                   bme;
-    OTA                   ota;
+    int                     rememberStationTime;
+    bool                    sendBatteryVoltage;
+    bool                    externalVoltageMeasurement;
+    int                     externalVoltagePin;
+    bool                    lowPowerMode;
+    double                  lowVoltageCutOff;
+    bool                    backupDigiMode;
+    std::vector<WiFi_AP>    wifiAPs;
+    WiFi_Auto_AP            wifiAutoAP;
+    Beacon                  beacon; // new
+    DIGI                    digi;
+    TNC                     tnc; // new
+    APRS_IS                 aprs_is;
+    LoraModule              loramodule;
+    Display                 display;
+    SYSLOG                  syslog;
+    BME                     bme;
+    OTA                     ota;
   
     void init();
     void writeFile();

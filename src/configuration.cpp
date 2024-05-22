@@ -105,6 +105,8 @@ void Configuration::writeFile() {
     data["other"]["lowPowerMode"] = lowPowerMode;
     data["other"]["lowVoltageCutOff"] = lowVoltageCutOff;
 
+    data["other"]["backupDigiMode"] = backupDigiMode;
+
     serializeJson(data, configFile);
 
     configFile.close();
@@ -173,6 +175,8 @@ bool Configuration::readFile() {
 
         lowPowerMode                    = data["other"]["lowPowerMode"].as<bool>();
         lowVoltageCutOff                = data["other"]["lowVoltageCutOff"].as<double>();
+
+        backupDigiMode                  = data["other"]["backupDigiMode"].as<bool>();
 
         int stationMode                     = data["stationMode"].as<int>(); // deprecated but need to specify config version
 
@@ -354,7 +358,9 @@ void Configuration::init() {
     lowPowerMode                = false;
     lowVoltageCutOff            = 0;
 
-    Serial.println("todo escrito");
+    backupDigiMode              = false;
+
+    Serial.println("All is Written!");
 }
 
 Configuration::Configuration() {

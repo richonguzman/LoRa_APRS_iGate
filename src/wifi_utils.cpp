@@ -5,29 +5,26 @@
 #include "display.h"
 #include "utils.h"
 
-extern Configuration  Config;
+extern Configuration    Config;
 
-extern uint8_t        myWiFiAPIndex;
-extern int            myWiFiAPSize;
-extern WiFi_AP        *currentWiFi;
+extern uint8_t          myWiFiAPIndex;
+extern int              myWiFiAPSize;
+extern WiFi_AP          *currentWiFi;
+extern bool             backUpDigiMode;
 
 bool        WiFiConnected       = false;
 uint32_t    WiFiAutoAPTime      = millis();
 bool        WiFiAutoAPStarted   = false;
 uint32_t    previousWiFiMillis  = 0;
+uint8_t     wifiCounter         = 0;
+uint32_t    lastBackupDigiTime  = millis();
 
-//
-uint8_t     wifiCounter                 = 0;
-bool        backupDigiModeActive        = true;
-extern bool        backUpDigiMode;
-uint32_t    lastWiFiCheckBackupDigiMode = millis();
-//
 
 namespace WIFI_Utils {
 
     void checkWiFi() {
         if (backUpDigiMode) {
-            uint32_t WiFiCheck = millis() - lastWiFiCheckBackupDigiMode;
+            uint32_t WiFiCheck = millis() - lastBackupDigiTime;
             if (WiFi.status() != WL_CONNECTED && WiFiCheck >= 15 * 60 * 1000) {
                 Serial.println("*** Stoping BackUp Digi Mode ***");
                 backUpDigiMode = false;
@@ -46,13 +43,13 @@ namespace WIFI_Utils {
             WiFi.reconnect();
             previousWiFiMillis = millis();
 
-            if (backupDigiModeActive) {
+            if (Config.backupDigiMode) {
                 wifiCounter++;
             }
             if (wifiCounter >= 2) {
                 Serial.println("*** Starting BackUp Digi Mode ***");
                 backUpDigiMode = true;
-                lastWiFiCheckBackupDigiMode = millis();
+                lastBackupDigiTime = millis();
             }
         }
     }

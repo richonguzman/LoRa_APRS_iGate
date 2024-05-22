@@ -22,7 +22,6 @@ extern String               fourthLine;
 extern String               fifthLine;
 extern String               sixthLine;
 extern String               seventhLine;
-extern uint32_t             lastScreenOn;
 extern String               iGateBeaconPacket;
 extern String               iGateLoRaBeaconPacket;
 extern std::vector<String>  lastHeardStation;
@@ -39,6 +38,7 @@ extern bool                 backUpDigiMode;
 bool        statusAfterBoot     = true;
 bool        beaconUpdate        = true;
 uint32_t    lastBeaconTx        = 0;
+uint32_t    lastScreenOn        = millis();
 
 
 namespace Utils {

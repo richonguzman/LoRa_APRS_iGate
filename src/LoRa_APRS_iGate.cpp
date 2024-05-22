@@ -46,15 +46,12 @@ int             myWiFiAPSize            = Config.wifiAPs.size();
 WiFi_AP         *currentWiFi            = &Config.wifiAPs[myWiFiAPIndex];
 
 bool            isUpdatingOTA           = false;
-uint32_t        lastScreenOn            = millis();
-
 uint32_t        lastBatteryCheck        = 0;
 String          batteryVoltage;
-
-std::vector<ReceivedPacket> receivedPackets;
-
 bool            backUpDigiMode          = false;
 bool            modemLoggedToAPRSIS     = false;
+
+std::vector<ReceivedPacket> receivedPackets;
 
 String firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine;
 
