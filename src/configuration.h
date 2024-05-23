@@ -9,8 +9,6 @@ class WiFi_AP {
 public:
     String  ssid;
     String  password;
-    // double  latitude; // deprecated
-    // double  longitude; // deprecated
 };
 
 class WiFi_Auto_AP {
@@ -21,47 +19,40 @@ public:
 
 class Beacon {
 public:
-    double  latitude; // new
-    double  longitude; // new
-    String  comment; // new
-    String  overlay; // new
-    String  symbol; // new
-    int     interval; // new
-    bool    sendViaRF; // new
-    bool    sendViaAPRSIS; // new
-    String  path; // new
-};
-
-class DIGI {
-public:
-    int     mode; // new
-    // String  comment; // deprecated
-    // double  latitude; // deprecated
-    // double  longitude; // deprecated
+    double  latitude;
+    double  longitude;
+    String  comment;
+    int     interval;
+    String  overlay;
+    String  symbol;
+    String  path;    
+    bool    sendViaRF;
+    bool    sendViaAPRSIS;
 };
 
 class APRS_IS {
 public:
-    bool    active; // new
+    bool    active;
     String  passcode;
     String  server;
     int     port;
-    // int     reportingDistance; // deprecated
-    String  filter; // new
-    //bool    toRF; // new
+    String  filter;
     bool    messagesToRF;
     bool    objectsToRF;
 };
 
+class DIGI {
+public:
+    int     mode;
+};
+
+
 class LoraModule {
 public:
-    // long    iGateFreq; // deprecated
-    // long    digirepeaterTxFreq; // deprecated
-    // long    digirepeaterRxFreq; // deprecated
-    long    txFreq; // new
-    long    rxFreq; // new
-    bool    txActive; // new
-    bool    rxActive; // new
+    long    txFreq;
+    long    rxFreq;
+    bool    txActive;
+    bool    rxActive;
     int     spreadingFactor;
     long    signalBandwidth;
     int     codingRate4;
@@ -75,11 +66,11 @@ public:
     bool    turn180;
 };
 
-class TNC {
+class BME {
 public:
-    bool    enableServer;
-    bool    enableSerial;
-    bool    acceptOwn;
+    bool    active;
+    int     heightCorrection;
+    float   temperatureCorrection;
 };
 
 class SYSLOG {
@@ -89,11 +80,11 @@ public:
     int     port;
 };
 
-class BME {
+class TNC {
 public:
-    bool    active;
-    int     heightCorrection;
-    float   temperatureCorrection;
+    bool    enableServer;
+    bool    enableSerial;
+    bool    acceptOwn;
 };
 
 class OTA {
@@ -102,18 +93,10 @@ public:
     String  password;
 };
 
-
-
-
 class Configuration {
 public:
-    bool                    reload;
-    String                  callsign;  
-    // int                   stationMode; // deprecated
-    // String                iGateComment; // deprecated
-    // int                   beaconInterval; // deprecated
-    // bool                  igateSendsLoRaBeacons; // deprecated
-    // bool                  igateRepeatsLoRaPackets; // deprecated
+    bool                    reload;     // ?
+    String                  callsign;
     int                     rememberStationTime;
     bool                    sendBatteryVoltage;
     bool                    externalVoltageMeasurement;
@@ -125,9 +108,9 @@ public:
     int                     rebootModeTime;
     std::vector<WiFi_AP>    wifiAPs;
     WiFi_Auto_AP            wifiAutoAP;
-    Beacon                  beacon; // new
+    Beacon                  beacon;
     DIGI                    digi;
-    TNC                     tnc; // new
+    TNC                     tnc;
     APRS_IS                 aprs_is;
     LoraModule              loramodule;
     Display                 display;

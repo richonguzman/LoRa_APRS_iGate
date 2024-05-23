@@ -88,75 +88,22 @@ namespace WEB_Utils {
             WiFi_AP wifiap;
             wifiap.ssid                   = request->getParam("wifi.AP." + String(i) + ".ssid", true)->value();
             wifiap.password               = request->getParam("wifi.AP." + String(i) + ".password", true)->value();
-            // wifiap.latitude               = request->getParam("wifi.AP." + String(i) + ".latitude", true)->value().toDouble();
-            // wifiap.longitude              = request->getParam("wifi.AP." + String(i) + ".longitude", true)->value().toDouble();
 
             Config.wifiAPs.push_back(wifiap);
         }
 
         Config.callsign                 = request->getParam("callsign", true)->value();
-        // Config.iGateComment = request->getParam("iGateComment", true)->value();
-        
+                
         Config.wifiAutoAP.password      = request->getParam("wifi.autoAP.password", true)->value();
         Config.wifiAutoAP.powerOff      = request->getParam("wifi.autoAP.powerOff", true)->value().toInt();
-
-        Config.digi.mode                = request->getParam("digi.mode", true)->value().toInt();
-        // Config.digi.comment = request->getParam("digi.comment", true)->value();
-        // Config.digi.latitude = request->getParam("digi.latitude", true)->value().toDouble();
-        // Config.digi.longitude = request->getParam("digi.longitude", true)->value().toDouble();
-
-        Config.tnc.enableServer         = request->hasParam("tnc.enableServer", true);
-        Config.tnc.enableSerial         = request->hasParam("tnc.enableSerial", true);
-        Config.tnc.acceptOwn            = request->hasParam("tnc.acceptOwn", true);
 
         Config.aprs_is.active           = request->hasParam("aprs_is.active", true);
         Config.aprs_is.passcode         = request->getParam("aprs_is.passcode", true)->value();
         Config.aprs_is.server           = request->getParam("aprs_is.server", true)->value();
         Config.aprs_is.port             = request->getParam("aprs_is.port", true)->value().toInt();
-        // Config.aprs_is.reportingDistance = request->getParam("aprs_is.reportingDistance", true)->value().toInt();
         Config.aprs_is.filter           = request->getParam("aprs_is.filter", true)->value();
-        //Config.aprs_is.toRF             = request->hasParam("aprs_is.toRF", true);
         Config.aprs_is.messagesToRF     = request->hasParam("aprs_is.messagesToRF", true);
         Config.aprs_is.objectsToRF      = request->hasParam("aprs_is.objectsToRF", true);
-        
-        // Config.loramodule.iGateFreq = request->getParam("lora.iGateFreq", true)->value().toInt();
-        // if (request->hasParam("lora.digirepeaterTxFreq", true)) {
-        //     Config.loramodule.digirepeaterTxFreq = request->getParam("lora.digirepeaterTxFreq", true)->value().toInt();
-        // }
-        // if (request->hasParam("lora.digirepeaterRxFreq", true)) {
-        //     Config.loramodule.digirepeaterRxFreq = request->getParam("lora.digirepeaterRxFreq", true)->value().toInt();
-        // }
-
-        Config.loramodule.txFreq            = request->getParam("lora.txFreq", true)->value().toInt();
-        Config.loramodule.rxFreq            = request->getParam("lora.rxFreq", true)->value().toInt();
-        Config.loramodule.spreadingFactor   = request->getParam("lora.spreadingFactor", true)->value().toInt();
-        Config.loramodule.signalBandwidth   = request->getParam("lora.signalBandwidth", true)->value().toInt();
-        Config.loramodule.codingRate4       = request->getParam("lora.codingRate4", true)->value().toInt();
-        Config.loramodule.power             = request->getParam("lora.power", true)->value().toInt();
-        Config.loramodule.txActive          = request->hasParam("lora.txActive", true);
-        Config.loramodule.rxActive          = request->hasParam("lora.rxActive", true);
-
-        Config.display.alwaysOn             = request->hasParam("display.alwaysOn", true);
-
-        if (!Config.display.alwaysOn) {
-            Config.display.timeout  = request->getParam("display.timeout", true)->value().toInt();
-        }
-
-        Config.display.turn180              = request->hasParam("display.turn180", true);
-
-        Config.syslog.active                = request->hasParam("syslog.active", true);
-
-        if (Config.syslog.active) {
-            Config.syslog.server    = request->getParam("syslog.server", true)->value();
-            Config.syslog.port      = request->getParam("syslog.port", true)->value().toInt();
-        }
-
-        Config.bme.active                   = request->hasParam("bme.active", true);
-        Config.bme.heightCorrection         = request->getParam("bme.heightCorrection", true)->value().toInt();
-        Config.bme.temperatureCorrection    = request->getParam("bme.temperatureCorrection", true)->value().toFloat();
-
-        Config.ota.username                 = request->getParam("ota.username", true)->value();
-        Config.ota.password                 = request->getParam("ota.password", true)->value();
 
         Config.beacon.interval              = request->getParam("beacon.interval", true)->value().toInt();
         Config.beacon.sendViaAPRSIS         = request->hasParam("beacon.sendViaAPRSIS", true);
@@ -168,28 +115,58 @@ namespace WEB_Utils {
         Config.beacon.symbol                = request->getParam("beacon.symbol", true)->value();
         Config.beacon.path                  = request->getParam("beacon.path", true)->value();
 
-        // Config.beaconInterval = request->getParam("other.beaconInterval", true)->value().toInt();
-        // Config.igateSendsLoRaBeacons = request->hasParam("other.igateSendsLoRaBeacons", true);
-        // Config.igateRepeatsLoRaPackets = request->hasParam("other.igateRepeatsLoRaPackets", true);
-        Config.rememberStationTime          = request->getParam("other.rememberStationTime", true)->value().toInt();
-        Config.sendBatteryVoltage           = request->hasParam("other.sendBatteryVoltage", true);
-        Config.externalVoltageMeasurement   = request->hasParam("other.externalVoltageMeasurement", true);
+        Config.digi.mode                = request->getParam("digi.mode", true)->value().toInt();
 
-        if (Config.externalVoltageMeasurement) {
-            Config.externalVoltagePin   = request->getParam("other.externalVoltagePin", true)->value().toInt();
+        Config.loramodule.txFreq            = request->getParam("lora.txFreq", true)->value().toInt();
+        Config.loramodule.rxFreq            = request->getParam("lora.rxFreq", true)->value().toInt();
+        Config.loramodule.spreadingFactor   = request->getParam("lora.spreadingFactor", true)->value().toInt();
+        Config.loramodule.signalBandwidth   = request->getParam("lora.signalBandwidth", true)->value().toInt();
+        Config.loramodule.codingRate4       = request->getParam("lora.codingRate4", true)->value().toInt();
+        Config.loramodule.power             = request->getParam("lora.power", true)->value().toInt();
+        Config.loramodule.txActive          = request->hasParam("lora.txActive", true);
+        Config.loramodule.rxActive          = request->hasParam("lora.rxActive", true);
+
+        Config.display.alwaysOn             = request->hasParam("display.alwaysOn", true);
+        if (!Config.display.alwaysOn) {
+            Config.display.timeout  = request->getParam("display.timeout", true)->value().toInt();
         }
+        Config.display.turn180              = request->hasParam("display.turn180", true);
 
-        Config.rebootMode                   = request->hasParam("other.rebootMode", true);
-        Config.rebootModeTime               = request->getParam("other.rebootModeTime", true)->value().toInt();
-
-        Config.lowPowerMode                 = request->hasParam("other.lowPowerMode", true);
-        Config.lowVoltageCutOff             = request->getParam("other.lowVoltageCutOff", true)->value().toDouble();
-
-        Config.backupDigiMode               = request->hasParam("other.backupDigiMode", true);
-
+        Config.bme.active                   = request->hasParam("bme.active", true);
+        Config.bme.heightCorrection         = request->getParam("bme.heightCorrection", true)->value().toInt();
+        Config.bme.temperatureCorrection    = request->getParam("bme.temperatureCorrection", true)->value().toFloat();
         if (Config.bme.active) {
             Config.beacon.symbol = "_";
         }
+
+        Config.syslog.active                = request->hasParam("syslog.active", true);
+        if (Config.syslog.active) {
+            Config.syslog.server    = request->getParam("syslog.server", true)->value();
+            Config.syslog.port      = request->getParam("syslog.port", true)->value().toInt();
+        }
+        
+        Config.tnc.enableServer         = request->hasParam("tnc.enableServer", true);
+        Config.tnc.enableSerial         = request->hasParam("tnc.enableSerial", true);
+        Config.tnc.acceptOwn            = request->hasParam("tnc.acceptOwn", true);
+
+        
+        Config.rebootMode                   = request->hasParam("other.rebootMode", true);
+        Config.rebootModeTime               = request->getParam("other.rebootModeTime", true)->value().toInt();
+        
+        Config.ota.username                 = request->getParam("ota.username", true)->value();
+        Config.ota.password                 = request->getParam("ota.password", true)->value();
+
+        Config.rememberStationTime          = request->getParam("other.rememberStationTime", true)->value().toInt();
+        Config.sendBatteryVoltage           = request->hasParam("other.sendBatteryVoltage", true);
+        Config.externalVoltageMeasurement   = request->hasParam("other.externalVoltageMeasurement", true);
+        if (Config.externalVoltageMeasurement) {
+            Config.externalVoltagePin   = request->getParam("other.externalVoltagePin", true)->value().toInt();
+        }
+       
+        Config.backupDigiMode               = request->hasParam("other.backupDigiMode", true);
+
+        Config.lowPowerMode                 = request->hasParam("other.lowPowerMode", true);
+        Config.lowVoltageCutOff             = request->getParam("other.lowVoltageCutOff", true)->value().toDouble();
 
         Config.writeFile();
 
