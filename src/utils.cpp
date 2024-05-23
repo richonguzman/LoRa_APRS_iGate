@@ -29,8 +29,6 @@ extern int                  rssi;
 extern float                snr;
 extern int                  freqError;
 extern String               distance;
-extern uint32_t             lastWiFiCheck;
-extern bool                 WiFiConnect;
 extern bool                 WiFiConnected;
 extern int                  wxModuleType;
 extern bool                 backUpDigiMode;
@@ -169,19 +167,6 @@ namespace Utils {
         uint32_t lastDisplayTime = millis() - lastScreenOn;
         if (!Config.display.alwaysOn && lastDisplayTime >= Config.display.timeout * 1000) {
             display_toggle(false);
-        }
-    }
-
-    void checkWiFiInterval() {
-        uint32_t WiFiCheck = millis() - lastWiFiCheck;
-        if (WiFi.status() != WL_CONNECTED && WiFiCheck >= 15 * 60 * 1000) {
-            WiFiConnect = true;
-        }
-        if (WiFiConnect) {
-            Serial.println("\nConnecting to WiFi ...");
-            WIFI_Utils::startWiFi();
-            lastWiFiCheck = millis();
-            WiFiConnect = false;
         }
     }
 
