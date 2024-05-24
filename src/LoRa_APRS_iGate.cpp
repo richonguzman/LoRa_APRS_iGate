@@ -47,9 +47,11 @@ WiFi_AP         *currentWiFi            = &Config.wifiAPs[myWiFiAPIndex];
 
 bool            isUpdatingOTA           = false;
 uint32_t        lastBatteryCheck        = 0;
-String          batteryVoltage;
+String          batteryVoltage; // ????
 bool            backUpDigiMode          = false;
 bool            modemLoggedToAPRSIS     = false;
+
+bool            shouldSleep             = false;
 
 std::vector<ReceivedPacket> receivedPackets;
 
@@ -94,7 +96,7 @@ void setup() {
                 if (lastBeacon == 0 || time - lastBeacon >= Config.beacon.interval * 60) {
                     Serial.println("Sending beacon");
                     String comment = Config.beacon.comment;
-                    if (Config.battery.sendBatteryVoltage) comment += " Batt=" + String(BATTERY_Utils::checkBattery(),2) + "V";
+                    if (Config.battery.sendBatteryVoltage) comment += " Batt=" + String(BATTERY_Utils::checkInternalVoltage(),2) + "V";
                     if (Config.battery.externalVoltageMeasurement) comment += " Ext=" + String(BATTERY_Utils::checkExternalVoltage(),2) + "V";
                     STATION_Utils::addToOutputPacketBuffer(GPS_Utils::getiGateLoRaBeaconPacket() + comment);                
                     lastBeacon = time;
@@ -183,4 +185,5 @@ void loop() {
 
     show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
     Utils::checkRebootTime();
+    Utils::checkSleepByLowBatteryVoltage();
 }

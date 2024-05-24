@@ -32,6 +32,7 @@ extern String               distance;
 extern bool                 WiFiConnected;
 extern int                  wxModuleType;
 extern bool                 backUpDigiMode;
+extern bool                 shouldSleep;
 
 bool        statusAfterBoot     = true;
 bool        beaconUpdate        = true;
@@ -123,18 +124,27 @@ namespace Utils {
 
             #ifdef BATTERY_PIN
                 if (Config.battery.sendInternalVoltage) {
-                    String batteryInfo = "Batt=" + String(BATTERY_Utils::checkBattery(),2) + "V";
-                    beaconPacket += " " + batteryInfo;
-                    secondaryBeaconPacket += " " + batteryInfo;
-                    sixthLine = "     ( " + batteryInfo + ")";
+                    float internalVoltage       = BATTERY_Utils::checkInternalVoltage();
+                    String internalVoltageInfo  = "Batt=" + String(internalVoltage,2) + "V";
+                    beaconPacket += " " + internalVoltageInfo;
+                    secondaryBeaconPacket += " " + internalVoltageInfo;
+                    sixthLine = "    ( " + internalVoltageInfo + ")";
                 }
             #endif
 
-            if (Config.battery.sendExternalVoltage) {
-                String externalVoltage = String(BATTERY_Utils::checkExternalVoltage(),2) + "V";
-                beaconPacket += " Ext=" + externalVoltage;
-                secondaryBeaconPacket += " Ext=" + externalVoltage;
-                sixthLine = "    (Ext V=" + externalVoltage;
+            if (Config.battery.sendExternalVoltage || Config.battery.monitorExternalVoltage) {
+                float externalVoltage       = BATTERY_Utils::checkExternalVoltage();
+                String externalVoltageInfo  = String(externalVoltage,2) + "V";
+                if (Config.battery.sendExternalVoltage) {
+                    beaconPacket += " Ext=" + externalVoltageInfo;
+                    secondaryBeaconPacket += " Ext=" + externalVoltageInfo;
+                    sixthLine = "    (Ext V=" + externalVoltageInfo + ")";
+                }
+                if (Config.battery.monitorExternalVoltage && externalVoltage <= Config.battery.externalSleepVoltage) {
+                    beaconPacket += " **ExtBatWarning:SLEEP**";
+                    secondaryBeaconPacket += " **ExtBatWarning:SLEEP**";
+                    shouldSleep = true;
+                }
             }
 
             if (Config.aprs_is.active && Config.beacon.sendViaAPRSIS && !backUpDigiMode) {
@@ -259,6 +269,14 @@ namespace Utils {
                 Serial.println("\n*** Automatic Reboot Time Restart! ****\n");
                 ESP.restart();
             }
+        }
+    }
+
+    void checkSleepByLowBatteryVoltage() {
+        if (shouldSleep) {
+            // dormir
+            shouldSleep = false;
+            Serial.println("Durmiendo");
         }
     }
 

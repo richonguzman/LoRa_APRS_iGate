@@ -25,6 +25,7 @@ namespace Utils {
     void println(const String& text);
     void checkRebootMode();
     void checkRebootTime();
+    void checkSleepByLowBatteryVoltage();
 
 }
 

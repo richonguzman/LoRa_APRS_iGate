@@ -21,7 +21,7 @@ namespace BATTERY_Utils {
         return (voltage - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
     }
 
-    float checkBattery() { 
+    float checkInternalVoltage() { 
         int sample;
         int sampleSum = 0;
         #ifdef ADC_CTRL
@@ -70,7 +70,7 @@ namespace BATTERY_Utils {
         }
 
         float voltage = ((((sampleSum/100)* adcReadingTransformation) + readingCorrection) * ((R1+R2)/R2)) - multiplyCorrection;
-
+        
         return voltage; // raw voltage without mapping
 
         // return mapVoltage(voltage, 5.05, 6.32, 4.5, 5.5); // mapped voltage
@@ -80,7 +80,7 @@ namespace BATTERY_Utils {
         if (lastBatteryCheck == 0 || millis() - lastBatteryCheck >= 15 * 60 * 1000) {
             lastBatteryCheck = millis();
 
-            float voltage = checkBattery();
+            float voltage = checkInternalVoltage();
             
             if (voltage < Config.lowVoltageCutOff) {
                 ESP.deepSleep(1800000000); // 30 min sleep (60s = 60e6)
