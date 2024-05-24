@@ -52,7 +52,7 @@ ____________________________________________________
 
 - 2024.05.23 Forced Reboot Mode added.
 - 2024.05.22 Experimental backup-Digirepeater-Mode when "only" iGate mode loses WiFi connection added.
-- 2024.05.20 WebConfig update to control wheter Messages and Objects should be Tx to RF.
+- 2024.05.20 WebConfig update to control whether Messages and Objects should be Tx to RF.
 - 2024.05.17 HELTEC Wireless Stick Lite v3 support added.
 - 2024.05.14 BME modules will be autodetected (I2C Address and if it is BME280/BMP280/BME680).
 - 2024.05.13 PacketBuffer for Rx (25 Seg).
