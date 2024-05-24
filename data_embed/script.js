@@ -74,19 +74,15 @@ logCheckbox.addEventListener("change", function () {
 function loadSettings(settings) {
     currentSettings = settings;
     // General
-    document.getElementById("callsign").value               = settings.callsign;
+    document.getElementById("callsign").value                           = settings.callsign;
+    document.getElementById("beacon.comment").value                     = settings.beacon.comment;
+    document.getElementById("beacon.path").value                        = settings.beacon.path;
+    document.getElementById("beacon.symbol").value                      = settings.beacon.symbol;
+    document.getElementById("beacon.overlay").value                     = settings.beacon.overlay;
 
-    document.getElementById("bme.active").checked           = settings.bme.active;
-    document.getElementById("bme.heightCorrection").value   = settings.bme.heightCorrection;
-    document.getElementById("bme.temperatureCorrection").value  = settings.bme.temperatureCorrection.toFixed(1);
-    
-    document.getElementById("beacon.comment").value         = settings.beacon.comment;
-    document.getElementById("beacon.symbol").value          = settings.beacon.symbol;
-    document.getElementById("beacon.overlay").value         = settings.beacon.overlay;
+    document.getElementById("action.symbol").value                      = settings.beacon.overlay + settings.beacon.symbol;
 
-    document.getElementById("action.symbol").value          = settings.beacon.overlay + settings.beacon.symbol;
-
-    document.querySelector(".list-networks").innerHTML      = "";
+    document.querySelector(".list-networks").innerHTML                  = "";
 
     // Networks
     const wifiNetworks = settings.wifi.AP || [];
@@ -122,18 +118,39 @@ function loadSettings(settings) {
     });
 
     // APRS-IS
-    document.getElementById("aprs_is.active").checked       = settings.aprs_is.active;
-    document.getElementById("aprs_is.messagesToRF").checked = settings.aprs_is.messagesToRF;
-    document.getElementById("aprs_is.objectsToRF").checked  = settings.aprs_is.objectsToRF;
-    document.getElementById("aprs_is.server").value         = settings.aprs_is.server;
-    document.getElementById("aprs_is.port").value           = settings.aprs_is.port;
-    document.getElementById("aprs_is.filter").value         = settings.aprs_is.filter;
-    document.getElementById("aprs_is.passcode").value       = settings.aprs_is.passcode;
+    document.getElementById("aprs_is.active").checked                   = settings.aprs_is.active;
+    document.getElementById("aprs_is.messagesToRF").checked             = settings.aprs_is.messagesToRF;
+    document.getElementById("aprs_is.objectsToRF").checked              = settings.aprs_is.objectsToRF;
+    document.getElementById("aprs_is.server").value                     = settings.aprs_is.server;
+    document.getElementById("aprs_is.port").value                       = settings.aprs_is.port;
+    document.getElementById("aprs_is.filter").value                     = settings.aprs_is.filter;
+    document.getElementById("aprs_is.passcode").value                   = settings.aprs_is.passcode;
+
+    // Beacon
+    document.getElementById("beacon.latitude").value                    = settings.beacon.latitude;
+    document.getElementById("beacon.longitude").value                   = settings.beacon.longitude;
+    document.getElementById("beacon.interval").value                    = settings.beacon.interval;
+    document.getElementById("other.rememberStationTime").value          = settings.other.rememberStationTime;   
+    document.getElementById("beacon.sendViaAPRSIS").checked             = settings.beacon.sendViaAPRSIS;
+    document.getElementById("beacon.sendViaRF").checked                 = settings.beacon.sendViaRF;
+
+    // Digi
+    document.getElementById("digi.mode").value                          = settings.digi.mode;
+
+    // LoRa
+    document.getElementById("lora.txFreq").value                        = settings.lora.txFreq;
+    document.getElementById("lora.rxFreq").value                        = settings.lora.rxFreq;
+    document.getElementById("lora.txActive").checked                    = settings.lora.txActive;
+    document.getElementById("lora.rxActive").checked                    = settings.lora.rxActive;
+    document.getElementById("lora.spreadingFactor").value               = settings.lora.spreadingFactor;
+    document.getElementById("lora.signalBandwidth").value               = settings.lora.signalBandwidth;
+    document.getElementById("lora.codingRate4").value                   = settings.lora.codingRate4;
+    document.getElementById("lora.power").value                         = settings.lora.power;
 
     // Display
-    document.getElementById("display.alwaysOn").checked     = settings.display.alwaysOn;
-    document.getElementById("display.turn180").checked      = settings.display.turn180;
-    document.getElementById("display.timeout").value        = settings.display.timeout;
+    document.getElementById("display.alwaysOn").checked                 = settings.display.alwaysOn;
+    document.getElementById("display.turn180").checked                  = settings.display.turn180;
+    document.getElementById("display.timeout").value                    = settings.display.timeout;
 
     if (settings.display.alwaysOn) {
         timeoutInput.disabled = true;
@@ -143,69 +160,50 @@ function loadSettings(settings) {
     document.getElementById("battery.sendInternalVoltage").checked      = settings.battery.sendInternalVoltage;
     document.getElementById("battery.monitorInternalVoltage").checked   = settings.battery.monitorInternalVoltage;
     document.getElementById("battery.internalSleepVoltage").value       = settings.battery.internalSleepVoltage.toFixed(1);
-    
     document.getElementById("battery.sendExternalVoltage").checked      = settings.battery.sendExternalVoltage;
     document.getElementById("battery.externalVoltagePin").value         = settings.battery.externalVoltagePin;
     document.getElementById("battery.monitorExternalVoltage").checked   = settings.battery.monitorExternalVoltage;
     document.getElementById("battery.externalSleepVoltage").value       = settings.battery.externalSleepVoltage.toFixed(1);
     
+    // TELEMETRY BME/WX
+    document.getElementById("bme.active").checked                       = settings.bme.active;
+    document.getElementById("bme.heightCorrection").value               = settings.bme.heightCorrection;
+    document.getElementById("bme.temperatureCorrection").value          = settings.bme.temperatureCorrection.toFixed(1);
     
-    // WiFi Auto AP
-    document.getElementById("wifi.autoAP.password").value   = settings.wifi.autoAP.password;
-    document.getElementById("wifi.autoAP.powerOff").value   = settings.wifi.autoAP.powerOff;
-
-    // Digi
-    document.getElementById("digi.mode").value              = settings.digi.mode;
-
-    // TNC
-    if (settings.tnc) {
-        document.getElementById("tnc.enableServer").checked = settings.tnc.enableServer;
-        document.getElementById("tnc.enableSerial").checked = settings.tnc.enableSerial;
-        document.getElementById("tnc.acceptOwn").checked    = settings.tnc.acceptOwn;
-    }
-
-    // OTA
-    document.getElementById("ota.username").value           = settings.ota.username;
-    document.getElementById("ota.password").value           = settings.ota.password;
-
-    // Beacon
-    document.getElementById("beacon.interval").value        = settings.beacon.interval;
-    document.getElementById("other.rememberStationTime").value  = settings.other.rememberStationTime;
-    document.getElementById("beacon.path").value            = settings.beacon.path;
-    document.getElementById("beacon.latitude").value        = settings.beacon.latitude;
-    document.getElementById("beacon.longitude").value       = settings.beacon.longitude;
-    document.getElementById("beacon.sendViaAPRSIS").checked = settings.beacon.sendViaAPRSIS;
-    document.getElementById("beacon.sendViaRF").checked     = settings.beacon.sendViaRF;
-
-    // Syslog
-    document.getElementById("syslog.active").checked        = settings.syslog.active;
-    document.getElementById("syslog.server").value          = settings.syslog.server;
-    document.getElementById("syslog.port").value            = settings.syslog.port;
+    // SYSLOG
+    document.getElementById("syslog.active").checked                    = settings.syslog.active;
+    document.getElementById("syslog.server").value                      = settings.syslog.server;
+    document.getElementById("syslog.port").value                        = settings.syslog.port;
 
     if (settings.syslog.active) {
         serverField.disabled = false;
         portField.disabled = false;
     }
 
-    // LoRa
-    document.getElementById("lora.txFreq").value            = settings.lora.txFreq;
-    document.getElementById("lora.rxFreq").value            = settings.lora.rxFreq;
-    document.getElementById("lora.txActive").checked        = settings.lora.txActive;
-    document.getElementById("lora.rxActive").checked        = settings.lora.rxActive;
-    document.getElementById("lora.spreadingFactor").value   = settings.lora.spreadingFactor;
-    document.getElementById("lora.signalBandwidth").value   = settings.lora.signalBandwidth;
-    document.getElementById("lora.codingRate4").value       = settings.lora.codingRate4;
-    document.getElementById("lora.power").value             = settings.lora.power;
+    // TNC
+    if (settings.tnc) {
+        document.getElementById("tnc.enableServer").checked             = settings.tnc.enableServer;
+        document.getElementById("tnc.enableSerial").checked             = settings.tnc.enableSerial;
+        document.getElementById("tnc.acceptOwn").checked                = settings.tnc.acceptOwn;
+    }
 
     // Reboot
-    document.getElementById("other.rebootMode").checked     = settings.other.rebootMode;
-    document.getElementById("other.rebootModeTime").value   = settings.other.rebootModeTime;
+    document.getElementById("other.rebootMode").checked                 = settings.other.rebootMode;
+    document.getElementById("other.rebootModeTime").value               = settings.other.rebootModeTime;
+
+    // WiFi Auto AP
+    document.getElementById("wifi.autoAP.password").value               = settings.wifi.autoAP.password;
+    document.getElementById("wifi.autoAP.powerOff").value               = settings.wifi.autoAP.powerOff;
+
+    // OTA
+    document.getElementById("ota.username").value                       = settings.ota.username;
+    document.getElementById("ota.password").value                       = settings.ota.password;
 
     // Experimental
-    document.getElementById("other.backupDigiMode").checked = settings.other.backupDigiMode;
+    document.getElementById("other.backupDigiMode").checked             = settings.other.backupDigiMode;
 
-    document.getElementById("other.lowPowerMode").checked   = settings.other.lowPowerMode;
-    document.getElementById("other.lowVoltageCutOff").value = settings.other.lowVoltageCutOff || 0
+    document.getElementById("other.lowPowerMode").checked               = settings.other.lowPowerMode;
+    document.getElementById("other.lowVoltageCutOff").value             = settings.other.lowVoltageCutOff || 0
 
     updateImage();
     refreshSpeedStandard();
