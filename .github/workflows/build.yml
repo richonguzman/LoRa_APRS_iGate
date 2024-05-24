@@ -49,7 +49,7 @@ jobs:
               run: |
                 python3 -m pip install esptool
                 if [ "${{ matrix.target.chip }}" == "esp32" ]; then
-                  python3 -m esptool merge_bin --chip esp32 \
+                  python3 -m esptool --chip esp32 merge_bin \
                     -o installer/web_factory_${{ matrix.target.name }}.bin \
                     --flash_mode dio \
                     --flash_freq 40m \
@@ -60,7 +60,7 @@ jobs:
                     0x10000 installer/firmware/firmware.bin \
                     0x3D0000 installer/firmware/spiffs.bin
                 elif [ "${{ matrix.target.chip }}" == "esp32s3" ]; then
-                  python3 -m esptool merge_bin --chip esp32s3 \
+                  python3 -m esptool --chip esp32s3 merge_bin \
                     -o installer/web_factory_${{ matrix.target.name }}.bin \
                     --flash_mode dio \
                     --flash_freq 40m \
@@ -71,7 +71,7 @@ jobs:
                     0x10000 installer/firmware/firmware.bin \
                     0x410000 installer/firmware/spiffs.bin
                 elif [ "${{ matrix.target.chip }}" == "esp32c3" ]; then
-                  python3 -m esptool merge_bin --chip esp32c3 \
+                  python3 -m esptool --chip esp32c3 merge_bin \
                     -o installer/web_factory_${{ matrix.target.name }}.bin \
                     --flash_mode dio \
                     --flash_freq 40m \
