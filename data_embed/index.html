@@ -625,75 +625,226 @@
                                         width="20"
                                         height="20"
                                         fill="currentColor"
-                                        class="bi bi-database-fill"
+                                        class="bi bi-broadcast"
                                         viewBox="0 0 16 16"
                                     >
                                         <path
-                                            d="M3.904 1.777C4.978 1.289 6.427 1 8 1s3.022.289 4.096.777C13.125 2.245 14 2.993 14 4s-.875 1.755-1.904 2.223C11.022 6.711 9.573 7 8 7s-3.022-.289-4.096-.777C2.875 5.755 2 5.007 2 4s.875-1.755 1.904-2.223"
-                                        />
-                                        <path
-                                            d="M2 6.161V7c0 1.007.875 1.755 1.904 2.223C4.978 9.71 6.427 10 8 10s3.022-.289 4.096-.777C13.125 8.755 14 8.007 14 7v-.839c-.457.432-1.004.751-1.49.972C11.278 7.693 9.682 8 8 8s-3.278-.307-4.51-.867c-.486-.22-1.033-.54-1.49-.972"
-                                        />
-                                        <path
-                                            d="M2 9.161V10c0 1.007.875 1.755 1.904 2.223C4.978 12.711 6.427 13 8 13s3.022-.289 4.096-.777C13.125 11.755 14 11.007 14 10v-.839c-.457.432-1.004.751-1.49.972-1.232.56-2.828.867-4.51.867s-3.278-.307-4.51-.867c-.486-.22-1.033-.54-1.49-.972"
-                                        />
-                                        <path
-                                            d="M2 12.161V13c0 1.007.875 1.755 1.904 2.223C4.978 15.711 6.427 16 8 16s3.022-.289 4.096-.777C13.125 14.755 14 14.007 14 13v-.839c-.457.432-1.004.751-1.49.972-1.232.56-2.828.867-4.51.867s-3.278-.307-4.51-.867c-.486-.22-1.033-.54-1.49-.972"
+                                            d="M3.05 3.05a7 7 0 0 0 0 9.9.5.5 0 0 1-.707.707 8 8 0 0 1 0-11.314.5.5 0 0 1 .707.707m2.122 2.122a4 4 0 0 0 0 5.656.5.5 0 1 1-.708.708 5 5 0 0 1 0-7.072.5.5 0 0 1 .708.708m5.656-.708a.5.5 0 0 1 .708 0 5 5 0 0 1 0 7.072.5.5 0 1 1-.708-.708 4 4 0 0 0 0-5.656.5.5 0 0 1 0-.708m2.122-2.12a.5.5 0 0 1 .707 0 8 8 0 0 1 0 11.313.5.5 0 0 1-.707-.707 7 7 0 0 0 0-9.9.5.5 0 0 1 0-.707zM10 8a2 2 0 1 1-4 0 2 2 0 0 1 4 0"
                                         />
                                     </svg>
-                                    TNC
+                                    LoRa
                                 </h5>
                                 <small
-                                    >TNC and KISS configuration</small
+                                    >Config LoRa APRS Xmitting settings.</small
                                 >
                             </div>
                             <div class="col-lg-9 col-sm-12">
                                 <div class="row">
-                                    <div class="col-12">
+                                    <div class="col-6">
                                         <div class="form-check form-switch">
-                                            <div class="form-text">
-                                                Server will be available at port <strong>8001</strong>
-                                            </div>
                                             <input
                                                 type="checkbox"
-                                                name="tnc.enableServer"
-                                                id="tnc.enableServer"
+                                                name="lora.txActive"
+                                                id="lora.txActive"
                                                 class="form-check-input"
                                             />
                                             <label
-                                                for="tnc.enableServer"
+                                                for="lora.txActive"
                                                 class="form-label"
-                                                >Enable TNC server</label
+                                                >Enable LoRa TX</label
                                             >
                                         </div>
                                     </div>
-                                    <div class="col-12">
+                                    <div class="col-6">
                                         <div class="form-check form-switch">
                                             <input
                                                 type="checkbox"
-                                                name="tnc.enableSerial"
-                                                id="tnc.enableSerial"
+                                                name="lora.rxActive"
+                                                id="lora.rxActive"
                                                 class="form-check-input"
                                             />
                                             <label
-                                                for="tnc.enableSerial"
+                                                for="lora.rxActive"
                                                 class="form-label"
-                                                >Enable Serial KISS</label
+                                                >Enable LoRa RX</label
                                             >
                                         </div>
                                     </div>
-                                    <div class="col-12">
-                                        <div class="form-check form-switch">
+                                    <div class="col-6">
+                                        <label
+                                            for="lora.txFreq"
+                                            class="form-label"
+                                            >Tx Frequency</label
+                                        >
+                                        <div class="input-group">
                                             <input
-                                                type="checkbox"
-                                                name="tnc.acceptOwn"
-                                                id="tnc.acceptOwn"
-                                                class="form-check-input"
+                                                type="text"
+                                                name="lora.txFreq"
+                                                id="lora.txFreq"
+                                                placeholder="433775000"
+                                                class="form-control"
+                                                required=""
                                             />
-                                            <label
-                                                for="tnc.acceptOwn"
-                                                class="form-label"
-                                                >Accept own frames via KISS</label
+                                            <input
+                                                type="hidden"
+                                                name="lora.iGateFreq"
+                                                id="lora.iGateFreq"
+                                                placeholder="433775000"
+                                                class="form-control"
+                                                required=""
+                                            />
+                                            <span class="input-group-text"
+                                                >Hz</span
+                                            >
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <label
+                                            for="lora.rxFreq"
+                                            class="form-label"
+                                            >Rx Frequency</label
+                                        >
+                                        <div class="input-group">
+                                            <input
+                                                type="text"
+                                                name="lora.rxFreq"
+                                                id="lora.rxFreq"
+                                                placeholder="433775000"
+                                                class="form-control"
+                                            />
+                                            <span class="input-group-text"
+                                                >Hz</span
+                                            >
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row mt-4">
+                                    <div class="col-12 mb-4">
+                                        <label
+                                            for="action.speed"
+                                            class="form-label"
+                                            >Predefined speeds</label
+                                        >
+                                        <select
+                                            class="form-select form-select"
+                                            name="action.speed"
+                                            id="action.speed"
+                                        >
+                                            <option value="300">
+                                                BW 125khz CR 4:5 SF 12 (Slow
+                                                Standard, 300bps)
+                                            </option>
+                                            <option value="244">
+                                                BW 125khz CR 4:6 SF 12 (244bps)
+                                            </option>
+                                            <option value="209">
+                                                BW 125khz CR 4:7 SF 12 (209bps)
+                                            </option>
+                                            <option value="183">
+                                                BW 125khz CR 4:8 SF 12 (183bps)
+                                            </option>
+                                            <option value="610">
+                                                BW 125khz CR 4:8 SF 10 (610bps)
+                                            </option>
+                                            <option value="1200">
+                                                BW 125khz CR 4:7 SF 9 (Fast
+                                                Standard, 1200bps)
+                                            </option>
+                                            <option value="">
+                                                User defined
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div class="col-5">
+                                        <label
+                                            for="lora.signalBandwidth"
+                                            class="form-label"
+                                            >Bandwidth</label
+                                        >
+                                        <div class="input-group">
+                                            <select
+                                                class="form-select form-select"
+                                                name="lora.signalBandwidth"
+                                                id="lora.signalBandwidth"
+                                                required=""
+                                            >
+                                                <option value="125000" selected>
+                                                    125 kHz
+                                                </option>
+                                                <option value="250000">
+                                                    250 kHz
+                                                </option>
+                                                <option value="500000">
+                                                    500 kHz
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-7">
+                                        <label
+                                            for="lora.spreadingFactor"
+                                            class="form-label"
+                                            >Spreading Factor</label
+                                        >
+                                        <select
+                                            class="form-select form-select"
+                                            name="lora.spreadingFactor"
+                                            id="lora.spreadingFactor"
+                                            required=""
+                                        >
+                                            <option value="7">
+                                                SF7 - Lowest battery usage
+                                            </option>
+                                            <option value="8">SF8</option>
+                                            <option value="9">SF9</option>
+                                            <option value="10">SF10</option>
+                                            <option value="11">SF11</option>
+                                            <option value="12" selected>
+                                                SF12 - Highest sensitivity
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row mt-3">
+                                    <div class="col-6">
+                                        <label
+                                            for="lora.codingRate4"
+                                            class="form-label"
+                                            >Coding Rate</label
+                                        >
+                                        <select
+                                            class="form-select form-select"
+                                            name="lora.codingRate4"
+                                            id="lora.codingRate4"
+                                            required=""
+                                        >
+                                            <option value="4">4</option>
+                                            <option value="5">5</option>
+                                            <option value="6">6</option>
+                                            <option value="7">7</option>
+                                            <option value="8">8</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-6">
+                                        <label
+                                            for="lora.power"
+                                            class="form-label"
+                                            >Power</label
+                                        >
+                                        <div class="input-group">
+                                            <input
+                                                type="number"
+                                                name="lora.power"
+                                                id="lora.power"
+                                                placeholder="20"
+                                                min="0"
+                                                max="20"
+                                                step="1"
+                                                class="form-control"
+                                                required=""
+                                            />
+                                            <span class="input-group-text"
+                                                >dBm</span
                                             >
                                         </div>
                                     </div>
@@ -970,226 +1121,75 @@
                                         width="20"
                                         height="20"
                                         fill="currentColor"
-                                        class="bi bi-broadcast"
+                                        class="bi bi-database-fill"
                                         viewBox="0 0 16 16"
                                     >
                                         <path
-                                            d="M3.05 3.05a7 7 0 0 0 0 9.9.5.5 0 0 1-.707.707 8 8 0 0 1 0-11.314.5.5 0 0 1 .707.707m2.122 2.122a4 4 0 0 0 0 5.656.5.5 0 1 1-.708.708 5 5 0 0 1 0-7.072.5.5 0 0 1 .708.708m5.656-.708a.5.5 0 0 1 .708 0 5 5 0 0 1 0 7.072.5.5 0 1 1-.708-.708 4 4 0 0 0 0-5.656.5.5 0 0 1 0-.708m2.122-2.12a.5.5 0 0 1 .707 0 8 8 0 0 1 0 11.313.5.5 0 0 1-.707-.707 7 7 0 0 0 0-9.9.5.5 0 0 1 0-.707zM10 8a2 2 0 1 1-4 0 2 2 0 0 1 4 0"
+                                            d="M3.904 1.777C4.978 1.289 6.427 1 8 1s3.022.289 4.096.777C13.125 2.245 14 2.993 14 4s-.875 1.755-1.904 2.223C11.022 6.711 9.573 7 8 7s-3.022-.289-4.096-.777C2.875 5.755 2 5.007 2 4s.875-1.755 1.904-2.223"
+                                        />
+                                        <path
+                                            d="M2 6.161V7c0 1.007.875 1.755 1.904 2.223C4.978 9.71 6.427 10 8 10s3.022-.289 4.096-.777C13.125 8.755 14 8.007 14 7v-.839c-.457.432-1.004.751-1.49.972C11.278 7.693 9.682 8 8 8s-3.278-.307-4.51-.867c-.486-.22-1.033-.54-1.49-.972"
+                                        />
+                                        <path
+                                            d="M2 9.161V10c0 1.007.875 1.755 1.904 2.223C4.978 12.711 6.427 13 8 13s3.022-.289 4.096-.777C13.125 11.755 14 11.007 14 10v-.839c-.457.432-1.004.751-1.49.972-1.232.56-2.828.867-4.51.867s-3.278-.307-4.51-.867c-.486-.22-1.033-.54-1.49-.972"
+                                        />
+                                        <path
+                                            d="M2 12.161V13c0 1.007.875 1.755 1.904 2.223C4.978 15.711 6.427 16 8 16s3.022-.289 4.096-.777C13.125 14.755 14 14.007 14 13v-.839c-.457.432-1.004.751-1.49.972-1.232.56-2.828.867-4.51.867s-3.278-.307-4.51-.867c-.486-.22-1.033-.54-1.49-.972"
                                         />
                                     </svg>
-                                    LoRa
+                                    TNC
                                 </h5>
                                 <small
-                                    >Config LoRa APRS Xmitting settings.</small
+                                    >TNC and KISS configuration</small
                                 >
                             </div>
                             <div class="col-lg-9 col-sm-12">
                                 <div class="row">
-                                    <div class="col-6">
+                                    <div class="col-12">
                                         <div class="form-check form-switch">
+                                            <div class="form-text">
+                                                Server will be available at port <strong>8001</strong>
+                                            </div>
                                             <input
                                                 type="checkbox"
-                                                name="lora.txActive"
-                                                id="lora.txActive"
+                                                name="tnc.enableServer"
+                                                id="tnc.enableServer"
                                                 class="form-check-input"
                                             />
                                             <label
-                                                for="lora.txActive"
+                                                for="tnc.enableServer"
                                                 class="form-label"
-                                                >Enable LoRa TX</label
+                                                >Enable TNC server</label
                                             >
                                         </div>
                                     </div>
-                                    <div class="col-6">
+                                    <div class="col-12">
                                         <div class="form-check form-switch">
                                             <input
                                                 type="checkbox"
-                                                name="lora.rxActive"
-                                                id="lora.rxActive"
+                                                name="tnc.enableSerial"
+                                                id="tnc.enableSerial"
                                                 class="form-check-input"
                                             />
                                             <label
-                                                for="lora.rxActive"
+                                                for="tnc.enableSerial"
                                                 class="form-label"
-                                                >Enable LoRa RX</label
+                                                >Enable Serial KISS</label
                                             >
                                         </div>
                                     </div>
-                                    <div class="col-6">
-                                        <label
-                                            for="lora.txFreq"
-                                            class="form-label"
-                                            >Tx Frequency</label
-                                        >
-                                        <div class="input-group">
+                                    <div class="col-12">
+                                        <div class="form-check form-switch">
                                             <input
-                                                type="text"
-                                                name="lora.txFreq"
-                                                id="lora.txFreq"
-                                                placeholder="433775000"
-                                                class="form-control"
-                                                required=""
+                                                type="checkbox"
+                                                name="tnc.acceptOwn"
+                                                id="tnc.acceptOwn"
+                                                class="form-check-input"
                                             />
-                                            <input
-                                                type="hidden"
-                                                name="lora.iGateFreq"
-                                                id="lora.iGateFreq"
-                                                placeholder="433775000"
-                                                class="form-control"
-                                                required=""
-                                            />
-                                            <span class="input-group-text"
-                                                >Hz</span
-                                            >
-                                        </div>
-                                    </div>
-                                    <div class="col-6">
-                                        <label
-                                            for="lora.rxFreq"
-                                            class="form-label"
-                                            >Rx Frequency</label
-                                        >
-                                        <div class="input-group">
-                                            <input
-                                                type="text"
-                                                name="lora.rxFreq"
-                                                id="lora.rxFreq"
-                                                placeholder="433775000"
-                                                class="form-control"
-                                            />
-                                            <span class="input-group-text"
-                                                >Hz</span
-                                            >
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row mt-4">
-                                    <div class="col-12 mb-4">
-                                        <label
-                                            for="action.speed"
-                                            class="form-label"
-                                            >Predefined speeds</label
-                                        >
-                                        <select
-                                            class="form-select form-select"
-                                            name="action.speed"
-                                            id="action.speed"
-                                        >
-                                            <option value="300">
-                                                BW 125khz CR 4:5 SF 12 (Slow
-                                                Standard, 300bps)
-                                            </option>
-                                            <option value="244">
-                                                BW 125khz CR 4:6 SF 12 (244bps)
-                                            </option>
-                                            <option value="209">
-                                                BW 125khz CR 4:7 SF 12 (209bps)
-                                            </option>
-                                            <option value="183">
-                                                BW 125khz CR 4:8 SF 12 (183bps)
-                                            </option>
-                                            <option value="610">
-                                                BW 125khz CR 4:8 SF 10 (610bps)
-                                            </option>
-                                            <option value="1200">
-                                                BW 125khz CR 4:7 SF 9 (Fast
-                                                Standard, 1200bps)
-                                            </option>
-                                            <option value="">
-                                                User defined
-                                            </option>
-                                        </select>
-                                    </div>
-                                    <div class="col-5">
-                                        <label
-                                            for="lora.signalBandwidth"
-                                            class="form-label"
-                                            >Bandwidth</label
-                                        >
-                                        <div class="input-group">
-                                            <select
-                                                class="form-select form-select"
-                                                name="lora.signalBandwidth"
-                                                id="lora.signalBandwidth"
-                                                required=""
-                                            >
-                                                <option value="125000" selected>
-                                                    125 kHz
-                                                </option>
-                                                <option value="250000">
-                                                    250 kHz
-                                                </option>
-                                                <option value="500000">
-                                                    500 kHz
-                                                </option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-7">
-                                        <label
-                                            for="lora.spreadingFactor"
-                                            class="form-label"
-                                            >Spreading Factor</label
-                                        >
-                                        <select
-                                            class="form-select form-select"
-                                            name="lora.spreadingFactor"
-                                            id="lora.spreadingFactor"
-                                            required=""
-                                        >
-                                            <option value="7">
-                                                SF7 - Lowest battery usage
-                                            </option>
-                                            <option value="8">SF8</option>
-                                            <option value="9">SF9</option>
-                                            <option value="10">SF10</option>
-                                            <option value="11">SF11</option>
-                                            <option value="12" selected>
-                                                SF12 - Highest sensitivity
-                                            </option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="row mt-3">
-                                    <div class="col-6">
-                                        <label
-                                            for="lora.codingRate4"
-                                            class="form-label"
-                                            >Coding Rate</label
-                                        >
-                                        <select
-                                            class="form-select form-select"
-                                            name="lora.codingRate4"
-                                            id="lora.codingRate4"
-                                            required=""
-                                        >
-                                            <option value="4">4</option>
-                                            <option value="5">5</option>
-                                            <option value="6">6</option>
-                                            <option value="7">7</option>
-                                            <option value="8">8</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-6">
-                                        <label
-                                            for="lora.power"
-                                            class="form-label"
-                                            >Power</label
-                                        >
-                                        <div class="input-group">
-                                            <input
-                                                type="number"
-                                                name="lora.power"
-                                                id="lora.power"
-                                                placeholder="20"
-                                                min="0"
-                                                max="20"
-                                                step="1"
-                                                class="form-control"
-                                                required=""
-                                            />
-                                            <span class="input-group-text"
-                                                >dBm</span
+                                            <label
+                                                for="tnc.acceptOwn"
+                                                class="form-label"
+                                                >Accept own frames via KISS</label
                                             >
                                         </div>
                                     </div>
