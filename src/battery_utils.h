@@ -8,7 +8,8 @@ namespace BATTERY_Utils {
 
     float   checkInternalVoltage();
     float   checkExternalVoltage();
-    void    checkIfShouldSleep();
+    void    checkIfShouldSleep(); // ????
+    void    startupBatteryHealth();
 
 }
 

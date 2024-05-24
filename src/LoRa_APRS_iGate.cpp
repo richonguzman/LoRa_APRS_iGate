@@ -51,7 +51,7 @@ String          batteryVoltage; // ????
 bool            backUpDigiMode          = false;
 bool            modemLoggedToAPRSIS     = false;
 
-bool            shouldSleep             = false;
+bool            shouldSleepLowVoltage   = false;
 
 std::vector<ReceivedPacket> receivedPackets;
 
@@ -185,5 +185,5 @@ void loop() {
 
     show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
     Utils::checkRebootTime();
-    Utils::checkSleepByLowBatteryVoltage();
+    Utils::checkSleepByLowBatteryVoltage(1);
 }

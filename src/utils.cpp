@@ -32,7 +32,7 @@ extern String               distance;
 extern bool                 WiFiConnected;
 extern int                  wxModuleType;
 extern bool                 backUpDigiMode;
-extern bool                 shouldSleep;
+extern bool                 shouldSleepLowVoltage;
 
 bool        statusAfterBoot     = true;
 bool        beaconUpdate        = true;
@@ -123,12 +123,19 @@ namespace Utils {
             secondaryBeaconPacket += Config.beacon.comment;
 
             #ifdef BATTERY_PIN
-                if (Config.battery.sendInternalVoltage) {
+                if (Config.battery.sendInternalVoltage || Config.battery.monitorInternalVoltage) {
                     float internalVoltage       = BATTERY_Utils::checkInternalVoltage();
-                    String internalVoltageInfo  = "Batt=" + String(internalVoltage,2) + "V";
-                    beaconPacket += " " + internalVoltageInfo;
-                    secondaryBeaconPacket += " " + internalVoltageInfo;
-                    sixthLine = "    ( " + internalVoltageInfo + ")";
+                    String internalVoltageInfo  = String(internalVoltage,2) + "V";
+                    if (Config.battery.sendInternalVoltage) {
+                        beaconPacket += " Batt=" + internalVoltageInfo;
+                        secondaryBeaconPacket += " Batt=" + internalVoltageInfo;
+                        sixthLine = "    (Batt=" + internalVoltageInfo + ")";
+                    }
+                    if (Config.battery.monitorInternalVoltage && internalVoltage < Config.battery.internalSleepVoltage) {
+                        beaconPacket += " **IntBatWarning:SLEEP**";
+                        secondaryBeaconPacket += " **IntBatWarning:SLEEP**";
+                        shouldSleepLowVoltage = true;
+                    }                    
                 }
             #endif
 
@@ -140,10 +147,10 @@ namespace Utils {
                     secondaryBeaconPacket += " Ext=" + externalVoltageInfo;
                     sixthLine = "    (Ext V=" + externalVoltageInfo + ")";
                 }
-                if (Config.battery.monitorExternalVoltage && externalVoltage <= Config.battery.externalSleepVoltage) {
+                if (Config.battery.monitorExternalVoltage && externalVoltage < Config.battery.externalSleepVoltage) {
                     beaconPacket += " **ExtBatWarning:SLEEP**";
                     secondaryBeaconPacket += " **ExtBatWarning:SLEEP**";
-                    shouldSleep = true;
+                    shouldSleepLowVoltage = true;
                 }
             }
 
@@ -272,11 +279,22 @@ namespace Utils {
         }
     }
 
-    void checkSleepByLowBatteryVoltage() {
-        if (shouldSleep) {
-            // dormir
-            shouldSleep = false;
-            Serial.println("Durmiendo");
+    void checkSleepByLowBatteryVoltage(uint8_t mode) {
+        if (shouldSleepLowVoltage) {
+            if (mode == 0) {
+                delay(3000);
+            }
+            Serial.println("\n\n*** Sleeping Low Battey Voltage ***\n\n");
+            esp_sleep_enable_timer_wakeup(30 * 60 * 1000000); // sleep 30 min
+            if (mode == 1) {
+                display_toggle(false);
+            }
+            #ifdef VEXT_CTRL
+                #ifndef HELTEC_WSL_V3
+                    digitalWrite(VEXT_CTRL, LOW);
+                #endif
+            #endif
+            esp_deep_sleep_start();
         }
     }
 

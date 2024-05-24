@@ -1,4 +1,5 @@
 #include "configuration.h"
+#include "battery_utils.h"
 #include "boards_pinout.h"
 #include "power_utils.h"
 
@@ -128,7 +129,7 @@ namespace POWER_Utils {
             pinMode(INTERNAL_LED_PIN, OUTPUT);
         #endif
 
-        if (Config.battery.sendExternalVoltage) {
+        if (Config.battery.sendExternalVoltage || Config.battery.monitorExternalVoltage) {
             pinMode(Config.battery.externalVoltagePin, INPUT);
         }
 
@@ -152,6 +153,8 @@ namespace POWER_Utils {
         #endif
         
         delay(1000);
+
+        BATTERY_Utils::startupBatteryHealth();
     }
 
 }

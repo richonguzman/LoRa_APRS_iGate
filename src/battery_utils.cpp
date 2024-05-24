@@ -1,9 +1,11 @@
 #include "battery_utils.h"
 #include "configuration.h"
 #include "boards_pinout.h"
+#include "utils.h"
 
 extern Configuration    Config;
 extern uint32_t         lastBatteryCheck;
+extern bool             shouldSleepLowVoltage;
 
 float adcReadingTransformation = (3.3/4095);
 float voltageDividerCorrection = 0.288;
@@ -85,6 +87,20 @@ namespace BATTERY_Utils {
             if (voltage < Config.lowVoltageCutOff) {
                 ESP.deepSleep(1800000000); // 30 min sleep (60s = 60e6)
             }
+        }
+    }
+
+    void startupBatteryHealth() {
+        #ifdef BATTERY_PIN
+            if (Config.battery.monitorInternalVoltage && checkInternalVoltage() < Config.battery.internalSleepVoltage) {
+                shouldSleepLowVoltage = true;
+            }
+        #endif
+        if (Config.battery.monitorExternalVoltage && checkExternalVoltage() < Config.battery.externalSleepVoltage) {
+            shouldSleepLowVoltage = true;
+        }
+        if (shouldSleepLowVoltage) {
+            Utils::checkSleepByLowBatteryVoltage(0);
         }
     }
 
