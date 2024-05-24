@@ -11,28 +11,43 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                target:
-                    - "ttgo-lora32-v21"
-                    - "heltec-lora32-v2"
-                    - "heltec_wifi_lora_32_V3"
-                    - "heltec_wireless_stick"
-                    - "heltec_wireless_stick_lite_v3"
-                    - "heltec_ht-ct62"
-                    - "ESP32_DIY_LoRa"
-                    - "ESP32_DIY_1W_LoRa"
-                    - "ttgo-t-beam-v1_2"
-                    - "ttgo-t-beam-v1"
-                    - "ttgo-t-beam-v1_SX1268"
-                    - "ttgo-t-beam-v1_2_SX1262"
-                    - "ESP32_DIY_LoRa_A7670"
-                    - "heltec_wireless_tracker"
-                    - "OE5HWN_MeshCom"
-                    - "WEMOS-LOLIN32-OLED-DIY"
-                    - "WEMOS-D1-R32-RA02"
-                    - "ttgo-lora32-v21-915"
-                board_type:
-                    - "esp32"
-                    - "esp32s3"
+              board:
+                - name: ttgo-lora32-v21
+                  board_type: esp32
+                - name: heltec-lora32-v2
+                  board_type: esp32
+                - name: heltec_wifi_lora_32_V3
+                  board_type: esp32s3
+                - name: heltec_wireless_stick
+                  board_type: esp32s3
+                - name: heltec_wireless_stick_lite_v3
+                  board_type: esp32s3
+                - name: heltec_ht-ct62
+                  board_type: esp32c3
+                - name: ESP32_DIY_LoRa
+                  board_type: esp32
+                - name: ESP32_DIY_1W_LoRa
+                  board_type: esp32
+                - name: ttgo-t-beam-v1_2
+                  board_type: esp32
+                - name: ttgo-t-beam-v1
+                  board_type: esp32
+                - name: ttgo-t-beam-v1_SX1268
+                  board_type: esp32
+                - name: ttgo-t-beam-v1_2_SX1262
+                  board_type: esp32
+                - name: ESP32_DIY_LoRa_A7670
+                  board_type: esp32
+                - name: heltec_wireless_tracker
+                  board_type: esp32s3
+                - name: OE5HWN_MeshCom
+                  board_type: esp32
+                - name: WEMOS-LOLIN32-OLED-DIY
+                  board_type: esp32
+                - name: WEMOS-D1-R32-RA02
+                  board_type: esp32
+                - name: ttgo-lora32-v21-915
+                  board_type: esp32
         steps:
             - uses: actions/checkout@v3
 
@@ -46,15 +61,19 @@ jobs:
             - name: Determine board type
               id: determine-board
               run: |
-                if [[ "${{ matrix.board_type }}" == "esp32s3" ]]; then
-                  echo "BOARD_ENV=esp32s3" >> $GITHUB_ENV
+                if [[ "${{ matrix.board.board_type }}" == "esp32s3" ]]; then
+                  export BOARD_ENV="esp32s3"
                 else
-                  echo "BOARD_ENV=esp32" >> $GITHUB_ENV
+                  if [[ "${{ matrix.board.board_type }}" == "esp32c3" ]]; then
+                    export BOARD_ENV="esp32c3"
+                  else
+                    export BOARD_ENV="esp32"
+                  fi
                 fi
               shell: bash
 
             - name: Build target
-              run: pio run -e ${{ matrix.target }}
+              run: pio run -e ${{ matrix.board.name }}
 
             - name: Build FS
-              run: pio run --target buildfs -e ${{ matrix.target }}
+              run: pio run --target buildfs -e ${{ matrix.board.name }}
