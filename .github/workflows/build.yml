@@ -11,42 +11,24 @@ jobs:
             fail-fast: false
             matrix:
                 board:
-                    - name: Ttgo-lora32-v21
-                      board_type: ttgo-lora32-v21
-                    - name: Heltec-lora32-v2
-                      board_type: heltec-lora32-v2
-                    - name: Heltec_wifi_lora_32_V3
-                      board_type: heltec_wifi_lora_32_V3
-                    - name: Heltec_wireless_stick
-                      board_type: heltec_wireless_stick
-                    - name: Heltec_wireless_stick_lite_v3
-                      board_type: heltec_wireless_stick_lite_v3
-                    - name: Heltec_ht-ct62
-                      board_type: heltec_ht-ct62
-                    - name: ESP32_DIY_LoRa
-                      board_type: ESP32_DIY_LoRa
-                    - name: ESP32_DIY_1W_LoRa
-                      board_type: ESP32_DIY_1W_LoRa
-                    - name: Ttgo-t-beam-v1_2
-                      board_type: ttgo-t-beam-v1_2
-                    - name: Ttgo-t-beam-v1
-                      board_type: ttgo-t-beam-v1
-                    - name: Ttgo-t-beam-v1_SX1268
-                      board_type: ttgo-t-beam-v1_SX1268
-                    - name: Ttgo-t-beam-v1_2_SX1262
-                      board_type: ttgo-t-beam-v1_2_SX1262
-                    - name: ESP32_DIY_LoRa_A7670
-                      board_type: ESP32_DIY_LoRa_A7670
-                    - name: Heltec_wireless_tracker
-                      board_type: heltec_wireless_tracker
-                    - name: OE5HWN_MeshCom
-                      board_type: OE5HWN_MeshCom
-                    - name: WEMOS-LOLIN32-OLED-DIY
-                      board_type: WEMOS-LOLIN32-OLED-DIY
-                    - name: WEMOS-D1-R32-RA02
-                      board_type: WEMOS-D1-R32-RA02
-                    - name: Ttgo-lora32-v21-915
-                      board_type: ttgo-lora32-v21-915
+                    - ttgo-lora32-v21
+                    - heltec-lora32-v2
+                    - heltec_wifi_lora_32_V3
+                    - heltec_wireless_stick
+                    - heltec_wireless_stick_lite_v3
+                    - heltec_ht-ct62
+                    - ESP32_DIY_LoRa
+                    - ESP32_DIY_1W_LoRa
+                    - ttgo-t-beam-v1_2
+                    - ttgo-t-beam-v1
+                    - ttgo-t-beam-v1_SX1268
+                    - ttgo-t-beam-v1_2_SX1262
+                    - ESP32_DIY_LoRa_A7670
+                    - heltec_wireless_tracker
+                    - OE5HWN_MeshCom
+                    - WEMOS-LOLIN32-OLED-DIY
+                    - WEMOS-D1-R32-RA02
+                    - ttgo-lora32-v21-915
         steps:
             - uses: actions/checkout@v3
 
@@ -57,44 +39,24 @@ jobs:
             - name: Install PlatformIO Core
               run: pip install --upgrade platformio
 
-            - name: Determine board type
-              run: |
-                if [[ "${{ matrix.board.board_type }}" == "esp32s3" ]]; then
-                  export BOARD_ENV="esp32s3"
-                else
-                  if [[ "${{ matrix.board.board_type }}" == "esp32c3" ]]; then
-                    export BOARD_ENV="esp32c3"
-                  else
-                    export BOARD_ENV="esp32"
-                  fi
-                fi
-              shell: bash
-
             - name: Build target
               run: |
-                  pio run -e ${{ matrix.board.name }} --environment $BOARD_ENV
+                  pio run -e ${{ matrix.board }}
 
             - name: Build FS
               run: |
-                  pio run --target buildfs -e ${{ matrix.board.name }} --environment $BOARD_ENV
-      
+                  pio run --target buildfs -e ${{ matrix.board }}
 
             - name: Move Files
               run: |
                   mkdir -p installer/firmware
-                  cp .pio/build/${{ matrix.board.name }}/firmware.bin installer/ota_update.bin
-                  cp .pio/build/${{ matrix.board.name }}/firmware.bin installer/firmware/
-                  cp .pio/build/${{ matrix.board.name }}/bootloader.bin installer/firmware/
-                  cp .pio/build/${{ matrix.board.name }}/partitions.bin installer/firmware/
-                  cp .pio/build/${{ matrix.board.name }}/spiffs.bin installer/firmware/
+                  cp .pio/build/${{ matrix.board }}/firmware.bin installer/ota_update.bin
+                  cp .pio/build/${{ matrix.board }}/firmware.bin installer/firmware/
+                  cp .pio/build/${{ matrix.board }}/bootloader.bin installer/firmware/
+                  cp .pio/build/${{ matrix.board }}/partitions.bin installer/firmware/
+                  cp .pio/build/${{ matrix.board }}/spiffs.bin installer/firmware/
                   cp ~/.platformio/packages/framework-arduinoespressif32/tools/partitions/boot_app0.bin installer/firmware/
             
-            #- name: Merge for web flashing
-            #  run: |
-            #      python installer/bin/esptool/esptool.py --chip esp32 merge_bin -o installer/web_upgrade.bin --flash_mode dio --flash_freq 40m --flash_size 4MB 0x1000 installer/firmware/bootloader.bin 0x8000 installer/firmware/partitions.bin 0xe000 installer/firmware/boot_app0.bin 0x10000 installer/firmware/firmware.bin
-            #      python installer/bin/esptool/esptool.py --chip esp32 merge_bin -o installer/web_factory.bin --flash_mode dio --flash_freq 40m --flash_size 4MB 0x1000 installer/firmware/bootloader.bin 0x8000 installer/firmware/partitions.bin 0xe000 installer/firmware/boot_app0.bin 0x10000 installer/firmware/firmware.bin 2686976 installer/firmware/spiffs.bin
-            #      python3 -m esptool --chip $BOARD_ENV merge_bin -o installer/web_upgrade.bin --flash_mode dio --flash_freq 40m --flash_size 4MB 0x1000 installer/firmware/bootloader.bin 0x9000 installer/firmware/partitions.bin 0xe000 installer/firmware/boot_app0.bin 0x10000 installer/firmware/firmware.bin
-
             - name: Merge for web flashing
               run: |
                   python3 -m pip install esptool
@@ -113,5 +75,5 @@ jobs:
               with:
                   upload_url: ${{ github.event.release.upload_url }}
                   asset_path: ./installer.zip
-                  asset_name: ${{ matrix.board.name }}.zip
+                  asset_name: ${{ matrix.board }}.zip
                   asset_content_type: application/zip
