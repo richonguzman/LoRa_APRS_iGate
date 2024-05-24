@@ -46,8 +46,8 @@
         "turn180": false
     },
     "battery": {
-        "sendBatteryVoltage": false,
-        "externalVoltageMeasurement": false,
+        "sendInternalVoltage": false,
+        "sendExternalVoltage": false,
         "externalVoltagePin": 34
 	},
     "bme": {

@@ -68,8 +68,8 @@ public:
 
 class BATTERY {
 public:
-    bool    sendBatteryVoltage;
-    bool    externalVoltageMeasurement;
+    bool    sendInternalVoltage;
+    bool    sendExternalVoltage;
     int     externalVoltagePin;
 };
 

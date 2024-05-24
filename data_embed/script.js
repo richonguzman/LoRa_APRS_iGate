@@ -164,8 +164,8 @@ function loadSettings(settings) {
     // Beacon
     document.getElementById("beacon.interval").value        = settings.beacon.interval;
     document.getElementById("other.rememberStationTime").value  = settings.other.rememberStationTime;
-    document.getElementById("battery.sendBatteryVoltage").checked = settings.battery.sendBatteryVoltage;
-    document.getElementById("battery.externalVoltageMeasurement").checked = settings.battery.externalVoltageMeasurement;
+    document.getElementById("battery.sendInternalVoltage").checked = settings.battery.sendInternalVoltage;
+    document.getElementById("battery.sendExternalVoltage").checked = settings.battery.sendExternalVoltage;
     document.getElementById("battery.externalVoltagePin").value   = settings.battery.externalVoltagePin;
     // document.getElementById("beacon.igateSendsLoRaBeacon").value = settings.beacon.igateSendsLoRaBeacon;
     // document.getElementById("beacon.igateRepeatLoRaPackets").value = settings.beacon.igateRepeatLoRaPackets;
@@ -267,25 +267,25 @@ function updateImage() {
 }
 
 function toggleFields() {
-    const externalVoltageMeasurementCheckbox = document.querySelector(
-        'input[name="battery.externalVoltageMeasurement"]'
+    const sendExternalVoltageCheckbox = document.querySelector(
+        'input[name="battery.sendExternalVoltage"]'
     );
     const externalVoltagePinInput = document.querySelector(
         'input[name="battery.externalVoltagePin"]'
     );
 
     externalVoltagePinInput.disabled =
-        !externalVoltageMeasurementCheckbox.checked;
+        !sendExternalVoltageCheckbox.checked;
 }
 
-const externalVoltageMeasurementCheckbox = document.querySelector(
-    'input[name="battery.externalVoltageMeasurement"]'
+const sendExternalVoltageCheckbox = document.querySelector(
+    'input[name="battery.sendExternalVoltage"]'
 );
 const externalVoltagePinInput = document.querySelector(
     'input[name="battery.externalVoltagePin"]'
 );
 
-externalVoltageMeasurementCheckbox.addEventListener("change", function () {
+sendExternalVoltageCheckbox.addEventListener("change", function () {
     externalVoltagePinInput.disabled = !this.checked;
 });
 

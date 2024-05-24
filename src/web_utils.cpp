@@ -156,10 +156,10 @@ namespace WEB_Utils {
         Config.ota.username                 = request->getParam("ota.username", true)->value();
         Config.ota.password                 = request->getParam("ota.password", true)->value();
 
-        Config.rememberStationTime          = request->getParam("other.rememberStationTime", true)->value().toInt();
-        Config.battery.sendBatteryVoltage           = request->hasParam("battery.sendBatteryVoltage", true);
-        Config.battery.externalVoltageMeasurement   = request->hasParam("battery.externalVoltageMeasurement", true);
-        if (Config.battery.externalVoltageMeasurement) {
+        Config.rememberStationTime              = request->getParam("other.rememberStationTime", true)->value().toInt();
+        Config.battery.sendInternalVoltage      = request->hasParam("battery.sendInternalVoltage", true);
+        Config.battery.sendExternalVoltage      = request->hasParam("battery.sendExternalVoltage", true);
+        if (Config.battery.sendExternalVoltage) {
             Config.battery.externalVoltagePin   = request->getParam("battery.externalVoltagePin", true)->value().toInt();
         }
        

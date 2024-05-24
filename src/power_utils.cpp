@@ -128,7 +128,7 @@ namespace POWER_Utils {
             pinMode(INTERNAL_LED_PIN, OUTPUT);
         #endif
 
-        if (Config.battery.externalVoltageMeasurement) {
+        if (Config.battery.sendExternalVoltage) {
             pinMode(Config.battery.externalVoltagePin, INPUT);
         }
 

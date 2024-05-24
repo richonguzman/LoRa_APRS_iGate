@@ -33,21 +33,14 @@ void Configuration::writeFile() {
     data["wifi"]["autoAP"]["powerOff"]      = wifiAutoAP.powerOff;
 
     data["callsign"]                        = callsign;
-    // data["stationMode"] = stationMode; // only check for config version
-    // data["iGateComment"] = iGateComment;
 
-    // data["other"]["beaconInterval"] = beaconInterval;
-    // data["other"]["igateSendsLoRaBeacons"] = igateSendsLoRaBeacons;
-    // data["other"]["igateRepeatsLoRaPackets"] = igateRepeatsLoRaPackets;
-    data["other"]["rememberStationTime"]    = rememberStationTime;
-    data["battery"]["sendBatteryVoltage"]           = battery.sendBatteryVoltage;
-    data["battery"]["externalVoltageMeasurement"]   = battery.externalVoltageMeasurement;
-    data["battery"]["externalVoltagePin"]           = battery.externalVoltagePin;
+    data["other"]["rememberStationTime"]        = rememberStationTime;
+
+    data["battery"]["sendInternalVoltage"]      = battery.sendInternalVoltage;
+    data["battery"]["sendExternalVoltage"]      = battery.sendExternalVoltage;
+    data["battery"]["externalVoltagePin"]       = battery.externalVoltagePin;
 
     data["digi"]["mode"]                    = digi.mode;
-    // data["digi"]["comment"] = digi.comment;
-    // data["digi"]["latitude"] = digi.latitude;
-    // data["digi"]["longitude"] = digi.longitude;
 
     data["tnc"]["enableServer"]             = tnc.enableServer;
     data["tnc"]["enableSerial"]             = tnc.enableSerial;
@@ -58,7 +51,6 @@ void Configuration::writeFile() {
     data["aprs_is"]["server"]               = aprs_is.server;
     data["aprs_is"]["port"]                 = aprs_is.port;
     data["aprs_is"]["filter"]               = aprs_is.filter;
-    //data["aprs_is"]["toRF"] = aprs_is.toRF;
     data["aprs_is"]["messagesToRF"]         = aprs_is.messagesToRF;
     data["aprs_is"]["objectsToRF"]          = aprs_is.objectsToRF;
     
@@ -145,13 +137,9 @@ bool Configuration::readFile() {
         callsign                        = data["callsign"].as<String>();
         rememberStationTime             = data["other"]["rememberStationTime"].as<int>();
 
-        /*sendBatteryVoltage              = data["other"]["sendBatteryVoltage"].as<bool>();
-        externalVoltageMeasurement      = data["other"]["externalVoltageMeasurement"].as<bool>();
-        externalVoltagePin              = data["other"]["externalVoltagePin"].as<int>();*/
-
-        battery.sendBatteryVoltage              = data["battery"]["sendBatteryVoltage"].as<bool>();
-        battery.externalVoltageMeasurement      = data["battery"]["externalVoltageMeasurement"].as<bool>();
-        battery.externalVoltagePin              = data["battery"]["externalVoltagePin"].as<int>();
+        battery.sendInternalVoltage         = data["battery"]["sendInternalVoltage"].as<bool>();
+        battery.sendExternalVoltage         = data["battery"]["sendExternalVoltage"].as<bool>();
+        battery.externalVoltagePin          = data["battery"]["externalVoltagePin"].as<int>();
 
         aprs_is.passcode                = data["aprs_is"]["passcode"].as<String>();
         aprs_is.server                  = data["aprs_is"]["server"].as<String>();
@@ -358,16 +346,11 @@ void Configuration::init() {
     ota.username                = "";
     ota.password                = "";
 
-    // beaconInterval = 15; // deprecated
-    // igateSendsLoRaBeacons = false; // deprecated
-    // igateRepeatsLoRaPackets = false; // deprecated
+    
     rememberStationTime         = 30;
-    /*sendBatteryVoltage          = false;
-    externalVoltageMeasurement  = false;
-    externalVoltagePin          = 34;*/
-
-    battery.sendBatteryVoltage          = false;
-    battery.externalVoltageMeasurement  = false;
+    
+    battery.sendInternalVoltage         = false;
+    battery.sendExternalVoltage         = false;
     battery.externalVoltagePin          = 34;
 
     lowPowerMode                = false;
