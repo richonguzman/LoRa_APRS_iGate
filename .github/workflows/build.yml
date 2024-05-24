@@ -10,25 +10,43 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                board:
-                    - ttgo-lora32-v21
-                    - heltec-lora32-v2
-                    - heltec_wifi_lora_32_V3
-                    - heltec_wireless_stick
-                    - heltec_wireless_stick_lite_v3
-                    - heltec_ht-ct62
-                    - ESP32_DIY_LoRa
-                    - ESP32_DIY_1W_LoRa
-                    - ttgo-t-beam-v1_2
-                    - ttgo-t-beam-v1
-                    - ttgo-t-beam-v1_SX1268
-                    - ttgo-t-beam-v1_2_SX1262
-                    - ESP32_DIY_LoRa_A7670
-                    - heltec_wireless_tracker
-                    - OE5HWN_MeshCom
-                    - WEMOS-LOLIN32-OLED-DIY
-                    - WEMOS-D1-R32-RA02
-                    - ttgo-lora32-v21-915
+                target:
+                    - name: ttgo-lora32-v21
+                      chip: esp32
+                    - name: heltec-lora32-v2
+                      chip: esp32
+                    - name: heltec_wifi_lora_32_V3
+                      chip: esp32s3
+                    - name: heltec_wireless_stick
+                      chip: esp32s3
+                    - name: heltec_wireless_stick_lite_v3
+                      chip: esp32s3
+                    - name: heltec_ht-ct62
+                      chip: esp32c3
+                    - name: ESP32_DIY_LoRa
+                      chip: esp32
+                    - name: ESP32_DIY_1W_LoRa
+                      chip: esp32
+                    - name: ttgo-t-beam-v1_2
+                      chip: esp32
+                    - name: ttgo-t-beam-v1
+                      chip: esp32
+                    - name: ttgo-t-beam-v1_SX1268
+                      chip: esp32
+                    - name: ttgo-t-beam-v1_2_SX1262
+                      chip: esp32
+                    - name: ESP32_DIY_LoRa_A7670
+                      chip: esp32
+                    - name: heltec_wireless_tracker
+                      chip: esp32s3
+                    - name: OE5HWN_MeshCom
+                      chip: esp32
+                    - name: WEMOS-LOLIN32-OLED-DIY
+                      chip: esp32
+                    - name: WEMOS-D1-R32-RA02
+                      chip: esp32
+                    - name: ttgo-lora32-v21-915
+                      chip: esp32
         steps:
             - uses: actions/checkout@v3
 
@@ -41,26 +59,29 @@ jobs:
 
             - name: Build target
               run: |
-                  pio run -e ${{ matrix.board }}
+                  pio run -e ${{ matrix.target.name }} 
 
             - name: Build FS
               run: |
-                  pio run --target buildfs -e ${{ matrix.board }}
+                  pio run --target buildfs -e ${{ matrix.target.name }}
 
             - name: Move Files
               run: |
                   mkdir -p installer/firmware
-                  cp .pio/build/${{ matrix.board }}/firmware.bin installer/ota_update.bin
-                  cp .pio/build/${{ matrix.board }}/firmware.bin installer/firmware/
-                  cp .pio/build/${{ matrix.board }}/bootloader.bin installer/firmware/
-                  cp .pio/build/${{ matrix.board }}/partitions.bin installer/firmware/
-                  cp .pio/build/${{ matrix.board }}/spiffs.bin installer/firmware/
+                  cp .pio/build/${{ matrix.target.name }}/firmware.bin installer/ota_update.bin
+                  cp .pio/build/${{ matrix.target.name }}/firmware.bin installer/firmware/
+                  cp .pio/build/${{ matrix.target.name }}/bootloader.bin installer/firmware/
+                  cp .pio/build/${{ matrix.target.name }}/partitions.bin installer/firmware/
+                  cp .pio/build/${{ matrix.target.name }}/spiffs.bin installer/firmware/
                   cp ~/.platformio/packages/framework-arduinoespressif32/tools/partitions/boot_app0.bin installer/firmware/
               
             - name: Merge for web flashing
+
               run: |
+                for board in ${{ matrix.target.name }}; do
                   python3 -m pip install esptool
-                  python3 -m esptool merge_bin -o installer/web_factory.bin --flash_mode dio --flash_freq 40m --flash_size 4MB 0x1000 installer/firmware/bootloader.bin 0x9000 installer/firmware/partitions.bin 0xe000 installer/firmware/boot_app0.bin 0x10000 installer/firmware/firmware.bin 0x3D0000 installer/firmware/spiffs.bin
+                  python3 -m esptool merge_bin --chip ${{ matrix.target.chip }} -o installer/web_factory_${board}.bin --flash_mode dio --flash_freq 40m --flash_size 4MB 0x1000 installer/firmware/bootloader.bin 0x9000 installer/firmware/partitions.bin 0xe000 installer/firmware/boot_app0.bin 0x10000 installer/firmware/firmware.bin 0x3D0000 installer/firmware/spiffs.bin
+                done
 
             - name: Install Zip
               run: sudo apt-get install zip
@@ -75,5 +96,5 @@ jobs:
               with:
                   upload_url: ${{ github.event.release.upload_url }}
                   asset_path: ./installer.zip
-                  asset_name: ${{ matrix.board }}.zip
+                  asset_name: ${{ matrix.target.name }}.zip
                   asset_content_type: application/zip
