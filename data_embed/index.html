@@ -928,7 +928,7 @@
                                 <small>Battery Monitor & Health</small>
                             </div>
                             <div class="col-9 mt-2">
-                                <div class="row mt-3">
+                                <div class="row mt-2">
                                     <div class="col-6">
                                         <div class="form-check form-switch">
                                             <input
@@ -943,9 +943,7 @@
                                                 >Send Internal Voltage</label
                                             >
                                         </div>
-                                        <div
-                                            class="form-check form-switch mt-1"
-                                        >
+                                        <div class="form-check form-switch">
                                             <input
                                                 type="checkbox"
                                                 name="battery.sendExternalVoltage"
@@ -958,20 +956,88 @@
                                                 >Send External Voltage</label
                                             >
                                         </div>
+                                        <div class="form-check form-switch mt-3">
+                                            <input
+                                                type="checkbox"
+                                                name="battery.monitorInternalVoltage"
+                                                id="battery.monitorInternalVoltage"
+                                                class="form-check-input"
+                                            />
+                                            <label
+                                                for="battery.monitorInternalVoltage"
+                                                class="form-label"
+                                                >Monitor Internal Voltage Health</label
+                                            >
+                                        </div>
+                                        <div class="col">
+                                            <label for="battery.internalSleepVoltage" class="form-label"
+                                                >Internal Sleep Voltage</label
+                                            >
+                                            <div class="input-group">
+                                                <input
+                                                    type="number"
+                                                    name="battery.internalSleepVoltage"
+                                                    id="battery.internalSleepVoltage"
+                                                    placeholder="3.0"
+                                                    class="form-control"
+                                                    step="0.1"
+                                                    min="3.0"
+                                                    max="4.2"
+                                                />
+                                                <span class="input-group-text"
+                                                    >volts</span
+                                                >
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="form-floating col-6 p-1">
-                                        <input
-                                            type="text"
-                                            name="battery.externalVoltagePin"
-                                            id="battery.externalVoltagePin"
-                                            value="34"
-                                            class="form-control"
-                                        />
-                                        <label
-                                            for="battery.externalVoltagePin"
-                                            class="form-label"
-                                            >External Voltage Pin</label
-                                        >
+                                    <div class="col-6">
+                                        <div class="form-floating col-7">
+                                            <input
+                                                type="text"
+                                                name="battery.externalVoltagePin"
+                                                id="battery.externalVoltagePin"
+                                                value="34"
+                                                class="form-control"
+                                            />
+                                            <label
+                                                for="battery.externalVoltagePin"
+                                                class="form-label"
+                                                >External Voltage Pin</label
+                                            >
+                                        </div>
+                                        <div class="form-check form-switch mt-4">
+                                            <input
+                                                type="checkbox"
+                                                name="battery.monitorExternalVoltage"
+                                                id="battery.monitorExternalVoltage"
+                                                class="form-check-input"
+                                            />
+                                            <label
+                                                for="battery.monitorExternalVoltage"
+                                                class="form-label"
+                                                >Monitor External Voltage Health</label
+                                            >
+                                        </div>
+                                        <div class="col">
+                                            <label for="battery.externalSleepVoltage" class="form-label"
+                                                >External Sleep Voltage</label
+                                            >
+                                            <div class="input-group">
+                                                <input
+                                                    type="number"
+                                                    name="battery.externalSleepVoltage"
+                                                    id="battery.externalSleepVoltage"
+                                                    placeholder="3.0"
+                                                    class="form-control"
+                                                    step="0.1"
+                                                    min="3.0"
+                                                    max="24.0"
+                                                />
+                                                <span class="input-group-text"
+                                                    >volts</span
+                                                >
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -1273,7 +1339,7 @@
                                                 placeholder="0"
                                                 class="form-control"
                                                 step="6"
-                                                min="0"
+                                                min="6"
                                                 max="168"
                                             />
                                             <span class="input-group-text"

@@ -75,7 +75,7 @@ function loadSettings(settings) {
     currentSettings = settings;
     // General
     document.getElementById("callsign").value               = settings.callsign;
-    // document.getElementById("stationMode").value = settings.stationMode;
+
     document.getElementById("bme.active").checked           = settings.bme.active;
     document.getElementById("bme.heightCorrection").value   = settings.bme.heightCorrection;
     document.getElementById("bme.temperatureCorrection").value  = settings.bme.temperatureCorrection.toFixed(1);
@@ -125,7 +125,6 @@ function loadSettings(settings) {
     document.getElementById("aprs_is.active").checked       = settings.aprs_is.active;
     document.getElementById("aprs_is.messagesToRF").checked = settings.aprs_is.messagesToRF;
     document.getElementById("aprs_is.objectsToRF").checked  = settings.aprs_is.objectsToRF;
-    //document.getElementById("aprs_is.toRF").checked         = settings.aprs_is.toRF;
     document.getElementById("aprs_is.server").value         = settings.aprs_is.server;
     document.getElementById("aprs_is.port").value           = settings.aprs_is.port;
     document.getElementById("aprs_is.filter").value         = settings.aprs_is.filter;
@@ -140,14 +139,22 @@ function loadSettings(settings) {
         timeoutInput.disabled = true;
     }
 
+    // BATTERY
+    document.getElementById("battery.sendInternalVoltage").checked      = settings.battery.sendInternalVoltage;
+    document.getElementById("battery.monitorInternalVoltage").checked   = settings.battery.monitorInternalVoltage;
+    document.getElementById("battery.internalSleepVoltage").value       = settings.battery.internalSleepVoltage.toFixed(1);
+    
+    document.getElementById("battery.sendExternalVoltage").checked      = settings.battery.sendExternalVoltage;
+    document.getElementById("battery.externalVoltagePin").value         = settings.battery.externalVoltagePin;
+    document.getElementById("battery.monitorExternalVoltage").checked   = settings.battery.monitorExternalVoltage;
+    document.getElementById("battery.externalSleepVoltage").value       = settings.battery.externalSleepVoltage.toFixed(1);
+    
+    
     // WiFi Auto AP
     document.getElementById("wifi.autoAP.password").value   = settings.wifi.autoAP.password;
     document.getElementById("wifi.autoAP.powerOff").value   = settings.wifi.autoAP.powerOff;
 
     // Digi
-    // document.getElementById("digi.comment").value = settings.digi.comment;
-    // document.getElementById("digi.latitude").value = settings.digi.latitude;
-    // document.getElementById("digi.longitude").value = settings.digi.longitude;
     document.getElementById("digi.mode").value              = settings.digi.mode;
 
     // TNC
@@ -164,11 +171,6 @@ function loadSettings(settings) {
     // Beacon
     document.getElementById("beacon.interval").value        = settings.beacon.interval;
     document.getElementById("other.rememberStationTime").value  = settings.other.rememberStationTime;
-    document.getElementById("battery.sendInternalVoltage").checked = settings.battery.sendInternalVoltage;
-    document.getElementById("battery.sendExternalVoltage").checked = settings.battery.sendExternalVoltage;
-    document.getElementById("battery.externalVoltagePin").value   = settings.battery.externalVoltagePin;
-    // document.getElementById("beacon.igateSendsLoRaBeacon").value = settings.beacon.igateSendsLoRaBeacon;
-    // document.getElementById("beacon.igateRepeatLoRaPackets").value = settings.beacon.igateRepeatLoRaPackets;
     document.getElementById("beacon.path").value            = settings.beacon.path;
     document.getElementById("beacon.latitude").value        = settings.beacon.latitude;
     document.getElementById("beacon.longitude").value       = settings.beacon.longitude;
@@ -186,9 +188,6 @@ function loadSettings(settings) {
     }
 
     // LoRa
-    // document.getElementById("lora.digirepeaterTxFreq").value = settings.lora.digirepeaterTxFreq;
-    // document.getElementById("lora.iGateFreq").value = settings.lora.iGateFreq;
-    // document.getElementById("lora.digirepeaterRxFreq").value = settings.lora.digirepeaterRxFreq;
     document.getElementById("lora.txFreq").value            = settings.lora.txFreq;
     document.getElementById("lora.rxFreq").value            = settings.lora.rxFreq;
     document.getElementById("lora.txActive").checked        = settings.lora.txActive;

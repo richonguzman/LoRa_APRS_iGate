@@ -48,11 +48,11 @@
     "battery": {
         "sendInternalVoltage": false,
         "monitorInternalVoltage": false,
-        "internalSleepVoltage": 0.0,
+        "internalSleepVoltage": 3.0,
         "sendExternalVoltage": false,
         "externalVoltagePin": 34,
         "monitorExternalVoltage": false,
-        "externalSleepVoltage": 0.0
+        "externalSleepVoltage": 3.0
 	},
     "bme": {
         "active": false,

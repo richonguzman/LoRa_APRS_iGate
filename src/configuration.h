@@ -69,8 +69,12 @@ public:
 class BATTERY {
 public:
     bool    sendInternalVoltage;
+    bool    monitorInternalVoltage;
+    float   internalSleepVoltage;
     bool    sendExternalVoltage;
     int     externalVoltagePin;
+    bool    monitorExternalVoltage;
+    float   externalSleepVoltage;
 };
 
 class BME {
@@ -105,9 +109,6 @@ public:
     bool                    reload;     // ?
     String                  callsign;
     int                     rememberStationTime;
-    /*bool                    sendBatteryVoltage;
-    bool                    externalVoltageMeasurement;
-    int                     externalVoltagePin;*/
     bool                    lowPowerMode;
     double                  lowVoltageCutOff;
     bool                    backupDigiMode;
