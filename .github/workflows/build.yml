@@ -49,7 +49,7 @@ jobs:
               run: |
                 for board in ${{ matrix.target.name }}; do
                   python3 -m pip install esptool
-                  python3 -m esptool merge_bin --chip 0x0000 -o installer/web_factory_${board}.bin --flash_mode dio --flash_freq 40m --flash_size 4MB 0x1000 installer/firmware/bootloader.bin 0x9000 installer/firmware/partitions.bin 0xe000 installer/firmware/boot_app0.bin 0x10000 installer/firmware/firmware.bin 0x3D0000 installer/firmware/spiffs.bin
+                  python3 -m esptool merge_bin -o --chip 0x0000 installer/web_factory_${board}.bin --flash_mode dio --flash_freq 40m --flash_size 4MB 0x1000 installer/firmware/bootloader.bin 0x9000 installer/firmware/partitions.bin 0xe000 installer/firmware/boot_app0.bin 0x10000 installer/firmware/firmware.bin 0x3D0000 installer/firmware/spiffs.bin
                 done
 
             - name: Install Zip
