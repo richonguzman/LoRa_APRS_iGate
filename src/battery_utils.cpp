@@ -3,12 +3,13 @@
 #include "boards_pinout.h"
 #include "utils.h"
 
-extern Configuration    Config;
-extern uint32_t         lastBatteryCheck;
-extern bool             shouldSleepLowVoltage;
+extern  Configuration               Config;
+extern  uint32_t                    lastBatteryCheck;
 
-float adcReadingTransformation = (3.3/4095);
-float voltageDividerCorrection = 0.288;
+bool    shouldSleepLowVoltage       = false;
+
+float   adcReadingTransformation    = (3.3/4095);
+float   voltageDividerCorrection    = 0.288;
 
 // for External Voltage Measurment (MAX = 15Volts !!!)
 float R1 = 100.000; //in Kilo-Ohms

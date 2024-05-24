@@ -47,11 +47,9 @@ WiFi_AP         *currentWiFi            = &Config.wifiAPs[myWiFiAPIndex];
 
 bool            isUpdatingOTA           = false;
 uint32_t        lastBatteryCheck        = 0;
-String          batteryVoltage; // ????
+
 bool            backUpDigiMode          = false;
 bool            modemLoggedToAPRSIS     = false;
-
-bool            shouldSleepLowVoltage   = false;
 
 std::vector<ReceivedPacket> receivedPackets;
 
