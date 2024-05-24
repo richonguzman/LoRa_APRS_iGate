@@ -79,6 +79,6 @@
         "lowVoltageCutOff": 0,
         "backupDigiMode": false,
         "rebootMode": false,
-        "rebootModeTime": 0
+        "rebootModeTime": 6
     }
 }
