@@ -97,6 +97,7 @@ namespace WEB_Utils {
         Config.wifiAutoAP.password      = request->getParam("wifi.autoAP.password", true)->value();
         Config.wifiAutoAP.powerOff      = request->getParam("wifi.autoAP.powerOff", true)->value().toInt();
 
+
         Config.aprs_is.active           = request->hasParam("aprs_is.active", true);
         Config.aprs_is.passcode         = request->getParam("aprs_is.passcode", true)->value();
         Config.aprs_is.server           = request->getParam("aprs_is.server", true)->value();
@@ -104,6 +105,7 @@ namespace WEB_Utils {
         Config.aprs_is.filter           = request->getParam("aprs_is.filter", true)->value();
         Config.aprs_is.messagesToRF     = request->hasParam("aprs_is.messagesToRF", true);
         Config.aprs_is.objectsToRF      = request->hasParam("aprs_is.objectsToRF", true);
+
 
         Config.beacon.interval              = request->getParam("beacon.interval", true)->value().toInt();
         Config.beacon.sendViaAPRSIS         = request->hasParam("beacon.sendViaAPRSIS", true);
@@ -115,7 +117,9 @@ namespace WEB_Utils {
         Config.beacon.symbol                = request->getParam("beacon.symbol", true)->value();
         Config.beacon.path                  = request->getParam("beacon.path", true)->value();
 
+
         Config.digi.mode                = request->getParam("digi.mode", true)->value().toInt();
+
 
         Config.loramodule.txFreq            = request->getParam("lora.txFreq", true)->value().toInt();
         Config.loramodule.rxFreq            = request->getParam("lora.rxFreq", true)->value().toInt();
@@ -126,11 +130,25 @@ namespace WEB_Utils {
         Config.loramodule.txActive          = request->hasParam("lora.txActive", true);
         Config.loramodule.rxActive          = request->hasParam("lora.rxActive", true);
 
+
         Config.display.alwaysOn             = request->hasParam("display.alwaysOn", true);
         if (!Config.display.alwaysOn) {
             Config.display.timeout  = request->getParam("display.timeout", true)->value().toInt();
         }
         Config.display.turn180              = request->hasParam("display.turn180", true);
+
+
+        Config.battery.sendInternalVoltage      = request->hasParam("battery.sendInternalVoltage", true);
+        Config.battery.monitorInternalVoltage   = request->hasParam("battery.monitorInternalVoltage", true);
+        Config.battery.internalSleepVoltage = request->getParam("battery.internalSleepVoltage", true)->value().toFloat();
+
+        Config.battery.sendExternalVoltage      = request->hasParam("battery.sendExternalVoltage", true);
+        if (Config.battery.sendExternalVoltage) {
+            Config.battery.externalVoltagePin   = request->getParam("battery.externalVoltagePin", true)->value().toInt();
+        }
+        Config.battery.monitorExternalVoltage   = request->hasParam("battery.monitorExternalVoltage", true);
+        Config.battery.externalSleepVoltage = request->getParam("battery.externalSleepVoltage", true)->value().toFloat();
+
 
         Config.bme.active                   = request->hasParam("bme.active", true);
         Config.bme.heightCorrection         = request->getParam("bme.heightCorrection", true)->value().toInt();
@@ -139,12 +157,14 @@ namespace WEB_Utils {
             Config.beacon.symbol = "_";
         }
 
+
         Config.syslog.active                = request->hasParam("syslog.active", true);
         if (Config.syslog.active) {
             Config.syslog.server    = request->getParam("syslog.server", true)->value();
             Config.syslog.port      = request->getParam("syslog.port", true)->value().toInt();
         }
         
+
         Config.tnc.enableServer         = request->hasParam("tnc.enableServer", true);
         Config.tnc.enableSerial         = request->hasParam("tnc.enableSerial", true);
         Config.tnc.acceptOwn            = request->hasParam("tnc.acceptOwn", true);
@@ -153,28 +173,16 @@ namespace WEB_Utils {
         Config.rebootMode                   = request->hasParam("other.rebootMode", true);
         Config.rebootModeTime               = request->getParam("other.rebootModeTime", true)->value().toInt();
         
+
         Config.ota.username                 = request->getParam("ota.username", true)->value();
         Config.ota.password                 = request->getParam("ota.password", true)->value();
 
+
         Config.rememberStationTime              = request->getParam("other.rememberStationTime", true)->value().toInt();
-
-        Config.battery.sendInternalVoltage      = request->hasParam("battery.sendInternalVoltage", true);
-        Config.battery.monitorInternalVoltage   = request->hasParam("battery.monitorInternalVoltage", true);
-        if (Config.battery.monitorInternalVoltage) {
-            Config.battery.internalSleepVoltage = request->getParam("battery.internalSleepVoltage", true)->value().toFloat();
-        }
-
-        Config.battery.sendExternalVoltage      = request->hasParam("battery.sendExternalVoltage", true);
-        if (Config.battery.sendExternalVoltage) {
-            Config.battery.externalVoltagePin   = request->getParam("battery.externalVoltagePin", true)->value().toInt();
-        }
-        Config.battery.monitorExternalVoltage   = request->hasParam("battery.monitorExternalVoltage", true);
-        if (Config.battery.monitorExternalVoltage) {
-            Config.battery.externalSleepVoltage = request->getParam("battery.externalSleepVoltage", true)->value().toFloat();
-        }
 
        
         Config.backupDigiMode               = request->hasParam("other.backupDigiMode", true);
+
 
         Config.lowPowerMode                 = request->hasParam("other.lowPowerMode", true);
         Config.lowVoltageCutOff             = request->getParam("other.lowVoltageCutOff", true)->value().toDouble();
