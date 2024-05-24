@@ -40,21 +40,8 @@ jobs:
             - name: Install PlatformIO Core
               run: pip install --upgrade platformio
 
-            - name: Determine board type
-              run: |
-                if [[ "${{ matrix.board }}" == "heltec_wifi_lora_32_V3" || "${{ matrix.board }}" == "heltec_wireless_tracker" || "${{ matrix.board }}" == "heltec_wireless_stick" || "${{ matrix.board }}" == "heltec_wireless_stick_lite_v3" ]]; then
-                  export BOARD_ENV="esp32s3"
-                else
-                  if [[ "${{ matrix.board }}" == "heltec_ht-ct62" ]]; then
-                    export BOARD_ENV="esp32c3"
-                  else
-                    export BOARD_ENV="esp32"
-                  fi
-                fi
-              shell: bash
-
             - name: Build target
-              run: pio run -e ${{ matrix.board }} --environment $BOARD_ENV
+              run: pio run -e ${{ matrix.board }}
 
             - name: Build FS
-              run: pio run --target buildfs -e ${{ matrix.board }} --environment $BOARD_ENV
+              run: pio run --target buildfs -e ${{ matrix.board }}
