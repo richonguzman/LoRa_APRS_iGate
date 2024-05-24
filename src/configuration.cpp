@@ -17,7 +17,7 @@ void Configuration::check() {
 void Configuration::writeFile() {
     Serial.println("Saving config..");
 
-    StaticJsonDocument<2048> data;
+    StaticJsonDocument<2560> data;
     File configFile = SPIFFS.open("/igate_conf.json", "w");
 
     if (wifiAPs[0].ssid != "") { // We don't want to save Auto AP empty SSID
@@ -40,9 +40,9 @@ void Configuration::writeFile() {
     // data["other"]["igateSendsLoRaBeacons"] = igateSendsLoRaBeacons;
     // data["other"]["igateRepeatsLoRaPackets"] = igateRepeatsLoRaPackets;
     data["other"]["rememberStationTime"]    = rememberStationTime;
-    data["other"]["sendBatteryVoltage"]     = sendBatteryVoltage;
-    data["other"]["externalVoltageMeasurement"] = externalVoltageMeasurement;
-    data["other"]["externalVoltagePin"]     = externalVoltagePin;
+    data["battery"]["sendBatteryVoltage"]           = battery.sendBatteryVoltage;
+    data["battery"]["externalVoltageMeasurement"]   = battery.externalVoltageMeasurement;
+    data["battery"]["externalVoltagePin"]           = battery.externalVoltagePin;
 
     data["digi"]["mode"]                    = digi.mode;
     // data["digi"]["comment"] = digi.comment;
@@ -123,7 +123,7 @@ bool Configuration::readFile() {
     File configFile = SPIFFS.open("/igate_conf.json", "r");
 
     if (configFile) {
-        StaticJsonDocument<2048> data;
+        StaticJsonDocument<2560> data;
 
         DeserializationError error = deserializeJson(data, configFile);
         if (error) {
@@ -144,9 +144,14 @@ bool Configuration::readFile() {
 
         callsign                        = data["callsign"].as<String>();
         rememberStationTime             = data["other"]["rememberStationTime"].as<int>();
-        sendBatteryVoltage              = data["other"]["sendBatteryVoltage"].as<bool>();
+
+        /*sendBatteryVoltage              = data["other"]["sendBatteryVoltage"].as<bool>();
         externalVoltageMeasurement      = data["other"]["externalVoltageMeasurement"].as<bool>();
-        externalVoltagePin              = data["other"]["externalVoltagePin"].as<int>();
+        externalVoltagePin              = data["other"]["externalVoltagePin"].as<int>();*/
+
+        battery.sendBatteryVoltage              = data["battery"]["sendBatteryVoltage"].as<bool>();
+        battery.externalVoltageMeasurement      = data["battery"]["externalVoltageMeasurement"].as<bool>();
+        battery.externalVoltagePin              = data["battery"]["externalVoltagePin"].as<int>();
 
         aprs_is.passcode                = data["aprs_is"]["passcode"].as<String>();
         aprs_is.server                  = data["aprs_is"]["server"].as<String>();
@@ -357,9 +362,13 @@ void Configuration::init() {
     // igateSendsLoRaBeacons = false; // deprecated
     // igateRepeatsLoRaPackets = false; // deprecated
     rememberStationTime         = 30;
-    sendBatteryVoltage          = false;
+    /*sendBatteryVoltage          = false;
     externalVoltageMeasurement  = false;
-    externalVoltagePin          = 34;
+    externalVoltagePin          = 34;*/
+
+    battery.sendBatteryVoltage          = false;
+    battery.externalVoltageMeasurement  = false;
+    battery.externalVoltagePin          = 34;
 
     lowPowerMode                = false;
     lowVoltageCutOff            = 0;

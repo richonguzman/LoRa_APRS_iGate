@@ -164,7 +164,7 @@ function loadSettings(settings) {
     // Beacon
     document.getElementById("beacon.interval").value        = settings.beacon.interval;
     document.getElementById("other.rememberStationTime").value  = settings.other.rememberStationTime;
-    document.getElementById("other.sendBatteryVoltage").checked = settings.other.sendBatteryVoltage;
+    document.getElementById("battery.sendBatteryVoltage").checked = settings.battery.sendBatteryVoltage;
     document.getElementById("other.externalVoltageMeasurement").checked = settings.other.externalVoltageMeasurement;
     document.getElementById("other.externalVoltagePin").value   = settings.other.externalVoltagePin;
     // document.getElementById("beacon.igateSendsLoRaBeacon").value = settings.beacon.igateSendsLoRaBeacon;

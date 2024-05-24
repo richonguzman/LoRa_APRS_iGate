@@ -17,7 +17,7 @@ public:
     int     powerOff;
 };
 
-class Beacon {
+class BEACON {
 public:
     double  latitude;
     double  longitude;
@@ -66,6 +66,13 @@ public:
     bool    turn180;
 };
 
+class BATTERY {
+public:
+    bool    sendBatteryVoltage;
+    bool    externalVoltageMeasurement;
+    int     externalVoltagePin;
+};
+
 class BME {
 public:
     bool    active;
@@ -98,9 +105,9 @@ public:
     bool                    reload;     // ?
     String                  callsign;
     int                     rememberStationTime;
-    bool                    sendBatteryVoltage;
+    /*bool                    sendBatteryVoltage;
     bool                    externalVoltageMeasurement;
-    int                     externalVoltagePin;
+    int                     externalVoltagePin;*/
     bool                    lowPowerMode;
     double                  lowVoltageCutOff;
     bool                    backupDigiMode;
@@ -108,14 +115,15 @@ public:
     int                     rebootModeTime;
     std::vector<WiFi_AP>    wifiAPs;
     WiFi_Auto_AP            wifiAutoAP;
-    Beacon                  beacon;
-    DIGI                    digi;
-    TNC                     tnc;
+    BEACON                  beacon;
     APRS_IS                 aprs_is;
+    DIGI                    digi;
     LoraModule              loramodule;
     Display                 display;
-    SYSLOG                  syslog;
+    BATTERY                 battery;
     BME                     bme;
+    SYSLOG                  syslog;
+    TNC                     tnc;  
     OTA                     ota;
   
     void init();

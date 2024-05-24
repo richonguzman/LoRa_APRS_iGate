@@ -64,7 +64,7 @@ namespace BATTERY_Utils {
         int sample;
         int sampleSum = 0;
         for (int i = 0; i < 100; i++) {
-            sample = analogRead(Config.externalVoltagePin);
+            sample = analogRead(Config.battery.externalVoltagePin);
             sampleSum += sample;
             delayMicroseconds(50); 
         }

@@ -45,10 +45,15 @@
         "timeout": 4,
         "turn180": false
     },
+    "battery": {
+        "sendBatteryVoltage": false,
+        "externalVoltageMeasurement": false,
+        "externalVoltagePin": 34
+	},
     "bme": {
-		"active": false,
-		"heightCorrection": 0,
-		"temperatureCorrection": 0.0
+        "active": false,
+        "heightCorrection": 0,
+        "temperatureCorrection": 0.0
 	},
     "syslog": {
         "active": false,
@@ -66,9 +71,6 @@
     },
     "other": {
         "rememberStationTime": 30,
-        "sendBatteryVoltage": false,
-        "externalVoltageMeasurement": false,
-        "externalVoltagePin": 34,
         "lowPowerMode": false,
         "lowVoltageCutOff": 0,
         "backupDigiMode": false,

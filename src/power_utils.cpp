@@ -128,8 +128,8 @@ namespace POWER_Utils {
             pinMode(INTERNAL_LED_PIN, OUTPUT);
         #endif
 
-        if (Config.externalVoltageMeasurement) {
-            pinMode(Config.externalVoltagePin, INPUT);
+        if (Config.battery.externalVoltageMeasurement) {
+            pinMode(Config.battery.externalVoltagePin, INPUT);
         }
 
         #ifdef VEXT_CTRL
