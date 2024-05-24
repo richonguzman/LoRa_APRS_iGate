@@ -165,8 +165,8 @@ function loadSettings(settings) {
     document.getElementById("beacon.interval").value        = settings.beacon.interval;
     document.getElementById("other.rememberStationTime").value  = settings.other.rememberStationTime;
     document.getElementById("battery.sendBatteryVoltage").checked = settings.battery.sendBatteryVoltage;
-    document.getElementById("other.externalVoltageMeasurement").checked = settings.other.externalVoltageMeasurement;
-    document.getElementById("other.externalVoltagePin").value   = settings.other.externalVoltagePin;
+    document.getElementById("battery.externalVoltageMeasurement").checked = settings.battery.externalVoltageMeasurement;
+    document.getElementById("battery.externalVoltagePin").value   = settings.battery.externalVoltagePin;
     // document.getElementById("beacon.igateSendsLoRaBeacon").value = settings.beacon.igateSendsLoRaBeacon;
     // document.getElementById("beacon.igateRepeatLoRaPackets").value = settings.beacon.igateRepeatLoRaPackets;
     document.getElementById("beacon.path").value            = settings.beacon.path;
@@ -268,10 +268,10 @@ function updateImage() {
 
 function toggleFields() {
     const externalVoltageMeasurementCheckbox = document.querySelector(
-        'input[name="other.externalVoltageMeasurement"]'
+        'input[name="battery.externalVoltageMeasurement"]'
     );
     const externalVoltagePinInput = document.querySelector(
-        'input[name="other.externalVoltagePin"]'
+        'input[name="battery.externalVoltagePin"]'
     );
 
     externalVoltagePinInput.disabled =
@@ -279,10 +279,10 @@ function toggleFields() {
 }
 
 const externalVoltageMeasurementCheckbox = document.querySelector(
-    'input[name="other.externalVoltageMeasurement"]'
+    'input[name="battery.externalVoltageMeasurement"]'
 );
 const externalVoltagePinInput = document.querySelector(
-    'input[name="other.externalVoltagePin"]'
+    'input[name="battery.externalVoltagePin"]'
 );
 
 externalVoltageMeasurementCheckbox.addEventListener("change", function () {
