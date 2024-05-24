@@ -14,40 +14,10 @@ jobs:
               target:
                 - name: ttgo-lora32-v21
                   chip: esp32
-                - name: heltec-lora32-v2
-                  chip: esp32
-                - name: heltec_wifi_lora_32_V3
-                  chip: esp32
                 - name: heltec_wireless_stick
-                  chip: esp32
-                - name: heltec_wireless_stick_lite_v3
-                  chip: esp32
+                  chip: esp32s3
                 - name: heltec_ht-ct62
-                  chip: esp32
-                - name: ESP32_DIY_LoRa
-                  chip: esp32
-                - name: ESP32_DIY_1W_LoRa
-                  chip: esp32
-                - name: ttgo-t-beam-v1_2
-                  chip: esp32
-                - name: ttgo-t-beam-v1
-                  chip: esp32
-                - name: ttgo-t-beam-v1_SX1268
-                  chip: esp32
-                - name: ttgo-t-beam-v1_2_SX1262
-                  chip: esp32
-                - name: ESP32_DIY_LoRa_A7670
-                  chip: esp32
-                - name: heltec_wireless_tracker
-                  chip: esp32
-                - name: OE5HWN_MeshCom
-                  chip: esp32
-                - name: WEMOS-LOLIN32-OLED-DIY
-                  chip: esp32
-                - name: WEMOS-D1-R32-RA02
-                  chip: esp32
-                - name: ttgo-lora32-v21-915
-                  chip: esp32
+                  chip: esp32c3
         steps:
             - uses: actions/checkout@v3
 
