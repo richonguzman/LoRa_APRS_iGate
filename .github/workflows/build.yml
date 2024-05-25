@@ -12,11 +12,11 @@ jobs:
             matrix:
                 target:
                     - name: ttgo-lora32-v21
-                      chip: esp32
+                      chip: ESP32
                     - name: heltec_wireless_tracker
-                      chip: esp32s3
+                      chip: ESP32S3
                     - name: heltec_ht-ct62
-                      chip: esp32c3
+                      chip: ESP32C3
         steps:
             - uses: actions/checkout@v3
 
