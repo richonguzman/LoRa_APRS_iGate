@@ -53,7 +53,7 @@ jobs:
                       0x9000 installer/firmware/partitions.bin \
                       0xe000 installer/firmware/boot_app0.bin \
                       0x10000 installer/firmware/firmware.bin \
-                      0x290000 installer/firmware/spiffs.bin
+                      0x3D0000 installer/firmware/spiffs.bin
                   elif [ "${{ matrix.target.chip }}" == "ESP32S3" ]; then
                     python installer/bin/esptool/esptool.py --chip ESP32S3 merge_bin \
                       -o installer/web_factory_${{ matrix.target.name }}.bin \
