@@ -13,10 +13,6 @@ jobs:
                 target:
                     - name: ttgo-lora32-v21
                       chip: ESP32
-                    - name: heltec_wireless_tracker
-                      chip: ESP32S3
-                    - name: heltec_ht-ct62
-                      chip: ESP32C3
         steps:
             - uses: actions/checkout@v3
 
