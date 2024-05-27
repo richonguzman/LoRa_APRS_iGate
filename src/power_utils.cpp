@@ -21,6 +21,22 @@ extern Configuration    Config;
 
 namespace POWER_Utils {
 
+    double getBatteryVoltage() {
+        #if defined(HAS_AXP192) || defined(HAS_AXP2101)
+            return (PMU.getBattVoltage() / 1000.0);
+        #else
+            return 0.0;
+        #endif
+    }
+
+    bool isBatteryConnected() {
+        #if defined(HAS_AXP192) || defined(HAS_AXP2101)
+            return PMU.isBatteryConnect();
+        #else
+            return false;
+        #endif
+    }
+
     void activateMeasurement() {
         #if defined(HAS_AXP192) || defined(HAS_AXP2101)
             PMU.disableTSPinMeasure();

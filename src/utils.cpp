@@ -122,7 +122,7 @@ namespace Utils {
             beaconPacket += Config.beacon.comment;
             secondaryBeaconPacket += Config.beacon.comment;
 
-            #ifdef BATTERY_PIN
+            #if defined(BATTERY_PIN) || defined(HAS_AXP192) || defined(HAS_AXP2101)
                 if (Config.battery.sendInternalVoltage || Config.battery.monitorInternalVoltage) {
                     float internalVoltage       = BATTERY_Utils::checkInternalVoltage();
                     String internalVoltageInfo  = String(internalVoltage,2) + "V";

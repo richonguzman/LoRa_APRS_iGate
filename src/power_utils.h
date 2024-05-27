@@ -11,6 +11,8 @@
 
 namespace POWER_Utils {
 
+    double getBatteryVoltage();
+    bool isBatteryConnected();
     void activateMeasurement();
     void activateLoRa();
     void deactivateLoRa();
