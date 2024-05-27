@@ -93,11 +93,11 @@ namespace BATTERY_Utils {
 
     void startupBatteryHealth() {
         #ifdef BATTERY_PIN
-            if (Config.battery.monitorInternalVoltage && checkInternalVoltage() < Config.battery.internalSleepVoltage) {
+            if (Config.battery.monitorInternalVoltage && checkInternalVoltage() < Config.battery.internalSleepVoltage + 0.1) {
                 shouldSleepLowVoltage = true;
             }
         #endif
-        if (Config.battery.monitorExternalVoltage && checkExternalVoltage() < Config.battery.externalSleepVoltage) {
+        if (Config.battery.monitorExternalVoltage && checkExternalVoltage() < Config.battery.externalSleepVoltage + 0.1) {
             shouldSleepLowVoltage = true;
         }
         if (shouldSleepLowVoltage) {
