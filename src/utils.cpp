@@ -34,6 +34,7 @@ extern bool                 WiFiConnected;
 extern int                  wxModuleType;
 extern bool                 backUpDigiMode;
 extern bool                 shouldSleepLowVoltage;
+extern bool                 transmitFlag;
 
 bool        statusAfterBoot     = true;
 bool        beaconUpdate        = true;
@@ -296,6 +297,7 @@ namespace Utils {
                 #endif
             #endif
             LoRa_Utils::sleepRadio();
+            transmitFlag = true;
             delay(100);
             esp_deep_sleep_start();
         }
