@@ -206,4 +206,8 @@ namespace LoRa_Utils {
         return packet;
     }
 
+    void sleepRadio() {
+        radio.sleep();
+    }
+
 }

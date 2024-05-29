@@ -6,6 +6,7 @@
 #include "boards_pinout.h"
 #include "syslog_utils.h"
 #include "A7670_utils.h"
+#include "lora_utils.h"
 #include "wifi_utils.h"
 #include "gps_utils.h"
 #include "bme_utils.h"
@@ -294,6 +295,8 @@ namespace Utils {
                     digitalWrite(VEXT_CTRL, LOW);
                 #endif
             #endif
+            LoRa_Utils::sleepRadio();
+            delay(100);
             esp_deep_sleep_start();
         }
     }

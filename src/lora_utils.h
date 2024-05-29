@@ -13,6 +13,7 @@ namespace LoRa_Utils {
     void changeFreqTx();
     void changeFreqRx();
     void startReceive(); // ???
+    void sleepRadio();
 
 }
 
