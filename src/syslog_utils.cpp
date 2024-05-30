@@ -12,58 +12,94 @@ WiFiUDP udpClient;
 namespace SYSLOG_Utils {
 
     void log(uint8_t type, const String& packet, int rssi, float snr, int freqError) {
-        String syslogPacket = "<165>1 - " + Config.callsign + " CA2RXU_LoRa_iGate_1.3" + " - - - "; //RFC5424 The Syslog Protocol
         if (Config.syslog.active && WiFi.status() == WL_CONNECTED) {
+            String syslogPacket = "<165>1 - ";
+            syslogPacket.concat(Config.callsign);
+            syslogPacket.concat(" CA2RXU_LoRa_iGate_1.3 - - - "); //RFC5424 The Syslog Protocol
+            
+            char signalData[35];
+            snprintf(signalData, sizeof(signalData), " / %ddBm / %.2fdB / %dHz", rssi, snr, freqError);
+
             switch (type) {
                 case 0:     // CRC
-                    syslogPacket += type + " / CRC-ERROR / " + packet;
-                    syslogPacket += " / " + String(rssi) + "dBm / " + String(snr) + "dB / " + String(freqError) + "Hz";
+                    syslogPacket.concat("CRC / CRC-ERROR / ");
+                    syslogPacket.concat(packet);
+                    syslogPacket.concat(signalData);
                     break;
                 case 1:     // RX
+                    syslogPacket.concat("RX / ");
                     if (packet.indexOf("::") > 10) {
-                        syslogPacket += type + " / MESSAGE / " + packet.substring(3,packet.indexOf(">")) + " ---> " + packet.substring(packet.indexOf("::")+2);
-                        syslogPacket += " / " + String(rssi) + "dBm / " + String(snr) + "dB / " + String(freqError) + "Hz";
+                        syslogPacket.concat("MESSAGE / ");
+                        syslogPacket.concat(packet.substring(3, packet.indexOf(">")));
+                        syslogPacket.concat(" ---> "); syslogPacket.concat(packet.substring(packet.indexOf("::") + 2));
+                        syslogPacket.concat(signalData);
                     } else if (packet.indexOf(":!") > 10 || packet.indexOf(":=") > 10) {
-                        syslogPacket += type + " / GPS / " + packet.substring(3,packet.indexOf(">")) + " / ";
+                        syslogPacket.concat("GPS / ");
+                        syslogPacket.concat(packet.substring(3, packet.indexOf(">")));
+                        syslogPacket.concat(" / ");
                         if (packet.indexOf("WIDE1-1") > 10) {
-                            syslogPacket += packet.substring(packet.indexOf(">")+1,packet.indexOf(",")) + " / WIDE1-1 / ";
+                            syslogPacket.concat(packet.substring(packet.indexOf(">") + 1, packet.indexOf(",")));
+                            syslogPacket.concat(" / WIDE1-1");
                         } else {
-                            syslogPacket += packet.substring(packet.indexOf(">")+1,packet.indexOf(":")) + " / - / ";
+                            syslogPacket.concat(packet.substring(packet.indexOf(">") + 1, packet.indexOf(":")));
+                            syslogPacket.concat(" / -");
                         }
-                        syslogPacket += String(rssi) + "dBm / " + String(snr) + "dB / " + String(freqError) + "Hz / " +  GPS_Utils::getDistanceAndComment(packet);
+                        syslogPacket.concat(signalData);
+                        syslogPacket.concat(" / ");
+                        syslogPacket.concat(GPS_Utils::getDistanceAndComment(packet));
                     } else if (packet.indexOf(":>") > 10) {
-                        syslogPacket += type + " / STATUS / " + packet.substring(3,packet.indexOf(">")) + " ---> " + packet.substring(packet.indexOf(":>")+2);
-                        syslogPacket += " / " + String(rssi) + "dBm / " + String(snr) + "dB / " + String(freqError) + "Hz";
+                        syslogPacket.concat("STATUS / ");
+                        syslogPacket.concat(packet.substring(3, packet.indexOf(">")));
+                        syslogPacket.concat(" ---> ");
+                        syslogPacket.concat(packet.substring(packet.indexOf(":>") + 2));
+                        syslogPacket.concat(signalData);
                     } else if (packet.indexOf(":`") > 10) {
-                        syslogPacket += type + " / MIC-E / " + packet.substring(3,packet.indexOf(">")) + " ---> " + packet.substring(packet.indexOf(":`")+2);
-                        syslogPacket += " / " + String(rssi) + "dBm / " + String(snr) + "dB / " + String(freqError) + "Hz";
+                        syslogPacket.concat("MIC-E / ");
+                        syslogPacket.concat(packet.substring(3, packet.indexOf(">")));
+                        syslogPacket.concat(" ---> ");
+                        syslogPacket.concat(packet.substring(packet.indexOf(":`") + 2));
+                        syslogPacket.concat(signalData);
                     } else if (packet.indexOf(":T#") >= 10 && packet.indexOf(":=/") == -1) {
-                        syslogPacket += type + " / TELEMETRY / " + packet.substring(3,packet.indexOf(">")) + " ---> " + packet.substring(packet.indexOf(":T#")+3);
-                        syslogPacket += " / " + String(rssi) + "dBm / " + String(snr) + "dB / " + String(freqError) + "Hz";
+                        syslogPacket.concat("TELEMETRY / ");
+                        syslogPacket.concat(packet.substring(3, packet.indexOf(">")));
+                        syslogPacket.concat(" ---> ");
+                        syslogPacket.concat(packet.substring(packet.indexOf(":T#") + 3));
+                        syslogPacket.concat(signalData);
                     } else if (packet.indexOf(":;") > 10) {
-                        syslogPacket += type + " / OBJECT / " + packet.substring(3,packet.indexOf(">")) + " ---> " + packet.substring(packet.indexOf(":;")+2);
-                        syslogPacket += " / " + String(rssi) + "dBm / " + String(snr) + "dB / " + String(freqError) + "Hz";
+                        syslogPacket.concat("OBJECT / ");
+                        syslogPacket.concat(packet.substring(3, packet.indexOf(">")));
+                        syslogPacket.concat(" ---> ");
+                        syslogPacket.concat(packet.substring(packet.indexOf(":;") + 2));
+                        syslogPacket.concat(signalData);
                     } else {
-                        syslogPacket += type + " / " + packet;
-                        syslogPacket += " / " + String(rssi) + "dBm / " + String(snr) + "dB / " + String(freqError) + "Hz";
+                        syslogPacket.concat(packet);
+                        syslogPacket.concat(signalData);
                     }
                     break;
                 case 2:     // APRSIS TX
+                    syslogPacket.concat("APRSIS TX / ");
                     if (packet.indexOf(":>") > 10) {
-                        syslogPacket += type + " / StartUp_Status / " + packet.substring(packet.indexOf(":>")+2);
+                        syslogPacket.concat("StartUp_Status / ");
+                        syslogPacket.concat(packet.substring(packet.indexOf(":>") + 2));
                     } else {
-                        syslogPacket += type + " / QUERY / " + packet;
+                        syslogPacket.concat("QUERY / ");
+                        syslogPacket.concat(packet);
                     }
                     break;
                 case 3:     // TX
+                    syslogPacket.concat("TX / ");
                     if (packet.indexOf("RFONLY") > 10) {
-                        syslogPacket += type + " / RFONLY / " + packet;
+                        syslogPacket.concat("RFONLY / ");
+                        syslogPacket.concat(packet);
                     } else if (packet.indexOf("::") > 10) {
-                        syslogPacket += type + " / MESSAGE / " + packet.substring(0,packet.indexOf(">")) + " ---> " + packet.substring(packet.indexOf("::")+2);
+                        syslogPacket.concat("MESSAGE / ");
+                        syslogPacket.concat(packet.substring(0,packet.indexOf(">")));
+                        syslogPacket.concat(" ---> ");
+                        syslogPacket.concat(packet.substring(packet.indexOf("::") + 2));
                     } else {
-                        syslogPacket += type + " / " + packet;
+                        syslogPacket.concat(packet);
                     }
-                    break;                
+                    break;
                 default:
                     syslogPacket = "<165>1 - ERROR LoRa - - - ERROR / Error in Syslog Packet"; //RFC5424 The Syslog Protocol
                     break;

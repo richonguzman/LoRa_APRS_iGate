@@ -51,7 +51,7 @@ namespace Utils {
             delay(1000);
             status += ",qAC:>https://github.com/richonguzman/LoRa_APRS_iGate " + versionDate;
             APRS_IS_Utils::upload(status);
-            SYSLOG_Utils::log(2, status,0,0,0);   // APRSIS TX
+            SYSLOG_Utils::log(2, status, 0, 0.0, 0);   // APRSIS TX
             statusAfterBoot = false;
         }
         if (statusAfterBoot && !Config.beacon.sendViaAPRSIS && Config.beacon.sendViaRF) {

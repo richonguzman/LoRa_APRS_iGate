@@ -262,7 +262,7 @@ namespace APRS_IS_Utils {
                         #else
                             upload(queryAnswer);
                         #endif                        
-                        SYSLOG_Utils::log(2, queryAnswer, 0, 0, 0); // APRSIS TX
+                        SYSLOG_Utils::log(2, queryAnswer, 0, 0.0, 0); // APRSIS TX
                         fifthLine = "APRS-IS ----> APRS-IS";
                         sixthLine = Config.callsign;
                         for (int j = sixthLine.length();j < 9;j++) {

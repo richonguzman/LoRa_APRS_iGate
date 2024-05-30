@@ -118,7 +118,7 @@ namespace LoRa_Utils {
         transmitFlag = true;
         if (state == RADIOLIB_ERR_NONE) {
             if (Config.syslog.active && WiFi.status() == WL_CONNECTED) {
-                SYSLOG_Utils::log(3, newPacket, 0, 0, 0);    // TX
+                SYSLOG_Utils::log(3, newPacket, 0, 0.0, 0);    // TX
             }
             Utils::print("---> LoRa Packet Tx    : ");
             Utils::println(newPacket);
