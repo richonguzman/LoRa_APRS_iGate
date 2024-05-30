@@ -54,11 +54,18 @@ namespace GPS_Utils {
     void generateBeacons() {
         String beaconPacket = Config.callsign + ">APLRG1";
         if (Config.beacon.path != "") {
-            beaconPacket += "," + Config.beacon.path;
+            beaconPacket += ",";
+            beaconPacket += Config.beacon.path;
         }
         String encodedGPS = encodeGPS(Config.beacon.latitude, Config.beacon.longitude, Config.beacon.overlay, Config.beacon.symbol);
-        iGateBeaconPacket = beaconPacket + ",qAC:!" + encodedGPS;
-        iGateLoRaBeaconPacket = beaconPacket + ":!" + encodedGPS;
+        
+        iGateBeaconPacket = beaconPacket;
+        iGateBeaconPacket += ",qAC:!";
+        iGateBeaconPacket += encodedGPS;
+
+        iGateLoRaBeaconPacket = beaconPacket;
+        iGateLoRaBeaconPacket += ":!";
+        iGateLoRaBeaconPacket += encodedGPS;
     }
 
     double calculateDistanceTo(double latitude, double longitude) {
@@ -93,9 +100,9 @@ namespace GPS_Utils {
     String getReceivedGPS(const String& packet) {
         String infoGPS;
         if (packet.indexOf(":!") > 10) {
-            infoGPS = packet.substring(packet.indexOf(":!")+2);
+            infoGPS = packet.substring(packet.indexOf(":!") + 2);
         } else if (packet.indexOf(":=") > 10) {
-            infoGPS = packet.substring(packet.indexOf(":=")+2);
+            infoGPS = packet.substring(packet.indexOf(":=") + 2);
         }
         String Latitude       = infoGPS.substring(0,8);
         String Longitude      = infoGPS.substring(9,18);
@@ -104,10 +111,11 @@ namespace GPS_Utils {
         float convertedLatitude, convertedLongitude;
         String firstLatPart   = Latitude.substring(0,2);
         String secondLatPart  = Latitude.substring(2,4);
-        String thirdLatPart   = Latitude.substring(Latitude.indexOf(".")+1,Latitude.indexOf(".")+3);
+        String thirdLatPart   = Latitude.substring(Latitude.indexOf(".") + 1, Latitude.indexOf(".") + 3);
         String firstLngPart   = Longitude.substring(0,3);
         String secondLngPart  = Longitude.substring(3,5);
-        String thirdLngPart   = Longitude.substring(Longitude.indexOf(".")+1,Longitude.indexOf(".")+3);
+        String thirdLngPart   = Longitude.substring(Longitude.indexOf(".") + 1, Longitude.indexOf(".") + 3);
+        
         convertedLatitude     = firstLatPart.toFloat() + (secondLatPart.toFloat()/60) + (thirdLatPart.toFloat()/(60*100));
         convertedLongitude    = firstLngPart.toFloat() + (secondLngPart.toFloat()/60) + (thirdLngPart.toFloat()/(60*100));
         

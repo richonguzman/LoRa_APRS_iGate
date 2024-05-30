@@ -188,9 +188,9 @@ namespace LoRa_Utils {
                         return packet;
                     }                
                 } else if (state == RADIOLIB_ERR_CRC_MISMATCH) {
-                    rssi = radio.getRSSI();
-                    snr = radio.getSNR();
-                    freqError = radio.getFrequencyError();
+                    rssi        = radio.getRSSI();
+                    snr         = radio.getSNR();
+                    freqError   = radio.getFrequencyError();
                     Utils::println(F("CRC error!"));
                     if (Config.syslog.active && WiFi.status() == WL_CONNECTED) {
                         SYSLOG_Utils::log(0, packet, rssi, snr, freqError); // CRC

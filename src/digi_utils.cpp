@@ -40,7 +40,13 @@ namespace DIGI_Utils {
                     else {
                         path.replace("WIDE1-" + hop, Config.callsign + "*,WIDE1-" + String(hop.toInt() - 1));
                     }
-                    String repeatedPacket = sender + ">" + tocall + "," + path + packet.substring(packet.indexOf(":"));
+
+                    String repeatedPacket = sender;
+                    repeatedPacket += ">";
+                    repeatedPacket += tocall;
+                    repeatedPacket += ",";
+                    repeatedPacket += path;
+                    repeatedPacket += packet.substring(packet.indexOf(":"));
                     return repeatedPacket;
                 }
                 else {
@@ -63,7 +69,7 @@ namespace DIGI_Utils {
             if ((packet.substring(0, 3) == "\x3c\xff\x01") && (packet.indexOf("NOGATE") == -1)) {
                 Sender = packet.substring(3, packet.indexOf(">"));
                 if (Sender != Config.callsign) {
-                    if (STATION_Utils::check25SegBuffer(Sender, packet.substring(packet.indexOf(":")+2))) {
+                    if (STATION_Utils::check25SegBuffer(Sender, packet.substring(packet.indexOf(":") + 2))) {
                         STATION_Utils::updateLastHeard(Sender);
                         Utils::typeOfPacket(packet.substring(3), 2);    // Digi
                         AddresseeAndMessage = packet.substring(packet.indexOf("::") + 2);

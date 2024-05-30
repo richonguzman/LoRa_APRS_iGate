@@ -222,10 +222,26 @@ namespace BME_Utils {
                 humStr  = "..";
             }
             presStr = generatePresString(newPress + (Config.bme.heightCorrection/CORRECTION_FACTOR));
-            fifthLine = "BME-> " + String(int(newTemp + Config.bme.temperatureCorrection))+"C " + humStr + "% " + presStr.substring(0,4) + "hPa";
-            wx = ".../...g...t" + tempStr + "r...p...P...h" + humStr + "b" + presStr;
+            
+            fifthLine = "BME-> ";
+            fifthLine += String(int(newTemp + Config.bme.temperatureCorrection));
+            fifthLine += "C ";
+            fifthLine += humStr;
+            fifthLine += "% ";
+            fifthLine += presStr.substring(0,4);
+            fifthLine += "hPa";
+
+            wx = ".../...g...t";
+            wx += tempStr;
+            wx += "r...p...P...h";
+            wx += humStr;
+            wx += "b";
+            wx += presStr;
+
             if (wxModuleType == 3) {
-                wx += "Gas: " + String(newGas) + "Kohms";
+                wx += "Gas: ";
+                wx += String(newGas);
+                wx += "Kohms";
             }
             return wx;
         }

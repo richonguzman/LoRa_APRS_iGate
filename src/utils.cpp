@@ -45,18 +45,22 @@ uint32_t    lastScreenOn        = millis();
 namespace Utils {
 
     void processStatus() {
-        String status = Config.callsign + ">APLRG1," + Config.beacon.path;
+        String status = Config.callsign;
+        status.concat(">APLRG1,");
+        status.concat(Config.beacon.path);
         
         if (WiFi.status() == WL_CONNECTED && Config.aprs_is.active && Config.beacon.sendViaAPRSIS) {
             delay(1000);
-            status += ",qAC:>https://github.com/richonguzman/LoRa_APRS_iGate " + versionDate;
+            status.concat(",qAC:>https://github.com/richonguzman/LoRa_APRS_iGate ");
+            status.concat(versionDate);
             APRS_IS_Utils::upload(status);
             SYSLOG_Utils::log(2, status, 0, 0.0, 0);   // APRSIS TX
             statusAfterBoot = false;
         }
         if (statusAfterBoot && !Config.beacon.sendViaAPRSIS && Config.beacon.sendViaRF) {
             delay(2000);
-            status += ":>https://github.com/richonguzman/LoRa_APRS_iGate " + versionDate;
+            status.concat(":>https://github.com/richonguzman/LoRa_APRS_iGate ");
+            status.concat(versionDate);
             STATION_Utils::addToOutputPacketBuffer(status);
             statusAfterBoot = false;
         }
@@ -87,11 +91,13 @@ namespace Utils {
     }
 
     void activeStations() {
-        fourthLine = "Stations (" + String(Config.rememberStationTime) + "min) = ";
+        fourthLine = "Stations (";
+        fourthLine.concat(String(Config.rememberStationTime));
+        fourthLine.concat("min) = ");
         if (lastHeardStation.size() < 10) {
             fourthLine += " ";
         }
-        fourthLine += String(lastHeardStation.size());            
+        fourthLine.concat(String(lastHeardStation.size()));
     }
 
     void checkBeaconInterval() {
@@ -129,9 +135,13 @@ namespace Utils {
                     float internalVoltage       = BATTERY_Utils::checkInternalVoltage();
                     String internalVoltageInfo  = String(internalVoltage,2) + "V";
                     if (Config.battery.sendInternalVoltage) {
-                        beaconPacket += " Batt=" + internalVoltageInfo;
-                        secondaryBeaconPacket += " Batt=" + internalVoltageInfo;
-                        sixthLine = "    (Batt=" + internalVoltageInfo + ")";
+                        beaconPacket += " Batt=";
+                        beaconPacket += internalVoltageInfo;
+                        secondaryBeaconPacket += " Batt=";
+                        secondaryBeaconPacket += internalVoltageInfo;
+                        sixthLine = "    (Batt=";
+                        sixthLine += internalVoltageInfo;
+                        sixthLine += ")";
                     }
                     if (Config.battery.monitorInternalVoltage && internalVoltage < Config.battery.internalSleepVoltage) {
                         beaconPacket += " **IntBatWarning:SLEEP**";
@@ -145,9 +155,13 @@ namespace Utils {
                 float externalVoltage       = BATTERY_Utils::checkExternalVoltage();
                 String externalVoltageInfo  = String(externalVoltage,2) + "V";
                 if (Config.battery.sendExternalVoltage) {
-                    beaconPacket += " Ext=" + externalVoltageInfo;
-                    secondaryBeaconPacket += " Ext=" + externalVoltageInfo;
-                    sixthLine = "    (Ext V=" + externalVoltageInfo + ")";
+                    beaconPacket += " Ext=";
+                    beaconPacket += externalVoltageInfo;
+                    secondaryBeaconPacket += " Ext=";
+                    secondaryBeaconPacket += externalVoltageInfo;
+                    sixthLine = "    (Ext V=";
+                    sixthLine += externalVoltageInfo;
+                    sixthLine += ")";
                 }
                 if (Config.battery.monitorExternalVoltage && externalVoltage < Config.battery.externalSleepVoltage) {
                     beaconPacket += " **ExtBatWarning:SLEEP**";
@@ -200,36 +214,42 @@ namespace Utils {
     }
 
     void typeOfPacket(const String& packet, uint8_t packetType) {
-        String sender;
+        String sender = packet.substring(0,packet.indexOf(">"));
         switch (packetType) {
             case 0: // LoRa-APRS
                 fifthLine = "LoRa Rx ----> APRS-IS";
-                sender = packet.substring(0,packet.indexOf(">"));
                 break;
             case 1: // APRS-LoRa
                 fifthLine = "APRS-IS ----> LoRa Tx";
-                sender = packet.substring(0,packet.indexOf(">"));
                 break;
             case 2: // Digi
                 fifthLine = "LoRa Rx ----> LoRa Tx";
-                sender = packet.substring(0,packet.indexOf(">"));
                 break;
         }
         for (int i = sender.length(); i < 9; i++) {
             sender += " ";
         }
+        sixthLine = sender;
+        String seventhLineHelper = "RSSI:";
+        seventhLineHelper += String(rssi);
+        seventhLineHelper += "dBm SNR: ";
+        seventhLineHelper += String(snr);
+        seventhLineHelper += "dBm";
+
         if (packet.indexOf("::") >= 10) {
-            sixthLine = sender + "> MESSAGE";
-            seventhLine = "RSSI:" + String(rssi) + "dBm SNR: " + String(snr) + "dBm";
+            sixthLine += "> MESSAGE";
+            seventhLine = seventhLineHelper;
         } else if (packet.indexOf(":>") >= 10) {
-            sixthLine = sender + "> NEW STATUS";
-            seventhLine = "RSSI:" + String(rssi) + "dBm SNR: " + String(snr) + "dBm";
+            sixthLine += "> NEW STATUS";
+            seventhLine = seventhLineHelper;
         } else if (packet.indexOf(":!") >= 10 || packet.indexOf(":=") >= 10) {
-            sixthLine = sender + "> GPS BEACON";
+            sixthLine += "> GPS BEACON";
             if (!Config.syslog.active) {
                 GPS_Utils::getDistanceAndComment(packet);       // to be checked!!!
-            }            
-            seventhLine = "RSSI:" + String(rssi) + "dBm";
+            }
+            seventhLine = "RSSI:";
+            seventhLine += String(rssi);
+            seventhLine += "dBm";
             if (rssi <= -100) {
                 seventhLine += " ";
             } else {
@@ -238,19 +258,21 @@ namespace Utils {
             if (distance.indexOf(".") == 1) {
                 seventhLine += " ";
             }
-            seventhLine += "D:" + distance + "km";
+            seventhLine += "D:";
+            seventhLine += distance;
+            seventhLine += "km";
         } else if (packet.indexOf(":T#") >= 10 && packet.indexOf(":=/") == -1) {
-            sixthLine = sender + "> TELEMETRY";
-            seventhLine = "RSSI:" + String(rssi) + "dBm SNR: " + String(snr) + "dBm";
+            sixthLine += "> TELEMETRY";
+            seventhLine = seventhLineHelper;
         } else if (packet.indexOf(":`") >= 10) {
-            sixthLine = sender + ">  MIC-E";
-            seventhLine = "RSSI:" + String(rssi) + "dBm SNR: " + String(snr) + "dBm";
+            sixthLine += ">  MIC-E";
+            seventhLine = seventhLineHelper;
         } else if (packet.indexOf(":;") >= 10) {
-            sixthLine = sender + ">  OBJECT";
-            seventhLine = "RSSI:" + String(rssi) + "dBm SNR: " + String(snr) + "dBm";
+            sixthLine += ">  OBJECT";
+            seventhLine = seventhLineHelper;
         } else {
-            sixthLine = sender + "> ??????????";
-            seventhLine = "RSSI:" + String(rssi) + "dBm SNR: " + String(snr) + "dBm";
+            sixthLine += "> ??????????";
+            seventhLine = seventhLineHelper;
         }
     }
 

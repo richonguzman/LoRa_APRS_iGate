@@ -46,7 +46,9 @@ namespace STATION_Utils {
             lastHeardStation.push_back(station + "," + String(millis()));
         }
 
-        fourthLine = "Stations (" + String(Config.rememberStationTime) + "min) = ";
+        fourthLine = "Stations (";
+        fourthLine += String(Config.rememberStationTime);
+        fourthLine += "min) = ";
         if (lastHeardStation.size() < 10) {
             fourthLine += " ";
         }
