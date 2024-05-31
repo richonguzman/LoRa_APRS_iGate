@@ -11,13 +11,13 @@
 
 namespace POWER_Utils {
 
-    double getBatteryVoltage();
-    bool isBatteryConnected();
-    void activateMeasurement();
-    void activateLoRa();
-    void deactivateLoRa();
-    bool begin(TwoWire &port);
-    void setup();
+    double  getBatteryVoltage();
+    bool    isBatteryConnected();
+    void    activateMeasurement();
+    void    activateLoRa();
+    void    deactivateLoRa();
+    bool    begin(TwoWire &port);
+    void    setup();
 
 }
 

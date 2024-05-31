@@ -6,8 +6,8 @@
 
 namespace DIGI_Utils {
 
-    String generateDigiRepeatedPacket(const String& packet);
-    void processLoRaPacket(const String& packet);
+    String  generateDigiRepeatedPacket(const String& packet);
+    void    processLoRaPacket(const String& packet);
 
 }
 

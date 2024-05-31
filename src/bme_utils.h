@@ -10,12 +10,12 @@
 
 namespace BME_Utils {
 
-    void getWxModuleAddres();
-    void setup();
-    String generateTempString(float bmeTemp);
-    String generateHumString(float bmeHum);
-    String generatePresString(float bmePress);
-    String readDataSensor();
+    void    getWxModuleAddres();
+    void    setup();
+    String  generateTempString(float bmeTemp);
+    String  generateHumString(float bmeHum);
+    String  generatePresString(float bmePress);
+    String  readDataSensor();
 
 }
 
