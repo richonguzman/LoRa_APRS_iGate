@@ -76,7 +76,7 @@ namespace GPS_Utils {
         String GPSPacket            = packet.substring(packet.indexOf(":!")+3);
         String encodedLatitude      = GPSPacket.substring(0,4);
         String encodedLongtitude    = GPSPacket.substring(4,8);
-        String comment              = GPSPacket.substring(13);
+        String comment              = GPSPacket.substring(12);
 
         int Y1 = int(encodedLatitude[0]);
         int Y2 = int(encodedLatitude[1]);
