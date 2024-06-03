@@ -25,39 +25,33 @@ extern bool             backUpDigiMode;
 namespace DIGI_Utils {
 
     String generateDigiRepeatedPacket(const String& packet){
-        String sender, temp0, tocall, path;
-        sender = packet.substring(0, packet.indexOf(">"));
+        String temp0, path;
         temp0 = packet.substring(packet.indexOf(">") + 1, packet.indexOf(":"));
         if (temp0.indexOf(",") > 2) {
-            tocall = temp0.substring(0, temp0.indexOf(","));
             path = temp0.substring(temp0.indexOf(",") + 1, temp0.indexOf(":"));
             if (path.indexOf("WIDE1-") >= 0) {
                 String hop = path.substring(path.indexOf("WIDE1-") + 6, path.indexOf("WIDE1-") + 7);
                 if (hop.toInt() >= 1 && hop.toInt() <= 7) {
                     if (hop.toInt() == 1) {
                         path.replace("WIDE1-1", Config.callsign + "*");
-                    }
-                    else {
+                    } else {
                         path.replace("WIDE1-" + hop, Config.callsign + "*,WIDE1-" + String(hop.toInt() - 1));
                     }
 
-                    String repeatedPacket = sender;
+                    String repeatedPacket = packet.substring(0, packet.indexOf(">"));   // sender
                     repeatedPacket += ">";
-                    repeatedPacket += tocall;
+                    repeatedPacket += temp0.substring(0, temp0.indexOf(","));           // tocall
                     repeatedPacket += ",";
                     repeatedPacket += path;
                     repeatedPacket += packet.substring(packet.indexOf(":"));
                     return repeatedPacket;
-                }
-                else {
+                } else {
                     return "";
                 }
-            }
-            else {
+            } else {
                 return "";
             }
-        }
-        else {
+        } else {
             return "";
         }
     }

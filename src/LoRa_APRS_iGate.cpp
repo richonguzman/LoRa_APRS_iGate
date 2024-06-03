@@ -154,7 +154,7 @@ void loop() {
     String packet = "";
     if (Config.loramodule.rxActive) {
         packet = LoRa_Utils::receivePacket(); // We need to fetch LoRa packet above APRSIS and Digi
-    } 
+    }
 
     if (packet != "") {
         if (Config.aprs_is.active) { // If APRSIS enabled
