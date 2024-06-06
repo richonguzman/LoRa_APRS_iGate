@@ -123,6 +123,7 @@ bool shouldCleanTFT(const String& header, const String& line1, const String& lin
 
 void show_display(const String& header, const String& line1, const String& line2, const String& line3, int wait) {
     #ifdef HAS_DISPLAY
+        const String* const lines[] = {&line1, &line2, &line3};
         #ifdef HAS_TFT
             if (shouldCleanTFT(header, line1, line2, line3)) {
                 cleanTFT();
@@ -132,24 +133,20 @@ void show_display(const String& header, const String& line1, const String& line2
             tft.setCursor(0, 0);
             tft.print(header);
             tft.setTextSize(smallSizeFont);
-            tft.setCursor(0, ((lineSpacing * 2) - 2));
-            tft.print(line1);
-            tft.setCursor(0, ((lineSpacing * 3) - 2));
-            tft.print(line2);
-            tft.setCursor(0, ((lineSpacing * 4) - 2));
-            tft.print(line3);
+            for (int i = 0; i < 3; i++) {
+                tft.setCursor(0, ((lineSpacing * (2 + i)) - 2));
+                tft.print(*lines[i]);
+            }
         #else
             display.clearDisplay();
             display.setTextColor(WHITE);
             display.setTextSize(1);
             display.setCursor(0, 0);
             display.println(header);
-            display.setCursor(0, 8);
-            display.println(line1);
-            display.setCursor(0, 16);
-            display.println(line2);
-            display.setCursor(0, 24);
-            display.println(line3);
+            for (int i = 0; i < 3; i++) {
+                display.setCursor(0, 8 + (8 * i));
+                display.println(*lines[i]);
+            }
             display.ssd1306_command(SSD1306_SETCONTRAST);
             display.ssd1306_command(1);
             display.display();
@@ -160,6 +157,7 @@ void show_display(const String& header, const String& line1, const String& line2
 
 void show_display(const String& header, const String& line1, const String& line2, const String& line3, const String& line4, const String& line5, const String& line6, int wait) {
     #ifdef HAS_DISPLAY
+        const String* const lines[] = {&line1, &line2, &line3, &line4, &line5, &line6};
         #ifdef HAS_TFT
             if (shouldCleanTFT(header, line1, line2, line3, line4, line5, line6)) {
                 cleanTFT();
@@ -169,18 +167,10 @@ void show_display(const String& header, const String& line1, const String& line2
             tft.setCursor(0, 0);
             tft.print(header);
             tft.setTextSize(smallSizeFont);
-            tft.setCursor(0, ((lineSpacing * 2) - 2));
-            tft.print(line1);
-            tft.setCursor(0, ((lineSpacing * 3) - 2));
-            tft.print(line2);
-            tft.setCursor(0, ((lineSpacing * 4) - 2));
-            tft.print(line3);
-            tft.setCursor(0, ((lineSpacing * 5) - 2));
-            tft.print(line4);
-            tft.setCursor(0, ((lineSpacing * 6) - 2));
-            tft.print(line5);
-            tft.setCursor(0, ((lineSpacing * 7) - 2));
-            tft.print(line6);
+            for (int i = 0; i < 6; i++) {
+                tft.setCursor(0, ((lineSpacing * (2 + i)) - 2));
+                tft.print(*lines[i]);
+            }
         #else
             display.clearDisplay();
             display.setTextColor(WHITE);
@@ -188,18 +178,10 @@ void show_display(const String& header, const String& line1, const String& line2
             display.setCursor(0, 0);
             display.println(header);
             display.setTextSize(1);
-            display.setCursor(0, 16);
-            display.println(line1);
-            display.setCursor(0, 24);
-            display.println(line2);
-            display.setCursor(0, 32);
-            display.println(line3);
-            display.setCursor(0, 40);
-            display.println(line4);
-            display.setCursor(0, 48);
-            display.println(line5);
-            display.setCursor(0, 56);
-            display.println(line6);
+            for (int i = 0; i < 6; i++) {
+                display.setCursor(0, 16 + (8 * i));
+                display.println(*lines[i]);
+            }
             display.ssd1306_command(SSD1306_SETCONTRAST);
             display.ssd1306_command(1);
             display.display();
