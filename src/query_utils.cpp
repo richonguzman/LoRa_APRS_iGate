@@ -12,7 +12,7 @@ extern int                  freqError;
 
 namespace QUERY_Utils {
 
-    String process(const String& query, const String& station, uint8_t queryOrigin) {
+    String process(const String& query, const String& station, const uint8_t queryOrigin) {
         String answer;
         if (query=="?APRS?" || query=="?aprs?" || query=="?Aprs?" || query=="H" || query=="h" || query=="HELP" || query=="Help" || query=="help" || query=="?") {
             answer = "?APRSV ?APRSP ?APRSL ?APRSH ?WHERE callsign";

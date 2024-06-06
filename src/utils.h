@@ -14,13 +14,13 @@ public:
 namespace Utils {
 
     void    processStatus();
-    String  getLocalIP();
+    const String getLocalIP();
     void    setupDisplay();
     void    activeStations();
     void    checkBeaconInterval();
     void    checkDisplayInterval();
     void    validateFreqs();
-    void    typeOfPacket(const String& packet, uint8_t packetType);
+    void    typeOfPacket(const String& packet, const uint8_t packetType);
     void    print(const String& text);
     void    println(const String& text);
     void    checkRebootMode();

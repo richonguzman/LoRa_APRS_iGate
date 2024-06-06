@@ -6,7 +6,7 @@
 
 namespace QUERY_Utils {
 
-    String process(const String& query, const String& station, uint8_t queryOrigin);
+    String process(const String& query, const String& station, const uint8_t queryOrigin);
 
 }
 

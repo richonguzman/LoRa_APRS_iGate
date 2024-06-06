@@ -134,7 +134,7 @@ namespace LoRa_Utils {
         }
     }
 
-    String packetSanitization(const String& packet) {
+    /*String packetSanitization(const String& packet) {
         String sanitizedPacket = packet;
         if (packet.indexOf("\0") > 0) {
             sanitizedPacket.replace("\0", "");
@@ -146,7 +146,7 @@ namespace LoRa_Utils {
             sanitizedPacket.replace("\n", "");
         }
         return sanitizedPacket;
-    }
+    }*/
 
     void startReceive() {
         radio.startReceive();

@@ -66,7 +66,7 @@ namespace Utils {
         }
     }
 
-    String getLocalIP() {
+    const String getLocalIP() {
         if (!WiFiConnected) {
             return "IP :  192.168.4.1";
         } else if (backUpDigiMode) {
@@ -213,7 +213,7 @@ namespace Utils {
         }
     }
 
-    void typeOfPacket(const String& packet, uint8_t packetType) {
+    void typeOfPacket(const String& packet, const uint8_t packetType) {
         String sender = packet.substring(0,packet.indexOf(">"));
         switch (packetType) {
             case 0: // LoRa-APRS
