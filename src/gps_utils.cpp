@@ -2,6 +2,8 @@
 #include <WiFi.h>
 #include "configuration.h"
 #include "gps_utils.h"
+#include "display.h"
+#include "utils.h"
 
 extern Configuration  Config;
 extern WiFiClient     espClient;
@@ -52,6 +54,10 @@ namespace GPS_Utils {
     }
 
     void generateBeacons() {
+        if (!Utils::checkValidCallsign(Config.callsign)) {
+            show_display("- ERROR -", "CALLSIGN = NOT VALID!", "    Use SSID 0-15", "  Or Valid Callsign", 0);
+            while (true) {}
+        }   
         String beaconPacket = Config.callsign;
         beaconPacket += ">APLRG1";
         if (Config.beacon.path != "") {

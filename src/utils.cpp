@@ -325,4 +325,47 @@ namespace Utils {
         }
     }
 
+    bool checkValidCallsign(const String& callsign) {
+        String cleanCallsign;
+        if (callsign.indexOf("-")) {
+            cleanCallsign = callsign.substring(0, callsign.indexOf("-"));
+            String ssid = callsign.substring(callsign.indexOf("-") + 1);
+            int ssidInt = ssid.toInt();
+            if (ssidInt == 0 && ssid != "0") {
+                return false;
+            } else if (ssidInt < 0 || ssidInt >= 15) {
+                return false;
+            }
+        } else {
+            cleanCallsign = callsign;
+        }
+        if (cleanCallsign.length() < 4 || cleanCallsign.length() > 6) {
+            return false;
+        }
+
+        if (isDigit(cleanCallsign[1]) && cleanCallsign.length() < 6) {
+            cleanCallsign = " " + cleanCallsign;    // ANAA --> _ANAA
+        }
+        if (!isAlpha(cleanCallsign[1]) && !isDigit(cleanCallsign[2]) && !isAlpha(cleanCallsign[3])) {
+            return false;
+        }
+        if (cleanCallsign.length() == 5 && !isAlpha(cleanCallsign[4])) {
+            return false;
+        }
+        if (cleanCallsign.length() == 6 && (!isAlpha(cleanCallsign[4]) || !isAlpha(cleanCallsign[5]))) {
+            return false;
+        }
+        /*  ABCDEFG - XX
+            0   A = _ or alpha num
+            1   B = alpha
+            2   C = num
+            3   D = alpha
+            4   E = _ or alpha
+            5   F = _ or alpha
+
+            XX = 0 - 15
+        */
+        return true;
+    }
+
 }
