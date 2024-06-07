@@ -52,7 +52,8 @@ namespace GPS_Utils {
     }
 
     void generateBeacons() {
-        String beaconPacket = Config.callsign + ">APLRG1";
+        String beaconPacket = Config.callsign;
+        beaconPacket += ">APLRG1";
         if (Config.beacon.path != "") {
             beaconPacket += ",";
             beaconPacket += Config.beacon.path;
