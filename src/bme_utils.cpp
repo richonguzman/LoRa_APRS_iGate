@@ -116,7 +116,7 @@ namespace BME_Utils {
         }
     }
 
-    const String generateTempString(const float bmeTemp) {
+    String generateTempString(const float bmeTemp) {
         String strTemp;
         strTemp = String((int)bmeTemp);
         switch (strTemp.length()) {
@@ -131,7 +131,7 @@ namespace BME_Utils {
         }
     }
 
-    const String generateHumString(const float bmeHum) {
+    String generateHumString(const float bmeHum) {
         String strHum;
         strHum = String((int)bmeHum);
         switch (strHum.length()) {
@@ -150,7 +150,7 @@ namespace BME_Utils {
         }
     }
 
-    const String generatePresString(const float bmePress) {
+    String generatePresString(const float bmePress) {
         String strPress = String((int)bmePress);
         String decPress = String(int((bmePress - int(bmePress)) * 10));
         switch (strPress.length()) {
@@ -169,7 +169,7 @@ namespace BME_Utils {
         }
     }
 
-    const String readDataSensor() {
+    String readDataSensor() {
         String wx, tempStr, humStr, presStr;
         switch (wxModuleType) {
             case 1: // BME280

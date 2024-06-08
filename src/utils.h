@@ -14,7 +14,7 @@ public:
 namespace Utils {
 
     void    processStatus();
-    const String getLocalIP();
+    String  getLocalIP();
     void    setupDisplay();
     void    activeStations();
     void    checkBeaconInterval();

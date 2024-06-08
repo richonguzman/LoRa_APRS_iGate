@@ -66,7 +66,7 @@ namespace Utils {
         }
     }
 
-    const String getLocalIP() {
+    String getLocalIP() {
         if (!WiFiConnected) {
             return "IP :  192.168.4.1";
         } else if (backUpDigiMode) {
