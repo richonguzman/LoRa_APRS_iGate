@@ -342,20 +342,16 @@ namespace Utils {
         } else {
             cleanCallsign = callsign;
         }
-        if (cleanCallsign.length() < 4 || cleanCallsign.length() > 6) {
-            return false;
-        }
+        if (cleanCallsign.length() < 4 || cleanCallsign.length() > 6) return false;
 
         if (isDigit(cleanCallsign[1]) && cleanCallsign.length() < 6 && cleanCallsign.indexOf("S5") != 0 && cleanCallsign.indexOf("E7") != 0 && cleanCallsign.indexOf("Z3") != 0) {
             cleanCallsign = " " + cleanCallsign;    // ANAA --> _ANAA
         }
 
         if (cleanCallsign.indexOf("S5") == 0 || cleanCallsign.indexOf("E7") == 0 || cleanCallsign.indexOf("Z3") == 0) {
-            if (!isDigit(cleanCallsign[2]) && !isAlpha(cleanCallsign[3])) {
-                return false;
-            }
+            if (!isDigit(cleanCallsign[2]) && !isAlpha(cleanCallsign[3])) return false;
         } else {
-            if (!isAlphaNumeric(cleanCallsign[1]) && !isDigit(cleanCallsign[2]) && !isAlpha(cleanCallsign[3])) {
+            if (!isAlphaNumeric(cleanCallsign[1]) || !isDigit(cleanCallsign[2]) || !isAlpha(cleanCallsign[3])) {
                 return false;
             }
         }
@@ -373,8 +369,7 @@ namespace Utils {
             4   E = _ or alpha
             5   F = _ or alpha
 
-            XX = 0 - 15
-        */
+            XX = SSID = _ or 0 - 15         */
         return true;
     }
 
