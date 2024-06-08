@@ -43,7 +43,12 @@ namespace DIGI_Utils {
                     repeatedPacket += temp0.substring(0, temp0.indexOf(","));           // tocall
                     repeatedPacket += ",";
                     repeatedPacket += path;
-                    repeatedPacket += packet.substring(packet.indexOf(":"));
+
+                    String payload = packet.substring(packet.indexOf(":"));
+                    if (payload.indexOf("\x3c\xff\x01") != -1) {
+                        payload = payload.substring(0, payload.indexOf("\x3c\xff\x01"));
+                    }
+                    repeatedPacket += payload;
                     return repeatedPacket;
                 } else {
                     return "";

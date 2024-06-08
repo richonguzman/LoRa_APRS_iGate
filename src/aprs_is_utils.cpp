@@ -107,10 +107,14 @@ namespace APRS_IS_Utils {
     }
 
     String buildPacketToUpload(const String& packet) {
+        String payload = packet.substring(packet.indexOf(":"));
+        if (payload.indexOf("\x3c\xff\x01") != -1) {
+            payload = payload.substring(0, payload.indexOf("\x3c\xff\x01"));
+        }
         if (!(Config.aprs_is.active && Config.digi.mode == 0)) { // Check if NOT only IGate
-            return packet.substring(3, packet.indexOf(":")) + ",qAR," + Config.callsign + packet.substring(packet.indexOf(":"));
+            return packet.substring(3, packet.indexOf(":")) + ",qAR," + Config.callsign + payload;
         } else {
-            return packet.substring(3, packet.indexOf(":")) + ",qAO," + Config.callsign + packet.substring(packet.indexOf(":"));
+            return packet.substring(3, packet.indexOf(":")) + ",qAO," + Config.callsign + payload;
         }
     }
 
@@ -202,6 +206,9 @@ namespace APRS_IS_Utils {
                             Addressee = AddresseeAndMessage.substring(0, AddresseeAndMessage.indexOf(":"));
                             Addressee.trim();
                             if (packet.indexOf("::") > 10 && Addressee == Config.callsign) {      // its a message for me!
+                                if (AddresseeAndMessage.indexOf("\x3c\xff\x01") != -1) {
+                                    AddresseeAndMessage = AddresseeAndMessage.substring(0, AddresseeAndMessage.indexOf("\x3c\xff\x01"));
+                                }
                                 queryMessage = processReceivedLoRaMessage(Sender, AddresseeAndMessage);
                             }
                             if (!queryMessage) {
