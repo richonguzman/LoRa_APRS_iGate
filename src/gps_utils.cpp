@@ -60,19 +60,19 @@ namespace GPS_Utils {
         }   
         String beaconPacket = Config.callsign;
         beaconPacket += ">APLRG1";
-        if (Config.beacon.path != "") {
+        if (Config.beacon.path.indexOf("WIDE") == 0) {
             beaconPacket += ",";
             beaconPacket += Config.beacon.path;
         }
-        String encodedGPS = encodeGPS(Config.beacon.latitude, Config.beacon.longitude, Config.beacon.overlay, Config.beacon.symbol);
-        
-        iGateBeaconPacket = beaconPacket;
-        iGateBeaconPacket += ",qAC:!";
-        iGateBeaconPacket += encodedGPS;
 
-        iGateLoRaBeaconPacket = beaconPacket;
-        iGateLoRaBeaconPacket += ":!";
-        iGateLoRaBeaconPacket += encodedGPS;
+        iGateBeaconPacket       = beaconPacket;
+        iGateBeaconPacket       += ",qAC:!";
+        iGateLoRaBeaconPacket   = beaconPacket;
+        iGateLoRaBeaconPacket   += ":!";
+
+        String encodedGPS       = encodeGPS(Config.beacon.latitude, Config.beacon.longitude, Config.beacon.overlay, Config.beacon.symbol);
+        iGateBeaconPacket       += encodedGPS;        
+        iGateLoRaBeaconPacket   += encodedGPS;
     }
 
     double calculateDistanceTo(double latitude, double longitude) {

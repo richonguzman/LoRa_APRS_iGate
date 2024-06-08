@@ -46,9 +46,11 @@ namespace Utils {
 
     void processStatus() {
         String status = Config.callsign;
-        status.concat(">APLRG1,");
-        status.concat(Config.beacon.path);
-        
+        status.concat(">APLRG1");
+        if (Config.beacon.path.indexOf("WIDE") == 0) {
+            status.concat(",");
+            status.concat(Config.beacon.path);
+        }
         if (WiFi.status() == WL_CONNECTED && Config.aprs_is.active && Config.beacon.sendViaAPRSIS) {
             delay(1000);
             status.concat(",qAC:>https://github.com/richonguzman/LoRa_APRS_iGate ");
@@ -326,9 +328,7 @@ namespace Utils {
     }
 
     bool checkValidCallsign(const String& callsign) {
-        if (callsign == "WLNK-1") {
-            return true;
-        }
+        if (callsign == "WLNK-1") return true;
         String cleanCallsign;
         if (callsign.indexOf("-")) {
             cleanCallsign = callsign.substring(0, callsign.indexOf("-"));
@@ -351,16 +351,10 @@ namespace Utils {
         if (cleanCallsign.indexOf("S5") == 0 || cleanCallsign.indexOf("E7") == 0 || cleanCallsign.indexOf("Z3") == 0) {
             if (!isDigit(cleanCallsign[2]) && !isAlpha(cleanCallsign[3])) return false;
         } else {
-            if (!isAlphaNumeric(cleanCallsign[1]) || !isDigit(cleanCallsign[2]) || !isAlpha(cleanCallsign[3])) {
-                return false;
-            }
+            if (!isAlphaNumeric(cleanCallsign[1]) || !isDigit(cleanCallsign[2]) || !isAlpha(cleanCallsign[3])) return false;
         }
-        if (cleanCallsign.length() == 5 && !isAlpha(cleanCallsign[4])) {
-            return false;
-        }
-        if (cleanCallsign.length() == 6 && (!isAlpha(cleanCallsign[4]) || !isAlpha(cleanCallsign[5]))) {
-            return false;
-        }
+        if (cleanCallsign.length() == 5 && !isAlpha(cleanCallsign[4])) return false;
+        if (cleanCallsign.length() == 6 && (!isAlpha(cleanCallsign[4]) || !isAlpha(cleanCallsign[5]))) return false;
         /*  ABCDEFG - XX
             0   A = _ or alpha num
             1   B = alpha (+num S5, E7, Z3)
