@@ -54,8 +54,8 @@ namespace GPS_Utils {
     }
 
     void generateBeacons() {
-        if (!Utils::checkValidCallsign(Config.callsign)) {
-            show_display("- ERROR -", "CALLSIGN = NOT VALID!", "    Use SSID 0-15", "  Or Valid Callsign", 0);
+        if (Config.callsign.indexOf("NOCALL-10") != 0 && !Utils::checkValidCallsign(Config.callsign)) {
+            show_display("***** ERROR ******", "CALLSIGN = NOT VALID!", "    Use SSID 0-15", "  Or Valid Callsign", 0);
             while (true) {}
         }   
         String beaconPacket = Config.callsign;
