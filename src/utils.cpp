@@ -326,6 +326,9 @@ namespace Utils {
     }
 
     bool checkValidCallsign(const String& callsign) {
+        if (callsign == "WLNK-1") {
+            return true;
+        }
         String cleanCallsign;
         if (callsign.indexOf("-")) {
             cleanCallsign = callsign.substring(0, callsign.indexOf("-"));
@@ -343,11 +346,18 @@ namespace Utils {
             return false;
         }
 
-        if (isDigit(cleanCallsign[1]) && cleanCallsign.length() < 6) {
+        if (isDigit(cleanCallsign[1]) && cleanCallsign.length() < 6 && cleanCallsign.indexOf("S5") != 0 && cleanCallsign.indexOf("E7") != 0 && cleanCallsign.indexOf("Z3") != 0) {
             cleanCallsign = " " + cleanCallsign;    // ANAA --> _ANAA
         }
-        if (!isAlpha(cleanCallsign[1]) && !isDigit(cleanCallsign[2]) && !isAlpha(cleanCallsign[3])) {
-            return false;
+
+        if (cleanCallsign.indexOf("S5") == 0 || cleanCallsign.indexOf("E7") == 0 || cleanCallsign.indexOf("Z3") == 0) {
+            if (!isDigit(cleanCallsign[2]) && !isAlpha(cleanCallsign[3])) {
+                return false;
+            }
+        } else {
+            if (!isAlphaNumeric(cleanCallsign[1]) && !isDigit(cleanCallsign[2]) && !isAlpha(cleanCallsign[3])) {
+                return false;
+            }
         }
         if (cleanCallsign.length() == 5 && !isAlpha(cleanCallsign[4])) {
             return false;
@@ -357,7 +367,7 @@ namespace Utils {
         }
         /*  ABCDEFG - XX
             0   A = _ or alpha num
-            1   B = alpha
+            1   B = alpha (+num S5, E7, Z3)
             2   C = num
             3   D = alpha
             4   E = _ or alpha

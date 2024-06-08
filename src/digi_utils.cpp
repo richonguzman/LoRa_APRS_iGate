@@ -63,7 +63,6 @@ namespace DIGI_Utils {
             if ((packet.substring(0, 3) == "\x3c\xff\x01") && (packet.indexOf("NOGATE") == -1)) {
                 Sender = packet.substring(3, packet.indexOf(">"));
                 if (Sender != Config.callsign && Utils::checkValidCallsign(Sender)) {
-                //if (Sender != Config.callsign) {
                     if (STATION_Utils::check25SegBuffer(Sender, packet.substring(packet.indexOf(":") + 2))) {
                         STATION_Utils::updateLastHeard(Sender);
                         Utils::typeOfPacket(packet.substring(3), 2);    // Digi

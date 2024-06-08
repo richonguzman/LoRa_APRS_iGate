@@ -195,7 +195,6 @@ namespace APRS_IS_Utils {
                 if ((packet.substring(0, 3) == "\x3c\xff\x01") && (packet.indexOf("TCPIP") == -1) && (packet.indexOf("NOGATE") == -1) && (packet.indexOf("RFONLY") == -1)) {
                     Sender = packet.substring(3, packet.indexOf(">"));
                     if (Sender != Config.callsign && Utils::checkValidCallsign(Sender)) {
-                    //if (Sender != Config.callsign) {   // avoid listening yourself by digirepeating
                         if (STATION_Utils::check25SegBuffer(Sender, packet.substring(packet.indexOf(":")+2))) {
                             STATION_Utils::updateLastHeard(Sender);
                             Utils::typeOfPacket(packet.substring(3), 0);  // LoRa-APRS
@@ -231,9 +230,9 @@ namespace APRS_IS_Utils {
     void processAPRSISPacket(const String& packet) {
         String Sender, AddresseeAndMessage, Addressee, receivedMessage;
         if (!packet.startsWith("#")) {
-            Sender = packet.substring(0, packet.indexOf(">"));
-            if (Utils::checkValidCallsign(Sender)) {
-                if (Config.aprs_is.messagesToRF && packet.indexOf("::") > 0) {
+            if (Config.aprs_is.messagesToRF && packet.indexOf("::") > 0) {
+                Sender = packet.substring(0, packet.indexOf(">"));
+                if (Utils::checkValidCallsign(Sender)) {
                     AddresseeAndMessage = packet.substring(packet.indexOf("::") + 2);
                     Addressee = AddresseeAndMessage.substring(0, AddresseeAndMessage.indexOf(":"));
                     Addressee.trim();
@@ -283,7 +282,6 @@ namespace APRS_IS_Utils {
                     } else {
                         Utils::print("Received Message from APRS-IS  : " + packet);
                         if (STATION_Utils::wasHeard(Addressee) && Utils::checkValidCallsign(Addressee)) {
-                        //if (STATION_Utils::wasHeard(Addressee)) {
                             STATION_Utils::addToOutputPacketBuffer(buildPacketToTx(packet, 1));
                             display_toggle(true);
                             lastScreenOn = millis();
@@ -291,13 +289,13 @@ namespace APRS_IS_Utils {
                         }
                     }
                     show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
-                } else if (Config.aprs_is.objectsToRF && packet.indexOf(":;") > 0) {
-                    Utils::println("Received Object from APRS-IS  : " + packet);
-                    STATION_Utils::addToOutputPacketBuffer(buildPacketToTx(packet, 5));
-                    display_toggle(true);
-                    lastScreenOn = millis();
-                    Utils::typeOfPacket(packet, 1); // APRS-LoRa
                 }
+            } else if (Config.aprs_is.objectsToRF && packet.indexOf(":;") > 0) {
+                Utils::println("Received Object from APRS-IS  : " + packet);
+                STATION_Utils::addToOutputPacketBuffer(buildPacketToTx(packet, 5));
+                display_toggle(true);
+                lastScreenOn = millis();
+                Utils::typeOfPacket(packet, 1); // APRS-LoRa
             }
         }
     }
