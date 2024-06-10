@@ -66,8 +66,11 @@ namespace LoRa_Utils {
         radio.setCodingRate(Config.loramodule.codingRate4);
         radio.setCRC(true);
 
-        #if defined(ESP32_DIY_1W_LoRa) || defined(OE5HWN_MeshCom)
+        #if defined(RADIO_RXEN) && defined(RADIO_TXEN)
             radio.setRfSwitchPins(RADIO_RXEN, RADIO_TXEN);
+        #endif
+
+        #if defined(ESP32_DIY_1W_LoRa) || defined(OE5HWN_MeshCom)
             state = radio.setOutputPower(Config.loramodule.power); // max value 20dB for 400M30S as it has Low Noise Amp
             radio.setCurrentLimit(140); // to be validated (100 , 120, 140)?
         #endif
