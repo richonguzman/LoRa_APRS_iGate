@@ -133,7 +133,7 @@
     #define OLED_RST    -1
 #endif
 
-#if !defined(HELTEC_HTCT62) && !defined(HELTEC_WSL_V3)
+#if !defined(HELTEC_HTCT62) && !defined(HELTEC_WSL_V3) && !defined(ESP32C3_DIY_1W_LoRa)
         #define HAS_DISPLAY
 #endif
 
@@ -186,6 +186,18 @@
     #define RADIO_CS         7
     #define RADIO_RST_PIN    3
     #define RADIO_IRQ_PIN    2
+#endif
+
+#ifdef ESP32C3_DIY_1W_LoRa
+    #define RADIO_SCLK_PIN      8
+    #define RADIO_MISO_PIN      9
+    #define RADIO_MOSI_PIN      10
+    #define RADIO_CS_PIN        5
+    #define RADIO_RST_PIN       4
+    #define RADIO_DIO1_PIN      2
+    #define RADIO_BUSY_PIN      3
+    #define RADIO_RXEN          6
+    #define RADIO_TXEN          7
 #endif
 
 /* (Same pins for LILYGO LoRa32 and ESP32 Wroom Dev )

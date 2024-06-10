@@ -24,7 +24,7 @@
         Adafruit_SSD1306 display(128, 64, &Wire, OLED_RST);
     #endif
 #endif
-
+    
 extern Configuration Config;
 
 String oldHeader, oldFirstLine, oldSecondLine, oldThirdLine, oldFourthLine, oldFifthLine, oldSixthLine;
