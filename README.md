@@ -50,6 +50,8 @@ ____________________________________________________
 ____________________________________________________
 ## Timeline (Versions):
 
+- 2024.06.10 ESP32C3 + 1W LoRa Module (E22 400M30S) support added.
+- 2024.06.09 Si7021 module added (with autodetected I2C Address)
 - 2024.06.08 Callsign Validation for all Rx and Tx Station that iGate/Digi hears.
 - 2024.05.27 Battery Monitor for internal and External Voltages (to make board sleep and avoid low discharge of batterys) T-Beam boards now with Battery readings as well.
 - 2024.05.23 Forced Reboot Mode added.
