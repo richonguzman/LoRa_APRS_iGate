@@ -5,6 +5,7 @@
 #include <Adafruit_BME280.h>
 #include <Adafruit_BMP280.h>
 #include <Adafruit_BME680.h>
+#include "Adafruit_Si7021.h"
 #include <Arduino.h>
 
 

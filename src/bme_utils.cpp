@@ -21,6 +21,7 @@ Adafruit_BMP280     bmp280(&Wire1);
 #else
 Adafruit_BMP280     bmp280;
 Adafruit_BME680     bme680;
+Adafruit_Si7021     sensor = Adafruit_Si7021();
 #endif
 
 
@@ -39,7 +40,10 @@ namespace BME_Utils {
             #endif
             if (err == 0) {
                 //Serial.println(addr); this shows any connected board to I2C
-                if (addr == 0x76 || addr == 0x77) {
+                if (addr == 0x76 || addr == 0x77) { // BME/BMP
+                    wxModuleAddress = addr;
+                    return;
+                } else if (addr == 0x40) {          // Si7011
                     wxModuleAddress = addr;
                     return;
                 }
@@ -52,36 +56,44 @@ namespace BME_Utils {
             getWxModuleAddres();
             if (wxModuleAddress != 0x00) {
                 bool wxModuleFound = false;
-                #ifdef HELTEC_V3
+                if (wxModuleAddress == 0x76 || wxModuleAddress == 0x77) {
+                    #ifdef HELTEC_V3
                     if (bme280.begin(wxModuleAddress, &Wire1)) {
                         Serial.println("BME280 sensor found");
                         wxModuleType = 1;
                         wxModuleFound = true;
                     }
-                #else
-                    if (bme280.begin(wxModuleAddress)) {
-                        Serial.println("BME280 sensor found");
-                        wxModuleType = 1;
-                        wxModuleFound = true;
-                    }
+                    #else
+                        if (bme280.begin(wxModuleAddress)) {
+                            Serial.println("BME280 sensor found");
+                            wxModuleType = 1;
+                            wxModuleFound = true;
+                        }
+                        if (!wxModuleFound) {
+                            if (bme680.begin(wxModuleAddress)) {
+                                Serial.println("BME680 sensor found");
+                                wxModuleType = 3;
+                                wxModuleFound = true;
+                            }
+                        }
+                    #endif
                     if (!wxModuleFound) {
-                        if (bme680.begin(wxModuleAddress)) {
-                            Serial.println("BME680 sensor found");
-                            wxModuleType = 3;
+                        if (bmp280.begin(wxModuleAddress)) {
+                            Serial.println("BMP280 sensor found");
+                            wxModuleType = 2;
                             wxModuleFound = true;
                         }
                     }
-                #endif
-                if (!wxModuleFound) {
-                    if (bmp280.begin(wxModuleAddress)) {
-                        Serial.println("BMP280 sensor found");
-                        wxModuleType = 2;
+                } else if (wxModuleAddress == 0x40) {
+                    if(sensor.begin()) {
+                        Serial.println("Si7021 sensor found");
+                        wxModuleType = 4;
                         wxModuleFound = true;
                     }
-                }
+                }                
                 if (!wxModuleFound) {
-                    show_display("ERROR", "", "BME/BMP sensor active", "but no sensor found...", 2000);
-                    Serial.println("BME/BMP sensor Active in config but not found! Check Wiring");
+                    show_display("ERROR", "", "BME/BMP/Si7021 sensor active", "but no sensor found...", 2000);
+                    Serial.println("BME/BMP/Si7021 sensor Active in config but not found! Check Wiring");
                 } else {
                     switch (wxModuleType) {
                         case 1:
@@ -196,21 +208,32 @@ namespace BME_Utils {
                     }
                 #endif
                 break;
+            case 4: // Si7021
+                newTemp     = sensor.readTemperature();
+                newPress    = 0;
+                newHum      = sensor.readHumidity();
+                break;
         }    
 
         if (isnan(newTemp) || isnan(newHum) || isnan(newPress)) {
-            Serial.println("BME/BMP Module data failed");
+            Serial.println("BME/BMP/Si7021 Module data failed");
             wx = ".../...g...t...r...p...P...h..b.....";
             fifthLine = "";
             return wx;
         } else {
             tempStr = generateTempString(((newTemp + Config.bme.temperatureCorrection) * 1.8) + 32);
-            if (wxModuleType == 1 || wxModuleType == 3) {
+            
+            if (wxModuleType == 1 || wxModuleType == 3 || wxModuleType == 4) {
                 humStr  = generateHumString(newHum);
             } else if (wxModuleType == 2) {
                 humStr  = "..";
             }
-            presStr = generatePresString(newPress + (Config.bme.heightCorrection/CORRECTION_FACTOR));
+            
+            if (wxModuleAddress == 4) {
+                presStr = ".....";
+            } else {
+                presStr = generatePresString(newPress + (Config.bme.heightCorrection/CORRECTION_FACTOR));
+            }           
             
             fifthLine = "BME-> ";
             fifthLine += String(int(newTemp + Config.bme.temperatureCorrection));
