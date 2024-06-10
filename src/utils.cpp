@@ -329,8 +329,9 @@ namespace Utils {
 
     bool checkValidCallsign(const String& callsign) {
         if (callsign == "WLNK-1") return true;
+        
         String cleanCallsign;
-        if (callsign.indexOf("-")) {
+        if (callsign.indexOf("-")) {    // SSID Validation
             cleanCallsign = callsign.substring(0, callsign.indexOf("-"));
             String ssid = callsign.substring(callsign.indexOf("-") + 1);
             int ssidInt = ssid.toInt();
@@ -342,28 +343,29 @@ namespace Utils {
         } else {
             cleanCallsign = callsign;
         }
+
         if (cleanCallsign.length() < 4 || cleanCallsign.length() > 6) return false;
 
-        if (isDigit(cleanCallsign[1]) && cleanCallsign.length() < 6 && cleanCallsign.indexOf("S5") != 0 && cleanCallsign.indexOf("E7") != 0 && cleanCallsign.indexOf("Z3") != 0) {
-            cleanCallsign = " " + cleanCallsign;    // ANAA --> _ANAA
+        if (cleanCallsign.length() < 6 && isAlpha(cleanCallsign[0]) && isDigit(cleanCallsign[1]) && isAlpha(cleanCallsign[2]) && isAlpha(cleanCallsign[3]) ) {
+            cleanCallsign = " " + cleanCallsign;    // A0AA --> _A0AA
         }
 
-        if (cleanCallsign.indexOf("S5") == 0 || cleanCallsign.indexOf("E7") == 0 || cleanCallsign.indexOf("Z3") == 0) {
-            if (!isDigit(cleanCallsign[2]) && !isAlpha(cleanCallsign[3])) return false;
-        } else {
-            if (!isAlphaNumeric(cleanCallsign[1]) || !isDigit(cleanCallsign[2]) || !isAlpha(cleanCallsign[3])) return false;
-        }
-        if (cleanCallsign.length() == 5 && !isAlpha(cleanCallsign[4])) return false;
-        if (cleanCallsign.length() == 6 && (!isAlpha(cleanCallsign[4]) || !isAlpha(cleanCallsign[5]))) return false;
-        /*  ABCDEFG - XX
-            0   A = _ or alpha num
-            1   B = alpha (+num S5, E7, Z3)
-            2   C = num
-            3   D = alpha
-            4   E = _ or alpha
-            5   F = _ or alpha
+        if (!isDigit(cleanCallsign[2]) || !isAlpha(cleanCallsign[3])) return false; // __0A must be validated
 
-            XX = SSID = _ or 0 - 15         */
+        bool isValid = false;
+        if ((isAlphaNumeric(cleanCallsign[0]) || cleanCallsign[0] == ' ') && isAlpha(cleanCallsign[1])) {
+            isValid = true;     //  AA0A (+A+A) + _A0AA (+A) + 0A0A (+A+A)
+        } else if (isAlpha(cleanCallsign[0]) && isDigit(cleanCallsign[1])) {
+            isValid = true;     //  A00A (+A+A)
+        }
+        if (!isValid) return false;   // also 00__ avoided
+
+        if (cleanCallsign.length() > 4) {
+            for (int i = 5; i <= cleanCallsign.length(); i++) {
+                if (!isAlpha(cleanCallsign[i - 1])) return false;
+            }
+        }
+
         return true;
     }
 
