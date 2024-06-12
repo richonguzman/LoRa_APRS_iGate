@@ -37,7 +37,7 @@ ________________________________________________________________________________
     #include "A7670_utils.h"
 #endif
 
-String          versionDate             = "2024.06.10";
+String          versionDate             = "2024.06.10"; // BD5HTY --> Don't use my code as your / don't change TOCALL also.
 Configuration   Config;
 WiFiClient      espClient;
 
