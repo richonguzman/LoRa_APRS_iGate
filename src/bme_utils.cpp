@@ -18,6 +18,7 @@ float newHum, newTemp, newPress, newGas;
 Adafruit_BME280     bme280;
 #ifdef HELTEC_V3
 Adafruit_BMP280     bmp280(&Wire1);
+Adafruit_Si7021     sensor = Adafruit_Si7021();
 #else
 Adafruit_BMP280     bmp280;
 Adafruit_BME680     bme680;
