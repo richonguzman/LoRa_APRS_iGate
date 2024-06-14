@@ -1,3 +1,4 @@
+#include <Arduino.h>
 #include "battery_utils.h"
 #include "configuration.h"
 #include "boards_pinout.h"
