@@ -30,7 +30,7 @@ jobs:
                     - name: ttgo-t-beam-v1
                       chip: esp32
                     - name: ttgo-t-beam-v1_SX1268
-                      chip: esp3
+                      chip: esp32
                     - name: ttgo-t-beam-v1_2_SX1262
                       chip: esp32
                     - name: ESP32_DIY_LoRa_A7670
