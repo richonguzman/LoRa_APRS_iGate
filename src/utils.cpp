@@ -337,7 +337,7 @@ namespace Utils {
             int ssidInt = ssid.toInt();
             if (ssidInt == 0 && ssid != "0") {
                 return false;
-            } else if (ssidInt < 0 || ssidInt >= 15) {
+            } else if (ssidInt < 0 || ssidInt > 15) {
                 return false;
             }
         } else {
