@@ -16,9 +16,9 @@ ____________________________________________________
 
 # WEB INSTALLER
 
-As easy as it gets, the new <a href="https://sq2cpa.github.io/lora-flasher/ca2rxu.html" target="_blank">Web Installer</a> (thanks Damian SQ2CPA)
+As easy as it gets, the new <a href="https://richonguzman.github.io/lora-igate-web-flasher/installer.html" target="_blank">Web Installer</a>
 
-[<img src="https://github.com/richonguzman/LoRa_APRS_iGate/blob/main/images/WebFlasher.png">](https://sq2cpa.github.io/lora-flasher/ca2rxu.html)
+[<img src="https://github.com/richonguzman/LoRa_APRS_iGate/blob/main/images/WebFlasherGithub.png">](https://sq2cpa.github.io/lora-flasher/ca2rxu.html)
 
 ____________________________________________________
 
