@@ -18,6 +18,15 @@ ____________________________________________________
 
 ____________________________________________________
 
+# WIKI
+
+### FAQ, BME280, TNC and more --> <a href="https://github.com/richonguzman/LoRa_APRS_iGate/wiki/00.-FAQ-(frequently-asked-questions)" target="_blank">here</a>
+
+### Installation Guide --> <a href="https://github.com/richonguzman/LoRa_APRS_iGate/wiki/01.-Installation-Guide" target="_blank">here</a>.
+
+
+____________________________________________________
+
 # SUPPORTED BOARDS
 
 - TTGO Lilygo LoRa32 v2.1 / v1.6 (they work the same).
@@ -36,14 +45,6 @@ ____________________________________________________
 
 
 ### Buying links --> <a href="https://github.com/richonguzman/LoRa_APRS_iGate/wiki/108.-Supported-Boards-and-Buying-Links" target="_blank">here</a>.
-
-____________________________________________________
-
-# WIKI
-
-### FAQ, BME280, TNC and more --> <a href="https://github.com/richonguzman/LoRa_APRS_iGate/wiki/00.-FAQ-(frequently-asked-questions)" target="_blank">here</a>
-
-### Installation Guide --> <a href="https://github.com/richonguzman/LoRa_APRS_iGate/wiki/01.-Installation-Guide" target="_blank">here</a>.
 
 ____________________________________________________
 ## Timeline (Versions):
