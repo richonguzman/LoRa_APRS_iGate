@@ -124,6 +124,7 @@ namespace APRS_IS_Utils {
         String outputPacket = packet.substring(0, packet.indexOf(","));
         outputPacket.concat(",TCPIP,WIDE1-1,");
         outputPacket.concat(Config.callsign);
+        outputPacket.concat("*");
         switch (packetType) {
             case 0: // gps
                 if (packet.indexOf(":=") > 0) {
@@ -239,64 +240,62 @@ namespace APRS_IS_Utils {
         if (!packet.startsWith("#")) {
             if (Config.aprs_is.messagesToRF && packet.indexOf("::") > 0) {
                 Sender = packet.substring(0, packet.indexOf(">"));
-                if (Utils::checkValidCallsign(Sender)) {
-                    AddresseeAndMessage = packet.substring(packet.indexOf("::") + 2);
-                    Addressee = AddresseeAndMessage.substring(0, AddresseeAndMessage.indexOf(":"));
-                    Addressee.trim();
-                    if (Addressee == Config.callsign) {             // its for me!
-                        if (AddresseeAndMessage.indexOf("{") > 0) {     // ack?
-                            String ackMessage = "ack" + AddresseeAndMessage.substring(AddresseeAndMessage.indexOf("{") + 1);
-                            ackMessage.trim();
-                            delay(4000);
-                            for (int i = Sender.length(); i < 9; i++) {
-                                Sender += ' ';
-                            }
-                            String ackPacket = Config.callsign + ">APLRG1,TCPIP,qAC::" + Sender + ":" + ackMessage;
-                            #ifdef ESP32_DIY_LoRa_A7670
-                                A7670_Utils::uploadToAPRSIS(ackPacket);
-                            #else
-                                upload(ackPacket);
-                            #endif                        
-                            receivedMessage = AddresseeAndMessage.substring(AddresseeAndMessage.indexOf(":") + 1, AddresseeAndMessage.indexOf("{"));
-                        } else {
-                            receivedMessage = AddresseeAndMessage.substring(AddresseeAndMessage.indexOf(":") + 1);
+                AddresseeAndMessage = packet.substring(packet.indexOf("::") + 2);
+                Addressee = AddresseeAndMessage.substring(0, AddresseeAndMessage.indexOf(":"));
+                Addressee.trim();
+                if (Addressee == Config.callsign) {             // its for me!
+                    if (AddresseeAndMessage.indexOf("{") > 0) {     // ack?
+                        String ackMessage = "ack" + AddresseeAndMessage.substring(AddresseeAndMessage.indexOf("{") + 1);
+                        ackMessage.trim();
+                        delay(4000);
+                        for (int i = Sender.length(); i < 9; i++) {
+                            Sender += ' ';
                         }
-                        if (receivedMessage.indexOf("?") == 0) {
-                            Utils::println("Received Query APRS-IS : " + packet);
-                            String queryAnswer = QUERY_Utils::process(receivedMessage, Sender, 1); // APRSIS
-                            //Serial.println("---> QUERY Answer : " + queryAnswer.substring(0,queryAnswer.indexOf("\n")));
-                            if (!Config.display.alwaysOn && Config.display.timeout != 0) {
-                                display_toggle(true);
-                            }
-                            lastScreenOn = millis();
-                            delay(500);
-                            #ifdef ESP32_DIY_LoRa_A7670
-                                A7670_Utils::uploadToAPRSIS(queryAnswer);
-                            #else
-                                upload(queryAnswer);
-                            #endif                        
-                            SYSLOG_Utils::log(2, queryAnswer, 0, 0.0, 0); // APRSIS TX
-                            fifthLine = "APRS-IS ----> APRS-IS";
-                            sixthLine = Config.callsign;
-                            for (int j = sixthLine.length();j < 9;j++) {
-                                sixthLine += " ";
-                            }
-                            sixthLine += "> ";
-                            sixthLine += Sender;
-                            seventhLine = "QUERY = ";
-                            seventhLine += receivedMessage;
-                        }
+                        String ackPacket = Config.callsign + ">APLRG1,TCPIP,qAC::" + Sender + ":" + ackMessage;
+                        #ifdef ESP32_DIY_LoRa_A7670
+                            A7670_Utils::uploadToAPRSIS(ackPacket);
+                        #else
+                            upload(ackPacket);
+                        #endif                        
+                        receivedMessage = AddresseeAndMessage.substring(AddresseeAndMessage.indexOf(":") + 1, AddresseeAndMessage.indexOf("{"));
                     } else {
-                        Utils::print("Received Message from APRS-IS  : " + packet);
-                        if (STATION_Utils::wasHeard(Addressee) && Utils::checkValidCallsign(Addressee)) {
-                            STATION_Utils::addToOutputPacketBuffer(buildPacketToTx(packet, 1));
-                            display_toggle(true);
-                            lastScreenOn = millis();
-                            Utils::typeOfPacket(packet, 1); // APRS-LoRa
-                        }
+                        receivedMessage = AddresseeAndMessage.substring(AddresseeAndMessage.indexOf(":") + 1);
                     }
-                    show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
+                    if (receivedMessage.indexOf("?") == 0) {
+                        Utils::println("Received Query APRS-IS : " + packet);
+                        String queryAnswer = QUERY_Utils::process(receivedMessage, Sender, 1); // APRSIS
+                        //Serial.println("---> QUERY Answer : " + queryAnswer.substring(0,queryAnswer.indexOf("\n")));
+                        if (!Config.display.alwaysOn && Config.display.timeout != 0) {
+                            display_toggle(true);
+                        }
+                        lastScreenOn = millis();
+                        delay(500);
+                        #ifdef ESP32_DIY_LoRa_A7670
+                            A7670_Utils::uploadToAPRSIS(queryAnswer);
+                        #else
+                            upload(queryAnswer);
+                        #endif                        
+                        SYSLOG_Utils::log(2, queryAnswer, 0, 0.0, 0); // APRSIS TX
+                        fifthLine = "APRS-IS ----> APRS-IS";
+                        sixthLine = Config.callsign;
+                        for (int j = sixthLine.length();j < 9;j++) {
+                            sixthLine += " ";
+                        }
+                        sixthLine += "> ";
+                        sixthLine += Sender;
+                        seventhLine = "QUERY = ";
+                        seventhLine += receivedMessage;
+                    }
+                } else {
+                    Utils::print("Received Message from APRS-IS  : " + packet);
+                    if (STATION_Utils::wasHeard(Addressee)) {
+                        STATION_Utils::addToOutputPacketBuffer(buildPacketToTx(packet, 1));
+                        display_toggle(true);
+                        lastScreenOn = millis();
+                        Utils::typeOfPacket(packet, 1); // APRS-LoRa
+                    }
                 }
+                show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
             } else if (Config.aprs_is.objectsToRF && packet.indexOf(":;") > 0) {
                 Utils::println("Received Object from APRS-IS  : " + packet);
                 STATION_Utils::addToOutputPacketBuffer(buildPacketToTx(packet, 5));
