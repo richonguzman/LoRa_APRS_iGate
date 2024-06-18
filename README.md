@@ -29,6 +29,8 @@ ____________________________________________________
 
 # SUPPORTED BOARDS
 
+### Buying links --> <a href="https://github.com/richonguzman/LoRa_APRS_iGate/wiki/108.-Supported-Boards-and-Buying-Links" target="_blank">here</a>.
+
 - TTGO Lilygo LoRa32 v2.1 / v1.6 (they work the same).
 
 - TTGO T-Beam v1.0 , v1.1, v1.2 (also variations with SX1262 and SX1268 LoRa Modules).
@@ -42,9 +44,6 @@ ____________________________________________________
 - ESP32 + 4G/LTE A7670 Modem + SX1278 DIY Version.
 
 - Wemos Lolin32 Oled + SX1278 DIY Version.
-
-
-### Buying links --> <a href="https://github.com/richonguzman/LoRa_APRS_iGate/wiki/108.-Supported-Boards-and-Buying-Links" target="_blank">here</a>.
 
 ____________________________________________________
 ## Timeline (Versions):
