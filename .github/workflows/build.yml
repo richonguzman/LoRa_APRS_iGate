@@ -95,7 +95,7 @@ jobs:
               run: |
                   if [ "${{ matrix.target.chip }}" == "esp32" ]; then
                     python installer/bin/esptool/esptool.py --chip esp32 merge_bin \
-                      -o installer/web_factory_${{ matrix.target.name }}.bin \
+                      -o installer/web_factory.bin \
                       --flash_mode dio \
                       --flash_freq 40m \
                       --flash_size 4MB \
@@ -106,7 +106,7 @@ jobs:
                       0x3D0000 installer/firmware/spiffs.bin
                   elif [ "${{ matrix.target.chip }}" == "esp32s3" ]; then
                     python installer/bin/esptool/esptool.py --chip esp32s3 merge_bin \
-                      -o installer/web_factory_${{ matrix.target.name }}.bin \
+                      -o installer/web_factory.bin \
                       --flash_mode dio \
                       --flash_freq 40m \
                       --flash_size 8MB \
@@ -117,7 +117,7 @@ jobs:
                       0x3D0000 installer/firmware/spiffs.bin
                   elif [ "${{ matrix.target.chip }}" == "esp32c3" ]; then
                     python installer/bin/esptool/esptool.py --chip esp32c3 merge_bin \
-                      -o installer/web_factory_${{ matrix.target.name }}.bin \
+                      -o installer/web_factory.bin \
                       --flash_mode dio \
                       --flash_freq 40m \
                       --flash_size 4MB \
