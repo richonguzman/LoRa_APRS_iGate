@@ -162,7 +162,8 @@ void loop() {
         }
 
         if (Config.digi.mode == 2 || backUpDigiMode) { // If Digi enabled
-            DIGI_Utils::processLoRaPacket(packet); // Send received packet to Digi
+            STATION_Utils::clean25SegBuffer();
+            DIGI_Utils::processLoRaPacket(packet); // Send received packet to Digi            
         }
 
         if (Config.tnc.enableServer) { // If TNC server enabled
@@ -176,9 +177,8 @@ void loop() {
     if (Config.aprs_is.active) { // If APRSIS enabled
         APRS_IS_Utils::listenAPRSIS(); // listen received packet from APRSIS
     }
-
-    STATION_Utils::processOutputPacketBuffer();
-    STATION_Utils::clean25SegBuffer();
+    
+    STATION_Utils::processOutputPacketBuffer();    
 
     show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
     Utils::checkRebootTime();

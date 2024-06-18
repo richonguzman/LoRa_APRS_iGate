@@ -200,34 +200,32 @@ namespace APRS_IS_Utils {
                 if ((packet.substring(0, 3) == "\x3c\xff\x01") && (packet.indexOf("TCPIP") == -1) && (packet.indexOf("NOGATE") == -1) && (packet.indexOf("RFONLY") == -1)) {
                     Sender = packet.substring(3, packet.indexOf(">"));
                     if (Sender != Config.callsign && Utils::checkValidCallsign(Sender)) {
-                        if (STATION_Utils::check25SegBuffer(Sender, packet.substring(packet.indexOf(":")+2))) {
-                            STATION_Utils::updateLastHeard(Sender);
-                            Utils::typeOfPacket(packet.substring(3), 0);  // LoRa-APRS
-                            AddresseeAndMessage = packet.substring(packet.indexOf("::") + 2);
-                            Addressee = AddresseeAndMessage.substring(0, AddresseeAndMessage.indexOf(":"));
-                            Addressee.trim();
-                            if (packet.indexOf("::") > 10 && Addressee == Config.callsign) {      // its a message for me!
-                                if (AddresseeAndMessage.indexOf("\x3c\xff\x01") != -1) {
-                                    AddresseeAndMessage = AddresseeAndMessage.substring(0, AddresseeAndMessage.indexOf("\x3c\xff\x01"));
-                                }
-                                queryMessage = processReceivedLoRaMessage(Sender, AddresseeAndMessage);
+                        STATION_Utils::updateLastHeard(Sender);
+                        Utils::typeOfPacket(packet.substring(3), 0);  // LoRa-APRS
+                        AddresseeAndMessage = packet.substring(packet.indexOf("::") + 2);
+                        Addressee = AddresseeAndMessage.substring(0, AddresseeAndMessage.indexOf(":"));
+                        Addressee.trim();
+                        if (packet.indexOf("::") > 10 && Addressee == Config.callsign) {      // its a message for me!
+                            if (AddresseeAndMessage.indexOf("\x3c\xff\x01") != -1) {
+                                AddresseeAndMessage = AddresseeAndMessage.substring(0, AddresseeAndMessage.indexOf("\x3c\xff\x01"));
                             }
-                            if (!queryMessage) {
-                                aprsPacket = buildPacketToUpload(packet);
-                                if (!Config.display.alwaysOn && Config.display.timeout != 0) {
-                                    display_toggle(true);
-                                }
-                                lastScreenOn = millis();
-                                #ifdef ESP32_DIY_LoRa_A7670
-                                    stationBeacon = true;
-                                    A7670_Utils::uploadToAPRSIS(aprsPacket);
-                                    stationBeacon = false;
-                                #else
-                                    upload(aprsPacket);
-                                #endif
-                                Utils::println("---> Uploaded to APRS-IS");
-                                show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
+                            queryMessage = processReceivedLoRaMessage(Sender, AddresseeAndMessage);
+                        }
+                        if (!queryMessage) {
+                            aprsPacket = buildPacketToUpload(packet);
+                            if (!Config.display.alwaysOn && Config.display.timeout != 0) {
+                                display_toggle(true);
                             }
+                            lastScreenOn = millis();
+                            #ifdef ESP32_DIY_LoRa_A7670
+                                stationBeacon = true;
+                                A7670_Utils::uploadToAPRSIS(aprsPacket);
+                                stationBeacon = false;
+                            #else
+                                upload(aprsPacket);
+                            #endif
+                            Utils::println("---> Uploaded to APRS-IS");
+                            show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
                         }
                     }
                 }
