@@ -334,11 +334,9 @@ namespace Utils {
         if (callsign.indexOf("-")) {    // SSID Validation
             cleanCallsign = callsign.substring(0, callsign.indexOf("-"));
             String ssid = callsign.substring(callsign.indexOf("-") + 1);
-            int ssidInt = ssid.toInt();
-            if (ssidInt == 0 && ssid != "0") {
-                return false;
-            } else if (ssidInt < 0 || ssidInt > 15) {
-                return false;
+            if (ssid.indexOf("-") != -1 || ssid.length() > 2) return false;
+            for (int i = 0; i < ssid.length(); i++) {
+                if (!isAlphaNumeric(ssid[i])) return false;
             }
         } else {
             cleanCallsign = callsign;
