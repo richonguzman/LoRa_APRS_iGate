@@ -31,13 +31,15 @@ ____________________________________________________
 
 ### Buying links --> <a href="https://github.com/richonguzman/LoRa_APRS_iGate/wiki/108.-Supported-Boards-and-Buying-Links" target="_blank">here</a>.
 
+(NOTE: all boards with 433-868-915 MHz versions)
+
 - TTGO Lilygo LoRa32 v2.1 / v1.6 (they work the same).
 
 - TTGO T-Beam v1.0 , v1.1, v1.2 (also variations with SX1262 and SX1268 LoRa Modules).
 
 - HELTEC V2, V3 , Wireless Stick, Wireless Stick Lite, HT-CT62, Wireless Tracker.
 
-- ESP32 Wroom + SX1278 LoRa Module or Ebyte 400M30S 1W LoRa Module for a DIY Versions.
+- ESP32 Wroom + SX1278 LoRa Module or Ebyte 400M30S/900M30S 1W LoRa Module for a DIY Versions.
 
 - ESP32C3 + Ebyte 400M30S 1W LoRa Module for another DIY version.
 
@@ -48,6 +50,7 @@ ____________________________________________________
 ____________________________________________________
 ## Timeline (Versions):
 
+- 2024.06.18 All boards with 433 / 868 / 915 MHz versions.
 - 2024.06.10 ESP32C3 + 1W LoRa Module (E22 400M30S) support added.
 - 2024.06.09 Si7021 module added (with autodetected I2C Address)
 - 2024.06.08 Callsign Validation for all Rx and Tx Station that iGate/Digi hears.
