@@ -24,7 +24,7 @@ extern bool                 backUpDigiMode;
 
 uint32_t lastRxTime         = millis();
 
-#if defined(ESP32_DIY_LoRa_A7670) || defined(ESP32_DIY_LoRa_A7670_915)
+#ifdef HAS_A7670
     extern bool                 stationBeacon;
 #endif
 
@@ -82,7 +82,7 @@ namespace APRS_IS_Utils {
         if (!Config.aprs_is.active) {
             aprsisState = "OFF";
         } else {
-            #if defined(ESP32_DIY_LoRa_A7670) || defined(ESP32_DIY_LoRa_A7670_915)
+            #ifdef HAS_A7670
                 if (modemLoggedToAPRSIS) {
                     aprsisState = "OK";
                 } else {
@@ -217,7 +217,7 @@ namespace APRS_IS_Utils {
                                 display_toggle(true);
                             }
                             lastScreenOn = millis();
-                            #if defined(ESP32_DIY_LoRa_A7670) || defined(ESP32_DIY_LoRa_A7670_915)
+                            #ifdef HAS_A7670
                                 stationBeacon = true;
                                 A7670_Utils::uploadToAPRSIS(aprsPacket);
                                 stationBeacon = false;
@@ -250,7 +250,7 @@ namespace APRS_IS_Utils {
                             Sender += ' ';
                         }
                         String ackPacket = Config.callsign + ">APLRG1,TCPIP,qAC::" + Sender + ":" + ackMessage;
-                        #if defined(ESP32_DIY_LoRa_A7670) || defined(ESP32_DIY_LoRa_A7670_915)
+                        #ifdef HAS_A7670
                             A7670_Utils::uploadToAPRSIS(ackPacket);
                         #else
                             upload(ackPacket);
@@ -268,7 +268,7 @@ namespace APRS_IS_Utils {
                         }
                         lastScreenOn = millis();
                         delay(500);
-                        #if defined(ESP32_DIY_LoRa_A7670) || defined(ESP32_DIY_LoRa_A7670_915)
+                        #ifdef HAS_A7670
                             A7670_Utils::uploadToAPRSIS(queryAnswer);
                         #else
                             upload(queryAnswer);
@@ -305,7 +305,7 @@ namespace APRS_IS_Utils {
     }
 
     void listenAPRSIS() {
-        #if defined(ESP32_DIY_LoRa_A7670) || defined(ESP32_DIY_LoRa_A7670_915)
+        #ifdef HAS_A7670
             A7670_Utils::listenAPRSIS();
         #else
             if (espClient.connected()) {

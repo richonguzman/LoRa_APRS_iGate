@@ -175,7 +175,7 @@ namespace Utils {
             if (Config.aprs_is.active && Config.beacon.sendViaAPRSIS && !backUpDigiMode) {
                 show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING IGATE BEACON", 0); 
                 seventhLine = "     listening...";
-                #if defined(ESP32_DIY_LoRa_A7670) || defined(ESP32_DIY_LoRa_A7670_915)
+                #ifdef HAS_A7670
                     A7670_Utils::uploadToAPRSIS(beaconPacket);
                 #else
                     APRS_IS_Utils::upload(beaconPacket);

@@ -6,7 +6,7 @@
 #include "display.h"
 #include "utils.h"
 
-#if defined(ESP32_DIY_LoRa_A7670) || defined(ESP32_DIY_LoRa_A7670_915)
+#ifdef HAS_A7670
     #define TINY_GSM_MODEM_SIM7600      //The AT instruction of A7670 is compatible with SIM7600 
     #define TINY_GSM_RX_BUFFER 1024     // Set RX buffer to 1Kb
     #define SerialAT Serial1

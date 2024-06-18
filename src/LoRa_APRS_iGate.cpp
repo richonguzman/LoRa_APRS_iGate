@@ -33,7 +33,7 @@ ________________________________________________________________________________
 #include "tnc_utils.h"
 #include "display.h"
 #include "utils.h"
-#if defined(ESP32_DIY_LoRa_A7670) || defined(ESP32_DIY_LoRa_A7670_915)
+#ifdef HAS_A7670
     #include "A7670_utils.h"
 #endif
 
@@ -116,7 +116,7 @@ void setup() {
     BME_Utils::setup();
     WEB_Utils::setup();
     TNC_Utils::setup();
-    #if defined(ESP32_DIY_LoRa_A7670) || defined(ESP32_DIY_LoRa_A7670_915)
+    #ifdef HAS_A7670
         A7670_Utils::setup();
     #endif
     Utils::checkRebootMode();
@@ -138,7 +138,7 @@ void loop() {
 
     WIFI_Utils::checkWiFi(); // Always use WiFi, not related to IGate/Digi mode
 
-    #if defined(ESP32_DIY_LoRa_A7670) || defined(ESP32_DIY_LoRa_A7670_915)
+    #ifdef HAS_A7670
         if (Config.aprs_is.active && !modemLoggedToAPRSIS) A7670_Utils::APRS_IS_connect();
     #else
         if (Config.aprs_is.active && (WiFi.status() == WL_CONNECTED) && !espClient.connected()) APRS_IS_Utils::connect();
