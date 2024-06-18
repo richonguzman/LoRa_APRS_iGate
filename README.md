@@ -4,7 +4,7 @@ This firmware is for using ESP32 based boards with LoRa Modules and GPS to live 
 
 ![Screenshot](https://github.com/richonguzman/LoRa_APRS_iGate/blob/main/images/iGateOledScreen.jpeg)
 
-__(NOTE: This iGate Firmware was develop to work with all LoRa APRS Trackers and specially with this firmware <a href="https://github.com/richonguzman/LoRa_APRS_Tracker" target="_blank">LoRa APRS Tracker</a>)__
+__(This iGate Firmware works with all <a href="https://github.com/richonguzman/LoRa_APRS_Tracker" target="_blank">LoRa APRS Tracker Firmware</a>)__
 
 ___________________________________________________
 
@@ -20,28 +20,30 @@ ____________________________________________________
 
 # SUPPORTED BOARDS
 
-- TTGO Lilygo LoRa32 v2.1 / v1.6 (they work the same)
+- TTGO Lilygo LoRa32 v2.1 / v1.6 (they work the same).
 
-- TTGO T-Beam v1.0 , v1.1, v1.2 (also variations with SX1262 and SX1268 LoRa Modules)
+- TTGO T-Beam v1.0 , v1.1, v1.2 (also variations with SX1262 and SX1268 LoRa Modules).
 
-- HELTEC V2, V3 , Wireless Stick, HT-CT62, Wireless Tracker
+- HELTEC V2, V3 , Wireless Stick, Wireless Stick Lite, HT-CT62, Wireless Tracker.
 
-- ESP32 Wroom + SX1278 LoRa Module or 400M30S 1W LoRa Module for a DIY Versions.
+- ESP32 Wroom + SX1278 LoRa Module or Ebyte 400M30S 1W LoRa Module for a DIY Versions.
+
+- ESP32C3 + Ebyte 400M30S 1W LoRa Module for another DIY version.
 
 - ESP32 + 4G/LTE A7670 Modem + SX1278 DIY Version.
 
 - Wemos Lolin32 Oled + SX1278 DIY Version.
 
 
-### Buying links --> <a href="https://github.com/richonguzman/LoRa_APRS_iGate/wiki/Z.-------Supported-Boards-and-Buying-Links" target="_blank">here</a>.
+### Buying links --> <a href="https://github.com/richonguzman/LoRa_APRS_iGate/wiki/108.-Supported-Boards-and-Buying-Links" target="_blank">here</a>.
 
 ____________________________________________________
 
 # WIKI
 
-### Installation Guide --> <a href="https://github.com/richonguzman/LoRa_APRS_iGate/wiki/01.-Installation-Guide" target="_blank">here</a>.
+### FAQ, BME280, TNC and more --> <a href="https://github.com/richonguzman/LoRa_APRS_iGate/wiki/00.-FAQ-(frequently-asked-questions)" target="_blank">here</a>
 
-*(Wiki has all configuration explanation, supported boards list, adding BME/BMP Wx modules and more)*
+### Installation Guide --> <a href="https://github.com/richonguzman/LoRa_APRS_iGate/wiki/01.-Installation-Guide" target="_blank">here</a>.
 
 ____________________________________________________
 ## Timeline (Versions):
