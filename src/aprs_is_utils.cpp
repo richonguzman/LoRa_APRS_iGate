@@ -121,8 +121,15 @@ namespace APRS_IS_Utils {
     String buildPacketToTx(const String& aprsisPacket, uint8_t packetType) {
         String packet = aprsisPacket;
         packet.trim();
-        String outputPacket = packet.substring(0, packet.indexOf(","));
-        outputPacket.concat(",TCPIP,WIDE1-1,");
+        String outputPacket = Config.callsign;
+        outputPacket += ">APLRG1";
+        if (Config.beacon.path != "") {
+            outputPacket += ",";
+            outputPacket += Config.beacon.path;
+        }
+        outputPacket += ":}";
+        outputPacket += packet.substring(0, packet.indexOf(",")); //packetCallsign>packetTocall
+        outputPacket.concat(",TCPIP,");
         outputPacket.concat(Config.callsign);
         outputPacket.concat("*");
         switch (packetType) {
