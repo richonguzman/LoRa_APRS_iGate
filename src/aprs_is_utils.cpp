@@ -106,11 +106,16 @@ namespace APRS_IS_Utils {
         secondLine += aprsisState;
     }
 
-    String buildPacketToUpload(const String& packet) {
-        String payload = packet.substring(packet.indexOf(":"));
-        if (payload.indexOf("\x3c\xff\x01") != -1) {
-            payload = payload.substring(0, payload.indexOf("\x3c\xff\x01"));
+    String checkForStartingBytes(const String& packet) {
+        if (packet.indexOf("\x3c\xff\x01") != -1) {
+            return packet.substring(0, packet.indexOf("\x3c\xff\x01"));
+        } else {
+            return packet;
         }
+    }
+
+    String buildPacketToUpload(const String& packet) {
+        String payload = checkForStartingBytes(packet.substring(packet.indexOf(":")));
         if (!(Config.aprs_is.active && Config.digi.mode == 0)) { // Check if NOT only IGate
             return packet.substring(3, packet.indexOf(":")) + ",qAR," + Config.callsign + payload;
         } else {
@@ -128,7 +133,7 @@ namespace APRS_IS_Utils {
             outputPacket += Config.beacon.path;
         }
         outputPacket += ":}";
-        outputPacket += packet.substring(0, packet.indexOf(",")); //packetCallsign>packetTocall
+        outputPacket += packet.substring(0, packet.indexOf(",")); // Callsign>Tocall
         outputPacket.concat(",TCPIP,");
         outputPacket.concat(Config.callsign);
         outputPacket.concat("*");
@@ -185,7 +190,6 @@ namespace APRS_IS_Utils {
             receivedMessage = packet.substring(packet.indexOf(":") + 1);
         }
         if (receivedMessage.indexOf("?") == 0) {
-            delay(2000);
             if (!Config.display.alwaysOn && Config.display.timeout != 0) {
                 display_toggle(true);
             }
@@ -204,7 +208,7 @@ namespace APRS_IS_Utils {
             bool queryMessage = false;
             String aprsPacket, Sender, AddresseeAndMessage, Addressee;
             if (packet != "") {
-                if ((packet.substring(0, 3) == "\x3c\xff\x01") && (packet.indexOf("TCPIP") == -1) && (packet.indexOf("NOGATE") == -1) && (packet.indexOf("RFONLY") == -1)) {
+                if ((packet.substring(0, 3) == "\x3c\xff\x01")  && (packet.indexOf("}") == -1 && packet.indexOf("TCPIP") == -1) && (packet.indexOf("NOGATE") == -1) && (packet.indexOf("RFONLY") == -1)) {                    
                     Sender = packet.substring(3, packet.indexOf(">"));
                     if (Sender != Config.callsign && Utils::checkValidCallsign(Sender)) {
                         STATION_Utils::updateLastHeard(Sender);
@@ -213,10 +217,7 @@ namespace APRS_IS_Utils {
                         Addressee = AddresseeAndMessage.substring(0, AddresseeAndMessage.indexOf(":"));
                         Addressee.trim();
                         if (packet.indexOf("::") > 10 && Addressee == Config.callsign) {      // its a message for me!
-                            if (AddresseeAndMessage.indexOf("\x3c\xff\x01") != -1) {
-                                AddresseeAndMessage = AddresseeAndMessage.substring(0, AddresseeAndMessage.indexOf("\x3c\xff\x01"));
-                            }
-                            queryMessage = processReceivedLoRaMessage(Sender, AddresseeAndMessage);
+                            queryMessage = processReceivedLoRaMessage(Sender, checkForStartingBytes(AddresseeAndMessage));
                         }
                         if (!queryMessage) {
                             aprsPacket = buildPacketToUpload(packet);

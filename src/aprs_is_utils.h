@@ -9,6 +9,7 @@ namespace APRS_IS_Utils {
     void    upload(const String& line);
     void    connect();
     void    checkStatus();
+    String  checkForStartingBytes(const String& packet);
     String  buildPacketToUpload(const String& packet);
     String  buildPacketToTx(const String& aprsisPacket, uint8_t packetType);
     bool    processReceivedLoRaMessage(const String& sender, const String& packet);

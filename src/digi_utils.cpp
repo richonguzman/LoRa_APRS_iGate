@@ -24,35 +24,32 @@ extern bool             backUpDigiMode;
 
 namespace DIGI_Utils {
 
-    String generateDigiRepeatedPacket(const String& packet){
-        String temp0, path;
-        temp0 = packet.substring(packet.indexOf(">") + 1, packet.indexOf(":"));
-        if (temp0.indexOf(",") > 2) {
-            path = temp0.substring(temp0.indexOf(",") + 1, temp0.indexOf(":"));
-            if (path.indexOf("WIDE1-") >= 0) {
-                String hop = path.substring(path.indexOf("WIDE1-") + 6, path.indexOf("WIDE1-") + 7);
-                if (hop.toInt() >= 1 && hop.toInt() <= 7) {
-                    if (hop.toInt() == 1) {
-                        path.replace("WIDE1-1", Config.callsign + "*");
-                    } else {
-                        path.replace("WIDE1-" + hop, Config.callsign + "*,WIDE1-" + String(hop.toInt() - 1));
-                    }
+    String buildPacket(const String& path, const String& packet, bool thirdParty) {
+        String packetToRepeat = packet.substring(0, packet.indexOf(",") + 1);
+        String tempPath = path;
+        tempPath.replace(Config.beacon.path, Config.callsign + "*");
+        packetToRepeat += tempPath;
+        if (thirdParty) {
+            packetToRepeat += APRS_IS_Utils::checkForStartingBytes(packet.substring(packet.indexOf(":}")));
+        } else {
+            packetToRepeat += APRS_IS_Utils::checkForStartingBytes(packet.substring(packet.indexOf(":")));
+        }        
+        return packetToRepeat;
+    }
 
-                    String repeatedPacket = packet.substring(0, packet.indexOf(">"));   // sender
-                    repeatedPacket += ">";
-                    repeatedPacket += temp0.substring(0, temp0.indexOf(","));           // tocall
-                    repeatedPacket += ",";
-                    repeatedPacket += path;
 
-                    String payload = packet.substring(packet.indexOf(":"));
-                    if (payload.indexOf("\x3c\xff\x01") != -1) {
-                        payload = payload.substring(0, payload.indexOf("\x3c\xff\x01"));
-                    }
-                    repeatedPacket += payload;
-                    return repeatedPacket;
-                } else {
-                    return "";
-                }
+    String generateDigiRepeatedPacket(const String& packet, bool thirdParty){
+        String temp, path;
+        if (thirdParty) { // only header is used
+            String header = packet.substring(0, packet.indexOf(":}"));
+            temp = header.substring(header.indexOf(">") + 1);
+        } else {
+            temp = packet.substring(packet.indexOf(">") + 1, packet.indexOf(":"));
+        }
+        if (temp.indexOf(",") > 2) { // checks for path
+            path = temp.substring(temp.indexOf(",") + 1);
+            if (path.indexOf(Config.beacon.path) != -1) {
+                return buildPacket(path, packet, thirdParty);
             } else {
                 return "";
             }
@@ -66,27 +63,56 @@ namespace DIGI_Utils {
         String loraPacket, Sender, AddresseeAndMessage, Addressee;
         if (packet != "") {
             if ((packet.substring(0, 3) == "\x3c\xff\x01") && (packet.indexOf("NOGATE") == -1)) {
-                Sender = packet.substring(3, packet.indexOf(">"));
-                if (Sender != Config.callsign && Utils::checkValidCallsign(Sender)) {
-                    if (STATION_Utils::check25SegBuffer(Sender, packet.substring(packet.indexOf(":") + 2))) {
-                        STATION_Utils::updateLastHeard(Sender);
-                        Utils::typeOfPacket(packet.substring(3), 2);    // Digi
-                        AddresseeAndMessage = packet.substring(packet.indexOf("::") + 2);
-                        Addressee = AddresseeAndMessage.substring(0, AddresseeAndMessage.indexOf(":"));
-                        Addressee.trim();
-                        if (packet.indexOf("::") > 10 && Addressee == Config.callsign) {      // its a message for me!
-                            queryMessage = APRS_IS_Utils::processReceivedLoRaMessage(Sender, AddresseeAndMessage);
-                        }
-                        if (!queryMessage && packet.indexOf("WIDE1-") > 10 && (Config.digi.mode == 2 || backUpDigiMode)) { // If should repeat packet (WIDE1 Digi)
-                            loraPacket = generateDigiRepeatedPacket(packet.substring(3));
-                            if (loraPacket != "") {
-                                STATION_Utils::addToOutputPacketBuffer(loraPacket);
-                                display_toggle(true);
-                                lastScreenOn = millis();
+                if (packet.indexOf("}") > 0 && packet.indexOf("TCPIP") > 0) {   // 3rd Party 
+                    String noHeaderPacket = packet.substring(packet.indexOf(":}") + 2);
+                    Sender = noHeaderPacket.substring(0, noHeaderPacket.indexOf(">"));
+                    if (Sender != Config.callsign) {                    // avoid processing own packets
+                        if (STATION_Utils::check25SegBuffer(Sender, noHeaderPacket.substring(noHeaderPacket.indexOf(":") + 2))) {
+                            STATION_Utils::updateLastHeard(Sender);
+                            Utils::typeOfPacket(noHeaderPacket, 2);    // Digi
+                            if (noHeaderPacket.indexOf("::") > 10) {   // it's a message
+                                AddresseeAndMessage = noHeaderPacket.substring(noHeaderPacket.indexOf("::") + 2);
+                                Addressee = AddresseeAndMessage.substring(0, AddresseeAndMessage.indexOf(":"));
+                                Addressee.trim();
+                                if (Addressee == Config.callsign) {     // it's a message for me!
+                                    queryMessage = APRS_IS_Utils::processReceivedLoRaMessage(Sender, AddresseeAndMessage);
+                                }
+                            }
+                            if (!queryMessage) {
+                                loraPacket = generateDigiRepeatedPacket(packet.substring(3), true);
+                                if (loraPacket != "") {
+                                    STATION_Utils::addToOutputPacketBuffer(loraPacket);
+                                    display_toggle(true);
+                                    lastScreenOn = millis();
+                                }
                             }
                         }
                     }
-                }
+                } else {
+                    Sender = packet.substring(3, packet.indexOf(">"));
+                    if (Sender != Config.callsign && Utils::checkValidCallsign(Sender)) {
+                        if (STATION_Utils::check25SegBuffer(Sender, packet.substring(packet.indexOf(":") + 2))) {
+                            STATION_Utils::updateLastHeard(Sender);
+                            Utils::typeOfPacket(packet.substring(3), 2);    // Digi
+                            if (packet.indexOf("::") > 10) {                // it's a message
+                                AddresseeAndMessage = packet.substring(packet.indexOf("::") + 2);
+                                Addressee = AddresseeAndMessage.substring(0, AddresseeAndMessage.indexOf(":"));
+                                Addressee.trim();
+                                if (Addressee == Config.callsign) {         // its a message for me!
+                                    queryMessage = APRS_IS_Utils::processReceivedLoRaMessage(Sender, AddresseeAndMessage);
+                                }
+                            }                            
+                            if (!queryMessage) {
+                                loraPacket = generateDigiRepeatedPacket(packet.substring(3), false);
+                                if (loraPacket != "") {
+                                    STATION_Utils::addToOutputPacketBuffer(loraPacket);
+                                    display_toggle(true);
+                                    lastScreenOn = millis();
+                                }
+                            }
+                        }
+                    }
+                }                
             }
         }
     }
