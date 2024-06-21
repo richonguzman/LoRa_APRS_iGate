@@ -49,16 +49,14 @@ jobs:
                       chip: esp32
                     - name: heltec_wireless_tracker
                       chip: esp32s3
+                    - name: heltec_ht-ct62
+                      chip: esp32c3
                     - name: OE5HWN_MeshCom
                       chip: esp32
                     - name: WEMOS-LOLIN32-OLED-DIY
                       chip: esp32
                     - name: WEMOS-D1-R32-RA02
                       chip: esp32
-                    - name: ttgo-lora32-v21_915
-                      chip: esp32
-                    - name: heltec_ht-ct62
-                      chip: esp32c3
                     - name: esp32c3_DIY_1W_LoRa
                       chip: esp32c3
                     - name: esp32c3_DIY_1W_LoRa_915
