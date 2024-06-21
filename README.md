@@ -39,9 +39,9 @@ ____________________________________________________
 
 - HELTEC V2, V3 , Wireless Stick, Wireless Stick Lite, HT-CT62, Wireless Tracker.
 
-- ESP32 Wroom + SX1278 LoRa Module or Ebyte 400M30S/900M30S 1W LoRa Module for a DIY Versions.
+- ESP32 Wroom + SX1278 LoRa Module or Ebyte 400M30S (or 900M30S) 1W LoRa Module for a DIY Versions.
 
-- ESP32C3 + Ebyte 400M30S 1W LoRa Module for another DIY version.
+- ESP32C3 + Ebyte 400M30S(or 900M30S) 1W LoRa Module for another DIY version.
 
 - ESP32 + 4G/LTE A7670 Modem + SX1278 DIY Version.
 
