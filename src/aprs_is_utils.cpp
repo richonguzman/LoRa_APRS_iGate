@@ -36,9 +36,8 @@ namespace APRS_IS_Utils {
     }
 
     void connect() {
-        uint8_t count = 0;
-        String aprsauth;
         Serial.print("Connecting to APRS-IS ...     ");
+        uint8_t count = 0;
         while (!espClient.connect(Config.aprs_is.server.c_str(), Config.aprs_is.port) && count < 20) {
             Serial.println("Didn't connect with server...");
             delay(1000);
@@ -54,10 +53,14 @@ namespace APRS_IS_Utils {
         }
         else {
             Serial.println("Connected!\n(Server: " + String(Config.aprs_is.server) + " / Port: " + String(Config.aprs_is.port) + ")");
-
             // String filter = "t/m/" + Config.callsign + "/" + (String)Config.aprs_is.reportingDistance;
 
-            aprsauth = "user " + Config.callsign + " pass " + Config.aprs_is.passcode + " vers CA2RXU_LoRa_iGate 1.3 filter " + Config.aprs_is.filter;
+            String aprsauth = "user ";
+            aprsauth += Config.callsign;
+            aprsauth += " pass ";
+            aprsauth += Config.aprs_is.passcode;
+            aprsauth += " vers CA2RXU_LoRa_iGate 1.3 filter ";
+            aprsauth += Config.aprs_is.filter;
             upload(aprsauth);
             delay(200);
         }
@@ -115,12 +118,15 @@ namespace APRS_IS_Utils {
     }
 
     String buildPacketToUpload(const String& packet) {
-        String payload = checkForStartingBytes(packet.substring(packet.indexOf(":")));
+        String buildedPacket = packet.substring(3, packet.indexOf(":"));
         if (!(Config.aprs_is.active && Config.digi.mode == 0)) { // Check if NOT only IGate
-            return packet.substring(3, packet.indexOf(":")) + ",qAR," + Config.callsign + payload;
+            buildedPacket += ",qAR,";
         } else {
-            return packet.substring(3, packet.indexOf(":")) + ",qAO," + Config.callsign + payload;
+            buildedPacket += ",qAO,";
         }
+        buildedPacket += Config.callsign;
+        buildedPacket += checkForStartingBytes(packet.substring(packet.indexOf(":")));
+        return buildedPacket;
     }
 
     String buildPacketToTx(const String& aprsisPacket, uint8_t packetType) {
@@ -175,16 +181,24 @@ namespace APRS_IS_Utils {
             ackMessage.concat(packet.substring(packet.indexOf("{") + 1));
             ackMessage.trim();
             //Serial.println(ackMessage);
+            
+            String addToBuffer = Config.callsign;
+            addToBuffer += ">APLRG1,RFONLY";
+            if (Config.beacon.path != "") {
+                addToBuffer += ",";
+                addToBuffer += Config.beacon.path;
+            }
+            addToBuffer += "::";
+
             String processedSender = sender;
             for (int i = sender.length(); i < 9; i++) {
                 processedSender += ' ';
             }
-            if (Config.beacon.path == "") {
-                STATION_Utils::addToOutputPacketBuffer(Config.callsign + ">APLRG1,RFONLY::" + processedSender + ":" + ackMessage);
-            } else {
-                STATION_Utils::addToOutputPacketBuffer(Config.callsign + ">APLRG1,RFONLY," + Config.beacon.path + "::" + processedSender + ":" + ackMessage);
-            }
+            addToBuffer += processedSender;
 
+            addToBuffer += ":";
+            addToBuffer += ackMessage;
+            STATION_Utils::addToOutputPacketBuffer(addToBuffer);
             receivedMessage = packet.substring(packet.indexOf(":") + 1, packet.indexOf("{"));
         } else {
             receivedMessage = packet.substring(packet.indexOf(":") + 1);
@@ -205,22 +219,21 @@ namespace APRS_IS_Utils {
 
     void processLoRaPacket(const String& packet) {
         if (espClient.connected() || modemLoggedToAPRSIS) {
-            bool queryMessage = false;
-            String aprsPacket, Sender, AddresseeAndMessage, Addressee;
             if (packet != "") {
                 if ((packet.substring(0, 3) == "\x3c\xff\x01")  && (packet.indexOf("}") == -1 && packet.indexOf("TCPIP") == -1) && (packet.indexOf("NOGATE") == -1) && (packet.indexOf("RFONLY") == -1)) {                    
-                    Sender = packet.substring(3, packet.indexOf(">"));
+                    const String& Sender = packet.substring(3, packet.indexOf(">"));
                     if (Sender != Config.callsign && Utils::checkValidCallsign(Sender)) {
                         STATION_Utils::updateLastHeard(Sender);
                         Utils::typeOfPacket(packet.substring(3), 0);  // LoRa-APRS
-                        AddresseeAndMessage = packet.substring(packet.indexOf("::") + 2);
-                        Addressee = AddresseeAndMessage.substring(0, AddresseeAndMessage.indexOf(":"));
+                        const String& AddresseeAndMessage = packet.substring(packet.indexOf("::") + 2);
+                        String Addressee = AddresseeAndMessage.substring(0, AddresseeAndMessage.indexOf(":"));
                         Addressee.trim();
+                        bool queryMessage = false;
                         if (packet.indexOf("::") > 10 && Addressee == Config.callsign) {      // its a message for me!
                             queryMessage = processReceivedLoRaMessage(Sender, checkForStartingBytes(AddresseeAndMessage));
                         }
                         if (!queryMessage) {
-                            aprsPacket = buildPacketToUpload(packet);
+                            const String& aprsPacket = buildPacketToUpload(packet);
                             if (!Config.display.alwaysOn && Config.display.timeout != 0) {
                                 display_toggle(true);
                             }
@@ -242,22 +255,28 @@ namespace APRS_IS_Utils {
     }
 
     void processAPRSISPacket(const String& packet) {
-        String Sender, AddresseeAndMessage, Addressee, receivedMessage;
         if (!packet.startsWith("#")) {
             if (Config.aprs_is.messagesToRF && packet.indexOf("::") > 0) {
-                Sender = packet.substring(0, packet.indexOf(">"));
-                AddresseeAndMessage = packet.substring(packet.indexOf("::") + 2);
-                Addressee = AddresseeAndMessage.substring(0, AddresseeAndMessage.indexOf(":"));
+                String Sender = packet.substring(0, packet.indexOf(">"));
+                const String& AddresseeAndMessage = packet.substring(packet.indexOf("::") + 2);
+                String Addressee = AddresseeAndMessage.substring(0, AddresseeAndMessage.indexOf(":"));
                 Addressee.trim();
                 if (Addressee == Config.callsign) {             // its for me!
+                    String receivedMessage;
                     if (AddresseeAndMessage.indexOf("{") > 0) {     // ack?
-                        String ackMessage = "ack" + AddresseeAndMessage.substring(AddresseeAndMessage.indexOf("{") + 1);
+                        String ackMessage = "ack";
+                        ackMessage += AddresseeAndMessage.substring(AddresseeAndMessage.indexOf("{") + 1);
                         ackMessage.trim();
                         delay(4000);
                         for (int i = Sender.length(); i < 9; i++) {
                             Sender += ' ';
                         }
-                        String ackPacket = Config.callsign + ">APLRG1,TCPIP,qAC::" + Sender + ":" + ackMessage;
+
+                        String ackPacket = Config.callsign;
+                        ackPacket += ">APLRG1,TCPIP,qAC::";
+                        ackPacket += Sender;
+                        ackPacket += ":";
+                        ackPacket += ackMessage;
                         #ifdef HAS_A7670
                             A7670_Utils::uploadToAPRSIS(ackPacket);
                         #else

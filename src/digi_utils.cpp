@@ -37,17 +37,16 @@ namespace DIGI_Utils {
         return packetToRepeat;
     }
 
-
     String generateDigiRepeatedPacket(const String& packet, bool thirdParty){
-        String temp, path;
+        String temp;
         if (thirdParty) { // only header is used
-            String header = packet.substring(0, packet.indexOf(":}"));
+            const String& header = packet.substring(0, packet.indexOf(":}"));
             temp = header.substring(header.indexOf(">") + 1);
         } else {
             temp = packet.substring(packet.indexOf(">") + 1, packet.indexOf(":"));
         }
         if (temp.indexOf(",") > 2) { // checks for path
-            path = temp.substring(temp.indexOf(",") + 1);
+            const String& path = temp.substring(temp.indexOf(",") + 1);
             if (path.indexOf(Config.beacon.path) != -1) {
                 return buildPacket(path, packet, thirdParty);
             } else {
@@ -58,61 +57,45 @@ namespace DIGI_Utils {
         }
     }
 
-    void processLoRaPacket(const String& packet) {
-        bool queryMessage = false;
-        String loraPacket, Sender, AddresseeAndMessage, Addressee;
+    void processLoRaPacket(const String& packet) {        
         if (packet != "") {
             if ((packet.substring(0, 3) == "\x3c\xff\x01") && (packet.indexOf("NOGATE") == -1)) {
+                bool thirdPartyPacket = false;
+                String temp, Sender;
                 if (packet.indexOf("}") > 0 && packet.indexOf("TCPIP") > 0) {   // 3rd Party 
-                    String noHeaderPacket = packet.substring(packet.indexOf(":}") + 2);
-                    Sender = noHeaderPacket.substring(0, noHeaderPacket.indexOf(">"));
-                    if (Sender != Config.callsign) {                    // avoid processing own packets
-                        if (STATION_Utils::check25SegBuffer(Sender, noHeaderPacket.substring(noHeaderPacket.indexOf(":") + 2))) {
-                            STATION_Utils::updateLastHeard(Sender);
-                            Utils::typeOfPacket(noHeaderPacket, 2);    // Digi
-                            if (noHeaderPacket.indexOf("::") > 10) {   // it's a message
-                                AddresseeAndMessage = noHeaderPacket.substring(noHeaderPacket.indexOf("::") + 2);
-                                Addressee = AddresseeAndMessage.substring(0, AddresseeAndMessage.indexOf(":"));
-                                Addressee.trim();
-                                if (Addressee == Config.callsign) {     // it's a message for me!
-                                    queryMessage = APRS_IS_Utils::processReceivedLoRaMessage(Sender, AddresseeAndMessage);
-                                }
-                            }
-                            if (!queryMessage) {
-                                loraPacket = generateDigiRepeatedPacket(packet.substring(3), true);
-                                if (loraPacket != "") {
-                                    STATION_Utils::addToOutputPacketBuffer(loraPacket);
-                                    display_toggle(true);
-                                    lastScreenOn = millis();
-                                }
-                            }
-                        }
-                    }
+                    thirdPartyPacket = true;
+                    temp    = packet.substring(packet.indexOf(":}") + 2);
+                    Sender  = temp.substring(0, temp.indexOf(">"));
                 } else {
-                    Sender = packet.substring(3, packet.indexOf(">"));
-                    if (Sender != Config.callsign && Utils::checkValidCallsign(Sender)) {
-                        if (STATION_Utils::check25SegBuffer(Sender, packet.substring(packet.indexOf(":") + 2))) {
-                            STATION_Utils::updateLastHeard(Sender);
-                            Utils::typeOfPacket(packet.substring(3), 2);    // Digi
-                            if (packet.indexOf("::") > 10) {                // it's a message
-                                AddresseeAndMessage = packet.substring(packet.indexOf("::") + 2);
-                                Addressee = AddresseeAndMessage.substring(0, AddresseeAndMessage.indexOf(":"));
-                                Addressee.trim();
-                                if (Addressee == Config.callsign) {         // its a message for me!
-                                    queryMessage = APRS_IS_Utils::processReceivedLoRaMessage(Sender, AddresseeAndMessage);
-                                }
-                            }                            
-                            if (!queryMessage) {
-                                loraPacket = generateDigiRepeatedPacket(packet.substring(3), false);
-                                if (loraPacket != "") {
-                                    STATION_Utils::addToOutputPacketBuffer(loraPacket);
-                                    display_toggle(true);
-                                    lastScreenOn = millis();
-                                }
+                    temp    = packet.substring(3);
+                    Sender  = packet.substring(3, packet.indexOf(">"));
+                }
+                if (Sender != Config.callsign) {        // Avoid listening to own packets
+                    if (!thirdPartyPacket && !Utils::checkValidCallsign(Sender)) {
+                        return;
+                    }
+                    if (STATION_Utils::check25SegBuffer(Sender, temp.substring(temp.indexOf(":") + 2))) {
+                        STATION_Utils::updateLastHeard(Sender);
+                        Utils::typeOfPacket(temp, 2);    // Digi
+                        bool queryMessage = false;
+                        if (temp.indexOf("::") > 10) {   // it's a message
+                            String AddresseeAndMessage  = temp.substring(temp.indexOf("::") + 2);
+                            String Addressee            = AddresseeAndMessage.substring(0, AddresseeAndMessage.indexOf(":"));
+                            Addressee.trim();
+                            if (Addressee == Config.callsign) {     // it's a message for me!
+                                queryMessage = APRS_IS_Utils::processReceivedLoRaMessage(Sender, AddresseeAndMessage);
+                            }
+                        }
+                        if (!queryMessage) {
+                            String loraPacket = generateDigiRepeatedPacket(packet.substring(3), thirdPartyPacket);
+                            if (loraPacket != "") {
+                                STATION_Utils::addToOutputPacketBuffer(loraPacket);
+                                display_toggle(true);
+                                lastScreenOn = millis();
                             }
                         }
                     }
-                }                
+                }
             }
         }
     }

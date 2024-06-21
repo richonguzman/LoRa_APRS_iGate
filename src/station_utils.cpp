@@ -81,9 +81,9 @@ namespace STATION_Utils {
         if (!packet25SegBuffer.empty()) {
             bool shouldBeIgnored = false;
             for (int i = 0; i < packet25SegBuffer.size(); i++) {
-                String temp = packet25SegBuffer[i].substring(packet25SegBuffer[i].indexOf(",") + 1);
-                String bufferStation = temp.substring(0, temp.indexOf(","));
-                String bufferMessage = temp.substring(temp.indexOf(",") + 1);
+                const String& temp          = packet25SegBuffer[i].substring(packet25SegBuffer[i].indexOf(",") + 1);
+                const String& bufferStation = temp.substring(0, temp.indexOf(","));
+                const String& bufferMessage = temp.substring(temp.indexOf(",") + 1);
                 if (bufferStation == station && bufferMessage == textMessage) {
                     shouldBeIgnored = true;
                 }
@@ -101,9 +101,9 @@ namespace STATION_Utils {
     }
 
     void processOutputPacketBuffer() {
-        int timeToWait = 3 * 1000;      // 3 segs between packet Tx and also Rx ???
-        uint32_t lastRx = millis() - lastRxTime;
-        uint32_t lastTx = millis() - lastTxTime;
+        int timeToWait   = 3 * 1000;      // 3 segs between packet Tx and also Rx ???
+        uint32_t lastRx  = millis() - lastRxTime;
+        uint32_t lastTx  = millis() - lastTxTime;
         if (outputPacketBuffer.size() > 0 && lastTx > timeToWait && lastRx > timeToWait) {
             LoRa_Utils::sendNewPacket(outputPacketBuffer[0]);
             outputPacketBuffer.erase(outputPacketBuffer.begin());

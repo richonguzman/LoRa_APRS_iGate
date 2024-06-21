@@ -49,7 +49,9 @@ namespace GPS_Utils {
         for (i = 0; i < 4; i++) {
             encodedData += helper_base91[i];
         }
-        encodedData += symbol + " x" + "\x47";
+        encodedData += symbol;
+        encodedData += " x";
+        encodedData += "\x47";
         return encodedData;
     }
 
@@ -80,10 +82,10 @@ namespace GPS_Utils {
     }
 
     String decodeEncodedGPS(const String& packet) {
-        String GPSPacket            = packet.substring(packet.indexOf(":!")+3);
-        String encodedLatitude      = GPSPacket.substring(0,4);
-        String encodedLongtitude    = GPSPacket.substring(4,8);
-        String comment              = GPSPacket.substring(12);
+        const String& GPSPacket         = packet.substring(packet.indexOf(":!")+3);
+        const String& encodedLatitude   = GPSPacket.substring(0,4);
+        const String& encodedLongtitude = GPSPacket.substring(4,8);
+        const String& comment           = GPSPacket.substring(12);
 
         int Y1 = int(encodedLatitude[0]);
         int Y2 = int(encodedLatitude[1]);
@@ -96,12 +98,21 @@ namespace GPS_Utils {
         int X3 = int(encodedLongtitude[2]);
         int X4 = int(encodedLongtitude[3]);
         float decodedLongitude = -180.0 + ((((X1-33) * pow(91,3)) + ((X2-33) * pow(91,2)) + ((X3-33) * 91) + X4-33) / 190463.0);
+
         distance = String(calculateDistanceTo(decodedLatitude, decodedLongitude),1);
+
+        String decodedGPS = String(decodedLatitude,5);
+        decodedGPS += "N / ";
+        decodedGPS += String(decodedLongitude,5);
+        decodedGPS += "E / ";
+        decodedGPS += distance;
+        decodedGPS += "km";
+
         if (comment != "") {
-            return String(decodedLatitude,5) + "N / " + String(decodedLongitude,5) + "E / " + distance + "km / " + comment;
-        } else {
-            return String(decodedLatitude,5) + "N / " + String(decodedLongitude,5) + "E / " + distance + "km";
+            decodedGPS += " / ";
+            decodedGPS += comment;
         }
+        return decodedGPS;
     }
 
     String getReceivedGPS(const String& packet) {
@@ -111,36 +122,43 @@ namespace GPS_Utils {
         } else if (packet.indexOf(":=") > 10) {
             infoGPS = packet.substring(packet.indexOf(":=") + 2);
         }
-        String Latitude       = infoGPS.substring(0,8);
-        String Longitude      = infoGPS.substring(9,18);
-        String comment        = infoGPS.substring(19);  
-
-        float convertedLatitude, convertedLongitude;
-        String firstLatPart   = Latitude.substring(0,2);
-        String secondLatPart  = Latitude.substring(2,4);
-        String thirdLatPart   = Latitude.substring(Latitude.indexOf(".") + 1, Latitude.indexOf(".") + 3);
-        String firstLngPart   = Longitude.substring(0,3);
-        String secondLngPart  = Longitude.substring(3,5);
-        String thirdLngPart   = Longitude.substring(Longitude.indexOf(".") + 1, Longitude.indexOf(".") + 3);
+        const String& Latitude      = infoGPS.substring(0,8);
+        const String& Longitude     = infoGPS.substring(9,18);
+        const String& comment       = infoGPS.substring(19);  
         
+        float convertedLatitude, convertedLongitude;
+        const String& firstLatPart   = Latitude.substring(0,2);
+        const String& secondLatPart  = Latitude.substring(2,4);
+        const String& thirdLatPart   = Latitude.substring(Latitude.indexOf(".") + 1, Latitude.indexOf(".") + 3);
         convertedLatitude     = firstLatPart.toFloat() + (secondLatPart.toFloat()/60) + (thirdLatPart.toFloat()/(60*100));
+
+        const String& firstLngPart   = Longitude.substring(0,3);
+        const String& secondLngPart  = Longitude.substring(3,5);
+        const String& thirdLngPart   = Longitude.substring(Longitude.indexOf(".") + 1, Longitude.indexOf(".") + 3);        
         convertedLongitude    = firstLngPart.toFloat() + (secondLngPart.toFloat()/60) + (thirdLngPart.toFloat()/(60*100));
         
-        String LatSign = String(Latitude[7]);
-        String LngSign = String(Longitude[8]);
-        if (LatSign == "S") {
+        if (String(Latitude[7]) == "S") {
             convertedLatitude = -convertedLatitude;
         } 
-        if (LngSign == "W") {
+        if (String(Longitude[8]) == "W") {
             convertedLongitude = -convertedLongitude;
         }
+        
         distance = String(calculateDistanceTo(convertedLatitude, convertedLongitude),1);
+
+        String decodedGPS = String(convertedLatitude,5);
+        decodedGPS += "N / ";
+        decodedGPS += String(convertedLongitude,5);
+        decodedGPS += "E / ";
+        decodedGPS += distance;
+        decodedGPS += "km";
+
         if (comment != "") {
-            return String(convertedLatitude,5) + "N / " + String(convertedLongitude,5) + "E / " + distance + "km / " + comment;
-        } else {
-            return String(convertedLatitude,5) + "N / " + String(convertedLongitude,5) + "E / " + distance + "km";
+            decodedGPS += " / ";
+            decodedGPS += comment;
         }
-    }      
+        return decodedGPS;
+    }
 
     String getDistanceAndComment(const String& packet) {
         uint8_t encodedBytePosition = 0;

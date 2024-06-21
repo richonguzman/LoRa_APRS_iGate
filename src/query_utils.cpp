@@ -15,7 +15,7 @@ namespace QUERY_Utils {
     String process(const String& query, const String& station, const uint8_t queryOrigin) {
         String answer;
         if (query=="?APRS?" || query=="?aprs?" || query=="?Aprs?" || query=="H" || query=="h" || query=="HELP" || query=="Help" || query=="help" || query=="?") {
-            answer = "?APRSV ?APRSP ?APRSL ?APRSH ?WHERE callsign";
+            answer.concat("?APRSV ?APRSP ?APRSL ?APRSH ?WHERE callsign");
         } else if (query=="?APRSV" || query=="?aprsv" || query=="?Aprsv") {
             answer = "CA2RXU_LoRa_iGate 1.3 v";
             answer.concat(versionDate);
@@ -42,25 +42,33 @@ namespace QUERY_Utils {
         } else if (query.indexOf("?APRSH") == 0 || query.indexOf("?aprsh") == 0 || query.indexOf("?Aprsh") == 0) {
             // sacar callsign despues de ?APRSH
             Serial.println("escuchaste a X estacion? en las ultimas 24 o 8 horas?");
-            answer = "?APRSH on development 73!";
+            answer.concat("?APRSH on development 73!");
         } else if (query.indexOf("?WHERE") == 0) { 
             // agregar callsign para completar donde esta X callsign --> posicion
             Serial.println("estaciones escuchadas directo (ultimos 30 min)");
-            answer = "?WHERE on development 73!";
+            answer.concat("?WHERE on development 73!");
         }
         String processedStation = station;
         for (int i = station.length(); i < 9; i++) {
             processedStation += ' ';
         }
+        String queryAnswer = Config.callsign;
+        queryAnswer += ">APLRG1,";
         if (queryOrigin == 1) { // from APRS-IS
-            return Config.callsign + ">APLRG1,TCPIP,qAC::" + processedStation + ":" + answer;
-        } else { // else == 0 , from LoRa
+            queryAnswer += "TCPIP,qAC::";
+        } else {                // else == 0 , from LoRa
             if (Config.beacon.path == "") {
-                return Config.callsign + ">APLRG1,RFONLY::" + processedStation + ":" + answer;
+                queryAnswer += "RFONLY::";
             } else {
-                return Config.callsign + ">APLRG1,RFONLY," + Config.beacon.path + "::" + processedStation + ":" + answer;
+                queryAnswer += "RFONLY,";
+                queryAnswer += Config.beacon.path;
+                queryAnswer += "::";
             }
         }
+        queryAnswer += processedStation;
+        queryAnswer += ":";
+        queryAnswer += answer;
+        return queryAnswer;
     }
 
 }

@@ -146,7 +146,12 @@
         }
 
         void APRS_IS_connect() {
-            String loginInfo = "user " + Config.callsign + " pass " + String(Config.aprs_is.passcode) + " vers CA2RXU_LoRa_iGate 1.3 filter " + Config.aprs_is.filter;
+            String loginInfo = "user ";
+            loginInfo += Config.callsign;
+            loginInfo += " pass ";
+            loginInfo += String(Config.aprs_is.passcode);
+            loginInfo += " vers CA2RXU_LoRa_iGate 1.3 filter ";
+            loginInfo += Config.aprs_is.filter;
             Serial.println("-----> Connecting to APRS IS");
             while (!modemStartUp) {
                 Serial.print("Opening Port...                 ");

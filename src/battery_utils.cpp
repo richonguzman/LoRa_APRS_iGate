@@ -91,11 +91,8 @@ namespace BATTERY_Utils {
 
     void checkIfShouldSleep() {
         if (lastBatteryCheck == 0 || millis() - lastBatteryCheck >= 15 * 60 * 1000) {
-            lastBatteryCheck = millis();
-
-            float voltage = checkInternalVoltage();
-            
-            if (voltage < Config.lowVoltageCutOff) {
+            lastBatteryCheck = millis();            
+            if (checkInternalVoltage() < Config.lowVoltageCutOff) {
                 ESP.deepSleep(1800000000); // 30 min sleep (60s = 60e6)
             }
         }

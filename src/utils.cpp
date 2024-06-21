@@ -104,9 +104,6 @@ namespace Utils {
 
     void checkBeaconInterval() {
         uint32_t lastTx = millis() - lastBeaconTx;
-        String beaconPacket             = iGateBeaconPacket;
-        String secondaryBeaconPacket    = iGateLoRaBeaconPacket;
-
         if (lastBeaconTx == 0 || lastTx >= Config.beacon.interval * 60 * 1000) {
             beaconUpdate = true;    
         }
@@ -121,6 +118,8 @@ namespace Utils {
 
             activeStations();
 
+            String beaconPacket             = iGateBeaconPacket;
+            String secondaryBeaconPacket    = iGateLoRaBeaconPacket;
             if (Config.bme.active && wxModuleType != 0) {
                 String sensorData = BME_Utils::readDataSensor();
                 beaconPacket += sensorData;
@@ -129,26 +128,26 @@ namespace Utils {
                 beaconPacket += ".../...g...t...r...p...P...h..b.....";
                 secondaryBeaconPacket += ".../...g...t...r...p...P...h..b.....";
             }
-            beaconPacket += Config.beacon.comment;
-            secondaryBeaconPacket += Config.beacon.comment;
+            beaconPacket            += Config.beacon.comment;
+            secondaryBeaconPacket   += Config.beacon.comment;
 
             #if defined(BATTERY_PIN) || defined(HAS_AXP192) || defined(HAS_AXP2101)
                 if (Config.battery.sendInternalVoltage || Config.battery.monitorInternalVoltage) {
                     float internalVoltage       = BATTERY_Utils::checkInternalVoltage();
                     String internalVoltageInfo  = String(internalVoltage,2) + "V";
                     if (Config.battery.sendInternalVoltage) {
-                        beaconPacket += " Batt=";
-                        beaconPacket += internalVoltageInfo;
-                        secondaryBeaconPacket += " Batt=";
-                        secondaryBeaconPacket += internalVoltageInfo;
-                        sixthLine = "    (Batt=";
-                        sixthLine += internalVoltageInfo;
-                        sixthLine += ")";
+                        beaconPacket            += " Batt=";
+                        beaconPacket            += internalVoltageInfo;
+                        secondaryBeaconPacket   += " Batt=";
+                        secondaryBeaconPacket   += internalVoltageInfo;
+                        sixthLine               = "    (Batt=";
+                        sixthLine               += internalVoltageInfo;
+                        sixthLine               += ")";
                     }
                     if (Config.battery.monitorInternalVoltage && internalVoltage < Config.battery.internalSleepVoltage) {
-                        beaconPacket += " **IntBatWarning:SLEEP**";
-                        secondaryBeaconPacket += " **IntBatWarning:SLEEP**";
-                        shouldSleepLowVoltage = true;
+                        beaconPacket            += " **IntBatWarning:SLEEP**";
+                        secondaryBeaconPacket   += " **IntBatWarning:SLEEP**";
+                        shouldSleepLowVoltage   = true;
                     }                    
                 }
             #endif
@@ -157,18 +156,18 @@ namespace Utils {
                 float externalVoltage       = BATTERY_Utils::checkExternalVoltage();
                 String externalVoltageInfo  = String(externalVoltage,2) + "V";
                 if (Config.battery.sendExternalVoltage) {
-                    beaconPacket += " Ext=";
-                    beaconPacket += externalVoltageInfo;
-                    secondaryBeaconPacket += " Ext=";
-                    secondaryBeaconPacket += externalVoltageInfo;
-                    sixthLine = "    (Ext V=";
-                    sixthLine += externalVoltageInfo;
-                    sixthLine += ")";
+                    beaconPacket            += " Ext=";
+                    beaconPacket            += externalVoltageInfo;
+                    secondaryBeaconPacket   += " Ext=";
+                    secondaryBeaconPacket   += externalVoltageInfo;
+                    sixthLine               = "    (Ext V=";
+                    sixthLine               += externalVoltageInfo;
+                    sixthLine               += ")";
                 }
                 if (Config.battery.monitorExternalVoltage && externalVoltage < Config.battery.externalSleepVoltage) {
-                    beaconPacket += " **ExtBatWarning:SLEEP**";
-                    secondaryBeaconPacket += " **ExtBatWarning:SLEEP**";
-                    shouldSleepLowVoltage = true;
+                    beaconPacket            += " **ExtBatWarning:SLEEP**";
+                    secondaryBeaconPacket   += " **ExtBatWarning:SLEEP**";
+                    shouldSleepLowVoltage   = true;
                 }
             }
 

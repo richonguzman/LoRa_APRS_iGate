@@ -130,8 +130,7 @@ namespace BME_Utils {
     }
 
     String generateTempString(const float bmeTemp) {
-        String strTemp;
-        strTemp = String((int)bmeTemp);
+        String strTemp = String((int)bmeTemp);
         switch (strTemp.length()) {
             case 1:
                 return "00" + strTemp;
@@ -145,8 +144,7 @@ namespace BME_Utils {
     }
 
     String generateHumString(const float bmeHum) {
-        String strHum;
-        strHum = String((int)bmeHum);
+        String strHum = String((int)bmeHum);
         switch (strHum.length()) {
             case 1:
                 return "0" + strHum;
