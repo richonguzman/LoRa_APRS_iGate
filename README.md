@@ -50,10 +50,11 @@ ____________________________________________________
 ____________________________________________________
 ## Timeline (Versions):
 
+- 2024.06.21 Tx packets comming from APRS-IS are (now) formated into 3rd Party (as they should have been since the beginning).
 - 2024.06.18 All boards with 433 / 868 / 915 MHz versions.
 - 2024.06.10 ESP32C3 + 1W LoRa Module (E22 400M30S) support added.
 - 2024.06.09 Si7021 module added (with autodetected I2C Address)
-- 2024.06.08 Callsign Validation for all Rx and Tx Station that iGate/Digi hears.
+- 2024.06.08 Callsign Validation for all Station that iGate/Digi hears.
 - 2024.05.27 Battery Monitor for internal and External Voltages (to make board sleep and avoid low discharge of batterys) T-Beam boards now with Battery readings as well.
 - 2024.05.23 Forced Reboot Mode added.
 - 2024.05.22 Experimental backup-Digirepeater-Mode when "only" iGate mode loses WiFi connection added.
