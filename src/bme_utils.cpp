@@ -181,7 +181,6 @@ namespace BME_Utils {
     }
 
     String readDataSensor() {
-        String wx, tempStr, humStr, presStr;
         switch (wxModuleType) {
             case 1: // BME280
                 bme280.takeForcedMeasurement();
@@ -214,20 +213,23 @@ namespace BME_Utils {
                 break;
         }    
 
+        String wx;
         if (isnan(newTemp) || isnan(newHum) || isnan(newPress)) {
             Serial.println("BME/BMP/Si7021 Module data failed");
             wx = ".../...g...t...r...p...P...h..b.....";
             fifthLine = "";
             return wx;
         } else {
-            tempStr = generateTempString(((newTemp + Config.bme.temperatureCorrection) * 1.8) + 32);
+            String tempStr = generateTempString(((newTemp + Config.bme.temperatureCorrection) * 1.8) + 32);
             
+            String humStr;
             if (wxModuleType == 1 || wxModuleType == 3 || wxModuleType == 4) {
                 humStr  = generateHumString(newHum);
             } else if (wxModuleType == 2) {
                 humStr  = "..";
             }
             
+            String presStr;
             if (wxModuleAddress == 4) {
                 presStr = ".....";
             } else {

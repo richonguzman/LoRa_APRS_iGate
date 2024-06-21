@@ -33,7 +33,7 @@ namespace DIGI_Utils {
             packetToRepeat += APRS_IS_Utils::checkForStartingBytes(packet.substring(packet.indexOf(":}")));
         } else {
             packetToRepeat += APRS_IS_Utils::checkForStartingBytes(packet.substring(packet.indexOf(":")));
-        }        
+        }
         return packetToRepeat;
     }
 
@@ -46,7 +46,7 @@ namespace DIGI_Utils {
             temp = packet.substring(packet.indexOf(">") + 1, packet.indexOf(":"));
         }
         if (temp.indexOf(",") > 2) { // checks for path
-            const String& path = temp.substring(temp.indexOf(",") + 1);
+            const String& path = temp.substring(temp.indexOf(",") + 1); // after tocall
             if (path.indexOf(Config.beacon.path) != -1) {
                 return buildPacket(path, packet, thirdParty);
             } else {
