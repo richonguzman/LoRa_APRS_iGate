@@ -989,6 +989,15 @@
                                                 >
                                             </div>
                                         </div>
+                                        <div class="col">
+                                            <label for="battery.externalR1" class="form-label">External Voltage divider R1</label>
+                                            <div class="input-group">
+                                                <input type="number" name="battery.externalR1"
+                                                    id="battery.externalR1" placeholder="100" class="form-control"
+                                                    step="0.1" min="1" max="1000" />
+                                                <span class="input-group-text">kOhm</span>
+                                            </div>
+                                        </div>
                                     </div>
                                     <div class="col-6">
                                         <div class="form-floating col-7">
@@ -1036,6 +1045,13 @@
                                                 <span class="input-group-text"
                                                     >volts</span
                                                 >
+                                            </div>
+                                            <div class="col">
+                                                <label for="battery.externalR2" class="form-label">External Voltage divider R2</label>
+                                                <div class="input-group">
+                                                    <input type="number" name="battery.externalR2" id="battery.externalR2" placeholder="27" class="form-control" step="0.1" min="1" max="1000" />
+                                                    <span class="input-group-text">kOhm</span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -1339,7 +1355,7 @@
                                                 type="number"
                                                 name="other.rebootModeTime"
                                                 id="other.rebootModeTime"
-                                                placeholder="0"
+                                                placeholder="6"
                                                 class="form-control"
                                                 step="6"
                                                 min="6"

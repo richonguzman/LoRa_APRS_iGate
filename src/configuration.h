@@ -75,6 +75,8 @@ public:
     int     externalVoltagePin;
     bool    monitorExternalVoltage;
     float   externalSleepVoltage;
+    float   externalR1;
+    float   externalR2;
 };
 
 class BME {

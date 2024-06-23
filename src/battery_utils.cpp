@@ -33,10 +33,7 @@ float   adcReadingTransformation    = (3.3/4095);
 float   voltageDividerCorrection    = 0.288;
 float readingCorrection = 0.125;
 float multiplyCorrection = 0.035;
-
-// for External Voltage Measurment (With those resistors max voltage input is 15 Volts !!!)
-float R1 = 100.000; //in Kilo-Ohms
-float R2 = 27.000; //in Kilo-Ohms
+float extbattdivider = 4.7037; // Calculated for R1 = 100k, R2=27k (With those resistors max voltage input is 15 Volts !!!) Actuall number is calculated on every startup based on R! and R2 values set up in Web GUI.
 
 bool cali_enable = false;
 esp_adc_cal_characteristics_t adc_chars;
@@ -140,14 +137,14 @@ namespace BATTERY_Utils {
         #ifdef TTGO_T_LORA32_V2_1
             if (cali_enable)
         {
-            voltage = esp_adc_cal_raw_to_voltage(sampleSum / 100, &adc_chars) * ((R1 + R2) / R2); // in mV
+            voltage = esp_adc_cal_raw_to_voltage(sampleSum / 100, &adc_chars) * extbattdivider; // in mV
             voltage /= 1000;
         }
         else{
-            voltage = ((((sampleSum/100)* adcReadingTransformation) + readingCorrection) * ((R1+R2)/R2)) - multiplyCorrection;
+            voltage = ((((sampleSum/100)* adcReadingTransformation) + readingCorrection) * extbattdivider) - multiplyCorrection;
         }
         #else
-        voltage = ((((sampleSum/100)* adcReadingTransformation) + readingCorrection) * ((R1+R2)/R2)) - multiplyCorrection;
+        voltage = ((((sampleSum/100)* adcReadingTransformation) + readingCorrection) * extbattdivider) - multiplyCorrection;
         #endif
         
         return voltage; // raw voltage without mapping
@@ -187,6 +184,7 @@ namespace BATTERY_Utils {
         adc1_config_width(ADC_WIDTH_BIT_12);
         adc1_config_channel_atten(INTCHAN, ADC_ATTEN_DB_12);
         adc1_config_channel_atten(EXTCHAN, ADC_ATTEN_DB_12);
+        extbattdivider = (Config.battery.externalR1 + Config.battery.externalR2)/Config.battery.externalR2; //calculate ext batt divider just once on startup
     }
 
 
