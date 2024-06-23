@@ -181,7 +181,7 @@ namespace WEB_Utils {
         Config.ota.password                 = request->getParam("ota.password", true)->value();
 
 
-        Config.rememberStationTime              = request->getParam("other.rememberStationTime", true)->value().toInt();
+        Config.rememberStationTime          = request->getParam("other.rememberStationTime", true)->value().toInt();
 
        
         Config.backupDigiMode               = request->hasParam("other.backupDigiMode", true);
@@ -189,6 +189,8 @@ namespace WEB_Utils {
 
         Config.lowPowerMode                 = request->hasParam("other.lowPowerMode", true);
         Config.lowVoltageCutOff             = request->getParam("other.lowVoltageCutOff", true)->value().toDouble();
+
+        Config.personalNote                 = request->getParam("personalNote", true)->value();
 
         Config.writeFile();
 

@@ -116,6 +116,7 @@ public:
     bool                    backupDigiMode;
     bool                    rebootMode;
     int                     rebootModeTime;
+    String                  personalNote;
     std::vector<WiFi_AP>    wifiAPs;
     WiFi_Auto_AP            wifiAutoAP;
     BEACON                  beacon;

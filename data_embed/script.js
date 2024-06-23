@@ -79,7 +79,7 @@ function loadSettings(settings) {
     document.getElementById("beacon.path").value                        = settings.beacon.path;
     document.getElementById("beacon.symbol").value                      = settings.beacon.symbol;
     document.getElementById("beacon.overlay").value                     = settings.beacon.overlay;
-
+    document.getElementById("personalNote").value                       = settings.personalNote;
     document.getElementById("action.symbol").value                      = settings.beacon.overlay + settings.beacon.symbol;
 
     document.querySelector(".list-networks").innerHTML                  = "";
@@ -273,8 +273,9 @@ function toggleFields() {
         'input[name="battery.externalVoltagePin"]'
     );
 
-    externalVoltagePinInput.disabled =
-        !sendExternalVoltageCheckbox.checked;
+    externalVoltagePinInput.disabled = !sendExternalVoltageCheckbox.checked;
+    externalR1.disabled = !sendExternalVoltageCheckbox.checked;
+    externalR2.disabled = !sendExternalVoltageCheckbox.checked;
 }
 
 const sendExternalVoltageCheckbox = document.querySelector(

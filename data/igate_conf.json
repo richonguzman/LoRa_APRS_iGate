@@ -82,5 +82,6 @@
         "backupDigiMode": false,
         "rebootMode": false,
         "rebootModeTime": 6
-    }
+    },
+    "personalNote": ""
 }
