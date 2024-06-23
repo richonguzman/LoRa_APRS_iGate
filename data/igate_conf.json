@@ -52,7 +52,9 @@
         "sendExternalVoltage": false,
         "externalVoltagePin": 34,
         "monitorExternalVoltage": false,
-        "externalSleepVoltage": 10.9
+        "externalSleepVoltage": 10.9,
+        "externalR1": 100,
+        "externalR2": 27
 	},
     "bme": {
         "active": false,
