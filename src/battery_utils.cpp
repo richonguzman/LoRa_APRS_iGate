@@ -4,6 +4,23 @@
 #include "boards_pinout.h"
 #include "power_utils.h"
 #include "utils.h"
+#include "driver/adc.h"
+#include <esp_adc_cal.h>
+
+
+#define EXTCHAN ADC1_CHANNEL_6
+#define INTCHAN ADC1_CHANNEL_7
+#define BATTDIVIDER 2 // Internal Battery Divider ratio
+
+#if CONFIG_IDF_TARGET_ESP32
+#define ADC_EXAMPLE_CALI_SCHEME ESP_ADC_CAL_VAL_EFUSE_VREF
+#elif CONFIG_IDF_TARGET_ESP32S2
+#define ADC_EXAMPLE_CALI_SCHEME ESP_ADC_CAL_VAL_EFUSE_TP
+#elif CONFIG_IDF_TARGET_ESP32C3
+#define ADC_EXAMPLE_CALI_SCHEME ESP_ADC_CAL_VAL_EFUSE_TP
+#elif CONFIG_IDF_TARGET_ESP32S3
+#define ADC_EXAMPLE_CALI_SCHEME ESP_ADC_CAL_VAL_EFUSE_TP_FIT
+#endif
 
 extern  Configuration               Config;
 extern  uint32_t                    lastBatteryCheck;
@@ -12,13 +29,15 @@ bool    shouldSleepLowVoltage       = false;
 
 float   adcReadingTransformation    = (3.3/4095);
 float   voltageDividerCorrection    = 0.288;
-
-// for External Voltage Measurment (MAX = 15Volts !!!)
-float R1 = 100.000; //in Kilo-Ohms
-float R2 = 27.000; //in Kilo-Ohms
 float readingCorrection = 0.125;
 float multiplyCorrection = 0.035;
 
+// for External Voltage Measurment (With those resistors max voltage input is 15 Volts !!!)
+float R1 = 100.000; //in Kilo-Ohms
+float R2 = 27.000; //in Kilo-Ohms
+
+bool cali_enable = false;
+esp_adc_cal_characteristics_t adc_chars;
 
 namespace BATTERY_Utils {
 
@@ -27,6 +46,7 @@ namespace BATTERY_Utils {
     }
 
     float checkInternalVoltage() { 
+        float voltage = 0.0;
         #if defined(HAS_AXP192) || defined(HAS_AXP2101)
             if(POWER_Utils::isBatteryConnected()) {
                 return POWER_Utils::getBatteryVoltage();
@@ -46,11 +66,22 @@ namespace BATTERY_Utils {
             #endif
 
             for (int i = 0; i < 100; i++) {
-                #ifdef BATTERY_PIN
-                    sample = analogRead(BATTERY_PIN);
-                #endif
-                #if defined(ESP32_DIY_LoRa) || defined(ESP32_DIY_1W_LoRa)
-                    sample = 0;
+                #ifdef TTGO_T_LORA32_V2_1
+                    if(cali_enable){
+                        sample = adc1_get_raw(INTCHAN);
+                    }
+                    else{
+                        sample = analogRead(BATTERY_PIN);
+                    }
+                #else
+                    #ifndef TTGO_T_LORA32_V2_1
+                        #ifdef BATTERY_PIN
+                            sample = analogRead(BATTERY_PIN);
+                        #endif
+                        #if defined(ESP32_DIY_LoRa) || defined(ESP32_DIY_1W_LoRa)
+                            sample = 0;
+                        #endif
+                    #endif
                 #endif
                 sampleSum += sample;
                 delayMicroseconds(50); 
@@ -64,10 +95,22 @@ namespace BATTERY_Utils {
                     digitalWrite(ADC_CTRL, HIGH);
                 #endif
                 double inputDivider = (1.0 / (390.0 + 100.0)) * 100.0;  // The voltage divider is a 390k + 100k resistor in series, 100k on the low side.
-                return (((sampleSum/100) * adcReadingTransformation) / inputDivider) + 0.285; // Yes, this offset is excessive, but the ADC on the ESP32s3 is quite inaccurate and noisy. Adjust to own measurements.
+                voltage = (((sampleSum/100) * adcReadingTransformation) / inputDivider) + 0.285; // Yes, this offset is excessive, but the ADC on the ESP32s3 is quite inaccurate and noisy. Adjust to own measurements.
             #else
-                return (2 * (sampleSum/100) * adcReadingTransformation) + voltageDividerCorrection; // raw voltage without mapping
+                #ifdef TTGO_T_LORA32_V2_1
+                    if (cali_enable){
+                        voltage = esp_adc_cal_raw_to_voltage(sampleSum / 100, &adc_chars) * BATTDIVIDER;
+                        return voltage / 1000;
+                    }
+                    else{
+                        voltage = (2 * (sampleSum/100) * adcReadingTransformation) + voltageDividerCorrection;
+                    }
+                #else
+                    voltage = (2 * (sampleSum/100) * adcReadingTransformation) + voltageDividerCorrection; // raw voltage without mapping
+                #endif
             #endif
+
+            return voltage;
 
             // return mapVoltage(voltage, 3.34, 4.71, 3.0, 4.2); // mapped voltage
         #endif
@@ -76,18 +119,73 @@ namespace BATTERY_Utils {
     float checkExternalVoltage() {
         int sample;
         int sampleSum = 0;
+        float voltage = 0.0;
         for (int i = 0; i < 100; i++) {
+            #ifdef TTGO_T_LORA32_V2_1
+                if(cali_enable){    
+                    sample = adc1_get_raw(EXTCHAN);
+                }
+                else{
+                    sample = analogRead(Config.battery.externalVoltagePin);
+                }
+            #else
             sample = analogRead(Config.battery.externalVoltagePin);
+            #endif
+            
             sampleSum += sample;
             delayMicroseconds(50); 
         }
-
-        float voltage = ((((sampleSum/100)* adcReadingTransformation) + readingCorrection) * ((R1+R2)/R2)) - multiplyCorrection;
+        #ifdef TTGO_T_LORA32_V2_1
+            if (cali_enable)
+        {
+            voltage = (esp_adc_cal_raw_to_voltage(sampleSum / 100, &adc_chars) * ((R1 + R2) / R2))/1000;
+        }
+        else{
+            voltage = ((((sampleSum/100)* adcReadingTransformation) + readingCorrection) * ((R1+R2)/R2)) - multiplyCorrection;
+        }
+        #else
+        voltage = ((((sampleSum/100)* adcReadingTransformation) + readingCorrection) * ((R1+R2)/R2)) - multiplyCorrection;
+        #endif
         
         return voltage; // raw voltage without mapping
 
         // return mapVoltage(voltage, 5.05, 6.32, 4.5, 5.5); // mapped voltage
     }
+
+
+    bool adc_calibration_init()
+    {
+        esp_err_t ret;
+
+        ret = esp_adc_cal_check_efuse(ADC_EXAMPLE_CALI_SCHEME);
+        if (ret == ESP_ERR_NOT_SUPPORTED)
+        {
+            Serial.println("Calibration scheme not supported, skip software calibration");
+        }
+        else if (ret == ESP_ERR_INVALID_VERSION)
+        {
+            Serial.println("eFuse not burnt, skip software calibration");
+        }
+        else if (ret == ESP_OK)
+        {
+            cali_enable = true;
+            esp_adc_cal_characterize(ADC_UNIT_1, ADC_ATTEN_DB_12, ADC_WIDTH_BIT_12, 1100, &adc_chars);
+            Serial.printf("eFuse Vref:%u mV", adc_chars.vref);
+        }
+        else
+        {
+            Serial.println("Invalid arg");
+        }
+        return cali_enable;
+    }
+
+    void configADC()
+    {
+        adc1_config_width(ADC_WIDTH_BIT_12);
+        adc1_config_channel_atten(INTCHAN, ADC_ATTEN_DB_12);
+        adc1_config_channel_atten(EXTCHAN, ADC_ATTEN_DB_12);
+    }
+
 
     void checkIfShouldSleep() {
         if (lastBatteryCheck == 0 || millis() - lastBatteryCheck >= 15 * 60 * 1000) {

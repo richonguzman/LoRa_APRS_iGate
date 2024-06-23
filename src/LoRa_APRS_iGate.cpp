@@ -111,6 +111,12 @@ void setup() {
             Config.loramodule.rxActive = false;
         }
     #endif
+
+    #ifdef TTGO_T_LORA32_V2_1
+    BATTERY_Utils::adc_calibration_init();
+    BATTERY_Utils::configADC();
+    #endif
+
     WIFI_Utils::setup();
     SYSLOG_Utils::setup();
     BME_Utils::setup();

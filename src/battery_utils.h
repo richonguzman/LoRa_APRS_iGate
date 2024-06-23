@@ -10,6 +10,8 @@ namespace BATTERY_Utils {
     float   checkExternalVoltage();
     void    checkIfShouldSleep(); // ????
     void    startupBatteryHealth();
+    bool    adc_calibration_init();
+    void    configADC();
 
 }
 
