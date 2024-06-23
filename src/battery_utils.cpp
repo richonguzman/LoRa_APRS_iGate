@@ -10,7 +10,9 @@
 
 #define EXTCHAN ADC1_CHANNEL_6
 #define INTCHAN ADC1_CHANNEL_7
-#define BATTDIVIDER 2 // Internal Battery Divider ratio
+#ifdef TTGO_T_LORA32_V2_1
+    #define INTBATTDIVIDER 2 // Internal Battery Divider ratio
+#endif
 
 #if CONFIG_IDF_TARGET_ESP32
 #define ADC_EXAMPLE_CALI_SCHEME ESP_ADC_CAL_VAL_EFUSE_VREF
@@ -99,8 +101,8 @@ namespace BATTERY_Utils {
             #else
                 #ifdef TTGO_T_LORA32_V2_1
                     if (cali_enable){
-                        voltage = esp_adc_cal_raw_to_voltage(sampleSum / 100, &adc_chars) * BATTDIVIDER;
-                        return voltage / 1000;
+                        voltage = esp_adc_cal_raw_to_voltage(sampleSum / 100, &adc_chars) * INTBATTDIVIDER; // in mV
+                        voltage /=1000;
                     }
                     else{
                         voltage = (2 * (sampleSum/100) * adcReadingTransformation) + voltageDividerCorrection;
@@ -138,7 +140,8 @@ namespace BATTERY_Utils {
         #ifdef TTGO_T_LORA32_V2_1
             if (cali_enable)
         {
-            voltage = (esp_adc_cal_raw_to_voltage(sampleSum / 100, &adc_chars) * ((R1 + R2) / R2))/1000;
+            voltage = esp_adc_cal_raw_to_voltage(sampleSum / 100, &adc_chars) * ((R1 + R2) / R2); // in mV
+            voltage /= 1000;
         }
         else{
             voltage = ((((sampleSum/100)* adcReadingTransformation) + readingCorrection) * ((R1+R2)/R2)) - multiplyCorrection;
