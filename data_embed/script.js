@@ -284,8 +284,18 @@ const externalVoltagePinInput = document.querySelector(
     'input[name="battery.externalVoltagePin"]'
 );
 
+const externalR1 = document.querySelector(
+    'input[name="battery.externalR1"]'
+);
+
+const externalR2 = document.querySelector(
+    'input[name="battery.externalR2"]'
+);
+
 sendExternalVoltageCheckbox.addEventListener("change", function () {
     externalVoltagePinInput.disabled = !this.checked;
+    externalR1.disabled = !this.checked;
+    externalR2.disabled = !this.checked;
 });
 
 document.querySelector(".new button").addEventListener("click", function () {
