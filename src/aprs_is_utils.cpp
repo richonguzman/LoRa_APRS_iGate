@@ -177,7 +177,7 @@ namespace APRS_IS_Utils {
             if (packet != "") {
                 if ((packet.substring(0, 3) == "\x3c\xff\x01")  && (packet.indexOf("NOGATE") == -1) && (packet.indexOf("RFONLY") == -1)) {                    
                     int firstColonIndex = packet.indexOf(":");
-                    if (firstColonIndex > 0 && packet[firstColonIndex + 1] != '}' && packet.indexOf("TCPIP") == -1) {
+                    if (firstColonIndex > 0 && firstColonIndex < packet.length() && packet[firstColonIndex + 1] != '}' && packet.indexOf("TCPIP") == -1) {
                         const String& Sender = packet.substring(3, packet.indexOf(">"));
                         if (Sender != Config.callsign && Utils::checkValidCallsign(Sender)) {
                             STATION_Utils::updateLastHeard(Sender);
