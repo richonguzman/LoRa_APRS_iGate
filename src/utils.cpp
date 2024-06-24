@@ -265,7 +265,7 @@ namespace Utils {
         } else if (packet.indexOf(":T#") >= 10 && packet.indexOf(":=/") == -1) {
             sixthLine += "> TELEMETRY";
             seventhLine = seventhLineHelper;
-        } else if (packet.indexOf(":`") >= 10) {
+        } else if (packet.indexOf(":`") >= 10 || packet.indexOf(":'") >= 10) {
             sixthLine += ">  MIC-E";
             seventhLine = seventhLineHelper;
         } else if (packet.indexOf(":;") >= 10) {
