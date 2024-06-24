@@ -220,7 +220,14 @@ namespace APRS_IS_Utils {
     void processLoRaPacket(const String& packet) {
         if (espClient.connected() || modemLoggedToAPRSIS) {
             if (packet != "") {
-                if ((packet.substring(0, 3) == "\x3c\xff\x01")  && (packet.indexOf("}") == -1 && packet.indexOf("TCPIP") == -1) && (packet.indexOf("NOGATE") == -1) && (packet.indexOf("RFONLY") == -1)) {                    
+                auto packetInfoFieldBeginIndex = packet.indexOf(':');
+                if (packet.substring(0, 3) == "\x3c\xff\x01"
+                    && packetInfoFieldBeginIndex >= 0
+                    && packetInfoFieldBeginIndex < packet.length()
+                    && packet[packetInfoFieldBeginIndex + 1] != '}'
+                    && packet.indexOf("TCPIP") == -1
+                    && packet.indexOf("NOGATE") == -1
+                    && packet.indexOf("RFONLY") == -1) {                    
                     const String& Sender = packet.substring(3, packet.indexOf(">"));
                     if (Sender != Config.callsign && Utils::checkValidCallsign(Sender)) {
                         STATION_Utils::updateLastHeard(Sender);
