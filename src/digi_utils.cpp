@@ -63,7 +63,7 @@ namespace DIGI_Utils {
                 bool thirdPartyPacket = false;
                 String temp, Sender;
                 int firstColonIndex = packet.indexOf(":");
-                if (firstColonIndex > 0 && firstColonIndex < packet.length() && packet[firstColonIndex + 1] == '}' && packet.indexOf("TCPIP") > 0) {   // 3rd Party 
+                if (firstColonIndex > 5 && firstColonIndex < (packet.length() - 1) && packet[firstColonIndex + 1] == '}' && packet.indexOf("TCPIP") > 0) {   // 3rd Party 
                     thirdPartyPacket = true;
                     temp    = packet.substring(packet.indexOf(":}") + 2);
                     Sender  = temp.substring(0, temp.indexOf(">"));
