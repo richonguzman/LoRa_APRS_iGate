@@ -62,7 +62,11 @@ namespace DIGI_Utils {
             if ((packet.substring(0, 3) == "\x3c\xff\x01") && (packet.indexOf("NOGATE") == -1)) {
                 bool thirdPartyPacket = false;
                 String temp, Sender;
-                if (packet.indexOf("}") > 0 && packet.indexOf("TCPIP") > 0) {   // 3rd Party 
+                auto packetInfoFieldBeginIndex = packet.indexOf(':');
+                if (packetInfoFieldBeginIndex >= 0
+                    && packetInfoFieldBeginIndex < packet.length()
+                    && packet[packetInfoFieldBeginIndex + 1] == '}'
+                    && packet.indexOf("TCPIP") > 0) {   // 3rd Party 
                     thirdPartyPacket = true;
                     temp    = packet.substring(packet.indexOf(":}") + 2);
                     Sender  = temp.substring(0, temp.indexOf(">"));
