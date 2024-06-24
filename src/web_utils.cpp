@@ -29,7 +29,6 @@ extern const char web_bootstrap_js[] asm("_binary_data_embed_bootstrap_js_gz_sta
 extern const char web_bootstrap_js_end[] asm("_binary_data_embed_bootstrap_js_gz_end");
 extern const size_t web_bootstrap_js_len = web_bootstrap_js_end - web_bootstrap_js;
 
-
 namespace WEB_Utils {
 
     AsyncWebServer server(80);
@@ -160,33 +159,25 @@ namespace WEB_Utils {
             Config.beacon.symbol = "_";
         }
 
-
         Config.syslog.active                = request->hasParam("syslog.active", true);
         if (Config.syslog.active) {
-            Config.syslog.server    = request->getParam("syslog.server", true)->value();
-            Config.syslog.port      = request->getParam("syslog.port", true)->value().toInt();
+            Config.syslog.server            = request->getParam("syslog.server", true)->value();
+            Config.syslog.port              = request->getParam("syslog.port", true)->value().toInt();
         }
         
+        Config.tnc.enableServer             = request->hasParam("tnc.enableServer", true);
+        Config.tnc.enableSerial             = request->hasParam("tnc.enableSerial", true);
+        Config.tnc.acceptOwn                = request->hasParam("tnc.acceptOwn", true);
 
-        Config.tnc.enableServer         = request->hasParam("tnc.enableServer", true);
-        Config.tnc.enableSerial         = request->hasParam("tnc.enableSerial", true);
-        Config.tnc.acceptOwn            = request->hasParam("tnc.acceptOwn", true);
-
-        
         Config.rebootMode                   = request->hasParam("other.rebootMode", true);
         Config.rebootModeTime               = request->getParam("other.rebootModeTime", true)->value().toInt();
-        
 
         Config.ota.username                 = request->getParam("ota.username", true)->value();
         Config.ota.password                 = request->getParam("ota.password", true)->value();
 
-
         Config.rememberStationTime          = request->getParam("other.rememberStationTime", true)->value().toInt();
 
-       
         Config.backupDigiMode               = request->hasParam("other.backupDigiMode", true);
-
-
         Config.lowPowerMode                 = request->hasParam("other.lowPowerMode", true);
         Config.lowVoltageCutOff             = request->getParam("other.lowVoltageCutOff", true)->value().toDouble();
 

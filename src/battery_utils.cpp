@@ -7,7 +7,6 @@
 #include "driver/adc.h"
 #include <esp_adc_cal.h>
 
-
 #define EXTCHAN ADC1_CHANNEL_6
 #define INTCHAN ADC1_CHANNEL_7
 #ifdef TTGO_T_LORA32_V2_1
@@ -27,10 +26,9 @@
 extern  Configuration               Config;
 extern  uint32_t                    lastBatteryCheck;
 
-bool    shouldSleepLowVoltage       = false;
-
-float   adcReadingTransformation    = (3.3/4095);
-float   voltageDividerCorrection    = 0.288;
+bool  shouldSleepLowVoltage       = false;
+float adcReadingTransformation    = (3.3/4095);
+float voltageDividerCorrection    = 0.288;
 float readingCorrection = 0.125;
 float multiplyCorrection = 0.035;
 float extbattdivider = 4.7037; // Calculated for R1 = 100k, R2=27k (With those resistors max voltage input is 15 Volts !!!) Actuall number is calculated on every startup based on R! and R2 values set up in Web GUI.
@@ -135,11 +133,10 @@ namespace BATTERY_Utils {
             delayMicroseconds(50); 
         }
         #ifdef TTGO_T_LORA32_V2_1
-            if (cali_enable)
-        {
+            if (cali_enable){
             voltage = esp_adc_cal_raw_to_voltage(sampleSum / 100, &adc_chars) * extbattdivider; // in mV
             voltage /= 1000;
-        }
+            }
         else{
             voltage = ((((sampleSum/100)* adcReadingTransformation) + readingCorrection) * extbattdivider) - multiplyCorrection;
         }
@@ -151,7 +148,6 @@ namespace BATTERY_Utils {
 
         // return mapVoltage(voltage, 5.05, 6.32, 4.5, 5.5); // mapped voltage
     }
-
 
     bool adc_calibration_init()
     {
@@ -179,14 +175,19 @@ namespace BATTERY_Utils {
         return cali_enable;
     }
 
-    void configADC()
-    {
+    void configADC() {
         adc1_config_width(ADC_WIDTH_BIT_12);
         adc1_config_channel_atten(INTCHAN, ADC_ATTEN_DB_12);
         adc1_config_channel_atten(EXTCHAN, ADC_ATTEN_DB_12);
-        extbattdivider = (Config.battery.externalR1 + Config.battery.externalR2)/Config.battery.externalR2; //calculate ext batt divider just once on startup
-    }
 
+        //calculate ext batt divider just once at startup
+        if(!Config.battery.externalR1 && !Config.battery.externalR2){ //In case there are no divider values set in the WEB GUI (For example after update) use R1 = 100k, R2 = 27k.
+            Config.battery.externalR1 = 100;
+            Config.battery.externalR2 = 27;
+        }
+
+        extbattdivider = (Config.battery.externalR1 + Config.battery.externalR2)/Config.battery.externalR2;       
+    }
 
     void checkIfShouldSleep() {
         if (lastBatteryCheck == 0 || millis() - lastBatteryCheck >= 15 * 60 * 1000) {
