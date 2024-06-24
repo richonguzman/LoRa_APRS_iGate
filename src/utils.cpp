@@ -237,13 +237,14 @@ namespace Utils {
         seventhLineHelper += String(snr);
         seventhLineHelper += "dBm";
 
-        if (packet.indexOf("::") >= 10) {
+        int firstColonIndex = packet.indexOf(":");
+        if (packet[firstColonIndex + 1] == ':') {
             sixthLine += "> MESSAGE";
             seventhLine = seventhLineHelper;
-        } else if (packet.indexOf(":>") >= 10) {
+        } else if (packet[firstColonIndex + 1] == '>') {
             sixthLine += "> NEW STATUS";
             seventhLine = seventhLineHelper;
-        } else if (packet.indexOf(":!") >= 10 || packet.indexOf(":=") >= 10) {
+        } else if (packet[firstColonIndex + 1] == '!' || packet[firstColonIndex + 1] == '=') {
             sixthLine += "> GPS BEACON";
             if (!Config.syslog.active) {
                 GPS_Utils::getDistanceAndComment(packet);       // to be checked!!!
@@ -262,14 +263,14 @@ namespace Utils {
             seventhLine += "D:";
             seventhLine += distance;
             seventhLine += "km";
-        } else if (packet.indexOf(":T#") >= 10 && packet.indexOf(":=/") == -1) {
-            sixthLine += "> TELEMETRY";
-            seventhLine = seventhLineHelper;
-        } else if (packet.indexOf(":`") >= 10 || packet.indexOf(":'") >= 10) {
+        } else if (packet[firstColonIndex + 1] == '`') {
             sixthLine += ">  MIC-E";
             seventhLine = seventhLineHelper;
-        } else if (packet.indexOf(":;") >= 10) {
+        } else if (packet[firstColonIndex + 1] == ';') {
             sixthLine += ">  OBJECT";
+            seventhLine = seventhLineHelper;
+        } else if (packet.indexOf(":T#") >= 10 && packet.indexOf(":=/") == -1) {
+            sixthLine += "> TELEMETRY";
             seventhLine = seventhLineHelper;
         } else {
             sixthLine += "> ??????????";
