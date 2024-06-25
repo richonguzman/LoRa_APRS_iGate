@@ -331,7 +331,7 @@ namespace Utils {
         if (callsign == "WLNK-1") return true;
         
         String cleanCallsign;
-        if (callsign.indexOf("-")) {    // SSID Validation
+        if (callsign.indexOf("-") > 0) {    // SSID Validation
             cleanCallsign = callsign.substring(0, callsign.indexOf("-"));
             String ssid = callsign.substring(callsign.indexOf("-") + 1);
             if (ssid.indexOf("-") != -1 || ssid.length() > 2) return false;
@@ -363,7 +363,6 @@ namespace Utils {
                 if (!isAlpha(cleanCallsign[i - 1])) return false;
             }
         }
-
         return true;
     }
 
