@@ -129,51 +129,6 @@ namespace APRS_IS_Utils {
         return buildedPacket;
     }
 
-    String buildPacketToTx(const String& aprsisPacket, uint8_t packetType) {
-        String packet = aprsisPacket;
-        packet.trim();
-        String outputPacket = Config.callsign;
-        outputPacket += ">APLRG1";
-        if (Config.beacon.path != "") {
-            outputPacket += ",";
-            outputPacket += Config.beacon.path;
-        }
-        outputPacket += ":}";
-        outputPacket += packet.substring(0, packet.indexOf(",")); // Callsign>Tocall
-        outputPacket.concat(",TCPIP,");
-        outputPacket.concat(Config.callsign);
-        outputPacket.concat("*");
-        switch (packetType) {
-            case 0: // gps
-                if (packet.indexOf(":=") > 0) {
-                    outputPacket += packet.substring(packet.indexOf(":="));
-                } else {
-                    outputPacket += packet.substring(packet.indexOf(":!"));
-                }
-                break;
-            case 1: // messages
-                outputPacket += packet.substring(packet.indexOf("::"));
-                break;
-            case 2: // status
-                outputPacket += packet.substring(packet.indexOf(":>"));
-                break;
-            case 3: // telemetry
-                outputPacket += packet.substring(packet.indexOf("::"));
-                break;
-            case 4: // mic-e
-                if (packet.indexOf(":`") > 0) {
-                    outputPacket += packet.substring(packet.indexOf(":`"));
-                } else {
-                    outputPacket += packet.substring(packet.indexOf(":'"));
-                }
-                break;
-            case 5: // object
-                outputPacket += packet.substring(packet.indexOf(":;"));
-                break;
-        }
-        return outputPacket;
-    }
-
     bool processReceivedLoRaMessage(const String& sender, const String& packet) {
         String receivedMessage;
         if (packet.indexOf("{") > 0) {     // ack?
@@ -220,38 +175,86 @@ namespace APRS_IS_Utils {
     void processLoRaPacket(const String& packet) {
         if (espClient.connected() || modemLoggedToAPRSIS) {
             if (packet != "") {
-                if ((packet.substring(0, 3) == "\x3c\xff\x01")  && (packet.indexOf("}") == -1 && packet.indexOf("TCPIP") == -1) && (packet.indexOf("NOGATE") == -1) && (packet.indexOf("RFONLY") == -1)) {                    
-                    const String& Sender = packet.substring(3, packet.indexOf(">"));
-                    if (Sender != Config.callsign && Utils::checkValidCallsign(Sender)) {
-                        STATION_Utils::updateLastHeard(Sender);
-                        Utils::typeOfPacket(packet.substring(3), 0);  // LoRa-APRS
-                        const String& AddresseeAndMessage = packet.substring(packet.indexOf("::") + 2);
-                        String Addressee = AddresseeAndMessage.substring(0, AddresseeAndMessage.indexOf(":"));
-                        Addressee.trim();
-                        bool queryMessage = false;
-                        if (packet.indexOf("::") > 10 && Addressee == Config.callsign) {      // its a message for me!
-                            queryMessage = processReceivedLoRaMessage(Sender, checkForStartingBytes(AddresseeAndMessage));
-                        }
-                        if (!queryMessage) {
-                            const String& aprsPacket = buildPacketToUpload(packet);
-                            if (!Config.display.alwaysOn && Config.display.timeout != 0) {
-                                display_toggle(true);
+                if ((packet.substring(0, 3) == "\x3c\xff\x01")  && (packet.indexOf("NOGATE") == -1) && (packet.indexOf("RFONLY") == -1)) {                    
+                    int firstColonIndex = packet.indexOf(":");
+                    if (firstColonIndex > 5 && firstColonIndex < (packet.length() - 1) && packet[firstColonIndex + 1] != '}' && packet.indexOf("TCPIP") == -1) {
+                        const String& Sender = packet.substring(3, packet.indexOf(">"));
+                        if (Sender != Config.callsign && Utils::checkValidCallsign(Sender)) {
+                            STATION_Utils::updateLastHeard(Sender);
+                            Utils::typeOfPacket(packet.substring(3), 0);  // LoRa-APRS
+                            const String& AddresseeAndMessage = packet.substring(packet.indexOf("::") + 2);
+                            String Addressee = AddresseeAndMessage.substring(0, AddresseeAndMessage.indexOf(":"));
+                            Addressee.trim();
+                            bool queryMessage = false;
+                            if (packet.indexOf("::") > 10 && Addressee == Config.callsign) {      // its a message for me!
+                                queryMessage = processReceivedLoRaMessage(Sender, checkForStartingBytes(AddresseeAndMessage));
                             }
-                            lastScreenOn = millis();
-                            #ifdef HAS_A7670
-                                stationBeacon = true;
-                                A7670_Utils::uploadToAPRSIS(aprsPacket);
-                                stationBeacon = false;
-                            #else
-                                upload(aprsPacket);
-                            #endif
-                            Utils::println("---> Uploaded to APRS-IS");
-                            show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
+                            if (!queryMessage) {
+                                const String& aprsPacket = buildPacketToUpload(packet);
+                                if (!Config.display.alwaysOn && Config.display.timeout != 0) {
+                                    display_toggle(true);
+                                }
+                                lastScreenOn = millis();
+                                #ifdef HAS_A7670
+                                    stationBeacon = true;
+                                    A7670_Utils::uploadToAPRSIS(aprsPacket);
+                                    stationBeacon = false;
+                                #else
+                                    upload(aprsPacket);
+                                #endif
+                                Utils::println("---> Uploaded to APRS-IS");
+                                show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
+                            }
                         }
-                    }
+                    }                    
                 }
             }
         }
+    }
+
+    String buildPacketToTx(const String& aprsisPacket, uint8_t packetType) {
+        String packet = aprsisPacket;
+        packet.trim();
+        String outputPacket = Config.callsign;
+        outputPacket += ">APLRG1";
+        if (Config.beacon.path != "") {
+            outputPacket += ",";
+            outputPacket += Config.beacon.path;
+        }
+        outputPacket += ":}";
+        outputPacket += packet.substring(0, packet.indexOf(",")); // Callsign>Tocall
+        outputPacket.concat(",TCPIP,");
+        outputPacket.concat(Config.callsign);
+        outputPacket.concat("*");
+        switch (packetType) {
+            case 0: // gps
+                if (packet.indexOf(":=") > 0) {
+                    outputPacket += packet.substring(packet.indexOf(":="));
+                } else {
+                    outputPacket += packet.substring(packet.indexOf(":!"));
+                }
+                break;
+            case 1: // messages
+                outputPacket += packet.substring(packet.indexOf("::"));
+                break;
+            case 2: // status
+                outputPacket += packet.substring(packet.indexOf(":>"));
+                break;
+            case 3: // telemetry
+                outputPacket += packet.substring(packet.indexOf("::"));
+                break;
+            case 4: // mic-e
+                if (packet.indexOf(":`") > 0) {
+                    outputPacket += packet.substring(packet.indexOf(":`"));
+                } else {
+                    outputPacket += packet.substring(packet.indexOf(":'"));
+                }
+                break;
+            case 5: // object
+                outputPacket += packet.substring(packet.indexOf(":;"));
+                break;
+        }
+        return outputPacket;
     }
 
     void processAPRSISPacket(const String& packet) {
