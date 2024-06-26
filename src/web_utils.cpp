@@ -145,13 +145,12 @@ namespace WEB_Utils {
         Config.battery.sendExternalVoltage      = request->hasParam("battery.sendExternalVoltage", true);
         if (Config.battery.sendExternalVoltage) {
             Config.battery.externalVoltagePin   = request->getParam("battery.externalVoltagePin", true)->value().toInt();
+            Config.battery.externalR1           = request->getParam("battery.externalR1", true)->value().toFloat();
+            Config.battery.externalR2           = request->getParam("battery.externalR2", true)->value().toFloat();
         }
         Config.battery.monitorExternalVoltage   = request->hasParam("battery.monitorExternalVoltage", true);
         Config.battery.externalSleepVoltage     = request->getParam("battery.externalSleepVoltage", true)->value().toFloat();
-        Config.battery.externalR1               = request->getParam("battery.externalR1", true)->value().toFloat();
-        Config.battery.externalR2               = request->getParam("battery.externalR2", true)->value().toFloat();
-
-
+        
         Config.bme.active                   = request->hasParam("bme.active", true);
         Config.bme.heightCorrection         = request->getParam("bme.heightCorrection", true)->value().toInt();
         Config.bme.temperatureCorrection    = request->getParam("bme.temperatureCorrection", true)->value().toFloat();
