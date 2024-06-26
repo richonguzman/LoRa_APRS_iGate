@@ -179,6 +179,8 @@ bool Configuration::readFile() {
         rebootMode                      = data["other"]["rebootMode"].as<bool>();
         rebootModeTime                  = data["other"]["rebootModeTime"].as<int>();
 
+        personalNote                    = data["personalNote"].as<String>();
+
         int stationMode                 = data["stationMode"].as<int>(); // deprecated but need to specify config version
 
         if (stationMode == 0) {
@@ -349,6 +351,8 @@ void Configuration::init() {
 
     rebootMode                  = false;
     rebootModeTime              = 0;
+
+    personalNote                = "";
 
     Serial.println("All is Written!");
 }
