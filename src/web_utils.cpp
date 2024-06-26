@@ -29,7 +29,6 @@ extern const char web_bootstrap_js[] asm("_binary_data_embed_bootstrap_js_gz_sta
 extern const char web_bootstrap_js_end[] asm("_binary_data_embed_bootstrap_js_gz_end");
 extern const size_t web_bootstrap_js_len = web_bootstrap_js_end - web_bootstrap_js;
 
-
 namespace WEB_Utils {
 
     AsyncWebServer server(80);
@@ -141,16 +140,17 @@ namespace WEB_Utils {
 
         Config.battery.sendInternalVoltage      = request->hasParam("battery.sendInternalVoltage", true);
         Config.battery.monitorInternalVoltage   = request->hasParam("battery.monitorInternalVoltage", true);
-        Config.battery.internalSleepVoltage = request->getParam("battery.internalSleepVoltage", true)->value().toFloat();
+        Config.battery.internalSleepVoltage     = request->getParam("battery.internalSleepVoltage", true)->value().toFloat();
 
         Config.battery.sendExternalVoltage      = request->hasParam("battery.sendExternalVoltage", true);
         if (Config.battery.sendExternalVoltage) {
             Config.battery.externalVoltagePin   = request->getParam("battery.externalVoltagePin", true)->value().toInt();
+            Config.battery.voltageDividerR1           = request->getParam("battery.voltageDividerR1", true)->value().toFloat();
+            Config.battery.voltageDividerR2           = request->getParam("battery.voltageDividerR2", true)->value().toFloat();
         }
         Config.battery.monitorExternalVoltage   = request->hasParam("battery.monitorExternalVoltage", true);
-        Config.battery.externalSleepVoltage = request->getParam("battery.externalSleepVoltage", true)->value().toFloat();
-
-
+        Config.battery.externalSleepVoltage     = request->getParam("battery.externalSleepVoltage", true)->value().toFloat();
+        
         Config.bme.active                   = request->hasParam("bme.active", true);
         Config.bme.heightCorrection         = request->getParam("bme.heightCorrection", true)->value().toInt();
         Config.bme.temperatureCorrection    = request->getParam("bme.temperatureCorrection", true)->value().toFloat();
@@ -158,31 +158,25 @@ namespace WEB_Utils {
             Config.beacon.symbol = "_";
         }
 
-
         Config.syslog.active                = request->hasParam("syslog.active", true);
         if (Config.syslog.active) {
-            Config.syslog.server    = request->getParam("syslog.server", true)->value();
-            Config.syslog.port      = request->getParam("syslog.port", true)->value().toInt();
+            Config.syslog.server            = request->getParam("syslog.server", true)->value();
+            Config.syslog.port              = request->getParam("syslog.port", true)->value().toInt();
         }
         
+        Config.tnc.enableServer             = request->hasParam("tnc.enableServer", true);
+        Config.tnc.enableSerial             = request->hasParam("tnc.enableSerial", true);
+        Config.tnc.acceptOwn                = request->hasParam("tnc.acceptOwn", true);
 
-        Config.tnc.enableServer         = request->hasParam("tnc.enableServer", true);
-        Config.tnc.enableSerial         = request->hasParam("tnc.enableSerial", true);
-        Config.tnc.acceptOwn            = request->hasParam("tnc.acceptOwn", true);
-
-        
         Config.rebootMode                   = request->hasParam("other.rebootMode", true);
         Config.rebootModeTime               = request->getParam("other.rebootModeTime", true)->value().toInt();
-        
 
         Config.ota.username                 = request->getParam("ota.username", true)->value();
         Config.ota.password                 = request->getParam("ota.password", true)->value();
 
-
         Config.rememberStationTime          = request->getParam("other.rememberStationTime", true)->value().toInt();
 
         Config.backupDigiMode               = request->hasParam("other.backupDigiMode", true);
-
         Config.lowPowerMode                 = request->hasParam("other.lowPowerMode", true);
         Config.lowVoltageCutOff             = request->getParam("other.lowVoltageCutOff", true)->value().toDouble();
 

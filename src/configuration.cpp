@@ -73,8 +73,9 @@ void Configuration::writeFile() {
     data["battery"]["externalVoltagePin"]       = battery.externalVoltagePin;
     data["battery"]["monitorExternalVoltage"]   = battery.monitorExternalVoltage;
     data["battery"]["externalSleepVoltage"]     = battery.externalSleepVoltage;
-    data["battery"]["voltageDividerR1"]         = battery.voltageDividerR1;
-    data["battery"]["voltageDividerR2"]         = battery.voltageDividerR2;
+    data["battery"]["voltageDividerR1"]               = battery.voltageDividerR1;
+    data["battery"]["voltageDividerR2"]               = battery.voltageDividerR2;
+    
 
     data["bme"]["active"]                   = bme.active;
     data["bme"]["heightCorrection"]         = bme.heightCorrection;
@@ -101,7 +102,7 @@ void Configuration::writeFile() {
     data["other"]["lowPowerMode"]           = lowPowerMode;
     data["other"]["lowVoltageCutOff"]       = lowVoltageCutOff;
 
-    data["personalNote"]                    = personalNote;
+    data["personalNote"]                    = personalNote;    
 
     serializeJson(data, configFile);
 
@@ -146,8 +147,8 @@ bool Configuration::readFile() {
         battery.externalVoltagePin      = data["battery"]["externalVoltagePin"].as<int>();
         battery.monitorExternalVoltage  = data["battery"]["monitorExternalVoltage"].as<bool>();
         battery.externalSleepVoltage    = data["battery"]["externalSleepVoltage"].as<float>();
-        battery.voltageDividerR1        = data["battery"]["voltageDividerR1"].as<float>();
-        battery.voltageDividerR2        = data["battery"]["voltageDividerR2"].as<float>();
+        battery.voltageDividerR1              = data["battery"]["voltageDividerR1"].as<float>();
+        battery.voltageDividerR2              = data["battery"]["voltageDividerR2"].as<float>();
 
         aprs_is.passcode                = data["aprs_is"]["passcode"].as<String>();
         aprs_is.server                  = data["aprs_is"]["server"].as<String>();
@@ -185,7 +186,7 @@ bool Configuration::readFile() {
         rebootMode                      = data["other"]["rebootMode"].as<bool>();
         rebootModeTime                  = data["other"]["rebootModeTime"].as<int>();
 
-        personalNote                    = data["personalNote"].as<String>();
+        personalNote    	            = data["personalNote"].as<String>();
 
         int stationMode                 = data["stationMode"].as<int>(); // deprecated but need to specify config version
 
@@ -338,7 +339,6 @@ void Configuration::init() {
     ota.username                = "";
     ota.password                = "";
 
-    
     rememberStationTime         = 30;
 
     battery.sendInternalVoltage     = false;
@@ -349,8 +349,8 @@ void Configuration::init() {
     battery.externalVoltagePin      = 34;
     battery.monitorExternalVoltage  = false;
     battery.externalSleepVoltage    = 3.0;
-    battery.voltageDividerR1        = 100.0;
-    battery.voltageDividerR2        = 27.0;
+    battery.voltageDividerR1              = 100.0;
+    battery.voltageDividerR2              = 27.0;
 
     lowPowerMode                = false;
     lowVoltageCutOff            = 0;

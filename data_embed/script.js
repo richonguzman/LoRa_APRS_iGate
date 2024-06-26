@@ -162,6 +162,8 @@ function loadSettings(settings) {
     document.getElementById("battery.internalSleepVoltage").value       = settings.battery.internalSleepVoltage.toFixed(1);
     document.getElementById("battery.sendExternalVoltage").checked      = settings.battery.sendExternalVoltage;
     document.getElementById("battery.externalVoltagePin").value         = settings.battery.externalVoltagePin;
+    document.getElementById("battery.voltageDividerR1").value                 = settings.battery.voltageDividerR1;
+    document.getElementById("battery.voltageDividerR2").value                 = settings.battery.voltageDividerR2;
     document.getElementById("battery.monitorExternalVoltage").checked   = settings.battery.monitorExternalVoltage;
     document.getElementById("battery.externalSleepVoltage").value       = settings.battery.externalSleepVoltage.toFixed(1);
     
@@ -271,8 +273,9 @@ function toggleFields() {
         'input[name="battery.externalVoltagePin"]'
     );
 
-    externalVoltagePinInput.disabled =
-        !sendExternalVoltageCheckbox.checked;
+    externalVoltagePinInput.disabled = !sendExternalVoltageCheckbox.checked;
+    voltageDividerR1.disabled = !sendExternalVoltageCheckbox.checked;
+    voltageDividerR2.disabled = !sendExternalVoltageCheckbox.checked;
 }
 
 const sendExternalVoltageCheckbox = document.querySelector(
@@ -282,8 +285,18 @@ const externalVoltagePinInput = document.querySelector(
     'input[name="battery.externalVoltagePin"]'
 );
 
+const voltageDividerR1 = document.querySelector(
+    'input[name="battery.voltageDividerR1"]'
+);
+
+const voltageDividerR2 = document.querySelector(
+    'input[name="battery.voltageDividerR2"]'
+);
+
 sendExternalVoltageCheckbox.addEventListener("change", function () {
     externalVoltagePinInput.disabled = !this.checked;
+    voltageDividerR1.disabled = !this.checked;
+    voltageDividerR2.disabled = !this.checked;
 });
 
 document.querySelector(".new button").addEventListener("click", function () {
