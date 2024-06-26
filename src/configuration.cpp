@@ -97,7 +97,9 @@ void Configuration::writeFile() {
     data["other"]["backupDigiMode"]         = backupDigiMode;    
 
     data["other"]["lowPowerMode"]           = lowPowerMode;
-    data["other"]["lowVoltageCutOff"]       = lowVoltageCutOff;    
+    data["other"]["lowVoltageCutOff"]       = lowVoltageCutOff;
+
+    data["personalNote"]                    = personalNote;
 
     serializeJson(data, configFile);
 
