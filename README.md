@@ -50,7 +50,7 @@ ____________________________________________________
 ____________________________________________________
 ## Timeline (Versions):
 
-- 2024.06.26 Personal Note for specific info on station. Thanks Tilen S54B.
+- 2024.06.26 Personal Note information on WebUI for the Station. Thanks Tilen S54B.
 - 2024.06.24 Callsign Validation fix. Thanks Helge SA7SKY.
 - 2024.06.21 Tx packets coming from APRS-IS are (now) formatted into 3rd Party (as they should have been since the beginning). Thanks Lynn KJ4ERJ and Geoffrey F4FXL.
 - 2024.06.18 All boards with 433 / 868 / 915 MHz versions.
