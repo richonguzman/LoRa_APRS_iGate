@@ -107,11 +107,14 @@
                                     Station
                                 </h5>
                                 <small
-                                    >Add your ham callsign and SSID. Optionally,
-                                    you can leave a comment describing your
-                                    station. In the bottom there is a field for
-                                    personal note that can only be seen in WEB GUI.</small
-                                >
+                                    >Add your Ham callsign and SSID. 
+                                    <br>
+                                    <br>
+                                    You can leave a comment describing your station. 
+                                    <br>
+                                    <br>
+                                    In the bottom there is a field for personal note that can only be seen in WEB GUI.
+                                </small>
                             </div>
                             <div class="col-lg-9 col-sm-12">
                                 <div class="row">
@@ -489,8 +492,8 @@
                                                 for="beacon.sendViaAPRSIS"
                                                 class="form-label"
                                                 >Send our beacon to
-                                                APRS-IS</label
-                                            >
+                                                APRS-IS
+                                            </label>
                                         </div>
                                     </div>
                                     <div class="col-6">
@@ -504,8 +507,8 @@
                                             <label
                                                 for="beacon.sendViaRF"
                                                 class="form-label"
-                                                >Send beacon via RF</label
-                                            >
+                                                >Send beacon via RF
+                                            </label>
                                         </div>
                                     </div>
                                     <div class="col-6 d-grid gap-2">
@@ -517,8 +520,8 @@
                                         <label
                                             for="beacon.interval"
                                             class="form-label"
-                                            >Interval</label
-                                        >
+                                            >Interval
+                                        </label>
                                         <div class="input-group">
                                             <input
                                                 type="number"
@@ -531,8 +534,8 @@
                                                 min="1"
                                             />
                                             <span class="input-group-text"
-                                                >minutes</span
-                                            >
+                                                >minutes
+                                            </span>
                                         </div>
                                     </div>
                                 </div>
@@ -640,8 +643,8 @@
                                         <label
                                             for="lora.txFreq"
                                             class="form-label"
-                                            >Tx Frequency</label
-                                        >
+                                            >Tx Frequency
+                                        </label>
                                         <div class="input-group">
                                             <input
                                                 type="text"
@@ -659,17 +662,17 @@
                                                 class="form-control"
                                                 required=""
                                             />
-                                            <span class="input-group-text"
-                                                >Hz</span
-                                            >
+                                            <span class="input-group-text">
+                                                Hz
+                                            </span>
                                         </div>
                                     </div>
                                     <div class="col-6">
                                         <label
                                             for="lora.rxFreq"
-                                            class="form-label"
-                                            >Rx Frequency</label
-                                        >
+                                            class="form-label">
+                                            Rx Frequency
+                                        </label>
                                         <div class="input-group">
                                             <input
                                                 type="text"
@@ -679,8 +682,8 @@
                                                 class="form-control"
                                             />
                                             <span class="input-group-text"
-                                                >Hz</span
-                                            >
+                                                >Hz
+                                            </span>
                                         </div>
                                     </div>
                                 </div>
@@ -689,8 +692,8 @@
                                         <label
                                             for="action.speed"
                                             class="form-label"
-                                            >Predefined speeds</label
-                                        >
+                                            >Predefined speeds
+                                        </label>
                                         <select
                                             class="form-select form-select"
                                             name="action.speed"
@@ -725,8 +728,8 @@
                                         <label
                                             for="lora.signalBandwidth"
                                             class="form-label"
-                                            >Bandwidth</label
-                                        >
+                                            >Bandwidth
+                                        </label>
                                         <div class="input-group">
                                             <select
                                                 class="form-select form-select"
@@ -750,8 +753,8 @@
                                         <label
                                             for="lora.spreadingFactor"
                                             class="form-label"
-                                            >Spreading Factor</label
-                                        >
+                                            >Spreading Factor
+                                        </label>
                                         <select
                                             class="form-select form-select"
                                             name="lora.spreadingFactor"
@@ -775,9 +778,9 @@
                                     <div class="col-6">
                                         <label
                                             for="lora.codingRate4"
-                                            class="form-label"
-                                            >Coding Rate</label
-                                        >
+                                            class="form-label">
+                                            Coding Rate
+                                        </label>
                                         <select
                                             class="form-select form-select"
                                             name="lora.codingRate4"
@@ -794,9 +797,9 @@
                                     <div class="col-6">
                                         <label
                                             for="lora.power"
-                                            class="form-label"
-                                            >Power</label
-                                        >
+                                            class="form-label">
+                                            Power
+                                        </label>
                                         <div class="input-group">
                                             <input
                                                 type="number"
@@ -940,9 +943,15 @@
                                     </svg>
                                     Battery
                                 </h5>
-                                <small>Battery Monitor & Health <br>
-                                Max Voltage on input pin is 3.3V.
-                                Calculate voltage divider accordingly.</small>
+                                <small>
+                                    Battery Monitor & Health
+                                    <br>
+                                    <br>
+                                    Max Voltage on input pin is 3.3V.
+                                    <br>
+                                    <br>
+                                    Calculate voltage divider accordingly.
+                                </small>
                             </div>
                             <div class="col-9 mt-2">
                                 <div class="row mt-2">
@@ -1094,7 +1103,7 @@
                                     </svg>
                                     Telemetry
                                 </h5>
-                                <small>Define the telemetry</small>
+                                <small>Define Wx telemetry</small>
                             </div>
                             <div class="col-9 mt-2">
                                 <div class="row">
@@ -1111,9 +1120,7 @@
                                                 class="form-label"
                                                 ><b>Activate Wx Telemetry</b>
                                                 <small
-                                                    >Requires a BME/BMP280 or
-                                                    BME680 sensor
-                                                    installed</small
+                                                    >Requires a BME/BMP280, BME680 or Si7021 sensor installed</small
                                                 ></label
                                             >
                                         </div>
@@ -1570,7 +1577,7 @@
                                             <label
                                                 for="other.lowPowerMode"
                                                 class="form-label"
-                                                >Low power mode</label
+                                                >Low power mode (only for HT-CT62)</label
                                             >
                                         </div>
                                     </div>
