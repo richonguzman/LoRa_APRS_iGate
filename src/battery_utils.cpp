@@ -12,12 +12,8 @@ bool    shouldSleepLowVoltage       = false;
 
 float   adcReadingTransformation    = (3.3/4095);
 float   voltageDividerCorrection    = 0.288;
-
-// for External Voltage Measurment (MAX = 15Volts !!!)
-float R1 = 100.000; //in Kilo-Ohms
-float R2 = 27.000; //in Kilo-Ohms
-float readingCorrection = 0.125;
-float multiplyCorrection = 0.035;
+float   readingCorrection           = 0.125;
+float   multiplyCorrection          = 0.035;
 
 
 namespace BATTERY_Utils {
@@ -81,8 +77,8 @@ namespace BATTERY_Utils {
             sampleSum += sample;
             delayMicroseconds(50); 
         }
-
-        float voltage = ((((sampleSum/100)* adcReadingTransformation) + readingCorrection) * ((R1+R2)/R2)) - multiplyCorrection;
+        float voltageDividerTransformation = (Config.battery.voltageDividerR1 + Config.battery.voltageDividerR2) / Config.battery.voltageDividerR2;
+        float voltage = ((((sampleSum/100)* adcReadingTransformation) + readingCorrection) * voltageDividerTransformation) - multiplyCorrection;
         
         return voltage; // raw voltage without mapping
 

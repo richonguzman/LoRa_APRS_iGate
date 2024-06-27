@@ -162,8 +162,8 @@ function loadSettings(settings) {
     document.getElementById("battery.internalSleepVoltage").value       = settings.battery.internalSleepVoltage.toFixed(1);
     document.getElementById("battery.sendExternalVoltage").checked      = settings.battery.sendExternalVoltage;
     document.getElementById("battery.externalVoltagePin").value         = settings.battery.externalVoltagePin;
-    document.getElementById("battery.voltageDividerR1").value                 = settings.battery.voltageDividerR1;
-    document.getElementById("battery.voltageDividerR2").value                 = settings.battery.voltageDividerR2;
+    document.getElementById("battery.voltageDividerR1").value                 = settings.battery.voltageDividerR1.toFixed(1);
+    document.getElementById("battery.voltageDividerR2").value                 = settings.battery.voltageDividerR2.toFixed(1);
     document.getElementById("battery.monitorExternalVoltage").checked   = settings.battery.monitorExternalVoltage;
     document.getElementById("battery.externalSleepVoltage").value       = settings.battery.externalSleepVoltage.toFixed(1);
     
