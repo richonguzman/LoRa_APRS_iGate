@@ -969,19 +969,6 @@
                                                 >Send Internal Voltage</label
                                             >
                                         </div>
-                                        <div class="form-check form-switch">
-                                            <input
-                                                type="checkbox"
-                                                name="battery.sendExternalVoltage"
-                                                id="battery.sendExternalVoltage"
-                                                class="form-check-input"
-                                            />
-                                            <label
-                                                for="battery.sendExternalVoltage"
-                                                class="form-label"
-                                                >Send External Voltage</label
-                                            >
-                                        </div>
                                         <div class="form-check form-switch mt-3">
                                             <input
                                                 type="checkbox"
@@ -1015,39 +1002,22 @@
                                                 >
                                             </div>
                                         </div>
-                                        <div class="col">
-                                            <label for="battery.voltageDividerR1" class="form-label">External Voltage divider R1</label>
-                                            <div class="input-group">
-                                                <input 
-                                                    type="number"
-                                                    name="battery.voltageDividerR1"
-                                                    id="battery.voltageDividerR1"
-                                                    placeholder="100.0"
-                                                    class="form-control"
-                                                    step="0.1"
-                                                    min="1"
-                                                    max="1000"
-                                                />
-                                                <span class="input-group-text">kOhm</span>
-                                            </div>
-                                        </div>
                                     </div>
                                     <div class="col-6">
-                                        <div class="form-floating col-7">
+                                        <div class="form-check form-switch">
                                             <input
-                                                type="text"
-                                                name="battery.externalVoltagePin"
-                                                id="battery.externalVoltagePin"
-                                                value="34"
-                                                class="form-control"
+                                                type="checkbox"
+                                                name="battery.sendExternalVoltage"
+                                                id="battery.sendExternalVoltage"
+                                                class="form-check-input"
                                             />
                                             <label
-                                                for="battery.externalVoltagePin"
+                                                for="battery.sendExternalVoltage"
                                                 class="form-label"
-                                                >External Voltage Pin</label
+                                                >Send External Voltage</label
                                             >
                                         </div>
-                                        <div class="form-check form-switch mt-4">
+                                        <div class="form-check form-switch mt-3">
                                             <input
                                                 type="checkbox"
                                                 name="battery.monitorExternalVoltage"
@@ -1079,21 +1049,51 @@
                                                     >volts</span
                                                 >
                                             </div>
-                                            <div class="col">
-                                                <label for="battery.voltageDividerR2" class="form-label">External Voltage divider R2</label>
-                                                <div class="input-group">
-                                                    <input
-                                                        type="number"
-                                                        name="battery.voltageDividerR2"
-                                                        id="battery.voltageDividerR2"
-                                                        placeholder="27.0"
-                                                        class="form-control"
-                                                        step="0.1"
-                                                        min="1"
-                                                        max="1000"
-                                                    />
-                                                    <span class="input-group-text">kOhm</span>
-                                                </div>
+                                        </div>
+                                        <div class="form-floating col-7 mt-3">
+                                            <input
+                                                type="text"
+                                                name="battery.externalVoltagePin"
+                                                id="battery.externalVoltagePin"
+                                                value="34"
+                                                class="form-control"
+                                            />
+                                            <label
+                                                for="battery.externalVoltagePin"
+                                                class="form-label"
+                                                >External Voltage Pin</label
+                                            >
+                                        </div>
+                                        <div class="col">
+                                            <label for="battery.voltageDividerR1" class="form-label">External Voltage divider R1</label>
+                                            <div class="input-group">
+                                                <input 
+                                                    type="number"
+                                                    name="battery.voltageDividerR1"
+                                                    id="battery.voltageDividerR1"
+                                                    placeholder="100.0"
+                                                    class="form-control"
+                                                    step="0.1"
+                                                    min="1"
+                                                    max="1000"
+                                                />
+                                                <span class="input-group-text">kOhm</span>
+                                            </div>
+                                        </div>
+                                        <div class="col">
+                                            <label for="battery.voltageDividerR2" class="form-label">External Voltage divider R2</label>
+                                            <div class="input-group">
+                                                <input
+                                                    type="number"
+                                                    name="battery.voltageDividerR2"
+                                                    id="battery.voltageDividerR2"
+                                                    placeholder="27.0"
+                                                    class="form-control"
+                                                    step="0.1"
+                                                    min="1"
+                                                    max="1000"
+                                                />
+                                                <span class="input-group-text">kOhm</span>
                                             </div>
                                         </div>
                                     </div>
