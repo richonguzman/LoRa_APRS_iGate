@@ -45,7 +45,8 @@ ____________________________________________________
 
 - Wemos Lolin32 Oled + SX1278 DIY Version.
 
-____________________________________________________
+<br />
+
 ## Timeline (Versions):
 
 - 2024.06.27 External Voltage Divider Resistor configuration on WebUI. Thanks Tilen S54B.
