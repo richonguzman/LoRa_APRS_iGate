@@ -84,7 +84,7 @@ namespace DIGI_Utils {
                             String Addressee            = AddresseeAndMessage.substring(0, AddresseeAndMessage.indexOf(":"));
                             Addressee.trim();
                             if (Addressee == Config.callsign) {     // it's a message for me!
-                                queryMessage = APRS_IS_Utils::processReceivedLoRaMessage(Sender, AddresseeAndMessage);
+                                queryMessage = APRS_IS_Utils::processReceivedLoRaMessage(Sender, AddresseeAndMessage, thirdPartyPacket);
                             }
                         }
                         if (!queryMessage) {

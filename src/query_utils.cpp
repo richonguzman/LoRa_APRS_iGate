@@ -12,12 +12,12 @@ extern int                  freqError;
 
 namespace QUERY_Utils {
 
-    String process(const String& query, const String& station, const uint8_t queryOrigin) {
+    String process(const String& query, const String& station, bool queryFromAPRSIS, bool thirdParty) {
         String answer;
         if (query=="?APRS?" || query=="?aprs?" || query=="?Aprs?" || query=="H" || query=="h" || query=="HELP" || query=="Help" || query=="help" || query=="?") {
             answer.concat("?APRSV ?APRSP ?APRSL ?APRSH ?WHERE callsign");
         } else if (query=="?APRSV" || query=="?aprsv" || query=="?Aprsv") {
-            answer = "CA2RXU_LoRa_iGate 1.3 v";
+            answer = "CA2RXU_LoRa_iGate 1.4 v";
             answer.concat(versionDate);
         } else if (query=="?APRSP" || query=="?aprsp" || query=="?Aprsp") {
             answer = "iGate QTH: ";
@@ -53,18 +53,17 @@ namespace QUERY_Utils {
             processedStation += ' ';
         }
         String queryAnswer = Config.callsign;
-        queryAnswer += ">APLRG1,";
-        if (queryOrigin == 1) { // from APRS-IS
-            queryAnswer += "TCPIP,qAC::";
-        } else {                // else == 0 , from LoRa
-            if (Config.beacon.path == "") {
-                queryAnswer += "RFONLY::";
-            } else {
-                queryAnswer += "RFONLY,";
+        queryAnswer += ">APLRG1";
+        if (queryFromAPRSIS) {
+            queryAnswer += ",TCPIP,qAC";
+        } else {
+            if (!thirdParty) queryAnswer += ",RFONLY";
+            if (Config.beacon.path != "") {
+                queryAnswer += ",";
                 queryAnswer += Config.beacon.path;
-                queryAnswer += "::";
             }
         }
+        queryAnswer += "::";
         queryAnswer += processedStation;
         queryAnswer += ":";
         queryAnswer += answer;

@@ -59,7 +59,7 @@ namespace APRS_IS_Utils {
             aprsauth += Config.callsign;
             aprsauth += " pass ";
             aprsauth += Config.aprs_is.passcode;
-            aprsauth += " vers CA2RXU_LoRa_iGate 1.3 filter ";
+            aprsauth += " vers CA2RXU_LoRa_iGate 1.4 filter ";
             aprsauth += Config.aprs_is.filter;
             upload(aprsauth);
             delay(200);
@@ -129,7 +129,7 @@ namespace APRS_IS_Utils {
         return buildedPacket;
     }
 
-    bool processReceivedLoRaMessage(const String& sender, const String& packet) {
+    bool processReceivedLoRaMessage(const String& sender, const String& packet, bool thirdParty) {
         String receivedMessage;
         if (packet.indexOf("{") > 0) {     // ack?
             String ackMessage = "ack";
@@ -162,7 +162,7 @@ namespace APRS_IS_Utils {
             if (!Config.display.alwaysOn && Config.display.timeout != 0) {
                 display_toggle(true);
             }
-            STATION_Utils::addToOutputPacketBuffer(QUERY_Utils::process(receivedMessage, sender, 0)); // LoRa
+            STATION_Utils::addToOutputPacketBuffer(QUERY_Utils::process(receivedMessage, sender, false, thirdParty));
             lastScreenOn = millis();
             show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, "Callsign = " + sender, "TYPE --> QUERY", 0);
             return true;
@@ -187,7 +187,7 @@ namespace APRS_IS_Utils {
                             Addressee.trim();
                             bool queryMessage = false;
                             if (packet.indexOf("::") > 10 && Addressee == Config.callsign) {      // its a message for me!
-                                queryMessage = processReceivedLoRaMessage(Sender, checkForStartingBytes(AddresseeAndMessage));
+                                queryMessage = processReceivedLoRaMessage(Sender, checkForStartingBytes(AddresseeAndMessage), false);
                             }
                             if (!queryMessage) {
                                 const String& aprsPacket = buildPacketToUpload(packet);
@@ -291,7 +291,7 @@ namespace APRS_IS_Utils {
                     }
                     if (receivedMessage.indexOf("?") == 0) {
                         Utils::println("Received Query APRS-IS : " + packet);
-                        String queryAnswer = QUERY_Utils::process(receivedMessage, Sender, 1); // APRSIS
+                        String queryAnswer = QUERY_Utils::process(receivedMessage, Sender, true, false);
                         //Serial.println("---> QUERY Answer : " + queryAnswer.substring(0,queryAnswer.indexOf("\n")));
                         if (!Config.display.alwaysOn && Config.display.timeout != 0) {
                             display_toggle(true);

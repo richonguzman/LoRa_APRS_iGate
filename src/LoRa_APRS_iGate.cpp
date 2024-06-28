@@ -37,7 +37,7 @@ ________________________________________________________________________________
     #include "A7670_utils.h"
 #endif
 
-String          versionDate             = "2024.06.27";
+String          versionDate             = "2024.06.28";
 Configuration   Config;
 WiFiClient      espClient;
 
