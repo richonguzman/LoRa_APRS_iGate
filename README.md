@@ -13,6 +13,7 @@ ___________________________________________________
 [<img src="https://github.com/richonguzman/LoRa_APRS_Tracker/blob/main/images/github-sponsors.png">](https://github.com/sponsors/richonguzman)     [<img src="https://github.com/richonguzman/LoRa_APRS_Tracker/blob/main/images/paypalme.png">](http://paypal.me/richonguzman)
 
 ____________________________________________________
+<br />
 
 # WEB FLASHER/INSTALLER is <a href="https://richonguzman.github.io/lora-igate-web-flasher/installer.html" target="_blank">here</a>
 <br />
