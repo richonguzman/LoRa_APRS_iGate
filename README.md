@@ -16,7 +16,6 @@ ____________________________________________________
 
 # WEB FLASHER/INSTALLER is <a href="https://richonguzman.github.io/lora-igate-web-flasher/installer.html" target="_blank">here</a>
 
-____________________________________________________
 
 # WIKI
 
@@ -24,8 +23,6 @@ ____________________________________________________
 
 ### Installation Guide --> <a href="https://github.com/richonguzman/LoRa_APRS_iGate/wiki/01.-Installation-Guide" target="_blank">here</a>.
 
-
-____________________________________________________
 
 # SUPPORTED BOARDS
 
