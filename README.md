@@ -5,14 +5,12 @@ This firmware is for using ESP32 based boards with LoRa Modules and GPS to live 
 ![Screenshot](https://github.com/richonguzman/LoRa_APRS_iGate/blob/main/images/iGateOledScreen.jpeg)
 
 __(This iGate Firmware works with all LoRa Tracker Firmwares (specially this <a href="https://github.com/richonguzman/LoRa_APRS_Tracker" target="_blank">LoRa APRS Tracker Firmware</a>))__
-
-___________________________________________________
+<br />
 
 ## You can support this project to continue to grow:
 
 [<img src="https://github.com/richonguzman/LoRa_APRS_Tracker/blob/main/images/github-sponsors.png">](https://github.com/sponsors/richonguzman)     [<img src="https://github.com/richonguzman/LoRa_APRS_Tracker/blob/main/images/paypalme.png">](http://paypal.me/richonguzman)
 
-____________________________________________________
 <br />
 
 # WEB FLASHER/INSTALLER is <a href="https://richonguzman.github.io/lora-igate-web-flasher/installer.html" target="_blank">here</a>
