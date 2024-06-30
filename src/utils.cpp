@@ -263,7 +263,7 @@ namespace Utils {
             seventhLine += "D:";
             seventhLine += distance;
             seventhLine += "km";
-        } else if (packet[firstColonIndex + 1] == '`') {
+        } else if (packet[firstColonIndex + 1] == '`' || packet[firstColonIndex + 1] == '\'') {
             sixthLine += ">  MIC-E";
             seventhLine = seventhLineHelper;
         } else if (packet[firstColonIndex + 1] == ';') {
