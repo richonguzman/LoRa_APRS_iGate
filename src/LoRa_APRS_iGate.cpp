@@ -178,7 +178,7 @@ void loop() {
         APRS_IS_Utils::listenAPRSIS(); // listen received packet from APRSIS
     }
     
-    STATION_Utils::processOutputPacketBuffer();    
+    STATION_Utils::processOutputPacketBuffer();
 
     show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
     Utils::checkRebootTime();
