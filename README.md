@@ -1,4 +1,4 @@
-# Richonguzman / CA2RXU LoRa APRS iGate/Digirepeater
+# CA2RXU LoRa APRS iGate/Digirepeater
 
 This firmware is for using ESP32 based boards with LoRa Modules and GPS to live in the APRS world.
 
