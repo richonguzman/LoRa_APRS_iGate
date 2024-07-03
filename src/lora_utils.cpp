@@ -50,7 +50,7 @@ namespace LoRa_Utils {
         if (state == RADIOLIB_ERR_NONE) {
             Utils::println("Initializing LoRa Module");
         } else {
-            Utils::println("Starting LoRa failed!");
+            Utils::println("Starting LoRa failed! State: " + String(state));
             while (true);
         }
         #if defined(HAS_SX1262) || defined(HAS_SX1268)
