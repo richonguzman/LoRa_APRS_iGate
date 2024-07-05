@@ -55,13 +55,13 @@ namespace APRS_IS_Utils {
             Serial.println("Connected!\n(Server: " + String(Config.aprs_is.server) + " / Port: " + String(Config.aprs_is.port) + ")");
             // String filter = "t/m/" + Config.callsign + "/" + (String)Config.aprs_is.reportingDistance;
 
-            String aprsauth = "user ";
-            aprsauth += Config.callsign;
-            aprsauth += " pass ";
-            aprsauth += Config.aprs_is.passcode;
-            aprsauth += " vers CA2RXU_LoRa_iGate 1.4 filter ";
-            aprsauth += Config.aprs_is.filter;
-            upload(aprsauth);
+            String aprsAuth = "user ";
+            aprsAuth += Config.callsign;
+            aprsAuth += " pass ";
+            aprsAuth += Config.aprs_is.passcode;
+            aprsAuth += " vers CA2RXU_LoRa_iGate 1.4 filter ";
+            aprsAuth += Config.aprs_is.filter;
+            upload(aprsAuth);
             delay(200);
         }
     }
