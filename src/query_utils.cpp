@@ -14,17 +14,19 @@ namespace QUERY_Utils {
 
     String process(const String& query, const String& station, bool queryFromAPRSIS, bool thirdParty) {
         String answer;
-        if (query=="?APRS?" || query=="?aprs?" || query=="?Aprs?" || query=="H" || query=="h" || query=="HELP" || query=="Help" || query=="help" || query=="?") {
+        String queryQuestion = query;
+        queryQuestion.toUpperCase();
+        if (queryQuestion == "?APRS?" || queryQuestion == "H" || queryQuestion == "HELP" || queryQuestion=="?") {
             answer.concat("?APRSV ?APRSP ?APRSL ?APRSH ?WHERE callsign");
-        } else if (query=="?APRSV" || query=="?aprsv" || query=="?Aprsv") {
-            answer = "CA2RXU_LoRa_iGate 1.4 v";
+        } else if (queryQuestion == "?APRSV") {
+            answer.concat("CA2RXU_LoRa_iGate 1.4 v");
             answer.concat(versionDate);
-        } else if (query=="?APRSP" || query=="?aprsp" || query=="?Aprsp") {
-            answer = "iGate QTH: ";
-            answer.concat(String(Config.beacon.latitude,2));
+        } else if (queryQuestion == "?APRSP") {
+            answer.concat("iGate QTH: ");
+            answer.concat(String(Config.beacon.latitude,3));
             answer.concat(" ");
-            answer.concat(String(Config.beacon.longitude,2));
-        } else if (query=="?APRSL" || query=="?aprsl" || query=="?Aprsl") {
+            answer.concat(String(Config.beacon.longitude,3));
+        } else if (queryQuestion == "?APRSL") {
             if (lastHeardStation.size() == 0) {
                 char answerArray[50];
                 snprintf(answerArray, sizeof(answerArray), "No Station Listened in the last %d min.", Config.rememberStationTime);
@@ -35,23 +37,20 @@ namespace QUERY_Utils {
                 }
                 answer.trim();
             }
-        } else if (query=="?APRSSR" || query=="?aprssr" || query=="?Aprssr") {
+        } else if (queryQuestion == "?APRSSR") {
             char signalData[35];
             snprintf(signalData, sizeof(signalData), " %ddBm / %.2fdB / %dHz", rssi, snr, freqError);
             answer.concat(signalData);        
-        } else if (query.indexOf("?APRSH") == 0 || query.indexOf("?aprsh") == 0 || query.indexOf("?Aprsh") == 0) {
+        } else if (queryQuestion.indexOf("?APRSH") == 0) {
             // sacar callsign despues de ?APRSH
             Serial.println("escuchaste a X estacion? en las ultimas 24 o 8 horas?");
             answer.concat("?APRSH on development 73!");
-        } else if (query.indexOf("?WHERE") == 0) { 
+        } else if (queryQuestion.indexOf("?WHERE") == 0) { 
             // agregar callsign para completar donde esta X callsign --> posicion
             Serial.println("estaciones escuchadas directo (ultimos 30 min)");
             answer.concat("?WHERE on development 73!");
         }
-        String processedStation = station;
-        for (int i = station.length(); i < 9; i++) {
-            processedStation += ' ';
-        }
+
         String queryAnswer = Config.callsign;
         queryAnswer += ">APLRG1";
         if (queryFromAPRSIS) {
@@ -64,6 +63,11 @@ namespace QUERY_Utils {
             }
         }
         queryAnswer += "::";
+
+        String processedStation = station;
+        for (int i = station.length(); i < 9; i++) {
+            processedStation += ' ';
+        }
         queryAnswer += processedStation;
         queryAnswer += ":";
         queryAnswer += answer;
