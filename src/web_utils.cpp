@@ -29,6 +29,11 @@ extern const char web_bootstrap_js[] asm("_binary_data_embed_bootstrap_js_gz_sta
 extern const char web_bootstrap_js_end[] asm("_binary_data_embed_bootstrap_js_gz_end");
 extern const size_t web_bootstrap_js_len = web_bootstrap_js_end - web_bootstrap_js;
 
+// Declare external symbols for the embedded image data
+extern const unsigned char favicon_data[] asm("_binary_data_embed_favicon_png_gz_start");
+extern const unsigned char favicon_data_end[] asm("_binary_data_embed_favicon_png_gz_end");
+extern const size_t favicon_data_len = favicon_data_end - favicon_data;
+
 namespace WEB_Utils {
 
     AsyncWebServer server(80);
@@ -45,6 +50,12 @@ namespace WEB_Utils {
 
     void handleHome(AsyncWebServerRequest *request) {
         AsyncWebServerResponse *response = request->beginResponse_P(200, "text/html", (const uint8_t*)web_index_html, web_index_html_len);
+        response->addHeader("Content-Encoding", "gzip");
+        request->send(response);
+    }
+
+    void handleFavicon(AsyncWebServerRequest *request) {
+        AsyncWebServerResponse *response = request->beginResponse_P(200, "image/x-icon", (const uint8_t*)favicon_data, favicon_data_len);
         response->addHeader("Content-Encoding", "gzip");
         request->send(response);
     }
@@ -243,6 +254,7 @@ namespace WEB_Utils {
         server.on("/script.js", HTTP_GET, handleScript);
         server.on("/bootstrap.css", HTTP_GET, handleBootstrapStyle);
         server.on("/bootstrap.js", HTTP_GET, handleBootstrapScript);
+        server.on("/favicon.png", HTTP_GET, handleFavicon);
 
         OTA_Utils::setup(&server); // Include OTA Updater for WebServer
 

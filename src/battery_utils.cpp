@@ -75,11 +75,13 @@ namespace BATTERY_Utils {
     }
 
     void setup() {
-        if (Config.battery.voltageDividerR2 != 0) voltageDividerTransformation = (Config.battery.voltageDividerR1 + Config.battery.voltageDividerR2) / Config.battery.voltageDividerR2;
-        
+        if ((Config.battery.sendExternalVoltage || Config.battery.monitorExternalVoltage) && Config.battery.voltageDividerR2 != 0) voltageDividerTransformation = (Config.battery.voltageDividerR1 + Config.battery.voltageDividerR2) / Config.battery.voltageDividerR2;
+
         #if defined(HAS_ADC_CALIBRATION)
-            adcCalibrationCheck();
-            adcCalibration();
+            if (Config.battery.sendInternalVoltage || Config.battery.monitorInternalVoltage || Config.battery.sendExternalVoltage || Config.battery.monitorExternalVoltage) {
+                adcCalibrationCheck();
+                adcCalibration();
+            }
         #endif
     }
 
