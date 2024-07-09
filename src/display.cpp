@@ -11,9 +11,9 @@
         TFT_eSPI tft = TFT_eSPI(); 
 
         #ifdef HELTEC_WIRELESS_TRACKER
-            #define bigSizeFont     2
-            #define smallSizeFont   1
-            #define lineSpacing     9
+            #define bigSizeFont     2.5
+            #define smallSizeFont   1.5
+            #define lineSpacing     12
         #endif
     #else
         #include <Adafruit_GFX.h>
