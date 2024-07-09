@@ -38,9 +38,9 @@ float   voltageDividerTransformation    = 0.0;
     #endif
 
     esp_adc_cal_characteristics_t adc_chars;
-    bool calibrationEnable = false;
 #endif
 
+bool calibrationEnable = false;
 
 
 namespace BATTERY_Utils {
@@ -50,28 +50,32 @@ namespace BATTERY_Utils {
     }
 
     void adcCalibration() {
-        if (calibrationEnable) {
-            adc1_config_width(ADC_WIDTH_BIT_12);
-            adc1_config_channel_atten(InternalBattery_ADC_Channel, ADC_ATTEN_DB_12);
-            adc1_config_channel_atten(ExternalVoltage_ADC_Channel, ADC_ATTEN_DB_12);
-        }  
+        #ifdef HAS_ADC_CALIBRATION
+            if (calibrationEnable) {
+                adc1_config_width(ADC_WIDTH_BIT_12);
+                adc1_config_channel_atten(InternalBattery_ADC_Channel, ADC_ATTEN_DB_12);
+                adc1_config_channel_atten(ExternalVoltage_ADC_Channel, ADC_ATTEN_DB_12);
+            }
+        #endif
     }
 
     void adcCalibrationCheck() {
-        esp_err_t ret;
-        ret = esp_adc_cal_check_efuse(ADC_EXAMPLE_CALI_SCHEME);
-        /*if (ret == ESP_ERR_NOT_SUPPORTED) {
-            Serial.println("Calibration scheme not supported, skip software calibration");
-        } else if (ret == ESP_ERR_INVALID_VERSION) {
-            Serial.println("eFuse not burnt, skip software calibration");
-        } else */
-        if (ret == ESP_OK) {
-            esp_adc_cal_characterize(ADC_UNIT_1, ADC_ATTEN_DB_12, ADC_WIDTH_BIT_12, 1100, &adc_chars);
-            //Serial.printf("eFuse Vref:%u mV\n", adc_chars.vref);
-            calibrationEnable = true;
-        } /*else {
-            Serial.println("Invalid Calibration Arg");
-        }*/        
+        #ifdef HAS_ADC_CALIBRATION
+            esp_err_t ret;
+            ret = esp_adc_cal_check_efuse(ADC_EXAMPLE_CALI_SCHEME);
+            /*if (ret == ESP_ERR_NOT_SUPPORTED) {
+                Serial.println("Calibration scheme not supported, skip software calibration");
+            } else if (ret == ESP_ERR_INVALID_VERSION) {
+                Serial.println("eFuse not burnt, skip software calibration");
+            } else */
+            if (ret == ESP_OK) {
+                esp_adc_cal_characterize(ADC_UNIT_1, ADC_ATTEN_DB_12, ADC_WIDTH_BIT_12, 1100, &adc_chars);
+                //Serial.printf("eFuse Vref:%u mV\n", adc_chars.vref);
+                calibrationEnable = true;
+            } /*else {
+                Serial.println("Invalid Calibration Arg");
+            }*/
+        #endif
     }
 
     void setup() {
@@ -108,11 +112,15 @@ namespace BATTERY_Utils {
                 #if defined(ESP32_DIY_LoRa) || defined(ESP32_DIY_LoRa_915) || defined(ESP32_DIY_1W_LoRa) || defined(ESP32_DIY_1W_LoRa_915)
                     sample = 0;
                 #else
-                    if (calibrationEnable) {
-                        sample = adc1_get_raw(InternalBattery_ADC_Channel);
-                    } else {
+                    #ifdef HAS_ADC_CALIBRATION
+                        if (calibrationEnable){
+                            sample = adc1_get_raw(InternalBattery_ADC_Channel);
+                        } else {
+                            sample = analogRead(BATTERY_PIN);
+                        }
+                    #else
                         sample = analogRead(BATTERY_PIN);
-                    }
+                    #endif
                 #endif                
                 sampleSum += sample;
                 delayMicroseconds(50); 
@@ -146,22 +154,31 @@ namespace BATTERY_Utils {
         int sample;
         int sampleSum = 0;
         for (int i = 0; i < 100; i++) {
-            if(calibrationEnable){    
-                sample = adc1_get_raw(ExternalVoltage_ADC_Channel);
-            } else {
+            #ifdef HAS_ADC_CALIBRATION
+                if (calibrationEnable){
+                    sample = adc1_get_raw(ExternalVoltage_ADC_Channel);
+                } else {
+                    sample = analogRead(Config.battery.externalVoltagePin);
+                }
+            #else
                 sample = analogRead(Config.battery.externalVoltagePin);
-            }
+            #endif
             sampleSum += sample;
             delayMicroseconds(50);
         }
 
         float extVoltage;
-        if (calibrationEnable){
-            extVoltage = esp_adc_cal_raw_to_voltage(sampleSum / 100, &adc_chars) * voltageDividerTransformation; // in mV
-            extVoltage /= 1000;
-        } else {
+        #ifdef HAS_ADC_CALIBRATION
+            if (calibrationEnable){       
+                extVoltage = esp_adc_cal_raw_to_voltage(sampleSum / 100, &adc_chars) * voltageDividerTransformation; // in mV
+                extVoltage /= 1000;
+            } else {
+                extVoltage = ((((sampleSum/100)* adcReadingTransformation) + readingCorrection) * voltageDividerTransformation) - multiplyCorrection;
+            }
+        #else
             extVoltage = ((((sampleSum/100)* adcReadingTransformation) + readingCorrection) * voltageDividerTransformation) - multiplyCorrection;
-        }
+        #endif
+        
         return extVoltage; // raw voltage without mapping
 
         // return mapVoltage(voltage, 5.05, 6.32, 4.5, 5.5); // mapped voltage
