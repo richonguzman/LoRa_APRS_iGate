@@ -21,6 +21,7 @@ ________________________________________________________________________________
 #include "aprs_is_utils.h"
 #include "station_utils.h"
 #include "boards_pinout.h"
+#include "battery_utils.h"
 #include "syslog_utils.h"
 #include "query_utils.h"
 #include "power_utils.h"
@@ -37,7 +38,7 @@ ________________________________________________________________________________
     #include "A7670_utils.h"
 #endif
 
-String          versionDate             = "2024.06.28";
+String          versionDate             = "2024.07.08";
 Configuration   Config;
 WiFiClient      espClient;
 
@@ -60,6 +61,7 @@ String firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seven
 void setup() {
     Serial.begin(115200);
     POWER_Utils::setup();
+    BATTERY_Utils::setup();
     Utils::setupDisplay();
     Config.check();
     LoRa_Utils::setup();
