@@ -57,8 +57,12 @@ namespace GPS_Utils {
 
     void generateBeacons() {
         if (Config.callsign.indexOf("NOCALL-10") != 0 && !Utils::checkValidCallsign(Config.callsign)) {
-            show_display("***** ERROR ******", "CALLSIGN = NOT VALID!", "    Use SSID 0-15", "  Or Valid Callsign", 0);
-            while (true) {}
+            show_display("***** ERROR ******", "CALLSIGN = NOT VALID!", "", "Only Rx Mode Active", 3000);
+            Config.loramodule.txActive  = false;
+            Config.aprs_is.messagesToRF = false;
+            Config.aprs_is.objectsToRF  = false;
+            Config.beacon.sendViaRF     = false;
+            Config.digi.mode            = 0;
         }   
         String beaconPacket = Config.callsign;
         beaconPacket += ">APLRG1";
