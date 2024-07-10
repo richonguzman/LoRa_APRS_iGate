@@ -14,7 +14,6 @@ float   adcReadingTransformation        = (3.3/4095);
 float   voltageDividerCorrection        = 0.288;
 float   readingCorrection               = 0.125;
 float   multiplyCorrection              = 0.035;
-float   adcVoltageCorrection            = 0.041;
 
 float   voltageDividerTransformation    = 0.0;
 
@@ -140,7 +139,6 @@ namespace BATTERY_Utils {
                     float voltage = esp_adc_cal_raw_to_voltage(sampleSum / 100, &adc_chars);
                     voltage *= 2;       // for 100K/100K voltage divider
                     voltage /= 1000;
-                    voltage -= adcVoltageCorrection;
                     return voltage;
                 } else {
                     return (2 * (sampleSum/100) * adcReadingTransformation) + voltageDividerCorrection;  // raw voltage without mapping
