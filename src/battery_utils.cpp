@@ -135,14 +135,18 @@ namespace BATTERY_Utils {
                 double inputDivider = (1.0 / (390.0 + 100.0)) * 100.0;  // The voltage divider is a 390k + 100k resistor in series, 100k on the low side.
                 return (((sampleSum/100) * adcReadingTransformation) / inputDivider) + 0.285; // Yes, this offset is excessive, but the ADC on the ESP32s3 is quite inaccurate and noisy. Adjust to own measurements.
             #else
-                if (calibrationEnable){
-                    float voltage = esp_adc_cal_raw_to_voltage(sampleSum / 100, &adc_chars);
-                    voltage *= 2;       // for 100K/100K voltage divider
-                    voltage /= 1000;
-                    return voltage;
-                } else {
+                #ifdef HAS_ADC_CALIBRATION
+                    if (calibrationEnable){
+                        float voltage = esp_adc_cal_raw_to_voltage(sampleSum / 100, &adc_chars);
+                        voltage *= 2;       // for 100K/100K voltage divider
+                        voltage /= 1000;
+                        return voltage;
+                    } else {
+                        return (2 * (sampleSum/100) * adcReadingTransformation) + voltageDividerCorrection;  // raw voltage without mapping
+                    }
+                #else
                     return (2 * (sampleSum/100) * adcReadingTransformation) + voltageDividerCorrection;  // raw voltage without mapping
-                }
+                #endif
             #endif
             // return mapVoltage(voltage, 3.34, 4.71, 3.0, 4.2); // mapped voltage
         #endif
