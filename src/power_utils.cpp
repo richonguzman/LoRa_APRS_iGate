@@ -164,7 +164,7 @@ namespace POWER_Utils {
             Wire.begin(BOARD_I2C_SDA, BOARD_I2C_SCL);
         #endif
 
-        #ifdef HELTEC_V3
+        #if defined(HELTEC_V3) || defined(HELTEC_WSL_V3_DISPLAY)
             Wire1.begin(BOARD_I2C_SDA, BOARD_I2C_SCL);
         #endif
         

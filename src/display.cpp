@@ -21,7 +21,11 @@
         #if defined(HELTEC_V3)
             #define OLED_DISPLAY_HAS_RST_PIN
         #endif
-        Adafruit_SSD1306 display(128, 64, &Wire, OLED_RST);
+        #ifdef HELTEC_WSL_V3_DISPLAY
+            Adafruit_SSD1306 display(128, 64, &Wire1, OLED_RST);
+        #else
+            Adafruit_SSD1306 display(128, 64, &Wire, OLED_RST);
+        #endif
     #endif
 #endif
     
@@ -55,7 +59,10 @@ void setup_display() {
                 delay(20);
                 digitalWrite(OLED_RST, HIGH);
             #endif
-            Wire.begin(OLED_SDA, OLED_SCL);
+
+            #ifndef HELTEC_WSL_V3_DISPLAY
+                Wire.begin(OLED_SDA, OLED_SCL);
+            #endif
 
             if(!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) { 
                 Serial.println(F("SSD1306 allocation failed"));
