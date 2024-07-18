@@ -43,11 +43,14 @@ namespace LoRa_Utils {
     void setup() {
         SPI.begin(RADIO_SCLK_PIN, RADIO_MISO_PIN, RADIO_MOSI_PIN);
         float freq = (float)Config.loramodule.rxFreq / 1000000;
+        #if defined(RADIO_HAS_XTAL)
+            radio.XTAL = true;
+        #endif
         int state = radio.begin(freq);
         if (state == RADIOLIB_ERR_NONE) {
             Utils::println("Initializing LoRa Module");
         } else {
-            Utils::println("Starting LoRa failed!");
+            Utils::println("Starting LoRa failed! State: " + String(state));
             while (true);
         }
         #if defined(HAS_SX1262) || defined(HAS_SX1268)

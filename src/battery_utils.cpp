@@ -118,7 +118,11 @@ namespace BATTERY_Utils {
                             sample = analogRead(BATTERY_PIN);
                         }
                     #else
-                        sample = analogRead(BATTERY_PIN);
+                        #ifdef BATTERY_PIN
+                            sample = analogRead(BATTERY_PIN);
+                        #else
+                            sample = 0;
+                        #endif
                     #endif
                 #endif                
                 sampleSum += sample;
