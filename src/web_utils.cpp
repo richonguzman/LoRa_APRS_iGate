@@ -49,13 +49,13 @@ namespace WEB_Utils {
     }
 
     void handleHome(AsyncWebServerRequest *request) {
-        AsyncWebServerResponse *response = request->beginResponse_P(200, "text/html", (const uint8_t*)web_index_html, web_index_html_len);
+        AsyncWebServerResponse *response = request->beginResponse(200, "text/html", (const uint8_t*)web_index_html, web_index_html_len);
         response->addHeader("Content-Encoding", "gzip");
         request->send(response);
     }
 
     void handleFavicon(AsyncWebServerRequest *request) {
-        AsyncWebServerResponse *response = request->beginResponse_P(200, "image/x-icon", (const uint8_t*)favicon_data, favicon_data_len);
+        AsyncWebServerResponse *response = request->beginResponse(200, "image/x-icon", (const uint8_t*)favicon_data, favicon_data_len);
         response->addHeader("Content-Encoding", "gzip");
         request->send(response);
     }
@@ -218,26 +218,26 @@ namespace WEB_Utils {
     }
 
     void handleStyle(AsyncWebServerRequest *request) {
-        AsyncWebServerResponse *response = request->beginResponse_P(200, "text/css", (const uint8_t*)web_style_css, web_style_css_len);
+        AsyncWebServerResponse *response = request->beginResponse(200, "text/css", (const uint8_t*)web_style_css, web_style_css_len);
         response->addHeader("Content-Encoding", "gzip");
         request->send(response);
     }
 
     void handleScript(AsyncWebServerRequest *request) {
-        AsyncWebServerResponse *response = request->beginResponse_P(200, "text/javascript", (const uint8_t*)web_script_js, web_script_js_len);
+        AsyncWebServerResponse *response = request->beginResponse(200, "text/javascript", (const uint8_t*)web_script_js, web_script_js_len);
         response->addHeader("Content-Encoding", "gzip");
         request->send(response);
     }
 
     void handleBootstrapStyle(AsyncWebServerRequest *request) {
-        AsyncWebServerResponse *response = request->beginResponse_P(200, "text/css", (const uint8_t*)web_bootstrap_css, web_bootstrap_css_len);
+        AsyncWebServerResponse *response = request->beginResponse(200, "text/css", (const uint8_t*)web_bootstrap_css, web_bootstrap_css_len);
         response->addHeader("Content-Encoding", "gzip");
         response->addHeader("Cache-Control", "max-age=3600");
         request->send(response);
     }
 
     void handleBootstrapScript(AsyncWebServerRequest *request) {
-        AsyncWebServerResponse *response = request->beginResponse_P(200, "text/javascript", (const uint8_t*)web_bootstrap_js, web_bootstrap_js_len);
+        AsyncWebServerResponse *response = request->beginResponse(200, "text/javascript", (const uint8_t*)web_bootstrap_js, web_bootstrap_js_len);
         response->addHeader("Content-Encoding", "gzip");
         response->addHeader("Cache-Control", "max-age=3600");
         request->send(response);
