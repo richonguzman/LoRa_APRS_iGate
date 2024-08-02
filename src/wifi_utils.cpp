@@ -40,7 +40,7 @@ namespace WIFI_Utils {
             Serial.print(millis());
             Serial.println("Reconnecting to WiFi...");
             WiFi.disconnect();
-            WiFi.reconnect();
+            WIFI_Utils::startWiFi();//WiFi.reconnect();
             previousWiFiMillis = millis();
 
             if (Config.backupDigiMode) {
