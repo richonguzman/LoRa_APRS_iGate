@@ -98,7 +98,7 @@ void setup() {
                     String comment = Config.beacon.comment;
                     if (Config.battery.sendInternalVoltage) comment += " Batt=" + String(BATTERY_Utils::checkInternalVoltage(),2) + "V";
                     if (Config.battery.sendExternalVoltage) comment += " Ext=" + String(BATTERY_Utils::checkExternalVoltage(),2) + "V";
-                    STATION_Utils::addToOutputPacketBuffer(GPS_Utils::getiGateLoRaBeaconPacket() + comment);                
+                    LoRa_Utils::sendNewPacket(GPS_Utils::getiGateLoRaBeaconPacket() + comment);                
                     lastBeacon = time;
                 }
 
