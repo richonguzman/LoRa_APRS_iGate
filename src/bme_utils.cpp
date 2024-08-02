@@ -32,7 +32,7 @@ namespace BME_Utils {
     void getWxModuleAddres() {
         uint8_t err, addr;
         for(addr = 1; addr < 0x7F; addr++) {
-            #ifdef HELTEC_V3
+            #if defined(HELTEC_V3) || defined(HELTEC_WSL_V3) || defined(HELTEC_WSL_V3_DISPLAY)
             Wire1.beginTransmission(addr);
             err = Wire1.endTransmission();
             #else
