@@ -27,7 +27,11 @@ namespace DIGI_Utils {
     String buildPacket(const String& path, const String& packet, bool thirdParty) {
         String packetToRepeat = packet.substring(0, packet.indexOf(",") + 1);
         String tempPath = path;
-        tempPath.replace(Config.beacon.path, Config.callsign + "*");
+        if (Config.digi.mode == 2) {
+            tempPath.replace("WIDE1-1", Config.callsign + "*");
+        } else if (Config.digi.mode == 3) {
+            tempPath.replace("WIDE2-1", Config.callsign + "*");
+        }
         packetToRepeat += tempPath;
         if (thirdParty) {
             packetToRepeat += APRS_IS_Utils::checkForStartingBytes(packet.substring(packet.indexOf(":}")));
@@ -47,7 +51,7 @@ namespace DIGI_Utils {
         }
         if (temp.indexOf(",") > 2) { // checks for path
             const String& path = temp.substring(temp.indexOf(",") + 1); // after tocall
-            if (path.indexOf(Config.beacon.path) != -1) {
+            if ((Config.digi.mode == 2 && path.indexOf("WIDE1-1") != - 1) || (Config.digi.mode == 3 && path.indexOf("WIDE2-1") != -1)) {
                 return buildPacket(path, packet, thirdParty);
             } else {
                 return "";
