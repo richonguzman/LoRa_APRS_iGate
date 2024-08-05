@@ -30,10 +30,10 @@ namespace DIGI_Utils {
         if (Config.digi.mode == 2) {
             tempPath.replace("WIDE1-1", Config.callsign + "*");
         } else if (Config.digi.mode == 3) {
-            if (path.indexOf("WIDE1-1")) {
+            if (path.indexOf("WIDE1-1") != -1) {
                 tempPath.replace("WIDE1-1", Config.callsign + "*");
             }
-            if (path.indexOf("WIDE2-1")) {
+            if (path.indexOf("WIDE2-1") != -1) {
                 tempPath.replace("WIDE2-1", Config.callsign + "*");
             }
             if (path.indexOf(Config.callsign + "*," + Config.callsign + "*")) {
@@ -59,8 +59,17 @@ namespace DIGI_Utils {
         }
         if (temp.indexOf(",") > 2) { // checks for path
             const String& path = temp.substring(temp.indexOf(",") + 1); // after tocall
-            if ((Config.digi.mode == 2 && path.indexOf("WIDE1-1") != - 1) || (Config.digi.mode == 3 && (path.indexOf("WIDE1-1") != - 1 || path.indexOf("WIDE2-1") != -1))) {
+            if (Config.digi.mode == 2 && path.indexOf("WIDE1-1") != - 1) {
                 return buildPacket(path, packet, thirdParty);
+            } else if (Config.digi.mode == 3) {
+                int wide1Index = path.indexOf("WIDE1-1");
+                int wide2Index = path.indexOf("WIDE2-1");
+
+                if ((wide1Index != -1 && wide2Index == -1) || (wide1Index != -1 && wide2Index != -1 && wide1Index < wide2Index) || (wide1Index == -1 && wide2Index != -1)) {
+                    return buildPacket(path, packet, thirdParty);
+                } else {
+                    return "";
+                }
             } else {
                 return "";
             }
