@@ -27,17 +27,19 @@ namespace DIGI_Utils {
     String buildPacket(const String& path, const String& packet, bool thirdParty) {
         String packetToRepeat = packet.substring(0, packet.indexOf(",") + 1);
         String tempPath = path;
-        if (Config.digi.mode == 2) {
+
+        if (path.indexOf("WIDE1-1") != -1 && (Config.digi.mode == 2 || Config.digi.mode == 3)) {
             tempPath.replace("WIDE1-1", Config.callsign + "*");
-        } else if (Config.digi.mode == 3) {
-            if (path.indexOf("WIDE1-1") != -1) {
-                tempPath.replace("WIDE1-1", Config.callsign + "*");
+        } else if (path.indexOf("WIDE2-") != -1 && Config.digi.mode == 3) {
+            if (path.indexOf("*") != 1) {
+                tempPath.remove(path.indexOf("*"), 1);
             }
             if (path.indexOf("WIDE2-1") != -1) {
                 tempPath.replace("WIDE2-1", Config.callsign + "*");
-            }
-            if (path.indexOf(Config.callsign + "*," + Config.callsign + "*")) {
-                tempPath.replace(Config.callsign + "*," + Config.callsign + "*", Config.callsign + "*");
+            } else if (path.indexOf("WIDE2-2") != -1) {
+                tempPath.replace("WIDE2-2", "WIDE2-1");
+            } else {
+                return "";
             }
         }
         packetToRepeat += tempPath;
@@ -63,11 +65,13 @@ namespace DIGI_Utils {
                 return buildPacket(path, packet, thirdParty);
             } else if (Config.digi.mode == 3) {
                 int wide1Index = path.indexOf("WIDE1-1");
-                int wide2Index = path.indexOf("WIDE2-1");
+                int wide2Index = path.indexOf("WIDE2-");
 
-                if (wide1Index != -1 && wide2Index != -1 && wide1Index < wide2Index) {
+                if (wide1Index != -1 && wide2Index != -1 && wide1Index < wide2Index) {  // WIDE1-1 && WIDE2-n
                     return buildPacket(path, packet, thirdParty);
-                } else if ((wide1Index != -1 && wide2Index == -1) || (wide1Index == -1 && wide2Index != -1)) {
+                } else if (wide1Index != -1 && wide2Index == -1) {                      // only WIDE1-1
+                    return buildPacket(path, packet, thirdParty);
+                } else if (wide1Index == -1 && wide2Index != -1) {                      // only WIDE2-n
                     return buildPacket(path, packet, thirdParty);
                 } else {
                     return "";
