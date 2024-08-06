@@ -93,7 +93,7 @@ namespace LoRa_Utils {
         if (state == RADIOLIB_ERR_NONE) {
             Utils::println("init : LoRa Module    ...     done!");
         } else {
-            Utils::println("Starting LoRa failed!");
+            Utils::println("Starting LoRa failed! State: " + String(state));
             while (true);
         }
     }
