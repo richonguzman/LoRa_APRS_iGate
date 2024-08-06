@@ -65,7 +65,9 @@ namespace DIGI_Utils {
                 int wide1Index = path.indexOf("WIDE1-1");
                 int wide2Index = path.indexOf("WIDE2-1");
 
-                if ((wide1Index != -1 && wide2Index == -1) || (wide1Index != -1 && wide2Index != -1 && wide1Index < wide2Index) || (wide1Index == -1 && wide2Index != -1)) {
+                if (wide1Index != -1 && wide2Index != -1 && wide1Index < wide2Index) {
+                    return buildPacket(path, packet, thirdParty);
+                } else if ((wide1Index != -1 && wide2Index == -1) || (wide1Index == -1 && wide2Index != -1)) {
                     return buildPacket(path, packet, thirdParty);
                 } else {
                     return "";
