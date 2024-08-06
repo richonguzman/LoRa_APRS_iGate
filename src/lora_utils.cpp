@@ -160,9 +160,9 @@ namespace LoRa_Utils {
 
     String receivePacket() {
         String packet = "";
-        if (operationDone) {
+        if (operationDone || Config.lowPowerMode) {
             operationDone = false;
-            if (transmitFlag) {
+            if (transmitFlag && !Config.lowPowerMode) {
                 radio.startReceive();
                 transmitFlag = false;
             } else {
