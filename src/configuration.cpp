@@ -104,6 +104,10 @@ void Configuration::writeFile() {
 
     data["personalNote"]                    = personalNote;    
 
+    data["webadmin"]["active"]                   = webadmin.active;
+    data["webadmin"]["username"]                 = webadmin.username;
+    data["webadmin"]["password"]                 = webadmin.password;
+
     serializeJson(data, configFile);
 
     configFile.close();
@@ -187,6 +191,10 @@ bool Configuration::readFile() {
         rebootModeTime                  = data["other"]["rebootModeTime"].as<int>();
 
         personalNote    	            = data["personalNote"].as<String>();
+
+        webadmin.active                 = data["webadmin"]["active"].as<bool>(); 
+        webadmin.username               = data["webadmin"]["username"].as<String>();
+        webadmin.password               = data["webadmin"]["password"].as<String>();
 
         int stationMode                 = data["stationMode"].as<int>(); // deprecated but need to specify config version
 
@@ -361,6 +369,10 @@ void Configuration::init() {
     rebootModeTime              = 0;
 
     personalNote                = "";
+
+    webadmin.active             = false;
+    webadmin.username           = "admin";
+    webadmin.password           = "";
 
     Serial.println("All is Written!");
 }
