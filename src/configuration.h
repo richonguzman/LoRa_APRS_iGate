@@ -106,6 +106,13 @@ public:
     String  password;
 };
 
+class WEBADMIN {
+public:
+    bool    active;
+    String  username;
+    String  password;
+};
+
 class Configuration {
 public:
     bool                    reload;     // ?
@@ -129,6 +136,7 @@ public:
     SYSLOG                  syslog;
     TNC                     tnc;  
     OTA                     ota;
+    WEBADMIN                webadmin;
   
     void init();
     void writeFile();
