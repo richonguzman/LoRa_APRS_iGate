@@ -40,6 +40,18 @@
     #define RADIO_TXEN      25
 #endif
 
+#if defined(ESP32_DIY_1W_LoRa_Mesh_V1_2)  // https://github.com/NanoVHF/Meshtastic-DIY/tree/main/PCB/ESP-32-devkit_EBYTE-E22/Mesh-v1.02-2LCD-FreePins
+    #define RADIO_SCLK_PIN  5
+    #define RADIO_MISO_PIN  19
+    #define RADIO_MOSI_PIN  27
+    #define RADIO_CS_PIN    18
+    #define RADIO_RST_PIN   23
+    #define RADIO_DIO1_PIN  33
+    #define RADIO_BUSY_PIN  32
+    #define RADIO_RXEN      14
+    #define RADIO_TXEN      13
+#endif
+
 #ifdef WEMOS_LOLIN32_OLED_DIY_LoRa
     #define RADIO_SCLK_PIN  15
     #define RADIO_MISO_PIN  13
@@ -122,7 +134,7 @@
 
 
 // OLED 
-#if defined(TTGO_T_LORA32_V2_1) || defined(ESP32_DIY_LoRa) || defined(ESP32_DIY_1W_LoRa) || defined(TTGO_T_Beam_V1_0) || defined(TTGO_T_Beam_V1_2) || defined(TTGO_T_Beam_V1_0_SX1268) || defined(TTGO_T_Beam_V1_2_SX1262) || defined(OE5HWN_MeshCom) || defined(ESP32_DIY_LoRa_A7670) || defined(TTGO_T_LORA32_V2_1_915) || defined(ESP32_DIY_LoRa_915) || defined(TTGO_T_Beam_V1_0_915) || defined(TTGO_T_Beam_V1_2_915) || defined(ESP32_DIY_LoRa_A7670_915) || defined(ESP32_DIY_1W_LoRa_915)
+#if defined(TTGO_T_LORA32_V2_1) || defined(ESP32_DIY_LoRa) || defined(ESP32_DIY_1W_LoRa) || defined(TTGO_T_Beam_V1_0) || defined(TTGO_T_Beam_V1_2) || defined(TTGO_T_Beam_V1_0_SX1268) || defined(TTGO_T_Beam_V1_2_SX1262) || defined(OE5HWN_MeshCom) || defined(ESP32_DIY_LoRa_A7670) || defined(TTGO_T_LORA32_V2_1_915) || defined(ESP32_DIY_LoRa_915) || defined(TTGO_T_Beam_V1_0_915) || defined(TTGO_T_Beam_V1_2_915) || defined(ESP32_DIY_LoRa_A7670_915) || defined(ESP32_DIY_1W_LoRa_915) || defined(ESP32_DIY_1W_LoRa_Mesh_V1_2)
     #define OLED_SDA    21
     #define OLED_SCL    22
     #define OLED_RST    -1      // Reset pin # (or -1 if sharing Arduino reset pin)
@@ -147,7 +159,7 @@
 #endif
 
 #if !defined(HELTEC_HTCT62) && !defined(HELTEC_WSL_V3) && !defined(ESP32C3_DIY_1W_LoRa) && !defined(ESP32C3_DIY_1W_LoRa_915)
-        #define HAS_DISPLAY
+    #define HAS_DISPLAY
 #endif
 
 // Leds and other stuff
