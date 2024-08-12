@@ -37,7 +37,7 @@ namespace DIGI_Utils {
             if (path.indexOf("WIDE2-1") != -1) {
                 tempPath.replace("WIDE2-1", Config.callsign + "*");
             } else if (path.indexOf("WIDE2-2") != -1) {
-                tempPath.replace("WIDE2-2", "WIDE2-1");
+                tempPath.replace("WIDE2-2", Config.callsign + "*,WIDE2-1");
             } else {
                 return "";
             }
