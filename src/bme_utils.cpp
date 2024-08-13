@@ -58,12 +58,12 @@ namespace BME_Utils {
             if (wxModuleAddress != 0x00) {
                 bool wxModuleFound = false;
                 if (wxModuleAddress == 0x76 || wxModuleAddress == 0x77) {
-                    #ifdef HELTEC_V3
-                    if (bme280.begin(wxModuleAddress, &Wire1)) {
-                        Serial.println("BME280 sensor found");
-                        wxModuleType = 1;
-                        wxModuleFound = true;
-                    }
+                    #if defined(HELTEC_V3) || defined(HELTEC_WSL_V3) || defined(HELTEC_WSL_V3_DISPLAY)
+                        if (bme280.begin(wxModuleAddress, &Wire1)) {
+                            Serial.println("BME280 sensor found");
+                            wxModuleType = 1;
+                            wxModuleFound = true;
+                        }
                     #else
                         if (bme280.begin(wxModuleAddress)) {
                             Serial.println("BME280 sensor found");

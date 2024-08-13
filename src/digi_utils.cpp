@@ -62,7 +62,7 @@ namespace DIGI_Utils {
         }
         if (temp.indexOf(",") > 2) { // checks for path
             const String& path = temp.substring(temp.indexOf(",") + 1); // after tocall
-            if (Config.digi.mode == 2 && path.indexOf("WIDE1-1") != - 1) {
+            if ((Config.digi.mode == 2 || backUpDigiMode) && path.indexOf("WIDE1-1") != - 1) {
                 return buildPacket(path, packet, thirdParty);
             } else if (Config.digi.mode == 3) {
                 int wide1Index = path.indexOf("WIDE1-1");
