@@ -75,6 +75,10 @@
         "username": "",
         "password": ""
     },
+    "webadmin": {
+        "username": "admin",
+        "password": ""
+    },
     "other": {
         "rememberStationTime": 30,
         "lowPowerMode": false,

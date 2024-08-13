@@ -49,6 +49,9 @@ namespace WEB_Utils {
     }
 
     void handleHome(AsyncWebServerRequest *request) {
+        if(Config.webadmin.active && !request->authenticate(Config.webadmin.username.c_str(), Config.webadmin.password.c_str()))
+            return request->requestAuthentication();
+
         AsyncWebServerResponse *response = request->beginResponse_P(200, "text/html", (const uint8_t*)web_index_html, web_index_html_len);
         response->addHeader("Content-Encoding", "gzip");
         request->send(response);
@@ -61,6 +64,9 @@ namespace WEB_Utils {
     }
 
     void handleReadConfiguration(AsyncWebServerRequest *request) {
+        if(Config.webadmin.active && !request->authenticate(Config.webadmin.username.c_str(), Config.webadmin.password.c_str()))
+            return request->requestAuthentication();
+
         File file = SPIFFS.open("/igate_conf.json");
         
         String fileContent;
@@ -192,6 +198,12 @@ namespace WEB_Utils {
         Config.lowVoltageCutOff             = request->getParam("other.lowVoltageCutOff", true)->value().toDouble();
 
         Config.personalNote                 = request->getParam("personalNote", true)->value();
+
+        Config.webadmin.active              = request->hasParam("webadmin.active", true);
+        if (Config.webadmin.active) {
+            Config.webadmin.username        = request->getParam("webadmin.username", true)->value();
+            Config.webadmin.password        = request->getParam("webadmin.password", true)->value();
+        }
 
         Config.writeFile();
 

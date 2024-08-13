@@ -201,6 +201,11 @@ function loadSettings(settings) {
     document.getElementById("ota.username").value                       = settings.ota.username;
     document.getElementById("ota.password").value                       = settings.ota.password;
 
+    // Webadmin
+    document.getElementById("webadmin.active").checked                  = settings.webadmin.active;
+    document.getElementById("webadmin.username").value                  = settings.webadmin.username;
+    document.getElementById("webadmin.password").value                  = settings.webadmin.password;
+
     // Experimental
     document.getElementById("other.backupDigiMode").checked             = settings.other.backupDigiMode;
 
@@ -276,6 +281,20 @@ function toggleFields() {
     externalVoltagePinInput.disabled = !sendExternalVoltageCheckbox.checked;
     voltageDividerR1.disabled = !sendExternalVoltageCheckbox.checked;
     voltageDividerR2.disabled = !sendExternalVoltageCheckbox.checked;
+
+    const WebadminCheckbox = document.querySelector(
+        'input[name="webadmin.active"]'
+    );
+
+    const WebadminUsername = document.querySelector(
+        'input[name="webadmin.username"]'
+    );
+
+    const WebadminPassword = document.querySelector(
+        'input[name="webadmin.password"]'
+    );
+    WebadminUsername.disabled = !WebadminCheckbox.checked;
+    WebadminPassword.disabled = !WebadminCheckbox.checked;
 }
 
 const sendExternalVoltageCheckbox = document.querySelector(
@@ -297,6 +316,22 @@ sendExternalVoltageCheckbox.addEventListener("change", function () {
     externalVoltagePinInput.disabled = !this.checked;
     voltageDividerR1.disabled = !this.checked;
     voltageDividerR2.disabled = !this.checked;
+});
+
+const WebadminCheckbox = document.querySelector(
+    'input[name="webadmin.active"]'
+);
+
+const WebadminUsername = document.querySelector(
+    'input[name="webadmin.username"]'
+);
+
+const WebadminPassword = document.querySelector(
+    'input[name="webadmin.password"]'
+);
+WebadminCheckbox.addEventListener("change", function () {
+    WebadminUsername.disabled = !this.checked;
+    WebadminPassword.disabled = !this.checked;
 });
 
 document.querySelector(".new button").addEventListener("click", function () {

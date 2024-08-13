@@ -110,7 +110,9 @@ namespace WIFI_Utils {
         #endif
         if (WiFi.status() == WL_CONNECTED) {
             Serial.print("Connected as ");
-            Serial.println(WiFi.localIP());
+            Serial.print(WiFi.localIP());
+            Serial.print(" / MAC Address: ");
+            Serial.println(WiFi.macAddress());
             show_display("", "     Connected!!", "" , "     loading ...", 1000);
         } else if (WiFi.status() != WL_CONNECTED) {
             startAP = true;
