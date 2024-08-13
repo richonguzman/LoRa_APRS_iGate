@@ -5,6 +5,7 @@
 #include "query_utils.h"
 #include "digi_utils.h"
 #include "wifi_utils.h"
+#include "lora_utils.h"
 #include "gps_utils.h"
 #include "display.h"
 #include "utils.h"
@@ -102,7 +103,7 @@ namespace DIGI_Utils {
                     if (!thirdPartyPacket && !Utils::checkValidCallsign(Sender)) {
                         return;
                     }
-                    if (STATION_Utils::check25SegBuffer(Sender, temp.substring(temp.indexOf(":") + 2))) {
+                    if (STATION_Utils::check25SegBuffer(Sender, temp.substring(temp.indexOf(":") + 2)) || Config.lowPowerMode) {
                         STATION_Utils::updateLastHeard(Sender);
                         Utils::typeOfPacket(temp, 2);    // Digi
                         bool queryMessage = false;
@@ -117,7 +118,11 @@ namespace DIGI_Utils {
                         if (!queryMessage) {
                             String loraPacket = generateDigiRepeatedPacket(packet.substring(3), thirdPartyPacket);
                             if (loraPacket != "") {
-                                STATION_Utils::addToOutputPacketBuffer(loraPacket);
+                                if (Config.lowPowerMode) {
+                                    LoRa_Utils::sendNewPacket(loraPacket);
+                                } else {
+                                    STATION_Utils::addToOutputPacketBuffer(loraPacket);
+                                }
                                 display_toggle(true);
                                 lastScreenOn = millis();
                             }
