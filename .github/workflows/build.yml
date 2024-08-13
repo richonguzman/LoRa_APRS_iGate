@@ -33,6 +33,8 @@ jobs:
                       chip: esp32
                     - name: ESP32_DIY_1W_LoRa_915
                       chip: esp32
+                    - name: ESP32_DIY_1W_LoRa_Mesh_V1_2
+                      chip: esp32
                     - name: ttgo-t-beam-v1_2
                       chip: esp32
                     - name: ttgo-t-beam-v1_2_915
@@ -62,6 +64,8 @@ jobs:
                     - name: esp32c3_DIY_1W_LoRa
                       chip: esp32c3
                     - name: esp32c3_DIY_1W_LoRa_915
+                      chip: esp32c3
+                    - name: ESP32_C3_OctopusLab_LoRa
                       chip: esp32c3
         steps:
             - uses: actions/checkout@v3
