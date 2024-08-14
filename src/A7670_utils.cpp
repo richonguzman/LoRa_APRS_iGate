@@ -33,7 +33,7 @@
         bool checkModemOn() {
             bool modemReady = false;
             Serial.print("Starting Modem ...              ");
-            show_display(firstLine, "Starting Modem...", " ", " ", 0);
+            displayShow(firstLine, "Starting Modem...", " ", " ", 0);
 
             pinMode(A7670_ResetPin, OUTPUT);        //A7670 Reset
             digitalWrite(A7670_ResetPin, LOW);
@@ -60,7 +60,7 @@
                         modemReady = true;
                         i = 1;
                         Serial.println("Modem Ready!\n");
-                        show_display(firstLine, "Starting Modem...", "---> Modem Ready", " ", 0);
+                        displayShow(firstLine, "Starting Modem...", "---> Modem Ready", " ", 0);
                         return true;
                     }
                 }
@@ -78,7 +78,7 @@
                 delay(1000);
                 //setup_gps();      // if gps active / won't be need for now
             } else {
-                show_display(firstLine, "Starting Modem...", "---> Failed !!!", " ", 0);
+                displayShow(firstLine, "Starting Modem...", "---> Failed !!!", " ", 0);
                 Serial.println(F("*********** Failed to connect to the modem! ***********"));
             }
         }
@@ -98,26 +98,26 @@
                     //Serial.println(response); // DEBUG of Modem AT message
                     if(response.indexOf("verified") >= 0) {
                         Serial.println("Logged! (User Validated)\n");
-                        show_display(firstLine, "Connecting APRS-IS...", "---> Logged!", " ", 1000);
+                        displayShow(firstLine, "Connecting APRS-IS...", "---> Logged!", " ", 1000);
                         Serial.println("####################   APRS-IS FEED   ####################");
                         validAT = true;
                         i = 1;
                         delayATMessage = 0;
                     } else if (ATMessage == "AT+NETOPEN" && response.indexOf("OK") >= 0) {
                         Serial.println("Port Open!");
-                        show_display(firstLine, "Opening Port...", "---> Port Open", " ", 0);
+                        displayShow(firstLine, "Opening Port...", "---> Port Open", " ", 0);
                         validAT = true;
                         i = 1;
                         delayATMessage = 0;
                     } else if (ATMessage == "AT+NETOPEN" && response.indexOf("Network is already opened") >= 0) {
                         Serial.println("Port Open! (was already opened)");
-                        show_display(firstLine, "Opening Port...", "---> Port Open", " ", 0);
+                        displayShow(firstLine, "Opening Port...", "---> Port Open", " ", 0);
                         validAT = true;
                         i = 1;
                         delayATMessage = 0;
                     } else if (ATMessage.indexOf("AT+CIPOPEN") == 0 && response.indexOf("PB DONE") >= 0) {
                         Serial.println("Contacted!");
-                        show_display(firstLine, "Connecting APRS-IS...", "---> Contacted", " ", 0);
+                        displayShow(firstLine, "Connecting APRS-IS...", "---> Contacted", " ", 0);
                         validAT = true;
                         i = 1;
                         delayATMessage = 0;
@@ -155,17 +155,17 @@
             Serial.println("-----> Connecting to APRS IS");
             while (!modemStartUp) {
                 Serial.print("Opening Port...                 ");
-                show_display(firstLine, "Opening Port...", " ", " ", 0);
+                displayShow(firstLine, "Opening Port...", " ", " ", 0);
                 modemStartUp = checkATResponse("AT+NETOPEN");
                 delay(2000);
             } while (!serverStartUp) {
                 Serial.print("Connecting APRS-IS Server...    ");
-                show_display(firstLine, "Connecting APRS-IS...", " ", " ", 0);
+                displayShow(firstLine, "Connecting APRS-IS...", " ", " ", 0);
                 serverStartUp = checkATResponse("AT+CIPOPEN=0,\"TCP\",\"" + String(Config.aprs_is.server) + "\"," + String(Config.aprs_is.port));
                 delay(2000);
             } while (!userBytesSended) {
                 Serial.print("Writing User Login Data       ");
-                show_display(firstLine, "Connecting APRS-IS...", "---> User Login Data", " ", 0);
+                displayShow(firstLine, "Connecting APRS-IS...", "---> User Login Data", " ", 0);
                 userBytesSended = checkATResponse("AT+CIPSEND=0," + String(loginInfo.length()+1));
                 delay(2000);
             } while (!modemLoggedToAPRSIS) {

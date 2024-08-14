@@ -77,7 +77,7 @@ namespace APRS_IS_Utils {
                 wifiState = "AP";
             }            
             if (!Config.display.alwaysOn && Config.display.timeout != 0) {
-                display_toggle(true);
+                displayToggle(true);
             }
             lastScreenOn = millis();
         }
@@ -99,7 +99,7 @@ namespace APRS_IS_Utils {
                 }
             #endif
             if(aprsisState == "--" && !Config.display.alwaysOn && Config.display.timeout != 0) {
-                display_toggle(true);
+                displayToggle(true);
                 lastScreenOn = millis();
             }            
         }
@@ -160,11 +160,11 @@ namespace APRS_IS_Utils {
         }
         if (receivedMessage.indexOf("?") == 0) {
             if (!Config.display.alwaysOn && Config.display.timeout != 0) {
-                display_toggle(true);
+                displayToggle(true);
             }
             STATION_Utils::addToOutputPacketBuffer(QUERY_Utils::process(receivedMessage, sender, false, thirdParty));
             lastScreenOn = millis();
-            show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, "Callsign = " + sender, "TYPE --> QUERY", 0);
+            displayShow(firstLine, secondLine, thirdLine, fourthLine, fifthLine, "Callsign = " + sender, "TYPE --> QUERY", 0);
             return true;
         }
         else {
@@ -192,7 +192,7 @@ namespace APRS_IS_Utils {
                             if (!queryMessage) {
                                 const String& aprsPacket = buildPacketToUpload(packet);
                                 if (!Config.display.alwaysOn && Config.display.timeout != 0) {
-                                    display_toggle(true);
+                                    displayToggle(true);
                                 }
                                 lastScreenOn = millis();
                                 #ifdef HAS_A7670
@@ -203,7 +203,7 @@ namespace APRS_IS_Utils {
                                     upload(aprsPacket);
                                 #endif
                                 Utils::println("---> Uploaded to APRS-IS");
-                                show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
+                                displayShow(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
                             }
                         }
                     }                    
@@ -294,7 +294,7 @@ namespace APRS_IS_Utils {
                         String queryAnswer = QUERY_Utils::process(receivedMessage, Sender, true, false);
                         //Serial.println("---> QUERY Answer : " + queryAnswer.substring(0,queryAnswer.indexOf("\n")));
                         if (!Config.display.alwaysOn && Config.display.timeout != 0) {
-                            display_toggle(true);
+                            displayToggle(true);
                         }
                         lastScreenOn = millis();
                         delay(500);
@@ -318,16 +318,16 @@ namespace APRS_IS_Utils {
                     Utils::print("Received Message from APRS-IS  : " + packet);
                     if (STATION_Utils::wasHeard(Addressee)) {
                         STATION_Utils::addToOutputPacketBuffer(buildPacketToTx(packet, 1));
-                        display_toggle(true);
+                        displayToggle(true);
                         lastScreenOn = millis();
                         Utils::typeOfPacket(packet, 1); // APRS-LoRa
                     }
                 }
-                show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
+                displayShow(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
             } else if (Config.aprs_is.objectsToRF && packet.indexOf(":;") > 0) {
                 Utils::println("Received Object from APRS-IS  : " + packet);
                 STATION_Utils::addToOutputPacketBuffer(buildPacketToTx(packet, 5));
-                display_toggle(true);
+                displayToggle(true);
                 lastScreenOn = millis();
                 Utils::typeOfPacket(packet, 1); // APRS-LoRa
             }

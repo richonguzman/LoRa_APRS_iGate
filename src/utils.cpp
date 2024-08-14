@@ -79,12 +79,12 @@ namespace Utils {
     }
 
     void setupDisplay() {
-        setup_display();
+        displaySetup();
         #ifdef INTERNAL_LED_PIN
             digitalWrite(INTERNAL_LED_PIN,HIGH);
         #endif
         Serial.println("\nStarting Station: " + Config.callsign + "   Version: " + versionDate);
-        show_display(" LoRa APRS", "", "   ( iGATE & DIGI )", "", "", "Richonguzman / CA2RXU", "      " + versionDate, 4000);
+        displayShow(" LoRa APRS", "", "", "   ( iGATE & DIGI )", "", "" , "  CA2RXU  " + versionDate, 4000);
         #ifdef INTERNAL_LED_PIN
             digitalWrite(INTERNAL_LED_PIN,LOW);
         #endif
@@ -110,7 +110,7 @@ namespace Utils {
 
         if (beaconUpdate) {
             if (!Config.display.alwaysOn && Config.display.timeout != 0) {
-                display_toggle(true);
+                displayToggle(true);
             }
             Utils::println("-- Sending Beacon to APRSIS --");
 
@@ -172,7 +172,7 @@ namespace Utils {
             }
 
             if (Config.aprs_is.active && Config.beacon.sendViaAPRSIS && !backUpDigiMode) {
-                show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING IGATE BEACON", 0); 
+                displayShow(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING IGATE BEACON", 0); 
                 seventhLine = "     listening...";
                 #ifdef HAS_A7670
                     A7670_Utils::uploadToAPRSIS(beaconPacket);
@@ -182,7 +182,7 @@ namespace Utils {
             }
 
             if (Config.beacon.sendViaRF || backUpDigiMode) {
-                show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING DIGI BEACON", 0);
+                displayShow(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING DIGI BEACON", 0);
                 seventhLine = "     listening...";
                 STATION_Utils::addToOutputPacketBuffer(secondaryBeaconPacket);
             }
@@ -200,14 +200,14 @@ namespace Utils {
     void checkDisplayInterval() {
         uint32_t lastDisplayTime = millis() - lastScreenOn;
         if (!Config.display.alwaysOn && lastDisplayTime >= Config.display.timeout * 1000) {
-            display_toggle(false);
+            displayToggle(false);
         }
     }
 
     void validateFreqs() {
         if (Config.loramodule.txFreq != Config.loramodule.rxFreq && abs(Config.loramodule.txFreq - Config.loramodule.rxFreq) < 125000) {
             Serial.println("Tx Freq less than 125kHz from Rx Freq ---> NOT VALID");
-            show_display("Tx Freq is less than ", "125kHz from Rx Freq", "device will autofix", "and then reboot", 1000);
+            displayShow("Tx Freq is less than ", "125kHz from Rx Freq", "device will autofix", "and then reboot", 1000);
             Config.loramodule.txFreq = Config.loramodule.rxFreq; // Inform about that but then change the TX QRG to RX QRG and reset the device
             Config.writeFile();
             ESP.restart();
@@ -313,7 +313,7 @@ namespace Utils {
             Serial.println("\n\n*** Sleeping Low Battey Voltage ***\n\n");
             esp_sleep_enable_timer_wakeup(30 * 60 * 1000000); // sleep 30 min
             if (mode == 1) {
-                display_toggle(false);
+                displayToggle(false);
             }
             #ifdef VEXT_CTRL
                 #ifndef HELTEC_WSL_V3

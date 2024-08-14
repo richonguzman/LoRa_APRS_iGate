@@ -123,7 +123,7 @@ namespace DIGI_Utils {
                                 } else {
                                     STATION_Utils::addToOutputPacketBuffer(loraPacket);
                                 }
-                                display_toggle(true);
+                                displayToggle(true);
                                 lastScreenOn = millis();
                             }
                         }

@@ -29,31 +29,31 @@ namespace OTA_Utils {
 
     void onOTAStart() {
         Serial.println("OTA update started!");
-        display_toggle(true);
+        displayToggle(true);
         lastScreenOn = millis();
-        show_display("", "", "", " OTA update started!", "", "", "", 1000);
+        displayShow("", "", "", " OTA update started!", "", "", "", 1000);
         isUpdatingOTA = true;
     }
 
     void onOTAProgress(size_t current, size_t final) {
         if (millis() - ota_progress_millis > 1000) {
-            display_toggle(true);
+            displayToggle(true);
             lastScreenOn = millis();
             ota_progress_millis = millis();
             Serial.printf("OTA Progress Current: %u bytes, Final: %u bytes\n", current, final);
-            show_display("", "", "  OTA Progress : " + String((current*100)/final) + "%", "", "", "", "", 100);
+            displayShow("", "", "  OTA Progress : " + String((current*100)/final) + "%", "", "", "", "", 100);
         }
     }
 
     void onOTAEnd(bool success) {
-        display_toggle(true);
+        displayToggle(true);
         lastScreenOn = millis();
         if (success) {
             Serial.println("OTA update finished successfully!");
-            show_display("", "", " OTA update success!", "", "    Rebooting ...", "", "", 4000);
+            displayShow("", "", " OTA update success!", "", "    Rebooting ...", "", "", 4000);
         } else {
             Serial.println("There was an error during OTA update!");
-            show_display("", "", " OTA update fail!", "", "", "", "", 4000);
+            displayShow("", "", " OTA update fail!", "", "", "", "", 4000);
         }
         isUpdatingOTA = false;
     }

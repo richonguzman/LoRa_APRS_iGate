@@ -68,7 +68,7 @@ void setup() {
     GPS_Utils::generateBeacons();
 
     #ifdef STARTUP_DELAY    // (TEST) just to wait for WiFi init of Routers
-    show_display("", "  STARTUP DELAY ...", "", "", 0);
+    displayShow("", "  STARTUP DELAY ...", "", "", 0);
     delay(STARTUP_DELAY * 60 * 1000);
     #endif
 
@@ -181,7 +181,7 @@ void loop() {
     
     STATION_Utils::processOutputPacketBuffer();
 
-    show_display(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
+    displayShow(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
     Utils::checkRebootTime();
     Utils::checkSleepByLowBatteryVoltage(1);
 }

@@ -93,7 +93,7 @@ namespace BME_Utils {
                     }
                 }                
                 if (!wxModuleFound) {
-                    show_display("ERROR", "", "BME/BMP/Si7021 sensor active", "but no sensor found...", 2000);
+                    displayShow("ERROR", "", "BME/BMP/Si7021 sensor active", "but no sensor found...", 2000);
                     Serial.println("BME/BMP/Si7021 sensor Active in config but not found! Check Wiring");
                 } else {
                     switch (wxModuleType) {

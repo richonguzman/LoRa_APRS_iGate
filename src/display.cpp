@@ -39,7 +39,7 @@ void cleanTFT() {
     #endif
 }
 
-void setup_display() {
+void displaySetup() {
     #ifdef HAS_DISPLAY
         delay(500);
         #ifdef HAS_TFT
@@ -83,7 +83,7 @@ void setup_display() {
     #endif
 }
 
-void display_toggle(bool toggle) {
+void displayToggle(bool toggle) {
     #ifdef HAS_DISPLAY
         if (toggle) {
             #ifdef HAS_TFT
@@ -128,7 +128,7 @@ bool shouldCleanTFT(const String& header, const String& line1, const String& lin
     }
 }
 
-void show_display(const String& header, const String& line1, const String& line2, const String& line3, int wait) {
+void displayShow(const String& header, const String& line1, const String& line2, const String& line3, int wait) {
     #ifdef HAS_DISPLAY
         const String* const lines[] = {&line1, &line2, &line3};
         #ifdef HAS_TFT
@@ -162,7 +162,7 @@ void show_display(const String& header, const String& line1, const String& line2
     #endif
 }
 
-void show_display(const String& header, const String& line1, const String& line2, const String& line3, const String& line4, const String& line5, const String& line6, int wait) {
+void displayShow(const String& header, const String& line1, const String& line2, const String& line3, const String& line4, const String& line5, const String& line6, int wait) {
     #ifdef HAS_DISPLAY
         const String* const lines[] = {&line1, &line2, &line3, &line4, &line5, &line6};
         #ifdef HAS_TFT

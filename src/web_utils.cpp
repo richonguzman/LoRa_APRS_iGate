@@ -210,7 +210,7 @@ namespace WEB_Utils {
         AsyncWebServerResponse *response    = request->beginResponse(302, "text/html", "");
         response->addHeader("Location", "/");
         request->send(response);
-        display_toggle(false);
+        displayToggle(false);
         ESP.restart();
     }
 
@@ -222,7 +222,7 @@ namespace WEB_Utils {
 
             request->send(200, "text/plain", "Beacon will be sent in a while");
         } else if (type == "reboot") {
-            display_toggle(false);
+            displayToggle(false);
             ESP.restart();
         } else {
             request->send(404, "text/plain", "Not Found");
