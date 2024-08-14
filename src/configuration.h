@@ -115,7 +115,6 @@ public:
 
 class Configuration {
 public:
-    bool                    reload;     // ?
     String                  callsign;
     int                     rememberStationTime;
     bool                    lowPowerMode;
@@ -140,7 +139,6 @@ public:
   
     void init();
     void writeFile();
-    void check();
     Configuration();
 
 private:

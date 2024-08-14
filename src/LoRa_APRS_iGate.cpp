@@ -38,7 +38,7 @@ ________________________________________________________________________________
     #include "A7670_utils.h"
 #endif
 
-String          versionDate             = "2024.08.13";
+String          versionDate             = "2024.08.14";
 Configuration   Config;
 WiFiClient      espClient;
 
@@ -63,7 +63,6 @@ void setup() {
     POWER_Utils::setup();
     BATTERY_Utils::setup();
     Utils::setupDisplay();
-    Config.check();
     LoRa_Utils::setup();
     Utils::validateFreqs();
     GPS_Utils::generateBeacons();
