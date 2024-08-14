@@ -63,6 +63,7 @@ namespace GPS_Utils {
             Config.aprs_is.objectsToRF  = false;
             Config.beacon.sendViaRF     = false;
             Config.digi.mode            = 0;
+            Config.backupDigiMode       = false;
         }   
         String beaconPacket = Config.callsign;
         beaconPacket += ">APLRG1";
