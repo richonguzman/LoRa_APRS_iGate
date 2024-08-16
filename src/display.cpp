@@ -219,3 +219,4 @@ void displayShow(const String& header, const String& line1, const String& line2,
         #endif
         delay(wait);
     #endif
+}
