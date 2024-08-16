@@ -35,6 +35,7 @@ extern int                  wxModuleType;
 extern bool                 backUpDigiMode;
 extern bool                 shouldSleepLowVoltage;
 extern bool                 transmitFlag;
+extern bool                 WiFiAutoAPStarted;
 
 bool        statusAfterBoot     = true;
 bool        beaconUpdate        = true;
@@ -69,11 +70,16 @@ namespace Utils {
     }
 
     String getLocalIP() {
-        if (!WiFiConnected) {
+        if (!WiFiConnected && WiFiAutoAPStarted) {
             return "IP :  192.168.4.1";
-        } else if (backUpDigiMode) {
+        } 
+        else if (backUpDigiMode) {
             return "- BACKUP DIGI MODE -";
-        } else {
+        } 
+        else if (!WiFiConnected) {
+            return "IP :  -";
+        }
+        else {
             return "IP :  " + String(WiFi.localIP()[0]) + "." + String(WiFi.localIP()[1]) + "." + String(WiFi.localIP()[2]) + "." + String(WiFi.localIP()[3]);
         }        
     }

@@ -18,6 +18,7 @@ bool        WiFiAutoAPStarted   = false;
 uint32_t    previousWiFiMillis  = 0;
 uint8_t     wifiCounter         = 0;
 uint32_t    lastBackupDigiTime  = millis();
+bool        WiFiAutoAPFirsttime = true;
 
 
 namespace WIFI_Utils {
@@ -62,12 +63,15 @@ namespace WIFI_Utils {
 
         WiFiAutoAPTime = millis();
         WiFiAutoAPStarted = true;
+        WiFiAutoAPFirsttime = false;
     }
 
     void startWiFi() {
         bool startAP = false;
-        if (currentWiFi->ssid == "") {
+        if (currentWiFi->ssid == "" && WiFiAutoAPFirsttime ) {
             startAP = true;
+        } else if (currentWiFi->ssid == "" ) {
+            startAP = false; 
         } else {
             uint8_t wifiCounter = 0;
             WiFi.mode(WIFI_STA);
@@ -114,17 +118,21 @@ namespace WIFI_Utils {
             Serial.print(" / MAC Address: ");
             Serial.println(WiFi.macAddress());
             displayShow("", "     Connected!!", "" , "     loading ...", 1000);
+            WiFiConnected = true;
         } else if (WiFi.status() != WL_CONNECTED) {
-            startAP = true;
-
-            Serial.println("\nNot connected to WiFi! Starting Auto AP");
+            
+            Serial.println("\nNot connected to WiFi!");
             displayShow("", " WiFi Not Connected!", "" , "     loading ...", 1000);
+            WiFi.disconnect();
+            WiFi.mode(WIFI_MODE_NULL);
+            WiFiConnected = false;
+            startAP = true;
         }
-        WiFiConnected = !startAP;
-        if (startAP) {
+        
+        if (startAP && WiFiAutoAPFirsttime && !backUpDigiMode) {
             Serial.println("\nNot connected to WiFi! Starting Auto AP");
             displayShow("", "   Starting Auto AP", " Please connect to it " , "     loading ...", 1000);
-
+            WiFiConnected = false;
             startAutoAP();
         }
     }
@@ -141,7 +149,7 @@ namespace WIFI_Utils {
 
                     WiFiAutoAPStarted = false;
                     WiFi.softAPdisconnect(true);
-
+                    WiFi.mode(WIFI_MODE_NULL);
                     Serial.println("Auto AP stopped (timeout)");
                 }
             }
