@@ -154,13 +154,16 @@ namespace POWER_Utils {
             #ifndef HELTEC_WSL_V3
                 digitalWrite(VEXT_CTRL, HIGH);
             #endif
+            #ifdef HELTEC_WP
+                digitalWrite(VEXT_CTRL, LOW);
+            #endif
         #endif
         
         #ifdef ADC_CTRL
             pinMode(ADC_CTRL, OUTPUT);
         #endif
 
-        #ifdef HELTEC_WIRELESS_TRACKER
+        #if defined(HELTEC_WIRELESS_TRACKER) || defined(HELTEC_WP)
             Wire.begin(BOARD_I2C_SDA, BOARD_I2C_SCL);
         #endif
 
