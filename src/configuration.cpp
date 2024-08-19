@@ -137,8 +137,8 @@ bool Configuration::readFile() {
         beacon.comment                  = data["beacon"]["comment"] | "LoRa APRS";
         beacon.interval                 = data["beacon"]["interval"] | 15;
         beacon.overlay                  = data["beacon"]["overlay"] | "L";
-        beacon.symbol                   = data["beacon"]["symbol"] | "a";     
-        beacon.path                     = data["beacon"]["path"] | "WIDE1-1";   
+        beacon.symbol                   = data["beacon"]["symbol"] | "a";
+        beacon.path                     = data["beacon"]["path"] | "WIDE1-1";
         beacon.sendViaAPRSIS            = data["beacon"]["sendViaAPRSIS"] | false;
         beacon.sendViaRF                = data["beacon"]["sendViaRF"] | false;
         

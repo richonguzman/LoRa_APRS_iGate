@@ -152,24 +152,26 @@ namespace Utils {
                 }
             #endif
 
-            if (Config.battery.sendExternalVoltage || Config.battery.monitorExternalVoltage) {
-                float externalVoltage       = BATTERY_Utils::checkExternalVoltage();
-                String externalVoltageInfo  = String(externalVoltage,2) + "V";
-                if (Config.battery.sendExternalVoltage) {
-                    beaconPacket            += " Ext=";
-                    beaconPacket            += externalVoltageInfo;
-                    secondaryBeaconPacket   += " Ext=";
-                    secondaryBeaconPacket   += externalVoltageInfo;
-                    sixthLine               = "    (Ext V=";
-                    sixthLine               += externalVoltageInfo;
-                    sixthLine               += ")";
+            #ifndef HELTEC_WP
+                if (Config.battery.sendExternalVoltage || Config.battery.monitorExternalVoltage) {
+                    float externalVoltage       = BATTERY_Utils::checkExternalVoltage();
+                    String externalVoltageInfo  = String(externalVoltage,2) + "V";
+                    if (Config.battery.sendExternalVoltage) {
+                        beaconPacket            += " Ext=";
+                        beaconPacket            += externalVoltageInfo;
+                        secondaryBeaconPacket   += " Ext=";
+                        secondaryBeaconPacket   += externalVoltageInfo;
+                        sixthLine               = "    (Ext V=";
+                        sixthLine               += externalVoltageInfo;
+                        sixthLine               += ")";
+                    }
+                    if (Config.battery.monitorExternalVoltage && externalVoltage < Config.battery.externalSleepVoltage) {
+                        beaconPacket            += " **ExtBatWarning:SLEEP**";
+                        secondaryBeaconPacket   += " **ExtBatWarning:SLEEP**";
+                        shouldSleepLowVoltage   = true;
+                    }
                 }
-                if (Config.battery.monitorExternalVoltage && externalVoltage < Config.battery.externalSleepVoltage) {
-                    beaconPacket            += " **ExtBatWarning:SLEEP**";
-                    secondaryBeaconPacket   += " **ExtBatWarning:SLEEP**";
-                    shouldSleepLowVoltage   = true;
-                }
-            }
+            #endif
 
             if (Config.aprs_is.active && Config.beacon.sendViaAPRSIS && !backUpDigiMode) {
                 displayShow(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING IGATE BEACON", 0); 

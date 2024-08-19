@@ -210,9 +210,11 @@ namespace BATTERY_Utils {
                 shouldSleepLowVoltage = true;
             }
         #endif
-        if (Config.battery.monitorExternalVoltage && checkExternalVoltage() < Config.battery.externalSleepVoltage + 0.1) {
-            shouldSleepLowVoltage = true;
-        }
+        #ifndef HELTEC_WP
+            if (Config.battery.monitorExternalVoltage && checkExternalVoltage() < Config.battery.externalSleepVoltage + 0.1) {
+                shouldSleepLowVoltage = true;
+            }
+        #endif
         if (shouldSleepLowVoltage) {
             Utils::checkSleepByLowBatteryVoltage(0);
         }
