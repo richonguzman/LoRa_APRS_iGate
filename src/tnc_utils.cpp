@@ -29,7 +29,7 @@ namespace TNC_Utils {
     }
 
     void checkNewClients() {
-        WiFiClient new_client = tncServer.available();
+        WiFiClient new_client = tncServer.accept();
         if (new_client.connected()) {
             for (int i = 0; i < MAX_CLIENTS; i++) {
                 WiFiClient* client = clients[i];
