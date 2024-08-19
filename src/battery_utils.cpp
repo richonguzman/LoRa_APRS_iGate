@@ -136,7 +136,12 @@ namespace BATTERY_Utils {
                 #if defined(HELTEC_V3) || defined(HELTEC_V2) || defined(HELTEC_WSL_V3) || defined(HELTEC_WP)
                     digitalWrite(ADC_CTRL, HIGH);
                 #endif
+
+                #ifdef HELTEC_WP
+                double inputDivider = (1.0 / (10.0 + 10.0)) * 10.0;  // The voltage divider is a 10k + 10k resistor in series
+                #else
                 double inputDivider = (1.0 / (390.0 + 100.0)) * 100.0;  // The voltage divider is a 390k + 100k resistor in series, 100k on the low side.
+                #endif
                 return (((sampleSum/100) * adcReadingTransformation) / inputDivider) + 0.285; // Yes, this offset is excessive, but the ADC on the ESP32s3 is quite inaccurate and noisy. Adjust to own measurements.
             #else
                 #ifdef HAS_ADC_CALIBRATION
