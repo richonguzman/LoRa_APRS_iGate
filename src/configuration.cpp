@@ -150,7 +150,7 @@ bool Configuration::readFile() {
         aprs_is.messagesToRF            = data["aprs_is"]["messagesToRF"] | false;
         aprs_is.objectsToRF             = data["aprs_is"]["objectsToRF"] | false;
         
-        digi.mode                       = data["digi"]["mode"].as<int>();
+        digi.mode                       = data["digi"]["mode"] | 0;
 
         loramodule.txFreq               = data["lora"]["txFreq"] | 433775000;
         loramodule.rxFreq               = data["lora"]["rxFreq"] | 433775000;
