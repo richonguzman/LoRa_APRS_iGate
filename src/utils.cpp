@@ -246,7 +246,7 @@ namespace Utils {
         } else if (packet[firstColonIndex + 1] == '>') {
             sixthLine += "> NEW STATUS";
             seventhLine = seventhLineHelper;
-        } else if (packet[firstColonIndex + 1] == '!' || packet[firstColonIndex + 1] == '=') {
+        } else if (packet[firstColonIndex + 1] == '!' || packet[firstColonIndex + 1] == '=' || packet[firstColonIndex + 1] == '@') {
             sixthLine += "> GPS BEACON";
             if (!Config.syslog.active) {
                 GPS_Utils::getDistanceAndComment(packet);       // to be checked!!!
