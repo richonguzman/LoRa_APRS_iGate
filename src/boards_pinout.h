@@ -140,7 +140,7 @@
     #define OLED_RST    -1      // Reset pin # (or -1 if sharing Arduino reset pin)
 #endif
 
-#ifdef HELTEC_V2
+#if defined(HELTEC_V2)
     #define OLED_SDA    4
     #define OLED_SCL    15
     #define OLED_RST    16
@@ -179,7 +179,7 @@
     #define INTERNAL_LED_PIN    35
     #define BATTERY_PIN         1
     #define VEXT_CTRL           36
-    #define ADC_CTRL            37 // Heltec WSL_V3 just like Heltec WT
+    #define ADC_CTRL            37
     #define BOARD_I2C_SDA       41
     #define BOARD_I2C_SCL       42
     #ifdef HELTEC_WSL_V3_DISPLAY

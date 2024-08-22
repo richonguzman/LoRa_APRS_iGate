@@ -67,7 +67,7 @@ void displaySetup() {
                     digitalWrite(OLED_RST, HIGH);
                 #endif
 
-                #ifndef HELTEC_WSL_V3_DISPLAY
+                #if defined(HELTEC_WS) || defined(HELTEC_WSL_V3_DISPLAY)
                     Wire.begin(OLED_SDA, OLED_SCL);
                 #endif
 
