@@ -47,6 +47,7 @@ __(This iGate Firmware works with all LoRa Tracker Firmwares (specially this <a 
 
 ## Timeline (Versions):
 
+- 2024.08.23 Wemos S2 Mini DIY LoRa added.
 - 2024.08.19 HELTEC Wireless Paper working (still missing Epaper code).
 - 2024.08.13 Web Authentication for WebUI. Thanks Mitja S57PNX.
 - 2024.08.05 WIDE2-n added to WIDE1-n in Digirepeater Modes.
