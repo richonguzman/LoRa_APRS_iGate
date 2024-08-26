@@ -137,8 +137,8 @@ bool Configuration::readFile() {
         beacon.comment                  = data["beacon"]["comment"] | "LoRa APRS";
         beacon.interval                 = data["beacon"]["interval"] | 15;
         beacon.overlay                  = data["beacon"]["overlay"] | "L";
-        beacon.symbol                   = data["beacon"]["symbol"] | "a";     
-        beacon.path                     = data["beacon"]["path"] | "WIDE1-1";   
+        beacon.symbol                   = data["beacon"]["symbol"] | "a";
+        beacon.path                     = data["beacon"]["path"] | "WIDE1-1";
         beacon.sendViaAPRSIS            = data["beacon"]["sendViaAPRSIS"] | false;
         beacon.sendViaRF                = data["beacon"]["sendViaRF"] | false;
         
@@ -150,7 +150,7 @@ bool Configuration::readFile() {
         aprs_is.messagesToRF            = data["aprs_is"]["messagesToRF"] | false;
         aprs_is.objectsToRF             = data["aprs_is"]["objectsToRF"] | false;
         
-        digi.mode                       = data["digi"]["mode"].as<int>();
+        digi.mode                       = data["digi"]["mode"] | 0;
 
         loramodule.txFreq               = data["lora"]["txFreq"] | 433775000;
         loramodule.rxFreq               = data["lora"]["rxFreq"] | 433775000;

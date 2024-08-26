@@ -18,7 +18,7 @@
     #define RADIO_BUSY_PIN  26      // GPIO26   - SX1278 IRQ ---->DIO0
 #endif
 
-#if defined(HELTEC_V3) || defined(HELTEC_WSL_V3) || defined(HELTEC_WSL_V3_DISPLAY) || defined(HELTEC_WIRELESS_TRACKER) || defined(HELTEC_WS)
+#if defined(HELTEC_V3) || defined(HELTEC_WSL_V3) || defined(HELTEC_WSL_V3_DISPLAY) || defined(HELTEC_WIRELESS_TRACKER) || defined(HELTEC_WS) || defined(HELTEC_WP)
     #define RADIO_SCLK_PIN  9   // SX1262 SCK
     #define RADIO_MISO_PIN  11  // SX1262 MISO
     #define RADIO_MOSI_PIN  10  // SX1262 MOSI
@@ -84,7 +84,7 @@
     #define RADIO_TXEN          13
 #endif
 
-#ifdef HELTEC_HTCT62
+#if defined(HELTEC_HTCT62)
     #define RADIO_SCLK_PIN  10   // SX1262 SCK
     #define RADIO_MISO_PIN  6    // SX1262 MISO
     #define RADIO_MOSI_PIN  7    // SX1262 MOSI
@@ -132,6 +132,15 @@
     #define RADIO_TXEN          7
 #endif
 
+#ifdef WEMOS_S2_MINI_DIY_LoRa
+    #define RADIO_SCLK_PIN  36
+    #define RADIO_MISO_PIN  37
+    #define RADIO_MOSI_PIN  35
+    #define RADIO_CS_PIN    34
+    #define RADIO_BUSY_PIN  38
+    #define RADIO_RST_PIN   33
+#endif
+
 
 // OLED 
 #if defined(TTGO_T_LORA32_V2_1) || defined(ESP32_DIY_LoRa) || defined(ESP32_DIY_1W_LoRa) || defined(TTGO_T_Beam_V1_0) || defined(TTGO_T_Beam_V1_2) || defined(TTGO_T_Beam_V1_0_SX1268) || defined(TTGO_T_Beam_V1_2_SX1262) || defined(OE5HWN_MeshCom) || defined(ESP32_DIY_LoRa_A7670) || defined(TTGO_T_LORA32_V2_1_915) || defined(ESP32_DIY_LoRa_915) || defined(TTGO_T_Beam_V1_0_915) || defined(TTGO_T_Beam_V1_2_915) || defined(ESP32_DIY_LoRa_A7670_915) || defined(ESP32_DIY_1W_LoRa_915) || defined(ESP32_DIY_1W_LoRa_Mesh_V1_2)
@@ -140,7 +149,7 @@
     #define OLED_RST    -1      // Reset pin # (or -1 if sharing Arduino reset pin)
 #endif
 
-#ifdef HELTEC_V2
+#if defined(HELTEC_V2)
     #define OLED_SDA    4
     #define OLED_SCL    15
     #define OLED_RST    16
@@ -158,13 +167,16 @@
     #define OLED_RST    -1
 #endif
 
-#if !defined(HELTEC_HTCT62) && !defined(HELTEC_WSL_V3) && !defined(ESP32C3_DIY_1W_LoRa) && !defined(ESP32C3_DIY_1W_LoRa_915)
+#if !defined(HELTEC_HTCT62) && !defined(HELTEC_WSL_V3) && !defined(ESP32C3_DIY_1W_LoRa) && !defined(ESP32C3_DIY_1W_LoRa_915) && !defined(WEMOS_S2_MINI_DIY_LoRa)
     #define HAS_DISPLAY
 #endif
 
 // Leds and other stuff
 #ifdef HELTEC_HTCT62
     #define BATTERY_PIN         1
+#endif
+#ifdef WEMOS_S2_MINI_DIY_LoRa
+    #define INTERNAL_LED_PIN    15
 #endif
 #if defined(TTGO_T_LORA32_V2_1) || defined(TTGO_T_LORA32_V2_1_915)
     #define INTERNAL_LED_PIN    25      // Green Led
@@ -179,7 +191,7 @@
     #define INTERNAL_LED_PIN    35
     #define BATTERY_PIN         1
     #define VEXT_CTRL           36
-    #define ADC_CTRL            37 // Heltec WSL_V3 just like Heltec WT
+    #define ADC_CTRL            37  
     #define BOARD_I2C_SDA       41
     #define BOARD_I2C_SCL       42
     #ifdef HELTEC_WSL_V3_DISPLAY
@@ -202,6 +214,21 @@
     #define VEXT_CTRL           3   // To turn on GPS and TFT
     #define BOARD_I2C_SDA       7
     #define BOARD_I2C_SCL       6
+#endif
+
+#ifdef HELTEC_WP
+    #define INTERNAL_LED_PIN    18
+    #define BATTERY_PIN         20
+    #define ADC_CTRL            19
+    #define VEXT_CTRL           45
+    #define BOARD_I2C_SDA       37
+    #define BOARD_I2C_SCL       36
+    #define EPAPER_BUSY         7
+    #define EPAPER_RST          6
+    #define EPAPER_DC           5
+    #define EPAPER_CS           4
+    #define EPAPER_SCL          3
+    #define EPAPER_SDA          2
 #endif
 
 #ifdef ESP32_C3_DIY_LoRa        // just testing!

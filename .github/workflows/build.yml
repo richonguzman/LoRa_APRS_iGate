@@ -61,6 +61,8 @@ jobs:
                       chip: esp32
                     - name: WEMOS-D1-R32-RA02
                       chip: esp32
+                    - name: WEMOS_S2_MINI_DIY_LoRa
+                      chip: esp32s2
                     - name: esp32c3_DIY_1W_LoRa
                       chip: esp32c3
                     - name: esp32c3_DIY_1W_LoRa_915
@@ -99,6 +101,17 @@ jobs:
               run: |
                   if [ "${{ matrix.target.chip }}" == "esp32" ]; then
                     python installer/bin/esptool/esptool.py --chip esp32 merge_bin \
+                      -o installer/web_factory.bin \
+                      --flash_mode dio \
+                      --flash_freq 40m \
+                      --flash_size 4MB \
+                      0x1000 installer/firmware/bootloader.bin \
+                      0x8000 installer/firmware/partitions.bin \
+                      0xe000 installer/firmware/boot_app0.bin \
+                      0x10000 installer/firmware/firmware.bin \
+                      0x3D0000 installer/firmware/spiffs.bin
+                  elif [ "${{ matrix.target.chip }}" == "esp32s2" ]; then
+                    python installer/bin/esptool/esptool.py --chip esp32s2 merge_bin \
                       -o installer/web_factory.bin \
                       --flash_mode dio \
                       --flash_freq 40m \
