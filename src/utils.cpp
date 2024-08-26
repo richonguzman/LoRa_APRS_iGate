@@ -112,8 +112,7 @@ namespace Utils {
             if (!Config.display.alwaysOn && Config.display.timeout != 0) {
                 displayToggle(true);
             }
-            Utils::println("-- Sending Beacon to APRSIS --");
-
+            
             STATION_Utils::deleteNotHeard();
 
             activeStations();
@@ -174,6 +173,7 @@ namespace Utils {
             #endif
 
             if (Config.aprs_is.active && Config.beacon.sendViaAPRSIS && !backUpDigiMode) {
+                Utils::println("-- Sending Beacon to APRSIS --");
                 displayShow(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING IGATE BEACON", 0); 
                 seventhLine = "     listening...";
                 #ifdef HAS_A7670
@@ -184,6 +184,7 @@ namespace Utils {
             }
 
             if (Config.beacon.sendViaRF || backUpDigiMode) {
+                Utils::println("-- Sending Beacon to RF --");
                 displayShow(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING DIGI BEACON", 0);
                 seventhLine = "     listening...";
                 STATION_Utils::addToOutputPacketBuffer(secondaryBeaconPacket);
