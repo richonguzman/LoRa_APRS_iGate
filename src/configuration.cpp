@@ -172,7 +172,7 @@ bool Configuration::readFile() {
         battery.sendExternalVoltage     = data["battery"]["sendExternalVoltage"] | false;
         battery.externalVoltagePin      = data["battery"]["externalVoltagePin"] | 34;
         battery.monitorExternalVoltage  = data["battery"]["monitorExternalVoltage"] | false;
-        battery.externalSleepVoltage    = data["battery"]["externalSleepVoltage"] | false;
+        battery.externalSleepVoltage    = data["battery"]["externalSleepVoltage"] | 10.9;
         battery.voltageDividerR1        = data["battery"]["voltageDividerR1"] | 100.0;
         battery.voltageDividerR2        = data["battery"]["voltageDividerR2"] | 27.0;
 
