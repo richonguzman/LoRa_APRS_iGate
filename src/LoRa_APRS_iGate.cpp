@@ -61,7 +61,6 @@ String firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seven
 void setup() {
     Serial.begin(115200);
     POWER_Utils::setup();
-    BATTERY_Utils::setup();
     Utils::setupDisplay();
     LoRa_Utils::setup();
     Utils::validateFreqs();

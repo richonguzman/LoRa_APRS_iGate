@@ -172,7 +172,7 @@ namespace POWER_Utils {
         #endif
         
         delay(1000);
-
+        BATTERY_Utils::setup();
         BATTERY_Utils::startupBatteryHealth();
     }
 
