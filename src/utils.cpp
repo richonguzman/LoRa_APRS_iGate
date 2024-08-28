@@ -310,12 +310,12 @@ namespace Utils {
 
     void checkSleepByLowBatteryVoltage(uint8_t mode) {
         if (shouldSleepLowVoltage) {
-            if (mode == 0) {
+            if (mode == 0) {    // at startup
                 delay(3000);
             }
             Serial.println("\n\n*** Sleeping Low Battey Voltage ***\n\n");
             esp_sleep_enable_timer_wakeup(30 * 60 * 1000000); // sleep 30 min
-            if (mode == 1) {
+            if (mode == 1) {    // low voltage detected after a while
                 displayToggle(false);
             }
             #ifdef VEXT_CTRL

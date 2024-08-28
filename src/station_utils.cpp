@@ -1,4 +1,5 @@
 #include "station_utils.h"
+#include "battery_utils.h"
 #include "aprs_is_utils.h"
 #include "configuration.h"
 #include "lora_utils.h"
@@ -8,6 +9,7 @@
 extern Configuration            Config;
 extern uint32_t                 lastRxTime;
 extern String                   fourthLine;
+extern bool                     shouldSleepLowVoltage;
 
 uint32_t lastTxTime             = millis();
 std::vector<String>             lastHeardStation;
@@ -108,6 +110,13 @@ namespace STATION_Utils {
             LoRa_Utils::sendNewPacket(outputPacketBuffer[0]);
             outputPacketBuffer.erase(outputPacketBuffer.begin());
             lastTxTime = millis();
+        }
+        if (shouldSleepLowVoltage) {
+            while (outputPacketBuffer.size() > 0) {
+                LoRa_Utils::sendNewPacket(outputPacketBuffer[0]);
+                outputPacketBuffer.erase(outputPacketBuffer.begin());
+                delay(4000);
+            }
         }
     }
 
