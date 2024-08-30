@@ -68,7 +68,7 @@ void displaySetup() {
                 #endif
 
                 #if defined(HELTEC_WS) || defined(HELTEC_WSL_V3_DISPLAY)
-                    Wire.begin(OLED_SDA, OLED_SCL);
+                    Wire.begin(BOARD_I2C_SDA, BOARD_I2C_SCL);
                 #endif
 
                 if(!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) { 
