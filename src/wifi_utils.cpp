@@ -151,7 +151,7 @@ namespace WIFI_Utils {
     void setup() {
         if (Config.callsign.length() > 0) {
             WiFi.mode(WIFI_MODE_NULL);
-            WiFi.setHostname (Config.callsign.c_str());
+            WiFi.setHostname(Config.callsign.c_str());
         }
         startWiFi();
         btStop();
