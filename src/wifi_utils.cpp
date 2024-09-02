@@ -70,7 +70,7 @@ namespace WIFI_Utils {
             startAP = true;
         } else {
             uint8_t wifiCounter = 0;
-            String hostName = "APRS_iGATE " + Config.callsign;
+            String hostName = "iGATE-" + Config.callsign;
             WiFi.setHostname(hostName.c_str());
             WiFi.mode(WIFI_STA);
             WiFi.disconnect();
