@@ -12,25 +12,23 @@ extern String                   fourthLine;
 extern bool                     shouldSleepLowVoltage;
 
 uint32_t lastTxTime             = millis();
-std::vector<String>             lastHeardStation;
+std::vector<LastHeardStation>   lastHeardStations;
 std::vector<String>             outputPacketBuffer;
-std::vector<String>             packet25SegBuffer;
+std::vector<Packet25SegBuffer>  packet25SegBuffer;
 
 
 namespace STATION_Utils {
 
     void deleteNotHeard() {
-        std::vector<String>  lastHeardStation_temp;
-        for (int i = 0; i < lastHeardStation.size(); i++) {
-            String deltaTimeString = lastHeardStation[i].substring(lastHeardStation[i].indexOf(",") + 1);
-            uint32_t deltaTime = deltaTimeString.toInt();
-            if ((millis() - deltaTime) < Config.rememberStationTime * 60 * 1000) {
-                lastHeardStation_temp.push_back(lastHeardStation[i]);
+        std::vector<LastHeardStation>  lastHeardStation_temp;
+        for (int i = 0; i < lastHeardStations.size(); i++) {
+            if (millis() - lastHeardStations[i].lastHeardTime < Config.rememberStationTime * 60 * 1000) {
+                lastHeardStation_temp.push_back(lastHeardStations[i]);
             }
         }
-        lastHeardStation.clear();
+        lastHeardStations.clear();
         for (int j = 0; j < lastHeardStation_temp.size(); j++) {
-            lastHeardStation.push_back(lastHeardStation_temp[j]);
+            lastHeardStations.push_back(lastHeardStation_temp[j]);
         }
         lastHeardStation_temp.clear();
     }
@@ -38,29 +36,32 @@ namespace STATION_Utils {
     void updateLastHeard(const String& station) {
         deleteNotHeard();
         bool stationHeard = false;
-        for (int i = 0; i < lastHeardStation.size(); i++) {
-            if (lastHeardStation[i].substring(0, lastHeardStation[i].indexOf(",")) == station) {
-                lastHeardStation[i] = station + "," + String(millis());
+        for (int i = 0; i < lastHeardStations.size(); i++) {
+            if (lastHeardStations[i].station == station) {
+                lastHeardStations[i].lastHeardTime = millis();
                 stationHeard = true;
             }
         }
         if (!stationHeard) {
-            lastHeardStation.push_back(station + "," + String(millis()));
+            LastHeardStation lastStation;
+            lastStation.lastHeardTime   = millis();
+            lastStation.station         = station;
+            lastHeardStations.push_back(lastStation);
         }
 
         fourthLine = "Stations (";
         fourthLine += String(Config.rememberStationTime);
         fourthLine += "min) = ";
-        if (lastHeardStation.size() < 10) {
+        if (lastHeardStations.size() < 10) {
             fourthLine += " ";
         }
-        fourthLine += String(lastHeardStation.size());
+        fourthLine += String(lastHeardStations.size());
     }
 
     bool wasHeard(const String& station) {
         deleteNotHeard();
-        for (int i = 0; i < lastHeardStation.size(); i++) {
-            if (lastHeardStation[i].substring(0, lastHeardStation[i].indexOf(",")) == station) {
+        for (int i = 0; i < lastHeardStations.size(); i++) {
+            if (lastHeardStations[i].station == station) {
                 Utils::println(" ---> Listened Station");
                 return true;
             }
@@ -71,35 +72,31 @@ namespace STATION_Utils {
 
     void clean25SegBuffer() {
         if (!packet25SegBuffer.empty()) {
-            String deltaTimeString = packet25SegBuffer[0].substring(0, packet25SegBuffer[0].indexOf(","));
-            uint32_t deltaTime = deltaTimeString.toInt();
-            if ((millis() - deltaTime) >  25 * 1000) {
+            if ((millis() - packet25SegBuffer[0].receivedTime) >  25 * 1000) {
                 packet25SegBuffer.erase(packet25SegBuffer.begin());
             }
         }
     }
 
     bool check25SegBuffer(const String& station, const String& textMessage) {
+        bool shouldBeIgnored = false;
         if (!packet25SegBuffer.empty()) {
-            bool shouldBeIgnored = false;
             for (int i = 0; i < packet25SegBuffer.size(); i++) {
-                const String& temp          = packet25SegBuffer[i].substring(packet25SegBuffer[i].indexOf(",") + 1);
-                const String& bufferStation = temp.substring(0, temp.indexOf(","));
-                const String& bufferMessage = temp.substring(temp.indexOf(",") + 1);
-                if (bufferStation == station && bufferMessage == textMessage) {
+                if (packet25SegBuffer[i].station == station && packet25SegBuffer[i].payload == textMessage) {
                     shouldBeIgnored = true;
                 }
             }
-            if (shouldBeIgnored) {
-                return false;
-            } else {
-                packet25SegBuffer.push_back(String(millis()) + "," + station + "," + textMessage);
-                return true;
-            }
+        }
+        if (shouldBeIgnored) {
+            return false;
         } else {
-            packet25SegBuffer.push_back(String(millis()) + "," + station + "," + textMessage);
+            Packet25SegBuffer packet;
+            packet.receivedTime = millis();
+            packet.station      = station;
+            packet.payload      = textMessage;
+            packet25SegBuffer.push_back(packet);
             return true;
-        }    
+        }
     }
 
     void processOutputPacketBuffer() {

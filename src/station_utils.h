@@ -1,7 +1,20 @@
 #ifndef STATION_UTILS_H_
 #define STATION_UTILS_H_
 
+
 #include <Arduino.h>
+
+
+struct Packet25SegBuffer {
+    uint32_t    receivedTime;
+    String      station;
+    String      payload;
+};
+
+struct LastHeardStation {
+    uint32_t    lastHeardTime;
+    String      station;
+};
 
 
 namespace STATION_Utils {

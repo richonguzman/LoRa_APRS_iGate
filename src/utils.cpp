@@ -25,7 +25,6 @@ extern String               sixthLine;
 extern String               seventhLine;
 extern String               iGateBeaconPacket;
 extern String               iGateLoRaBeaconPacket;
-extern std::vector<String>  lastHeardStation;
 extern int                  rssi;
 extern float                snr;
 extern int                  freqError;
@@ -35,6 +34,8 @@ extern int                  wxModuleType;
 extern bool                 backUpDigiMode;
 extern bool                 shouldSleepLowVoltage;
 extern bool                 transmitFlag;
+
+extern std::vector<LastHeardStation>    lastHeardStations;
 
 bool        statusAfterBoot     = true;
 bool        beaconUpdate        = true;
@@ -96,10 +97,10 @@ namespace Utils {
         fourthLine = "Stations (";
         fourthLine.concat(String(Config.rememberStationTime));
         fourthLine.concat("min) = ");
-        if (lastHeardStation.size() < 10) {
+        if (lastHeardStations.size() < 10) {
             fourthLine += " ";
         }
-        fourthLine.concat(String(lastHeardStation.size()));
+        fourthLine.concat(String(lastHeardStations.size()));
     }
 
     void checkBeaconInterval() {
