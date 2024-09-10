@@ -163,12 +163,16 @@ namespace POWER_Utils {
             pinMode(ADC_CTRL, OUTPUT);
         #endif
 
-        #if defined(HELTEC_WIRELESS_TRACKER) || defined(HELTEC_WP)
+        #if defined(HELTEC_WIRELESS_TRACKER) || defined(HELTEC_WS)
             Wire.begin(BOARD_I2C_SDA, BOARD_I2C_SCL);
         #endif
 
-        #if defined(HELTEC_V3) || defined(HELTEC_WSL_V3) || defined(HELTEC_WP) || defined(HELTEC_WSL_V3_DISPLAY)
+        #if defined(HELTEC_V3) || defined(HELTEC_WP) || defined(HELTEC_WSL_V3) || defined(HELTEC_WSL_V3_DISPLAY)
             Wire1.begin(BOARD_I2C_SDA, BOARD_I2C_SCL);
+        #endif
+
+        #if defined(HELTEC_V3)
+            Wire.begin(OLED_SDA, OLED_SCL);
         #endif
         
         delay(1000);

@@ -33,11 +33,11 @@ namespace BME_Utils {
         uint8_t err, addr;
         for(addr = 1; addr < 0x7F; addr++) {
             #if defined(HELTEC_V3) || defined(HELTEC_WSL_V3) || defined(HELTEC_WSL_V3_DISPLAY)
-            Wire1.beginTransmission(addr);
-            err = Wire1.endTransmission();
+                Wire1.beginTransmission(addr);
+                err = Wire1.endTransmission();
             #else
-            Wire.beginTransmission(addr);
-            err = Wire.endTransmission();
+                Wire.beginTransmission(addr);
+                err = Wire.endTransmission();
             #endif
             if (err == 0) {
                 //Serial.println(addr); this shows any connected board to I2C
