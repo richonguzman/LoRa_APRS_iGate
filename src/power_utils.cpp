@@ -163,7 +163,7 @@ namespace POWER_Utils {
             pinMode(ADC_CTRL, OUTPUT);
         #endif
 
-        #if defined(HELTEC_WIRELESS_TRACKER) || defined(HELTEC_WS)
+        #if defined(HELTEC_WIRELESS_TRACKER)
             Wire.begin(BOARD_I2C_SDA, BOARD_I2C_SCL);
         #endif
 
@@ -171,7 +171,7 @@ namespace POWER_Utils {
             Wire1.begin(BOARD_I2C_SDA, BOARD_I2C_SCL);
         #endif
 
-        #if defined(HELTEC_V3)
+        #if defined(HELTEC_V3) || defined(HELTEC_WS)
             Wire.begin(OLED_SDA, OLED_SCL);
         #endif
         

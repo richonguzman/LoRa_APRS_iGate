@@ -149,13 +149,13 @@
     #define OLED_RST    -1      // Reset pin # (or -1 if sharing Arduino reset pin)
 #endif
 
-#if defined(HELTEC_V2)
+#if defined(HELTEC_V2) || defined(HELTEC_WS)
     #define OLED_SDA    4
     #define OLED_SCL    15
     #define OLED_RST    16
 #endif
 
-#if defined(HELTEC_V3) || defined(HELTEC_WS)
+#if defined(HELTEC_V3)
     #define OLED_SDA    17
     #define OLED_SCL    18
     #define OLED_RST    21
