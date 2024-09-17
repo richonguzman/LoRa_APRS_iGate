@@ -61,7 +61,6 @@ namespace Utils {
             statusAfterBoot = false;
         }
         if (statusAfterBoot && !Config.beacon.sendViaAPRSIS && Config.beacon.sendViaRF) {
-            delay(2000);
             status.concat(":>https://github.com/richonguzman/LoRa_APRS_iGate ");
             status.concat(versionDate);
             STATION_Utils::addToOutputPacketBuffer(status);
