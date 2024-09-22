@@ -167,6 +167,8 @@ namespace WEB_Utils {
         }
         Config.battery.monitorExternalVoltage   = request->hasParam("battery.monitorExternalVoltage", true);
         Config.battery.externalSleepVoltage     = request->getParam("battery.externalSleepVoltage", true)->value().toFloat();
+
+        Config.battery.sendVoltageAsTelemetry   = request->hasParam("battery.sendVoltageAsTelemetry", true);
         
         Config.bme.active                   = request->hasParam("bme.active", true);
         Config.bme.heightCorrection         = request->getParam("bme.heightCorrection", true)->value().toInt();

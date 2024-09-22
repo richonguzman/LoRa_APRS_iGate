@@ -14,6 +14,9 @@ namespace BATTERY_Utils {
     void    checkIfShouldSleep(); // ????
     void    startupBatteryHealth();
 
+    String generateEncodedTelemetryBytes(float value, bool firstBytes, byte voltageType);
+    String generateEncodedTelemetry();
+
 }
 
 #endif

@@ -65,6 +65,8 @@ void Configuration::writeFile() {
     data["battery"]["externalSleepVoltage"]     = battery.externalSleepVoltage;
     data["battery"]["voltageDividerR1"]         = battery.voltageDividerR1;
     data["battery"]["voltageDividerR2"]         = battery.voltageDividerR2;
+
+    data["battery"]["sendVoltageAsTelemetry"]   = battery.sendVoltageAsTelemetry;
     
     data["bme"]["active"]                       = bme.active;
     data["bme"]["heightCorrection"]             = bme.heightCorrection;
@@ -175,6 +177,8 @@ bool Configuration::readFile() {
         battery.externalSleepVoltage    = data["battery"]["externalSleepVoltage"] | 10.9;
         battery.voltageDividerR1        = data["battery"]["voltageDividerR1"] | 100.0;
         battery.voltageDividerR2        = data["battery"]["voltageDividerR2"] | 27.0;
+
+        battery.sendVoltageAsTelemetry  = data["battery"]["sendVoltageAsTelemetry"] | true;
 
         bme.active                      = data["bme"]["active"] | false;
         bme.heightCorrection            = data["bme"]["heightCorrection"] | 0;
@@ -294,6 +298,8 @@ void Configuration::init() {
     battery.externalSleepVoltage    = 10.9;
     battery.voltageDividerR1        = 100.0;
     battery.voltageDividerR2        = 27.0;
+
+    battery.sendVoltageAsTelemetry  = true;
 
     lowPowerMode                    = false;
     lowVoltageCutOff                = 0;

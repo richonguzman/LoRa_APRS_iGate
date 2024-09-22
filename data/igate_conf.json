@@ -54,7 +54,8 @@
         "monitorExternalVoltage": false,
         "externalSleepVoltage": 10.9,
         "voltageDividerR1": 100.0,
-        "voltageDividerR2": 27.0
+        "voltageDividerR2": 27.0,
+        "sendVoltageAsTelemetry": true
 	},
     "bme": {
         "active": false,

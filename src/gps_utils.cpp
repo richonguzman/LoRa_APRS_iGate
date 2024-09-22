@@ -50,7 +50,7 @@ namespace GPS_Utils {
             encodedData += helper_base91[i];
         }
         encodedData += symbol;
-        encodedData += " x";
+        encodedData += "  ";
         encodedData += "\x47";
         return encodedData;
     }

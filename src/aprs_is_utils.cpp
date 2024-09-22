@@ -302,7 +302,7 @@ namespace APRS_IS_Utils {
                             A7670_Utils::uploadToAPRSIS(queryAnswer);
                         #else
                             upload(queryAnswer);
-                        #endif                        
+                        #endif
                         SYSLOG_Utils::log(2, queryAnswer, 0, 0.0, 0); // APRSIS TX
                         fifthLine = "APRS-IS ----> APRS-IS";
                         sixthLine = Config.callsign;

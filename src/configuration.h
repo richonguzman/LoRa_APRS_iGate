@@ -77,6 +77,7 @@ public:
     float   externalSleepVoltage;
     float   voltageDividerR1;
     float   voltageDividerR2;
+    bool    sendVoltageAsTelemetry;
 };
 
 class BME {
