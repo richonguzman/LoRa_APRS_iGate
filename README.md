@@ -47,6 +47,7 @@ __(This iGate Firmware works with all LoRa Tracker Firmwares (specially this <a 
 
 ## Timeline (Versions):
 
+- 2024.09.23 Added Enconded Telemetry for Battery (+ External Voltage) in Station GPS Beacon Packet. 
 - 2024.08.23 Wemos S2 Mini DIY LoRa added.
 - 2024.08.19 HELTEC Wireless Paper working (still missing Epaper code).
 - 2024.08.13 Web Authentication for WebUI. Thanks Mitja S57PNX.
