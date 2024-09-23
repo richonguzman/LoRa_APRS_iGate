@@ -18,17 +18,17 @@ bool transmitFlag    = true;
 #ifdef HAS_SX1262
     SX1262 radio = new Module(RADIO_CS_PIN, RADIO_DIO1_PIN, RADIO_RST_PIN, RADIO_BUSY_PIN);
 #endif
-
 #ifdef HAS_SX1268
     SX1268 radio = new Module(RADIO_CS_PIN, RADIO_DIO1_PIN, RADIO_RST_PIN, RADIO_BUSY_PIN);
 #endif
-
 #ifdef HAS_SX1278
     SX1278 radio = new Module(RADIO_CS_PIN, RADIO_BUSY_PIN, RADIO_RST_PIN);
 #endif
-
 #ifdef HAS_SX1276
     SX1276 radio = new Module(RADIO_CS_PIN, RADIO_BUSY_PIN, RADIO_RST_PIN);
+#endif
+#if defined(HAS_LLCC68)         //LLCC68 supports spreading factor only in range of 5-11!
+    LLCC68 radio = new Module(RADIO_CS_PIN, RADIO_DIO1_PIN, RADIO_RST_PIN, RADIO_BUSY_PIN);
 #endif
 
 int rssi, freqError;
@@ -53,7 +53,7 @@ namespace LoRa_Utils {
             Utils::println("Starting LoRa failed! State: " + String(state));
             while (true);
         }
-        #if defined(HAS_SX1262) || defined(HAS_SX1268)
+        #if defined(HAS_SX1262) || defined(HAS_SX1268) || defined(HAS_LLCC68)
             if (!Config.lowPowerMode) {
                 radio.setDio1Action(setFlag);
             } else {
@@ -73,7 +73,7 @@ namespace LoRa_Utils {
             radio.setRfSwitchPins(RADIO_RXEN, RADIO_TXEN);
         #endif
 
-        #ifdef HAS_1W_LORA  // Ebyte E22 400M30S (SX1268) / 900M30S (SX1262)
+        #ifdef HAS_1W_LORA  // Ebyte E22 400M30S (SX1268) / 900M30S (SX1262) / Ebyte E220 400M30S (LLCC68)
             state = radio.setOutputPower(Config.loramodule.power); // max value 20dB for 1W modules as they have Low Noise Amp
             radio.setCurrentLimit(140); // to be validated (100 , 120, 140)?
         #endif
@@ -86,7 +86,7 @@ namespace LoRa_Utils {
             radio.setCurrentLimit(140);
         #endif
 
-        #if defined(HAS_SX1262) || defined(HAS_SX1268)
+        #if defined(HAS_SX1262) || defined(HAS_SX1268) || defined(HAS_LLCC68)
             radio.setRxBoostedGainMode(true);
         #endif
 
