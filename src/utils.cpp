@@ -253,7 +253,7 @@ namespace Utils {
                 }
             #endif
 
-            if (Config.battery.sendVoltageAsTelemetry && !Config.bme.active){
+            if (Config.battery.sendVoltageAsTelemetry && !Config.bme.active && (Config.battery.sendInternalVoltage || Config.battery.sendExternalVoltage)){
                 String encodedTelemetry = BATTERY_Utils::generateEncodedTelemetry();
                 beaconPacket += encodedTelemetry;
                 secondaryBeaconPacket += encodedTelemetry;

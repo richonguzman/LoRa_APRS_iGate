@@ -259,8 +259,8 @@ namespace BATTERY_Utils {
         if (telemetryCounter == 1000) {
             telemetryCounter = 0;
         }
-        if (Config.battery.sendInternalVoltage) telemetry += generateEncodedTelemetryBytes(3.987/*checkInternalVoltage()*/, false, 0);
-        if (Config.battery.sendExternalVoltage) telemetry += generateEncodedTelemetryBytes(12.123/*checkExternalVoltage()*/, false, 1);
+        if (Config.battery.sendInternalVoltage) telemetry += generateEncodedTelemetryBytes(checkInternalVoltage(), false, 0);
+        if (Config.battery.sendExternalVoltage) telemetry += generateEncodedTelemetryBytes(checkExternalVoltage(), false, 1);
         telemetry += "|";
         return telemetry;
     }
