@@ -33,6 +33,8 @@ jobs:
                       chip: esp32
                     - name: ESP32_DIY_1W_LoRa_915
                       chip: esp32
+                    - name: ESP32_DIY_1W_LoRa_LLCC68
+                      chip: esp32
                     - name: ESP32_DIY_1W_LoRa_Mesh_V1_2
                       chip: esp32
                     - name: ttgo-t-beam-v1_2
@@ -55,6 +57,8 @@ jobs:
                       chip: esp32s3
                     - name: heltec_ht-ct62
                       chip: esp32c3
+                    - name: heltec_wireless_paper
+                      chip: esp32s3
                     - name: OE5HWN_MeshCom
                       chip: esp32
                     - name: WEMOS-LOLIN32-OLED-DIY
