@@ -216,7 +216,7 @@ namespace BME_Utils {
         String wx;
         if (isnan(newTemp) || isnan(newHum) || isnan(newPress)) {
             Serial.println("BME/BMP/Si7021 Module data failed");
-            wx = ".../...g...t...r...p...P...h..b.....";
+            wx = ".../...g...t...";
             fifthLine = "";
             return wx;
         } else {
@@ -246,7 +246,7 @@ namespace BME_Utils {
 
             wx = ".../...g...t";
             wx += tempStr;
-            wx += "r...p...P...h";
+            wx += "h";
             wx += humStr;
             wx += "b";
             wx += presStr;

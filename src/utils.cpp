@@ -199,8 +199,8 @@ namespace Utils {
                 beaconPacket += sensorData;
                 secondaryBeaconPacket += sensorData;
             } else if (Config.bme.active && wxModuleType == 0) {
-                beaconPacket += ".../...g...t...r...p...P...h..b.....";
-                secondaryBeaconPacket += ".../...g...t...r...p...P...h..b.....";
+                beaconPacket += ".../...g...t...";
+                secondaryBeaconPacket += ".../...g...t...";
             }
             beaconPacket            += Config.beacon.comment;
             secondaryBeaconPacket   += Config.beacon.comment;
