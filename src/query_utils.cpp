@@ -20,7 +20,7 @@ namespace QUERY_Utils {
         if (queryQuestion == "?APRS?" || queryQuestion == "H" || queryQuestion == "HELP" || queryQuestion=="?") {
             answer.concat("?APRSV ?APRSP ?APRSL ?APRSH ?WHERE callsign");
         } else if (queryQuestion == "?APRSV") {
-            answer.concat("CA2RXU_LoRa_iGate 1.4 v");
+            answer.concat("CA2RXU_LoRa_iGate 2.0 v");
             answer.concat(versionDate);
         } else if (queryQuestion == "?APRSP") {
             answer.concat("iGate QTH: ");

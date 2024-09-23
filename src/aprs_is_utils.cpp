@@ -59,7 +59,7 @@ namespace APRS_IS_Utils {
             aprsAuth += Config.callsign;
             aprsAuth += " pass ";
             aprsAuth += Config.aprs_is.passcode;
-            aprsAuth += " vers CA2RXU_LoRa_iGate 1.4 filter ";
+            aprsAuth += " vers CA2RXU_LoRa_iGate 2.0 filter ";
             aprsAuth += Config.aprs_is.filter;
             upload(aprsAuth);
             delay(200);
