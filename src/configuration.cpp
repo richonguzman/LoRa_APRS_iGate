@@ -178,7 +178,7 @@ bool Configuration::readFile() {
         battery.voltageDividerR1        = data["battery"]["voltageDividerR1"] | 100.0;
         battery.voltageDividerR2        = data["battery"]["voltageDividerR2"] | 27.0;
 
-        battery.sendVoltageAsTelemetry  = data["battery"]["sendVoltageAsTelemetry"] | true;
+        battery.sendVoltageAsTelemetry  = data["battery"]["sendVoltageAsTelemetry"] | false;
 
         bme.active                      = data["bme"]["active"] | false;
         bme.heightCorrection            = data["bme"]["heightCorrection"] | 0;
