@@ -21,6 +21,7 @@ extern String               sixthLine;
 extern String               seventhLine;
 extern bool                 modemLoggedToAPRSIS;
 extern bool                 backUpDigiMode;
+extern bool                 WiFiAutoAPStarted;
 
 uint32_t lastRxTime         = millis();
 
@@ -72,10 +73,14 @@ namespace APRS_IS_Utils {
             wifiState = "OK";
         } else {
             if (backUpDigiMode) {
-                wifiState = "--";
-            } else {
+                wifiState = "BK";
+            } else if (WiFiAutoAPStarted){
                 wifiState = "AP";
-            }            
+            } 
+            else {
+                wifiState = "--";
+            }
+
             if (!Config.display.alwaysOn && Config.display.timeout != 0) {
                 displayToggle(true);
             }
