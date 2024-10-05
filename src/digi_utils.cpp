@@ -114,7 +114,7 @@ namespace DIGI_Utils {
 
         // sin path "," y !thirdParty
         } else if (temp.indexOf(",") == -1 && !thirdParty && (Config.digi.mode == 2 || backUpDigiMode || Config.digi.mode == 3) && (abs(Config.loramodule.txFreq - Config.loramodule.rxFreq) >= 125000)) {
-            Serial.println("sin path, 125k");
+            Serial.println("CrossFreqDigi, sin path , no thirdParty");
             return buildPacket("", packet, thirdParty, true);
 
 
