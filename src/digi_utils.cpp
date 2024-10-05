@@ -87,7 +87,7 @@ namespace DIGI_Utils {
                 if (path.indexOf("WIDE1-1") != - 1) {
                     return buildPacket(path, packet, thirdParty, false);
                 } else if (path.indexOf("WIDE1-1") == -1 && (abs(Config.loramodule.txFreq - Config.loramodule.rxFreq) >= 125000)) { //  CrossFreq Digi
-                    //Serial.println("CrossFreqDigi mode 2");
+                    Serial.println("CrossFreqDigi mode 2");
                     return buildPacket(path, packet, thirdParty, true);
                 } else {
                     return "";
@@ -112,14 +112,14 @@ namespace DIGI_Utils {
                 return "";
             }
 
-        // sin path y !thirdpacket
+        // sin path "," y !thirdParty
         } else if (temp.indexOf(",") == -1 && !thirdParty && (Config.digi.mode == 2 || backUpDigiMode || Config.digi.mode == 3) && (abs(Config.loramodule.txFreq - Config.loramodule.rxFreq) >= 125000)) {
             Serial.println("sin path, 125k");
             return buildPacket("", packet, thirdParty, true);
 
 
-        // sin "," !!!! (ni path)
-        } else if (thirdParty && temp.indexOf(",") == -1 && (Config.digi.mode == 2 || backUpDigiMode || Config.digi.mode == 3) && (abs(Config.loramodule.txFreq - Config.loramodule.rxFreq) >= 125000)) {
+        // sin path "," y thirdParty
+        } else if (temp.indexOf(",") == -1 && thirdParty && (Config.digi.mode == 2 || backUpDigiMode || Config.digi.mode == 3) && (abs(Config.loramodule.txFreq - Config.loramodule.rxFreq) >= 125000)) {
             Serial.println("sin path,  thirdparty , 125k");
             return buildPacket("", packet, thirdParty, true);
         } else {
