@@ -1,7 +1,8 @@
-#include "bme_utils.h"
 #include "configuration.h"
 #include "gps_utils.h"
+#include "wx_utils.h"
 #include "display.h"
+
 
 #define SEALEVELPRESSURE_HPA (1013.25)
 #define CORRECTION_FACTOR (8.2296)      // for meters
@@ -27,7 +28,7 @@ Adafruit_Si7021     sensor = Adafruit_Si7021();
 
 
 
-namespace BME_Utils {
+namespace WX_Utils {
 
     void getWxModuleAddres() {
         uint8_t err, addr;
@@ -53,7 +54,7 @@ namespace BME_Utils {
     }
 
     void setup() {
-        if (Config.bme.active) {
+        if (Config.wxsensor.active) {
             getWxModuleAddres();
             if (wxModuleAddress != 0x00) {
                 bool wxModuleFound = false;
@@ -129,8 +130,8 @@ namespace BME_Utils {
         }
     }
 
-    String generateTempString(const float bmeTemp) {
-        String strTemp = String((int)bmeTemp);
+    String generateTempString(const float sensorTemp) {
+        String strTemp = String((int)sensorTemp);
         switch (strTemp.length()) {
             case 1:
                 return "00" + strTemp;
@@ -143,15 +144,15 @@ namespace BME_Utils {
         }
     }
 
-    String generateHumString(const float bmeHum) {
-        String strHum = String((int)bmeHum);
+    String generateHumString(const float sensorHum) {
+        String strHum = String((int)sensorHum);
         switch (strHum.length()) {
             case 1:
                 return "0" + strHum;
             case 2:
                 return strHum;
             case 3:
-                if ((int)bmeHum == 100) {
+                if ((int)sensorHum == 100) {
                     return "00";
                 } else {
                     return "-99";
@@ -161,9 +162,9 @@ namespace BME_Utils {
         }
     }
 
-    String generatePresString(const float bmePress) {
-        String strPress = String((int)bmePress);
-        String decPress = String(int((bmePress - int(bmePress)) * 10));
+    String generatePresString(const float sensorPres) {
+        String strPress = String((int)sensorPres);
+        String decPress = String(int((sensorPres - int(sensorPres)) * 10));
         switch (strPress.length()) {
             case 1:
                 return "000" + strPress + decPress;
@@ -213,14 +214,12 @@ namespace BME_Utils {
                 break;
         }    
 
-        String wx;
         if (isnan(newTemp) || isnan(newHum) || isnan(newPress)) {
             Serial.println("BME/BMP/Si7021 Module data failed");
-            wx = ".../...g...t...";
             fifthLine = "";
-            return wx;
+            return ".../...g...t...";
         } else {
-            String tempStr = generateTempString(((newTemp + Config.bme.temperatureCorrection) * 1.8) + 32);
+            String tempStr = generateTempString(((newTemp + Config.wxsensor.temperatureCorrection) * 1.8) + 32);
             
             String humStr;
             if (wxModuleType == 1 || wxModuleType == 3 || wxModuleType == 4) {
@@ -233,30 +232,30 @@ namespace BME_Utils {
             if (wxModuleAddress == 4) {
                 presStr = ".....";
             } else {
-                presStr = generatePresString(newPress + (Config.bme.heightCorrection/CORRECTION_FACTOR));
+                presStr = generatePresString(newPress + (Config.wxsensor.heightCorrection/CORRECTION_FACTOR));
             }           
             
             fifthLine = "BME-> ";
-            fifthLine += String(int(newTemp + Config.bme.temperatureCorrection));
+            fifthLine += String(int(newTemp + Config.wxsensor.temperatureCorrection));
             fifthLine += "C ";
             fifthLine += humStr;
             fifthLine += "% ";
             fifthLine += presStr.substring(0,4);
             fifthLine += "hPa";
 
-            wx = ".../...g...t";
-            wx += tempStr;
-            wx += "h";
-            wx += humStr;
-            wx += "b";
-            wx += presStr;
+            String wxPayload = ".../...g...t";
+            wxPayload += tempStr;
+            wxPayload += "h";
+            wxPayload += humStr;
+            wxPayload += "b";
+            wxPayload += presStr;
 
             if (wxModuleType == 3) {
-                wx += "Gas: ";
-                wx += String(newGas);
-                wx += "Kohms";
+                wxPayload += "Gas: ";
+                wxPayload += String(newGas);
+                wxPayload += "Kohms";
             }
-            return wx;
+            return wxPayload;
         }
     }
 

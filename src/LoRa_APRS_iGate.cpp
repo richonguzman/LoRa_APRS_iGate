@@ -29,16 +29,16 @@ ________________________________________________________________________________
 #include "wifi_utils.h"
 #include "digi_utils.h"
 #include "gps_utils.h"
-#include "bme_utils.h"
 #include "web_utils.h"
 #include "tnc_utils.h"
+#include "wx_utils.h"
 #include "display.h"
 #include "utils.h"
 #ifdef HAS_A7670
     #include "A7670_utils.h"
 #endif
 
-String          versionDate             = "2024.09.25";
+String          versionDate             = "2024.10.05";
 Configuration   Config;
 WiFiClient      espClient;
 
@@ -113,7 +113,7 @@ void setup() {
     #endif
     WIFI_Utils::setup();
     SYSLOG_Utils::setup();
-    BME_Utils::setup();
+    WX_Utils::setup();
     WEB_Utils::setup();
     TNC_Utils::setup();
     #ifdef HAS_A7670

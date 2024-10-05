@@ -57,7 +57,7 @@
         "voltageDividerR2": 27.0,
         "sendVoltageAsTelemetry": true
 	},
-    "bme": {
+    "wxsensor": {
         "active": false,
         "heightCorrection": 0,
         "temperatureCorrection": 0.0

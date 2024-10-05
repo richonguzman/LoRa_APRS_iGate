@@ -168,10 +168,10 @@ function loadSettings(settings) {
     document.getElementById("battery.externalSleepVoltage").value       = settings.battery.externalSleepVoltage.toFixed(1);
     document.getElementById("battery.sendVoltageAsTelemetry").checked   = settings.battery.sendVoltageAsTelemetry;
     
-    // TELEMETRY BME/WX
-    document.getElementById("bme.active").checked                       = settings.bme.active;
-    document.getElementById("bme.heightCorrection").value               = settings.bme.heightCorrection;
-    document.getElementById("bme.temperatureCorrection").value          = settings.bme.temperatureCorrection.toFixed(1);
+    // TELEMETRY WX SENSOR
+    document.getElementById("wxsensor.active").checked                  = settings.wxsensor.active;
+    document.getElementById("wxsensor.heightCorrection").value          = settings.wxsensor.heightCorrection;
+    document.getElementById("wxsensor.temperatureCorrection").value     = settings.wxsensor.temperatureCorrection.toFixed(1);
     
     // SYSLOG
     document.getElementById("syslog.active").checked                    = settings.syslog.active;
@@ -242,7 +242,7 @@ document.getElementById('reboot').addEventListener('click', function (e) {
     showToast("Your device will be rebooted in a while");
 });
 
-const bmeCheckbox = document.querySelector("input[name='bme.active']");
+const wxsensorCheckbox = document.querySelector("input[name='wxsensor.active']");
 
 const stationModeSelect = document.querySelector("select[name='stationMode']");
 

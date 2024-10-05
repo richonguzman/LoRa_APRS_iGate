@@ -148,11 +148,11 @@ namespace WEB_Utils {
         Config.loramodule.rxActive          = request->hasParam("lora.rxActive", true);
 
 
-        Config.display.alwaysOn             = request->hasParam("display.alwaysOn", true);
+        Config.display.alwaysOn                 = request->hasParam("display.alwaysOn", true);
         if (!Config.display.alwaysOn) {
             Config.display.timeout  = request->getParam("display.timeout", true)->value().toInt();
         }
-        Config.display.turn180              = request->hasParam("display.turn180", true);
+        Config.display.turn180                  = request->hasParam("display.turn180", true);
 
 
         Config.battery.sendInternalVoltage      = request->hasParam("battery.sendInternalVoltage", true);
@@ -162,18 +162,18 @@ namespace WEB_Utils {
         Config.battery.sendExternalVoltage      = request->hasParam("battery.sendExternalVoltage", true);
         if (Config.battery.sendExternalVoltage) {
             Config.battery.externalVoltagePin   = request->getParam("battery.externalVoltagePin", true)->value().toInt();
-            Config.battery.voltageDividerR1           = request->getParam("battery.voltageDividerR1", true)->value().toFloat();
-            Config.battery.voltageDividerR2           = request->getParam("battery.voltageDividerR2", true)->value().toFloat();
+            Config.battery.voltageDividerR1     = request->getParam("battery.voltageDividerR1", true)->value().toFloat();
+            Config.battery.voltageDividerR2     = request->getParam("battery.voltageDividerR2", true)->value().toFloat();
         }
         Config.battery.monitorExternalVoltage   = request->hasParam("battery.monitorExternalVoltage", true);
         Config.battery.externalSleepVoltage     = request->getParam("battery.externalSleepVoltage", true)->value().toFloat();
 
         Config.battery.sendVoltageAsTelemetry   = request->hasParam("battery.sendVoltageAsTelemetry", true);
         
-        Config.bme.active                   = request->hasParam("bme.active", true);
-        Config.bme.heightCorrection         = request->getParam("bme.heightCorrection", true)->value().toInt();
-        Config.bme.temperatureCorrection    = request->getParam("bme.temperatureCorrection", true)->value().toFloat();
-        if (Config.bme.active) {
+        Config.wxsensor.active                  = request->hasParam("wxsensor.active", true);
+        Config.wxsensor.heightCorrection        = request->getParam("wxsensor.heightCorrection", true)->value().toInt();
+        Config.wxsensor.temperatureCorrection   = request->getParam("wxsensor.temperatureCorrection", true)->value().toFloat();
+        if (Config.wxsensor.active) {
             Config.beacon.symbol = "_";
         }
 

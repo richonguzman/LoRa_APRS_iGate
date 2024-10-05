@@ -68,9 +68,9 @@ void Configuration::writeFile() {
 
     data["battery"]["sendVoltageAsTelemetry"]   = battery.sendVoltageAsTelemetry;
     
-    data["bme"]["active"]                       = bme.active;
-    data["bme"]["heightCorrection"]             = bme.heightCorrection;
-    data["bme"]["temperatureCorrection"]        = bme.temperatureCorrection;
+    data["wxsensor"]["active"]                  = wxsensor.active;
+    data["wxsensor"]["heightCorrection"]        = wxsensor.heightCorrection;
+    data["wxsensor"]["temperatureCorrection"]   = wxsensor.temperatureCorrection;
 
     data["syslog"]["active"]                    = syslog.active;
     data["syslog"]["server"]                    = syslog.server;
@@ -180,9 +180,9 @@ bool Configuration::readFile() {
 
         battery.sendVoltageAsTelemetry  = data["battery"]["sendVoltageAsTelemetry"] | false;
 
-        bme.active                      = data["bme"]["active"] | false;
-        bme.heightCorrection            = data["bme"]["heightCorrection"] | 0;
-        bme.temperatureCorrection       = data["bme"]["temperatureCorrection"] | 0.0;
+        wxsensor.active                 = data["wxsensor"]["active"] | false;
+        wxsensor.heightCorrection       = data["wxsensor"]["heightCorrection"] | 0;
+        wxsensor.temperatureCorrection  = data["wxsensor"]["temperatureCorrection"] | 0.0;
 
         syslog.active                   = data["syslog"]["active"] | false;
         syslog.server                   = data["syslog"]["server"] | "192.168.0.100";
@@ -279,9 +279,9 @@ void Configuration::init() {
     syslog.server                   = "192.168.0.100";
     syslog.port                     = 514;
 
-    bme.active                      = false;
-    bme.heightCorrection            = 0;
-    bme.temperatureCorrection       = 0.0;
+    wxsensor.active                 = false;
+    wxsensor.heightCorrection       = 0;
+    wxsensor.temperatureCorrection  = 0.0;
 
     ota.username                    = "";
     ota.password                    = "";

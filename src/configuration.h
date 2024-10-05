@@ -80,7 +80,7 @@ public:
     bool    sendVoltageAsTelemetry;
 };
 
-class BME {
+class WXSENSOR {
 public:
     bool    active;
     int     heightCorrection;
@@ -132,7 +132,7 @@ public:
     LoraModule              loramodule;
     Display                 display;
     BATTERY                 battery;
-    BME                     bme;
+    WXSENSOR                wxsensor;
     SYSLOG                  syslog;
     TNC                     tnc;  
     OTA                     ota;

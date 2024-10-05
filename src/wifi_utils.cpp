@@ -58,7 +58,7 @@ namespace WIFI_Utils {
         WiFi.mode(WIFI_MODE_NULL);
 
         WiFi.mode(WIFI_AP);
-        WiFi.softAP(Config.callsign + " AP", Config.wifiAutoAP.password);
+        WiFi.softAP(Config.callsign + "-AP", Config.wifiAutoAP.password);
 
         WiFiAutoAPTime = millis();
         WiFiAutoAPStarted = true;

@@ -10,7 +10,7 @@
 
 // LORA MODULES
 #if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2) || defined(ESP32_DIY_LoRa) || defined(TTGO_T_Beam_V1_2) || defined(TTGO_T_Beam_V1_0) || defined(TTGO_T_LORA32_V2_1_915) || defined(ESP32_DIY_LoRa_915) || defined(TTGO_T_Beam_V1_2_915) || defined(TTGO_T_Beam_V1_0_915)
-    #define RADIO_SCLK_PIN  5      // GPIO5    - SX1278 SCK
+    #define RADIO_SCLK_PIN  5       // GPIO5    - SX1278 SCK
     #define RADIO_MISO_PIN  19      // GPIO19   - SX1278 MISO
     #define RADIO_MOSI_PIN  27      // GPIO27   - SX1278 MOSI
     #define RADIO_CS_PIN    18      // GPIO18   - SX1278 CS ---> NSS
@@ -19,13 +19,13 @@
 #endif
 
 #if defined(HELTEC_V3) || defined(HELTEC_WSL_V3) || defined(HELTEC_WSL_V3_DISPLAY) || defined(HELTEC_WIRELESS_TRACKER) || defined(HELTEC_WS) || defined(HELTEC_WP)
-    #define RADIO_SCLK_PIN  9   // SX1262 SCK
-    #define RADIO_MISO_PIN  11  // SX1262 MISO
-    #define RADIO_MOSI_PIN  10  // SX1262 MOSI
-    #define RADIO_CS_PIN    8   // SX1262 NSS
-    #define RADIO_RST_PIN   12  // SX1262 RST
-    #define RADIO_DIO1_PIN  14  // SX1262 DIO1
-    #define RADIO_BUSY_PIN  13  // SX1262 BUSY
+    #define RADIO_SCLK_PIN  9       // SX1262 SCK
+    #define RADIO_MISO_PIN  11      // SX1262 MISO
+    #define RADIO_MOSI_PIN  10      // SX1262 MOSI
+    #define RADIO_CS_PIN    8       // SX1262 NSS
+    #define RADIO_RST_PIN   12      // SX1262 RST
+    #define RADIO_DIO1_PIN  14      // SX1262 DIO1
+    #define RADIO_BUSY_PIN  13      // SX1262 BUSY
 #endif
 
 #if defined(ESP32_DIY_1W_LoRa) || defined(ESP32_DIY_1W_LoRa_915) || defined(ESP32_DIY_1W_LoRa_LLCC68)   // Ebyte E22 400M30S (SX1268) or E22 900M30S (SX1262) or E220 LLCC68
