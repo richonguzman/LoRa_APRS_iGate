@@ -87,9 +87,6 @@ namespace DIGI_Utils {
                 if (path.indexOf("WIDE1-1") != - 1) {
                     return buildPacket(path, packet, thirdParty, false);
                 } else if (path.indexOf("WIDE1-1") == -1 && (abs(Config.loramodule.txFreq - Config.loramodule.rxFreq) >= 125000)) { //  CrossFreq Digi
-                    //
-                    Serial.println("CrossFreqDigi mode 2");
-                    //
                     return buildPacket(path, packet, thirdParty, true);
                 } else {
                     return "";
@@ -105,9 +102,6 @@ namespace DIGI_Utils {
                     }
                     return "";
                 } else if (path.indexOf("WIDE1-1") == -1 && path.indexOf("WIDE2-") == -1 && (abs(Config.loramodule.txFreq - Config.loramodule.rxFreq) >= 125000)) {    //  CrossFreq Digi
-                    //
-                    Serial.println("CrossFreqDigi mode 3");
-                    //
                     return buildPacket(path, packet, thirdParty, true);
                 } else {
                     return "";
