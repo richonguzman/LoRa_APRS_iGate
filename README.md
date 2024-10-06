@@ -47,6 +47,7 @@ __(This iGate Firmware works with all LoRa Tracker Firmwares (specially this <a 
 
 ## Timeline (Versions):
 
+- 2024.10.06 Cross Frequency Digirepeater Rules added.
 - 2024.09.23 Libraries Update for SDK3
 - 2024.09.23 Added Enconded Telemetry for Battery (+ External Voltage) in Station GPS Beacon Packet. 
 - 2024.08.23 Wemos S2 Mini DIY LoRa added.
