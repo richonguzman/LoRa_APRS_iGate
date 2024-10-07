@@ -171,7 +171,7 @@ bool Configuration::readFile() {
 
         battery.sendInternalVoltage     = data["battery"]["sendInternalVoltage"] | false;
         battery.monitorInternalVoltage  = data["battery"]["monitorInternalVoltage"] | false;
-        battery.internalSleepVoltage    = data["battery"]["internalSleepVoltage"] | 3.0;
+        battery.internalSleepVoltage    = data["battery"]["internalSleepVoltage"] | 2.9;
 
         battery.sendExternalVoltage     = data["battery"]["sendExternalVoltage"] | false;
         battery.externalVoltagePin      = data["battery"]["externalVoltagePin"] | 34;
@@ -293,7 +293,7 @@ void Configuration::init() {
 
     battery.sendInternalVoltage     = false;
     battery.monitorInternalVoltage  = false;
-    battery.internalSleepVoltage    = 3.0;
+    battery.internalSleepVoltage    = 2.9;
 
     battery.sendExternalVoltage     = false;
     battery.externalVoltagePin      = 34;

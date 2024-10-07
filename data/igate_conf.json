@@ -49,7 +49,7 @@
     "battery": {
         "sendInternalVoltage": false,
         "monitorInternalVoltage": false,
-        "internalSleepVoltage": 3.0,
+        "internalSleepVoltage": 2.9,
         "sendExternalVoltage": false,
         "externalVoltagePin": 34,
         "monitorExternalVoltage": false,
