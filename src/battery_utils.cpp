@@ -222,7 +222,6 @@ namespace BATTERY_Utils {
         }
     }
 
-
     String generateEncodedTelemetryBytes(float value, bool firstBytes, byte voltageType) {  // 0 = internal battery(0-4,2V) , 1 = external battery(0-15V)
         String encodedBytes;
         int tempValue;
@@ -250,7 +249,6 @@ namespace BATTERY_Utils {
         encodedBytes    += char(tempValue + 33);
         return encodedBytes;
     }
-
 
     String generateEncodedTelemetry() {
         String telemetry = "|";
