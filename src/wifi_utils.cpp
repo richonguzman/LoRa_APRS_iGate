@@ -151,7 +151,9 @@ namespace WIFI_Utils {
     }
 
     void setup() {
-        startWiFi();
+        if (Config.wifiAutoAP.active) {
+            startWiFi();
+        }
         btStop();
     }
 
