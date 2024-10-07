@@ -195,6 +195,7 @@ function loadSettings(settings) {
     document.getElementById("other.rebootModeTime").value               = settings.other.rebootModeTime;
 
     // WiFi Auto AP
+    document.getElementById("wifi.autoAP.active").checked               = settings.wifi.autoAP.active;
     document.getElementById("wifi.autoAP.password").value               = settings.wifi.autoAP.password;
     document.getElementById("wifi.autoAP.timeout").value                = settings.wifi.autoAP.timeout;
 
