@@ -70,7 +70,9 @@ namespace Utils {
     }
 
     String getLocalIP() {
-        if (!WiFiConnected) {
+        if (!Config.wifiAutoAP.active) {
+            return "** WiFi AP  Killed **";
+        } else if (!WiFiConnected) {
             return "IP :  192.168.4.1";
         } else if (backUpDigiMode) {
             return "- BACKUP DIGI MODE -";

@@ -259,23 +259,25 @@ namespace WEB_Utils {
     }
 
     void setup() {
-        server.on("/", HTTP_GET, handleHome);
-        server.on("/status", HTTP_GET, handleStatus);
-        server.on("/received-packets.json", HTTP_GET, handleReceivedPackets);
-        server.on("/configuration.json", HTTP_GET, handleReadConfiguration);
-        server.on("/configuration.json", HTTP_POST, handleWriteConfiguration);
-        server.on("/action", HTTP_POST, handleAction);
-        server.on("/style.css", HTTP_GET, handleStyle);
-        server.on("/script.js", HTTP_GET, handleScript);
-        server.on("/bootstrap.css", HTTP_GET, handleBootstrapStyle);
-        server.on("/bootstrap.js", HTTP_GET, handleBootstrapScript);
-        server.on("/favicon.png", HTTP_GET, handleFavicon);
+        if (Config.wifiAutoAP.active) {
+            server.on("/", HTTP_GET, handleHome);
+            server.on("/status", HTTP_GET, handleStatus);
+            server.on("/received-packets.json", HTTP_GET, handleReceivedPackets);
+            server.on("/configuration.json", HTTP_GET, handleReadConfiguration);
+            server.on("/configuration.json", HTTP_POST, handleWriteConfiguration);
+            server.on("/action", HTTP_POST, handleAction);
+            server.on("/style.css", HTTP_GET, handleStyle);
+            server.on("/script.js", HTTP_GET, handleScript);
+            server.on("/bootstrap.css", HTTP_GET, handleBootstrapStyle);
+            server.on("/bootstrap.js", HTTP_GET, handleBootstrapScript);
+            server.on("/favicon.png", HTTP_GET, handleFavicon);
 
-        OTA_Utils::setup(&server); // Include OTA Updater for WebServer
+            OTA_Utils::setup(&server); // Include OTA Updater for WebServer
 
-        server.onNotFound(handleNotFound);
+            server.onNotFound(handleNotFound);
 
-        server.begin();
+            server.begin();
+        }
     }
 
 }

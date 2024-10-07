@@ -123,7 +123,7 @@ void setup() {
 }
 
 void loop() {
-    WIFI_Utils::checkIfAutoAPShouldPowerOff();
+    WIFI_Utils::checkAutoAPTimeout();
 
     if (isUpdatingOTA) {
         ElegantOTA.loop();
@@ -136,7 +136,7 @@ void loop() {
 
     thirdLine = Utils::getLocalIP();
 
-    WIFI_Utils::checkWiFi(); // Always use WiFi, not related to IGate/Digi mode
+    WIFI_Utils::checkWiFi();
 
     #ifdef HAS_A7670
         if (Config.aprs_is.active && !modemLoggedToAPRSIS) A7670_Utils::APRS_IS_connect();
