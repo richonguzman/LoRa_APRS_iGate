@@ -196,7 +196,7 @@ function loadSettings(settings) {
 
     // WiFi Auto AP
     document.getElementById("wifi.autoAP.password").value               = settings.wifi.autoAP.password;
-    document.getElementById("wifi.autoAP.powerOff").value               = settings.wifi.autoAP.powerOff;
+    document.getElementById("wifi.autoAP.timeout").value                = settings.wifi.autoAP.timeout;
 
     // OTA
     document.getElementById("ota.username").value                       = settings.ota.username;

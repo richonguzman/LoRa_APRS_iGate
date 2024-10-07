@@ -132,13 +132,13 @@ namespace WIFI_Utils {
     }
 
     void checkIfAutoAPShouldPowerOff() {
-        if (WiFiAutoAPStarted && Config.wifiAutoAP.powerOff > 0) {
+        if (WiFiAutoAPStarted && Config.wifiAutoAP.timeout > 0) {
             if (WiFi.softAPgetStationNum() > 0) {
                 WiFiAutoAPTime = 0;
             } else {
                 if (WiFiAutoAPTime == 0) {
                     WiFiAutoAPTime = millis();
-                } else if ((millis() - WiFiAutoAPTime) > Config.wifiAutoAP.powerOff * 60 * 1000) {
+                } else if ((millis() - WiFiAutoAPTime) > Config.wifiAutoAP.timeout * 60 * 1000) {
                     Serial.println("Stopping auto AP");
 
                     WiFiAutoAPStarted = false;

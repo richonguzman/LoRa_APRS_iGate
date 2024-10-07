@@ -2,8 +2,9 @@
     "callsign": "NOCALL-10",
     "wifi": {
         "autoAP": {
+            "active": true,
             "password": "1234567890",
-            "powerOff": 10
+            "timeout": 10
         },
         "AP": []
     },

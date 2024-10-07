@@ -17,8 +17,9 @@ void Configuration::writeFile() {
         }
     }
 
+    data["wifi"]["autoAP"]["active"]            = wifiAutoAP.active;
     data["wifi"]["autoAP"]["password"]          = wifiAutoAP.password;
-    data["wifi"]["autoAP"]["powerOff"]          = wifiAutoAP.powerOff;
+    data["wifi"]["autoAP"]["timeout"]           = wifiAutoAP.timeout;
 
     data["callsign"]                            = callsign;
 
@@ -128,8 +129,9 @@ bool Configuration::readFile() {
             wifiAPs.push_back(wifiap);
         }
 
+        wifiAutoAP.active               = data["wifi"]["autoAP"]["active"] | true;
         wifiAutoAP.password             = data["wifi"]["autoAP"]["password"] | "1234567890";
-        wifiAutoAP.powerOff             = data["wifi"]["autoAP"]["powerOff"] | 10;
+        wifiAutoAP.timeout              = data["wifi"]["autoAP"]["timeout"] | 10;
 
         callsign                        = data["callsign"] | "NOCALL-10";
         rememberStationTime             = data["other"]["rememberStationTime"] | 30;
@@ -233,8 +235,9 @@ void Configuration::init() {
 
     wifiAPs.push_back(wifiap);
 
+    wifiAutoAP.active               = true;
     wifiAutoAP.password             = "1234567890";
-    wifiAutoAP.powerOff             = 15;
+    wifiAutoAP.timeout              = 10;
 
     callsign                        = "N0CALL-10";
 

@@ -1453,10 +1453,10 @@
                                             d="M8.5 5.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0"
                                         />
                                     </svg>
-                                    Auto AP
+                                    WiFi Auto AP
                                 </h5>
                                 <small
-                                    >Add your password and power off timeout to
+                                    >Add your password and WiFi AP timeout to
                                     auto access point. Auto AP will start if
                                     there is no WiFi connection. Timeout will
                                     count from startup or last client
@@ -1481,24 +1481,24 @@
                                 </div>
                                 <div class="col-12 mt-3">
                                     <label
-                                        for="wifi.autoAP.powerOff"
+                                        for="wifi.autoAP.timeout"
                                         class="form-label"
-                                        >Power off timeout
+                                        >WiFi AP timeout to search again for available WiFi's
                                         <small>(in minutes)</small></label
                                     >
                                     <input
                                         type="number"
-                                        name="wifi.autoAP.powerOff"
-                                        id="wifi.autoAP.powerOff"
+                                        name="wifi.autoAP.timeout"
+                                        id="wifi.autoAP.timeout"
                                         class="form-control"
-                                        placeholder="15"
+                                        placeholder="10"
                                         required=""
                                         step="1"
                                         min="0"
                                     />
                                     <div class="form-text">
                                         Set to <strong>0</strong> if you don't
-                                        want this option.
+                                        want WiFi AP to stop.
                                     </div>
                                 </div>
                             </div>

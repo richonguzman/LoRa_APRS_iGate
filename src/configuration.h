@@ -13,8 +13,9 @@ public:
 
 class WiFi_Auto_AP {
 public:
+    bool    active;
     String  password;
-    int     powerOff;
+    int     timeout;
 };
 
 class BEACON {
