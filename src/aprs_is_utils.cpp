@@ -138,7 +138,8 @@ namespace APRS_IS_Utils {
             //Serial.println(ackMessage);
             
             String addToBuffer = Config.callsign;
-            addToBuffer += ">APLRG1,RFONLY";
+            addToBuffer += ">APLRG1";
+            if (!thirdParty) addToBuffer += ",RFONLY";
             if (Config.beacon.path != "") {
                 addToBuffer += ",";
                 addToBuffer += Config.beacon.path;

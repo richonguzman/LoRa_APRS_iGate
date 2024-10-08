@@ -3,6 +3,7 @@
 #include "query_utils.h"
 #include "lora_utils.h"
 
+
 extern Configuration                    Config;
 extern std::vector<LastHeardStation>    lastHeardStations;
 extern String                           versionDate;
@@ -50,6 +51,16 @@ namespace QUERY_Utils {
             // agregar callsign para completar donde esta X callsign --> posicion
             Serial.println("estaciones escuchadas directo (ultimos 30 min)");
             answer.concat("?WHERE on development 73!");
+        } else if (queryQuestion.indexOf("?APRSEEM") == 0) {    // Exit DigiRepeater EcoMode
+            answer = "DigiEcoMode:Stop";
+            Config.digi.ecoMode     = false;
+            Config.display.alwaysOn = true;
+            Config.display.timeout  = 10;
+        } else if (queryQuestion.indexOf("?APRSSEM") == 0) {    // Start DigiRepeater EcoMode
+            answer = "DigiEcoMode:Start";
+            Config.digi.ecoMode     = true;
+        } else if (queryQuestion.indexOf("?APRSEMS") == 0) {    // DigiRepeater EcoMode Status
+            answer = (Config.digi.ecoMode) ? "DigiEcoMode:ON" : "DigiEcoMode:OFF";
         }
 
         String queryAnswer = Config.callsign;
