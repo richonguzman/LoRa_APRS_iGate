@@ -2,7 +2,6 @@
     "callsign": "NOCALL-10",
     "wifi": {
         "autoAP": {
-            "active": true,
             "password": "1234567890",
             "timeout": 10
         },
@@ -29,7 +28,8 @@
         "objectsToRF": false
     },
     "digi": {
-        "mode": 0
+        "mode": 0,
+        "ecoMode": false
     },
     "lora": {
         "txFreq": 433775000,

@@ -111,7 +111,6 @@ namespace WEB_Utils {
 
         Config.callsign                 = request->getParam("callsign", true)->value();
 
-        Config.wifiAutoAP.active        = request->hasParam("wifi.autoAP.active", true);
         Config.wifiAutoAP.password      = request->getParam("wifi.autoAP.password", true)->value();
         Config.wifiAutoAP.timeout       = request->getParam("wifi.autoAP.timeout", true)->value().toInt();
         
@@ -136,7 +135,8 @@ namespace WEB_Utils {
         Config.beacon.path                  = request->getParam("beacon.path", true)->value();
 
 
-        Config.digi.mode                = request->getParam("digi.mode", true)->value().toInt();
+        Config.digi.mode                    = request->getParam("digi.mode", true)->value().toInt();
+        Config.digi.ecoMode                 = request->hasParam("digi.ecoMode", true);
 
 
         Config.loramodule.txFreq            = request->getParam("lora.txFreq", true)->value().toInt();
@@ -259,7 +259,7 @@ namespace WEB_Utils {
     }
 
     void setup() {
-        if (Config.wifiAutoAP.active) {
+        if (!Config.digi.ecoMode) {
             server.on("/", HTTP_GET, handleHome);
             server.on("/status", HTTP_GET, handleStatus);
             server.on("/received-packets.json", HTTP_GET, handleReceivedPackets);

@@ -116,9 +116,9 @@ namespace LoRa_Utils {
         if (Config.loramodule.txFreq != Config.loramodule.rxFreq) {
             changeFreqTx();
         }
-
+        
         #ifdef INTERNAL_LED_PIN
-            digitalWrite(INTERNAL_LED_PIN, HIGH);
+            if (!Config.digi.ecoMode) digitalWrite(INTERNAL_LED_PIN, HIGH);
         #endif
         int state = radio.transmit("\x3c\xff\x01" + newPacket);
         transmitFlag = true;
@@ -133,7 +133,7 @@ namespace LoRa_Utils {
             Utils::println(String(state));
         }
         #ifdef INTERNAL_LED_PIN
-            digitalWrite(INTERNAL_LED_PIN, LOW);
+            if (!Config.digi.ecoMode) digitalWrite(INTERNAL_LED_PIN, LOW);
         #endif
         if (Config.loramodule.txFreq != Config.loramodule.rxFreq) {
             changeFreqRx();

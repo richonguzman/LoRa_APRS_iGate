@@ -17,7 +17,6 @@ void Configuration::writeFile() {
         }
     }
 
-    data["wifi"]["autoAP"]["active"]            = wifiAutoAP.active;
     data["wifi"]["autoAP"]["password"]          = wifiAutoAP.password;
     data["wifi"]["autoAP"]["timeout"]           = wifiAutoAP.timeout;
 
@@ -42,6 +41,7 @@ void Configuration::writeFile() {
     data["beacon"]["path"]                      = beacon.path;
 
     data["digi"]["mode"]                        = digi.mode;
+    data["digi"]["ecoMode"]                     = digi.ecoMode;
 
     data["lora"]["rxFreq"]                      = loramodule.rxFreq;
     data["lora"]["txFreq"]                      = loramodule.txFreq;
@@ -129,7 +129,6 @@ bool Configuration::readFile() {
             wifiAPs.push_back(wifiap);
         }
 
-        wifiAutoAP.active               = data["wifi"]["autoAP"]["active"] | true;
         wifiAutoAP.password             = data["wifi"]["autoAP"]["password"] | "1234567890";
         wifiAutoAP.timeout              = data["wifi"]["autoAP"]["timeout"] | 10;
 
@@ -155,6 +154,7 @@ bool Configuration::readFile() {
         aprs_is.objectsToRF             = data["aprs_is"]["objectsToRF"] | false;
         
         digi.mode                       = data["digi"]["mode"] | 0;
+        digi.ecoMode                    = data["digi"]["ecoMode"] | false;
 
         loramodule.txFreq               = data["lora"]["txFreq"] | 433775000;
         loramodule.rxFreq               = data["lora"]["rxFreq"] | 433775000;
@@ -235,7 +235,6 @@ void Configuration::init() {
 
     wifiAPs.push_back(wifiap);
 
-    wifiAutoAP.active               = true;
     wifiAutoAP.password             = "1234567890";
     wifiAutoAP.timeout              = 10;
 
@@ -251,7 +250,8 @@ void Configuration::init() {
     beacon.sendViaRF                = false;
     beacon.path                     = "WIDE1-1";
     
-    digi.mode = 0;
+    digi.mode                       = 0;
+    digi.ecoMode                    = false;
 
     tnc.enableServer                = false;
     tnc.enableSerial                = false;

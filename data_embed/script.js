@@ -136,6 +136,7 @@ function loadSettings(settings) {
 
     // Digi
     document.getElementById("digi.mode").value                          = settings.digi.mode;
+    document.getElementById("digi.ecoMode").checked                     = settings.digi.ecoMode;
 
     // LoRa
     document.getElementById("lora.txFreq").value                        = settings.lora.txFreq;
@@ -195,7 +196,6 @@ function loadSettings(settings) {
     document.getElementById("other.rebootModeTime").value               = settings.other.rebootModeTime;
 
     // WiFi Auto AP
-    document.getElementById("wifi.autoAP.active").checked               = settings.wifi.autoAP.active;
     document.getElementById("wifi.autoAP.password").value               = settings.wifi.autoAP.password;
     document.getElementById("wifi.autoAP.timeout").value                = settings.wifi.autoAP.timeout;
 

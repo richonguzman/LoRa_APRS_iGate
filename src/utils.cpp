@@ -70,7 +70,7 @@ namespace Utils {
     }
 
     String getLocalIP() {
-        if (!Config.wifiAutoAP.active) {
+        if (Config.digi.ecoMode) {
             return "** WiFi AP  Killed **";
         } else if (!WiFiConnected) {
             return "IP :  192.168.4.1";

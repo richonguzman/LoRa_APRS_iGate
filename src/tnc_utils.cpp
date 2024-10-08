@@ -22,7 +22,7 @@ String inputSerialBuffer = "";
 namespace TNC_Utils {
     
     void setup() {
-        if (Config.tnc.enableServer && Config.wifiAutoAP.active) {
+        if (Config.tnc.enableServer && !Config.digi.ecoMode) {
             tncServer.stop();
             tncServer.begin();
         }
@@ -133,7 +133,7 @@ namespace TNC_Utils {
     }
 
     void loop() {
-        if (Config.wifiAutoAP.active) {
+        if (!Config.digi.ecoMode) {
             if (Config.tnc.enableServer) {
                 checkNewClients();
                 readFromClients();

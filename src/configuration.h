@@ -13,7 +13,6 @@ public:
 
 class WiFi_Auto_AP {
 public:
-    bool    active;
     String  password;
     int     timeout;
 };
@@ -45,6 +44,7 @@ public:
 class DIGI {
 public:
     int     mode;
+    bool    ecoMode;
 };
 
 

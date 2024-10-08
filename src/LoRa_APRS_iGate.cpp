@@ -38,7 +38,7 @@ ________________________________________________________________________________
     #include "A7670_utils.h"
 #endif
 
-String          versionDate             = "2024.10.07";
+String          versionDate             = "2024.10.08";
 Configuration   Config;
 WiFiClient      espClient;
 
@@ -111,6 +111,7 @@ void setup() {
             Config.loramodule.rxActive = false;
         }
     #endif
+    DIGI_Utils::checkEcoMode();
     WIFI_Utils::setup();
     SYSLOG_Utils::setup();
     WX_Utils::setup();

@@ -164,4 +164,12 @@ namespace DIGI_Utils {
         }
     }
 
+    void checkEcoMode() {
+        if (Config.digi.ecoMode) {
+            Config.display.alwaysOn     = false;
+            Config.display.timeout      = 0;
+            setCpuFrequencyMhz(10);
+        }
+    }
+
 }

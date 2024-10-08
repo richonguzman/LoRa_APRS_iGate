@@ -71,7 +71,7 @@ namespace APRS_IS_Utils {
         if (WiFi.status() == WL_CONNECTED) {
             wifiState = "OK";
         } else {
-            if (backUpDigiMode || !Config.wifiAutoAP.active) {
+            if (backUpDigiMode || Config.digi.ecoMode) {
                 wifiState = "--";
             } else {
                 wifiState = "AP";
