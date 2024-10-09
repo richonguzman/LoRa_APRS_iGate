@@ -16,7 +16,6 @@ ____________________________________________________
 <br />
 
 # WEB FLASHER/INSTALLER is <a href="https://richonguzman.github.io/lora-igate-web-flasher/installer.html" target="_blank">here</a>
-<br />
 
 ____________________________________________________
 
