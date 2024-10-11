@@ -116,4 +116,4 @@ ____________________________________________________
 
 __________________________________________
 
-# Hope You Enjoy this, 73 !!  CA2RXU , Valparaiso, Chile
+# Hope You Enjoy this, 73! CA2RXU, Valparaiso, Chile
