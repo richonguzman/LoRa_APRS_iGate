@@ -31,6 +31,7 @@ ________________________________________________________________________________
 #include "gps_utils.h"
 #include "web_utils.h"
 #include "tnc_utils.h"
+#include "ntp_utils.h"
 #include "wx_utils.h"
 #include "display.h"
 #include "utils.h"
@@ -38,7 +39,7 @@ ________________________________________________________________________________
     #include "A7670_utils.h"
 #endif
 
-String          versionDate             = "2024.10.08";
+String          versionDate             = "2024.10.14";
 Configuration   Config;
 WiFiClient      espClient;
 
@@ -67,8 +68,8 @@ void setup() {
     GPS_Utils::generateBeacons();
 
     #ifdef STARTUP_DELAY    // (TEST) just to wait for WiFi init of Routers
-    displayShow("", "  STARTUP DELAY ...", "", "", 0);
-    delay(STARTUP_DELAY * 60 * 1000);
+        displayShow("", "  STARTUP DELAY ...", "", "", 0);
+        delay(STARTUP_DELAY * 60 * 1000);
     #endif
 
     #ifdef HELTEC_HTCT62
@@ -113,6 +114,7 @@ void setup() {
     #endif
     DIGI_Utils::checkEcoMode();
     WIFI_Utils::setup();
+    NTP_Utils::setup();
     SYSLOG_Utils::setup();
     WX_Utils::setup();
     WEB_Utils::setup();
@@ -145,6 +147,7 @@ void loop() {
         if (Config.aprs_is.active && (WiFi.status() == WL_CONNECTED) && !espClient.connected()) APRS_IS_Utils::connect();
     #endif
 
+    NTP_Utils::update();
     TNC_Utils::loop();
 
     Utils::checkDisplayInterval();

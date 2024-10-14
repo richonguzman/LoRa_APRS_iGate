@@ -100,6 +100,8 @@ void Configuration::writeFile() {
     data["webadmin"]["username"]                = webadmin.username;
     data["webadmin"]["password"]                = webadmin.password;
 
+    data["ntp"]["gmtCorrection"]                = ntp.gmtCorrection;
+
     serializeJson(data, configFile);
 
     configFile.close();
@@ -200,6 +202,8 @@ bool Configuration::readFile() {
         webadmin.active                 = data["webadmin"]["active"] | false;
         webadmin.username               = data["webadmin"]["username"] | "admin";
         webadmin.password               = data["webadmin"]["password"] | "";
+
+        ntp.gmtCorrection               = data["ntp"]["gmtCorrection"] | 0;
 
         lowPowerMode                    = data["other"]["lowPowerMode"] | false;
         lowVoltageCutOff                = data["other"]["lowVoltageCutOff"] | 0;
@@ -317,6 +321,8 @@ void Configuration::init() {
     webadmin.active                 = false;
     webadmin.username               = "admin";
     webadmin.password               = "";
+
+    ntp.gmtCorrection               = 0;
 
     Serial.println("All is Written!");
 }

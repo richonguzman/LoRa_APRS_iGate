@@ -208,6 +208,9 @@ function loadSettings(settings) {
     document.getElementById("webadmin.username").value                  = settings.webadmin.username;
     document.getElementById("webadmin.password").value                  = settings.webadmin.password;
 
+    // NTP
+    document.getElementById("ntp.gmtCorrection").value                  = settings.ntp.gmtCorrection;
+
     // Experimental
     document.getElementById("other.backupDigiMode").checked             = settings.other.backupDigiMode;
 
@@ -507,13 +510,9 @@ function loadReceivedPackets(packets) {
 
         packets.forEach((packet) => {
             const element = document.createElement("tr");
-
-            date.setTime(packet.millis);
-
-            const p = date.toUTCString().split(' ')
         
             element.innerHTML = `
-                        <td>${p[p.length-2]}</td>
+                        <td>${packet.rxTime}</td>
                         <td>${packet.packet}</td>
                         <td>${packet.RSSI}</td>
                         <td>${packet.SNR}</td>

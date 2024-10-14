@@ -5,7 +5,7 @@
 
 class ReceivedPacket {
 public:
-    long    millis;
+    String  rxTime;
     String  packet;
     int     RSSI;
     float   SNR;

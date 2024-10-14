@@ -81,6 +81,9 @@
         "username": "admin",
         "password": ""
     },
+    "ntp": {
+        "gmtCorrection": 0
+    },
     "other": {
         "rememberStationTime": 30,
         "lowPowerMode": false,
