@@ -47,6 +47,36 @@ namespace POWER_Utils {
         #endif
     }
 
+    void activateGPS() {
+        #ifdef HAS_AXP192
+            PMU.setLDO3Voltage(3300);
+            PMU.enableLDO3();
+        #endif
+
+        #ifdef HAS_AXP2101
+                PMU.setALDO3Voltage(3300);
+                PMU.enableALDO3();
+        #endif
+        #ifdef HELTEC_WIRELESS_TRACKER
+            digitalWrite(VEXT_CTRL, HIGH);
+        #endif
+        //gpsIsActive = true;
+    }
+
+    void deactivateGPS() {
+        #ifdef HAS_AXP192
+            PMU.disableLDO3();
+        #endif
+
+        #ifdef HAS_AXP2101
+            PMU.disableALDO3();
+        #endif
+        #ifdef HELTEC_WIRELESS_TRACKER
+            digitalWrite(VEXT_CTRL, LOW);
+        #endif
+        //gpsIsActive = false;
+    }
+
     void activateLoRa() {
         #ifdef HAS_AXP192
             PMU.setLDO2Voltage(3300);
@@ -159,6 +189,10 @@ namespace POWER_Utils {
             #endif
         #endif
         
+        #ifdef HAS_GPS
+            if (Config.beacon.gpsActive) activateGPS();
+        #endif
+
         #ifdef ADC_CTRL
             pinMode(ADC_CTRL, OUTPUT);
         #endif

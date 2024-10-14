@@ -1,5 +1,6 @@
 #include <NTPClient.h>
 #include <WiFiUdp.h>
+#include <WiFi.h>
 #include "configuration.h"
 #include "ntp_utils.h"
 #include "time.h"
@@ -14,7 +15,7 @@ NTPClient   timeClient(ntpUDP, "pool.ntp.org", 0, 15 * 60 * 1000);  // Update in
 namespace NTP_Utils {
 
     void setup() {
-        if (!Config.digi.ecoMode && Config.callsign != "NOCALL-10") {
+        if (WiFi.status() == WL_CONNECTED && !Config.digi.ecoMode && Config.callsign != "NOCALL-10") {
             int gmt = Config.ntp.gmtCorrection * 3600;
             timeClient.setTimeOffset(gmt);
             timeClient.begin();
@@ -22,7 +23,7 @@ namespace NTP_Utils {
     }
 
     void update() {
-        if (!Config.digi.ecoMode && Config.callsign != "NOCALL-10") timeClient.update();
+        if (WiFi.status() == WL_CONNECTED && !Config.digi.ecoMode && Config.callsign != "NOCALL-10") timeClient.update();
     }
 
     String getFormatedTime() {

@@ -134,6 +134,9 @@ namespace WEB_Utils {
         Config.beacon.symbol                = request->getParam("beacon.symbol", true)->value();
         Config.beacon.path                  = request->getParam("beacon.path", true)->value();
 
+        Config.beacon.gpsActive             = request->hasParam("beacon.gpsActive", true);
+        Config.beacon.gpsAmbiguity          = request->hasParam("beacon.gpsAmbiguity", true);
+        
 
         Config.digi.mode                    = request->getParam("digi.mode", true)->value().toInt();
         Config.digi.ecoMode                 = request->hasParam("digi.ecoMode", true);

@@ -28,6 +28,8 @@ public:
     String  path;    
     bool    sendViaRF;
     bool    sendViaAPRSIS;
+    bool    gpsActive;
+    bool    gpsAmbiguity;
 };
 
 class APRS_IS {

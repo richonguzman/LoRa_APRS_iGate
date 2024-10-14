@@ -1,13 +1,22 @@
 #include <TinyGPS++.h>
 #include <WiFi.h>
 #include "configuration.h"
+#include "boards_pinout.h"
 #include "gps_utils.h"
 #include "display.h"
 #include "utils.h"
 
-extern Configuration  Config;
-extern WiFiClient     espClient;
-String                distance, iGateBeaconPacket, iGateLoRaBeaconPacket;
+#ifdef GPS_BAUDRATE
+    #define GPS_BAUD    GPS_BAUDRATE
+#else
+    #define GPS_BAUD    9600
+#endif
+
+extern Configuration    Config;
+extern WiFiClient       espClient;
+extern HardwareSerial   gpsSerial;
+extern TinyGPSPlus      gps;
+String                  distance, iGateBeaconPacket, iGateLoRaBeaconPacket;
 
 
 namespace GPS_Utils {
@@ -24,20 +33,32 @@ namespace GPS_Utils {
         return(s);
     }
 
+    float roundToTwoDecimals(float degrees) {
+        return round(degrees * 100) / 100;
+    }
+
     String encodeGPS(float latitude, float longitude, const String& overlay, const String& symbol) {
         String encodedData = overlay;
         uint32_t aprs_lat, aprs_lon;
-        aprs_lat = 900000000 - latitude * 10000000;
+
+        float processedLatitude     = latitude;
+        float processedLongitude    = longitude;
+        if (Config.beacon.gpsActive && Config.beacon.gpsAmbiguity) {
+            processedLatitude       = roundToTwoDecimals(latitude);
+            processedLongitude      = roundToTwoDecimals(longitude);
+        }
+
+        aprs_lat = 900000000 - processedLatitude * 10000000;
         aprs_lat = aprs_lat / 26 - aprs_lat / 2710 + aprs_lat / 15384615;
-        aprs_lon = 900000000 + longitude * 10000000 / 2;
+        aprs_lon = 900000000 + processedLongitude * 10000000 / 2;
         aprs_lon = aprs_lon / 26 - aprs_lon / 2710 + aprs_lon / 15384615;
 
         String Ns, Ew, helper;
-        if(latitude < 0) { Ns = "S"; } else { Ns = "N"; }
-        if(latitude < 0) { latitude= -latitude; }
+        if(processedLatitude < 0) { Ns = "S"; } else { Ns = "N"; }
+        if(processedLatitude < 0) { processedLatitude = -processedLatitude; }
 
-        if(longitude < 0) { Ew = "W"; } else { Ew = "E"; }
-        if(longitude < 0) { longitude= -longitude; }
+        if(processedLongitude < 0) { Ew = "W"; } else { Ew = "E"; }
+        if(processedLongitude < 0) { processedLongitude = -processedLongitude; }
 
         char helper_base91[] = {"0000\0"};
         int i;
@@ -55,6 +76,19 @@ namespace GPS_Utils {
         return encodedData;
     }
 
+    void generateBeaconFirstPart() {
+        String beaconPacket = Config.callsign;
+        beaconPacket += ">APLRG1";
+        if (Config.beacon.path.indexOf("WIDE") == 0) {
+            beaconPacket += ",";
+            beaconPacket += Config.beacon.path;
+        }
+        iGateBeaconPacket       = beaconPacket;
+        iGateBeaconPacket       += ",qAC:!";
+        iGateLoRaBeaconPacket   = beaconPacket;
+        iGateLoRaBeaconPacket   += ":!";
+    }
+
     void generateBeacons() {
         if (Config.callsign.indexOf("NOCALL-10") != 0 && !Utils::checkValidCallsign(Config.callsign)) {
             displayShow("***** ERROR ******", "CALLSIGN = NOT VALID!", "", "Only Rx Mode Active", 3000);
@@ -64,19 +98,8 @@ namespace GPS_Utils {
             Config.beacon.sendViaRF     = false;
             Config.digi.mode            = 0;
             Config.backupDigiMode       = false;
-        }   
-        String beaconPacket = Config.callsign;
-        beaconPacket += ">APLRG1";
-        if (Config.beacon.path.indexOf("WIDE") == 0) {
-            beaconPacket += ",";
-            beaconPacket += Config.beacon.path;
         }
-
-        iGateBeaconPacket       = beaconPacket;
-        iGateBeaconPacket       += ",qAC:!";
-        iGateLoRaBeaconPacket   = beaconPacket;
-        iGateLoRaBeaconPacket   += ":!";
-
+        generateBeaconFirstPart();
         String encodedGPS       = encodeGPS(Config.beacon.latitude, Config.beacon.longitude, Config.beacon.overlay, Config.beacon.symbol);
         iGateBeaconPacket       += encodedGPS;        
         iGateLoRaBeaconPacket   += encodedGPS;
@@ -181,6 +204,21 @@ namespace GPS_Utils {
             }
         } else {
             return " _ / _ / _ ";
+        }
+    }
+
+    void setup() {
+        #ifdef HAS_GPS
+            if (Config.beacon.gpsActive) {
+                gpsSerial.begin(GPS_BAUD, SERIAL_8N1, GPS_TX, GPS_RX);
+            }
+        #endif
+        generateBeacons();
+    }
+
+    void getData() {
+        while (gpsSerial.available() > 0) {
+            gps.encode(gpsSerial.read());
         }
     }
 

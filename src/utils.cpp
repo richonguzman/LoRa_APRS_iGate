@@ -1,3 +1,4 @@
+#include <TinyGPS++.h>
 #include <WiFi.h>
 #include "configuration.h"
 #include "station_utils.h"
@@ -13,8 +14,10 @@
 #include "display.h"
 #include "utils.h"
 
+
 extern Configuration        Config;
 extern WiFiClient           espClient;
+extern TinyGPSPlus          gps;
 extern String               versionDate;
 extern String               firstLine;
 extern String               secondLine;
@@ -195,8 +198,20 @@ namespace Utils {
 
             activeStations();
 
-            String beaconPacket             = iGateBeaconPacket;
-            String secondaryBeaconPacket    = iGateLoRaBeaconPacket;
+            String beaconPacket            = iGateBeaconPacket;
+            String secondaryBeaconPacket   = iGateLoRaBeaconPacket;
+            #ifdef HAS_GPS
+                if (Config.beacon.gpsActive && !Config.digi.ecoMode) {
+                    GPS_Utils::getData();
+                    if (gps.location.isUpdated()) {
+                        GPS_Utils::generateBeaconFirstPart();
+                        String encodedGPS = GPS_Utils::encodeGPS(gps.location.lat(), gps.location.lng(), Config.beacon.overlay, Config.beacon.symbol);
+                        beaconPacket = iGateBeaconPacket + encodedGPS;
+                        secondaryBeaconPacket = iGateLoRaBeaconPacket + encodedGPS;
+                    }
+                }            
+            #endif    
+
             if (Config.wxsensor.active && wxModuleType != 0) {
                 String sensorData = WX_Utils::readDataSensor();
                 beaconPacket += sensorData;

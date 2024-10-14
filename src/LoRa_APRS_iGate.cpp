@@ -13,6 +13,7 @@
 ______________________________________________________________________________________________________________*/
 
 #include <ElegantOTA.h>
+#include <TinyGPS++.h>
 #include <Arduino.h>
 #include <WiFi.h>
 #include <vector>
@@ -39,19 +40,23 @@ ________________________________________________________________________________
     #include "A7670_utils.h"
 #endif
 
-String          versionDate             = "2024.10.14";
-Configuration   Config;
-WiFiClient      espClient;
+String              versionDate             = "2024.10.14";
+Configuration       Config;
+WiFiClient          espClient;
+#ifdef HAS_GPS
+    HardwareSerial  gpsSerial(1);
+    TinyGPSPlus     gps;
+#endif
 
-uint8_t         myWiFiAPIndex           = 0;
-int             myWiFiAPSize            = Config.wifiAPs.size();
-WiFi_AP         *currentWiFi            = &Config.wifiAPs[myWiFiAPIndex];
+uint8_t             myWiFiAPIndex           = 0;
+int                 myWiFiAPSize            = Config.wifiAPs.size();
+WiFi_AP             *currentWiFi            = &Config.wifiAPs[myWiFiAPIndex];
 
-bool            isUpdatingOTA           = false;
-uint32_t        lastBatteryCheck        = 0;
+bool                isUpdatingOTA           = false;
+uint32_t            lastBatteryCheck        = 0;
 
-bool            backUpDigiMode          = false;
-bool            modemLoggedToAPRSIS     = false;
+bool                backUpDigiMode          = false;
+bool                modemLoggedToAPRSIS     = false;
 
 std::vector<ReceivedPacket> receivedPackets;
 
@@ -65,7 +70,7 @@ void setup() {
     Utils::setupDisplay();
     LoRa_Utils::setup();
     Utils::validateFreqs();
-    GPS_Utils::generateBeacons();
+    GPS_Utils::setup();
 
     #ifdef STARTUP_DELAY    // (TEST) just to wait for WiFi init of Routers
         displayShow("", "  STARTUP DELAY ...", "", "", 0);

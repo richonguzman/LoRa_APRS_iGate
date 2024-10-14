@@ -256,6 +256,16 @@
     #define RADIO_BUSY_PIN      8
 #endif
 
+#if defined(TTGO_T_Beam_V1_2) || defined(TTGO_T_Beam_V1_2_915) || defined(TTGO_T_Beam_V1_0) || defined(TTGO_T_Beam_V1_0_915) || defined(TTGO_T_Beam_V1_0_SX1268) || defined(TTGO_T_Beam_V1_2_SX1262)
+    #define GPS_RX              12
+    #define GPS_TX              34
+#endif
+
+#if defined( HELTEC_WIRELESS_TRACKER)
+    #define GPS_RX              34
+    #define GPS_TX              33
+#endif
+
 /* (Same pins for LILYGO LoRa32 and ESP32 Wroom Dev )
 SX1278-------------------> ESP32 ttgo-lora32-v21 and ESP32 WROOM Dev
 GND                         GND
