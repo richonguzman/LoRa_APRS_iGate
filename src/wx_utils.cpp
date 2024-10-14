@@ -1,11 +1,10 @@
 #include "configuration.h"
-#include "gps_utils.h"
 #include "wx_utils.h"
 #include "display.h"
 
 
-#define SEALEVELPRESSURE_HPA (1013.25)
-#define CORRECTION_FACTOR (8.2296)      // for meters
+#define SEALEVELPRESSURE_HPA    (1013.25)
+#define CORRECTION_FACTOR       (8.2296)      // for meters
 
 extern Configuration            Config;
 extern String                   fifthLine;
