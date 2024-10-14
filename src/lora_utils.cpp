@@ -177,14 +177,14 @@ namespace LoRa_Utils {
                         Utils::println("(RSSI:" + String(rssi) + " / SNR:" + String(snr) + " / FreqErr:" + String(freqError) + ")");
 
                         if (!Config.lowPowerMode && !Config.digi.ecoMode) {
+                            if (receivedPackets.size() >= 10) {
+                                receivedPackets.erase(receivedPackets.begin());
+                            }
                             ReceivedPacket receivedPacket;
                             receivedPacket.rxTime   = NTP_Utils::getFormatedTime();
                             receivedPacket.packet   = packet.substring(3);
                             receivedPacket.RSSI     = rssi;
                             receivedPacket.SNR      = snr;
-                            if (receivedPackets.size() >= 20) {
-                                receivedPackets.erase(receivedPackets.begin());
-                            }
                             receivedPackets.push_back(receivedPacket);
                         }
 
