@@ -50,6 +50,7 @@ ____________________________________________________
 
 ## Timeline (Versions):
 
+- 2024.10.14 Received Packets in WebUI show real Local Time (NTP with GMT offset).
 - 2024.10.08 New EcoMode for Remote Digirepeaters without WiFi/WiFiAP, Screen, Leds (Example: LILYGO LoRa32 uses only 24mA, with WifiAP and all was 150mA). APRS Message/Queries can start/stop this mode too.
 - 2024.10.06 Cross Frequency Digirepeater Rules added.
 - 2024.09.23 Libraries Update for SDK3
