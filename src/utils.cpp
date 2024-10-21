@@ -186,7 +186,7 @@ namespace Utils {
         }
 
         #ifdef HAS_GPS
-            if (Config.beacon.gpsActive && gps.location.lat() == 0.0 && gps.location.lng() == 0.0) {
+            if (Config.beacon.gpsActive && gps.location.lat() == 0.0 && gps.location.lng() == 0.0 && Config.beacon.latitude == 0.0 && Config.beacon.longitude == 0.0) {
                 GPS_Utils::getData();
                 beaconUpdate = false;
             }
