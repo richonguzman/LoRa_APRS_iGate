@@ -27,11 +27,11 @@ namespace WIFI_Utils {
             if (backUpDigiMode) {
                 uint32_t WiFiCheck = millis() - lastBackupDigiTime;
                 if (WiFi.status() != WL_CONNECTED && WiFiCheck >= 15 * 60 * 1000) {
-                    Serial.println("*** Stoping BackUp Digi Mode ***");
+                    Serial.println("*** Stopping BackUp Digi Mode ***");
                     backUpDigiMode = false;
                     wifiCounter = 0;
                 } else if (WiFi.status() == WL_CONNECTED) {
-                    Serial.println("*** WiFi Reconnect Success (Stoping Backup Digi Mode) ***");
+                    Serial.println("*** WiFi Reconnect Success (Stopping Backup Digi Mode) ***");
                     backUpDigiMode = false;
                     wifiCounter = 0;
                 }
@@ -78,7 +78,7 @@ namespace WIFI_Utils {
             WiFi.disconnect();
             delay(500);
             unsigned long start = millis();
-            displayShow("", "Connecting to Wifi:", "", currentWiFi->ssid + " ...", 0);
+            displayShow("", "Connecting to WiFi:", "", currentWiFi->ssid + " ...", 0);
             Serial.print("\nConnecting to WiFi '"); Serial.print(currentWiFi->ssid); Serial.println("' ...");
             WiFi.begin(currentWiFi->ssid.c_str(), currentWiFi->password.c_str());
             while (WiFi.status() != WL_CONNECTED && wifiCounter<myWiFiAPSize) {
@@ -103,7 +103,7 @@ namespace WIFI_Utils {
                     currentWiFi = &Config.wifiAPs[myWiFiAPIndex];
                     start = millis();
                     Serial.print("\nConnecting to WiFi '"); Serial.print(currentWiFi->ssid); Serial.println("' ...");
-                    displayShow("", "Connecting to Wifi:", "", currentWiFi->ssid + " ...", 0);
+                    displayShow("", "Connecting to WiFi:", "", currentWiFi->ssid + " ...", 0);
                     WiFi.disconnect();
                     WiFi.begin(currentWiFi->ssid.c_str(), currentWiFi->password.c_str());
                 }
