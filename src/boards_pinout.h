@@ -186,7 +186,8 @@
     #define OLED_RST    -1
 #endif
 
-#if !defined(LIGHTGATEWAY_1_0) && !defined(HELTEC_HTCT62) && !defined(HELTEC_WSL_V3) && !defined(ESP32C3_DIY_1W_LoRa) && !defined(ESP32C3_DIY_1W_LoRa_915) && !defined(WEMOS_S2_MINI_DIY_LoRa)
+
+#if !defined(HELTEC_HTCT62) && !defined(HELTEC_WSL_V3) && !defined(ESP32C3_DIY_1W_LoRa) && !defined(ESP32C3_DIY_1W_LoRa_915) && !defined(WEMOS_S2_MINI_DIY_LoRa)
     #define HAS_DISPLAY
 #endif
 

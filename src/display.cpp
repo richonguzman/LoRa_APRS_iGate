@@ -67,20 +67,22 @@ void displaySetup() {
                     digitalWrite(OLED_RST, HIGH);
                 #endif
 
-                if(!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) { 
-                    Serial.println(F("SSD1306 allocation failed"));
-                    for(;;); // Don't proceed, loop forever
-                }
-                if (Config.display.turn180) {
+                if(display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) {
+                    if (Config.display.turn180) {
                     display.setRotation(2);
+                    }
+                    display.clearDisplay();
+                    display.setTextColor(WHITE);
+                    display.setTextSize(1);
+                    display.setCursor(0, 0);
+                    display.ssd1306_command(SSD1306_SETCONTRAST);
+                    display.ssd1306_command(1);
+                    display.display();
+                } else {
+                    //Serial.println(F("SSD1306 allocation failed"));
+                    #undef HAS_DISPLAY
                 }
-                display.clearDisplay();
-                display.setTextColor(WHITE);
-                display.setTextSize(1);
-                display.setCursor(0, 0);
-                display.ssd1306_command(SSD1306_SETCONTRAST);
-                display.ssd1306_command(1);
-                display.display();
+                
             #endif
         #endif
         delay(1000);
