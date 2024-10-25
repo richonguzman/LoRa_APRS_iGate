@@ -20,7 +20,12 @@ bool transmitFlag    = true;
     SX1262 radio = new Module(RADIO_CS_PIN, RADIO_DIO1_PIN, RADIO_RST_PIN, RADIO_BUSY_PIN);
 #endif
 #ifdef HAS_SX1268
-    SX1268 radio = new Module(RADIO_CS_PIN, RADIO_DIO1_PIN, RADIO_RST_PIN, RADIO_BUSY_PIN);
+    #if defined(LIGHTGATEWAY_1_0)
+        SPIClass loraSPI(FSPI);
+        SX1268 radio = new Module(RADIO_CS_PIN, RADIO_DIO1_PIN, RADIO_RST_PIN, RADIO_BUSY_PIN, loraSPI); 
+    #else
+        SX1268 radio = new Module(RADIO_CS_PIN, RADIO_DIO1_PIN, RADIO_RST_PIN, RADIO_BUSY_PIN);
+    #endif
 #endif
 #ifdef HAS_SX1278
     SX1278 radio = new Module(RADIO_CS_PIN, RADIO_BUSY_PIN, RADIO_RST_PIN);
@@ -42,7 +47,13 @@ namespace LoRa_Utils {
     }
 
     void setup() {
-        SPI.begin(RADIO_SCLK_PIN, RADIO_MISO_PIN, RADIO_MOSI_PIN);
+        #ifdef LIGHTGATEWAY_1_0
+            pinMode(RADIO_VCC_PIN,OUTPUT);
+            digitalWrite(RADIO_VCC_PIN,HIGH);
+            loraSPI.begin(RADIO_SCLK_PIN, RADIO_MISO_PIN, RADIO_MOSI_PIN, RADIO_CS_PIN);
+        #else
+            SPI.begin(RADIO_SCLK_PIN, RADIO_MISO_PIN, RADIO_MOSI_PIN);
+        #endif
         float freq = (float)Config.loramodule.rxFreq / 1000000;
         #if defined(RADIO_HAS_XTAL)
             radio.XTAL = true;
@@ -70,7 +81,7 @@ namespace LoRa_Utils {
         radio.setCodingRate(Config.loramodule.codingRate4);
         radio.setCRC(true);
 
-        #if defined(RADIO_RXEN) && defined(RADIO_TXEN)
+        #if (defined(RADIO_RXEN) && defined(RADIO_TXEN)) || defined(LIGHTGATEWAY_1_0)   // QRP Labs LightGateway has 400M22S (SX1268)
             radio.setRfSwitchPins(RADIO_RXEN, RADIO_TXEN);
         #endif
 

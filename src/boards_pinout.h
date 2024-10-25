@@ -10,66 +10,66 @@
 
 // LORA MODULES
 #if defined(TTGO_T_LORA32_V2_1) || defined(HELTEC_V2) || defined(ESP32_DIY_LoRa) || defined(TTGO_T_Beam_V1_2) || defined(TTGO_T_Beam_V1_0) || defined(TTGO_T_LORA32_V2_1_915) || defined(ESP32_DIY_LoRa_915) || defined(TTGO_T_Beam_V1_2_915) || defined(TTGO_T_Beam_V1_0_915)
-    #define RADIO_SCLK_PIN  5       // GPIO5    - SX1278 SCK
-    #define RADIO_MISO_PIN  19      // GPIO19   - SX1278 MISO
-    #define RADIO_MOSI_PIN  27      // GPIO27   - SX1278 MOSI
-    #define RADIO_CS_PIN    18      // GPIO18   - SX1278 CS ---> NSS
-    #define RADIO_RST_PIN   14      // GPIO14   - SX1278 RST
-    #define RADIO_BUSY_PIN  26      // GPIO26   - SX1278 IRQ ---->DIO0
+    #define RADIO_SCLK_PIN      5       // GPIO5    - SX1278 SCK
+    #define RADIO_MISO_PIN      19      // GPIO19   - SX1278 MISO
+    #define RADIO_MOSI_PIN      27      // GPIO27   - SX1278 MOSI
+    #define RADIO_CS_PIN        18      // GPIO18   - SX1278 CS ---> NSS
+    #define RADIO_RST_PIN       14      // GPIO14   - SX1278 RST
+    #define RADIO_BUSY_PIN      26      // GPIO26   - SX1278 IRQ ---->DIO0
 #endif
 
 #if defined(HELTEC_V3) || defined(HELTEC_WSL_V3) || defined(HELTEC_WSL_V3_DISPLAY) || defined(HELTEC_WIRELESS_TRACKER) || defined(HELTEC_WS) || defined(HELTEC_WP)
-    #define RADIO_SCLK_PIN  9       // SX1262 SCK
-    #define RADIO_MISO_PIN  11      // SX1262 MISO
-    #define RADIO_MOSI_PIN  10      // SX1262 MOSI
-    #define RADIO_CS_PIN    8       // SX1262 NSS
-    #define RADIO_RST_PIN   12      // SX1262 RST
-    #define RADIO_DIO1_PIN  14      // SX1262 DIO1
-    #define RADIO_BUSY_PIN  13      // SX1262 BUSY
+    #define RADIO_SCLK_PIN      9       // SX1262 SCK
+    #define RADIO_MISO_PIN      11      // SX1262 MISO
+    #define RADIO_MOSI_PIN      10      // SX1262 MOSI
+    #define RADIO_CS_PIN        8       // SX1262 NSS
+    #define RADIO_RST_PIN       12      // SX1262 RST
+    #define RADIO_DIO1_PIN      14      // SX1262 DIO1
+    #define RADIO_BUSY_PIN      13      // SX1262 BUSY
 #endif
 
 #if defined(ESP32_DIY_1W_LoRa) || defined(ESP32_DIY_1W_LoRa_915) || defined(ESP32_DIY_1W_LoRa_LLCC68)   // Ebyte E22 400M30S (SX1268) or E22 900M30S (SX1262) or E220 LLCC68
-    #define RADIO_SCLK_PIN  18
-    #define RADIO_MISO_PIN  19
-    #define RADIO_MOSI_PIN  23
-    #define RADIO_CS_PIN    5
-    #define RADIO_RST_PIN   27
-    #define RADIO_DIO1_PIN  12
-    #define RADIO_BUSY_PIN  14
-    #define RADIO_RXEN      32
-    #define RADIO_TXEN      25
+    #define RADIO_SCLK_PIN      18
+    #define RADIO_MISO_PIN      19
+    #define RADIO_MOSI_PIN      23
+    #define RADIO_CS_PIN        5
+    #define RADIO_RST_PIN       27
+    #define RADIO_DIO1_PIN      12
+    #define RADIO_BUSY_PIN      14
+    #define RADIO_RXEN          32
+    #define RADIO_TXEN          25
 #endif
 
 #if defined(ESP32_DIY_1W_LoRa_Mesh_V1_2)  // https://github.com/NanoVHF/Meshtastic-DIY/tree/main/PCB/ESP-32-devkit_EBYTE-E22/Mesh-v1.02-2LCD-FreePins
-    #define RADIO_SCLK_PIN  5
-    #define RADIO_MISO_PIN  19
-    #define RADIO_MOSI_PIN  27
-    #define RADIO_CS_PIN    18
-    #define RADIO_RST_PIN   23
-    #define RADIO_DIO1_PIN  33
-    #define RADIO_BUSY_PIN  32
-    #define RADIO_RXEN      14
-    #define RADIO_TXEN      13
+    #define RADIO_SCLK_PIN      5
+    #define RADIO_MISO_PIN      19
+    #define RADIO_MOSI_PIN      27
+    #define RADIO_CS_PIN        18
+    #define RADIO_RST_PIN       23
+    #define RADIO_DIO1_PIN      33
+    #define RADIO_BUSY_PIN      32
+    #define RADIO_RXEN          14
+    #define RADIO_TXEN          13
 #endif
 
 #ifdef WEMOS_LOLIN32_OLED_DIY_LoRa
-    #define RADIO_SCLK_PIN  15
-    #define RADIO_MISO_PIN  13
-    #define RADIO_MOSI_PIN  12
-    #define RADIO_CS_PIN    14
-    #define RADIO_RST_PIN   2
-    #define RADIO_BUSY_PIN  25
+    #define RADIO_SCLK_PIN      15
+    #define RADIO_MISO_PIN      13
+    #define RADIO_MOSI_PIN      12
+    #define RADIO_CS_PIN        14
+    #define RADIO_RST_PIN       2
+    #define RADIO_BUSY_PIN      25
 #endif
 
 #if defined(TTGO_T_Beam_V1_0_SX1268) || defined(TTGO_T_Beam_V1_2_SX1262)
-    #define RADIO_SCLK_PIN  5
-    #define RADIO_MISO_PIN  19
-    #define RADIO_MOSI_PIN  27
-    #define RADIO_CS_PIN    18
-    #define RADIO_DIO0_PIN  26
-    #define RADIO_RST_PIN   23
-    #define RADIO_DIO1_PIN  33
-    #define RADIO_BUSY_PIN  32
+    #define RADIO_SCLK_PIN      5
+    #define RADIO_MISO_PIN      19
+    #define RADIO_MOSI_PIN      27
+    #define RADIO_CS_PIN        18
+    #define RADIO_DIO0_PIN      26
+    #define RADIO_RST_PIN       23
+    #define RADIO_DIO1_PIN      33
+    #define RADIO_BUSY_PIN      32
 #endif
 
 #if defined(OE5HWN_MeshCom)
@@ -85,39 +85,39 @@
 #endif
 
 #if defined(HELTEC_HTCT62)
-    #define RADIO_SCLK_PIN  10   // SX1262 SCK
-    #define RADIO_MISO_PIN  6    // SX1262 MISO
-    #define RADIO_MOSI_PIN  7    // SX1262 MOSI
-    #define RADIO_CS_PIN    8    // SX1262 NSS
-    #define RADIO_RST_PIN   5    // SX1262 RST
-    #define RADIO_DIO1_PIN  3    // SX1262 DIO1
-    #define RADIO_BUSY_PIN  4    // SX1262 BUSY
+    #define RADIO_SCLK_PIN      10   // SX1262 SCK
+    #define RADIO_MISO_PIN      6    // SX1262 MISO
+    #define RADIO_MOSI_PIN      7    // SX1262 MOSI
+    #define RADIO_CS_PIN        8    // SX1262 NSS
+    #define RADIO_RST_PIN       5    // SX1262 RST
+    #define RADIO_DIO1_PIN      3    // SX1262 DIO1
+    #define RADIO_BUSY_PIN      4    // SX1262 BUSY
 #endif
 
 #if defined(ESP32_DIY_LoRa_A7670) || defined(ESP32_DIY_LoRa_A7670_915)
-    #define RADIO_SCLK_PIN  18
-    #define RADIO_MISO_PIN  19
-    #define RADIO_MOSI_PIN  23
-    #define RADIO_CS_PIN    2
-    #define RADIO_RST_PIN   0
-    #define RADIO_BUSY_PIN  32
-    #define A7670_PWR_PIN   4
-    #define A7670_ResetPin  5
-    #define A7670_TX_PIN    26
-    #define A7670_RX_PIN    27
+    #define RADIO_SCLK_PIN      18
+    #define RADIO_MISO_PIN      19
+    #define RADIO_MOSI_PIN      23
+    #define RADIO_CS_PIN        2
+    #define RADIO_RST_PIN       0
+    #define RADIO_BUSY_PIN      32
+    #define A7670_PWR_PIN       4
+    #define A7670_ResetPin      5
+    #define A7670_TX_PIN        26
+    #define A7670_RX_PIN        27
 #endif
 
 #ifdef WEMOS_D1_R32_RA02
-    #define RADIO_SCLK_PIN  18
-    #define RADIO_MISO_PIN  19
-    #define RADIO_MOSI_PIN  23
-    #define RADIO_CS_PIN    5
-    #define RADIO_BUSY_PIN  12
-    #define RADIO_RST_PIN   13
-    #define RADIO_DIO1_PIN  14
-    #define OLED_SDA        21
-    #define OLED_SCL        22
-    #define OLED_RST        36
+    #define RADIO_SCLK_PIN      18
+    #define RADIO_MISO_PIN      19
+    #define RADIO_MOSI_PIN      23
+    #define RADIO_CS_PIN        5
+    #define RADIO_BUSY_PIN      12
+    #define RADIO_RST_PIN       13
+    #define RADIO_DIO1_PIN      14
+    #define OLED_SDA            21
+    #define OLED_SCL            22
+    #define OLED_RST            36
 #endif
 
 #if defined(ESP32C3_DIY_1W_LoRa) || defined(ESP32C3_DIY_1W_LoRa_915)
@@ -133,12 +133,25 @@
 #endif
 
 #ifdef WEMOS_S2_MINI_DIY_LoRa
-    #define RADIO_SCLK_PIN  36
-    #define RADIO_MISO_PIN  37
-    #define RADIO_MOSI_PIN  35
-    #define RADIO_CS_PIN    34
-    #define RADIO_BUSY_PIN  38
-    #define RADIO_RST_PIN   33
+    #define RADIO_SCLK_PIN      36
+    #define RADIO_MISO_PIN      37
+    #define RADIO_MOSI_PIN      35
+    #define RADIO_CS_PIN        34
+    #define RADIO_BUSY_PIN      38
+    #define RADIO_RST_PIN       33
+#endif
+
+#ifdef LIGHTGATEWAY_1_0
+    #define RADIO_VCC_PIN       21
+    #define RADIO_SCLK_PIN      12
+    #define RADIO_MISO_PIN      13
+    #define RADIO_MOSI_PIN      11
+    #define RADIO_CS_PIN        10
+    #define RADIO_RST_PIN       9
+    #define RADIO_DIO1_PIN      5
+    #define RADIO_BUSY_PIN      6
+    #define RADIO_RXEN          42
+    #define RADIO_TXEN          14
 #endif
 
 
@@ -167,9 +180,16 @@
     #define OLED_RST    -1
 #endif
 
-#if !defined(HELTEC_HTCT62) && !defined(HELTEC_WSL_V3) && !defined(ESP32C3_DIY_1W_LoRa) && !defined(ESP32C3_DIY_1W_LoRa_915) && !defined(WEMOS_S2_MINI_DIY_LoRa)
+#ifdef LIGHTGATEWAY_1_0
+    #define OLED_SDA    3
+    #define OLED_SCL    4
+    #define OLED_RST    -1
+#endif
+
+#if !defined(LIGHTGATEWAY_1_0) && !defined(HELTEC_HTCT62) && !defined(HELTEC_WSL_V3) && !defined(ESP32C3_DIY_1W_LoRa) && !defined(ESP32C3_DIY_1W_LoRa_915) && !defined(WEMOS_S2_MINI_DIY_LoRa)
     #define HAS_DISPLAY
 #endif
+
 
 // Leds and other stuff
 #ifdef HELTEC_HTCT62
@@ -256,6 +276,13 @@
     #define RADIO_BUSY_PIN      8
 #endif
 
+#ifdef LIGHTGATEWAY_1_0
+    #define BUTTON_PIN          0
+    #define INTERNAL_LED_PIN    16
+#endif
+
+
+//      GPS
 #if defined(TTGO_T_Beam_V1_2) || defined(TTGO_T_Beam_V1_2_915) || defined(TTGO_T_Beam_V1_0) || defined(TTGO_T_Beam_V1_0_915) || defined(TTGO_T_Beam_V1_0_SX1268) || defined(TTGO_T_Beam_V1_2_SX1262)
     #define GPS_RX              12
     #define GPS_TX              34
@@ -265,6 +292,7 @@
     #define GPS_RX              34
     #define GPS_TX              33
 #endif
+
 
 /* (Same pins for LILYGO LoRa32 and ESP32 Wroom Dev )
 SX1278-------------------> ESP32 ttgo-lora32-v21 and ESP32 WROOM Dev
