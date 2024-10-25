@@ -38,6 +38,8 @@ ____________________________________________________
 
 - HELTEC V2, V3 , Wireless Stick, Wireless Stick Lite, HT-CT62, Wireless Tracker.
 
+- QRP Labs LightGateway 1.0.
+
 - ESP32 Wroom + SX1278 LoRa Module or Ebyte 400M30S (or 900M30S) 1W LoRa Module for a DIY Versions.
 
 - ESP32C3 + Ebyte 400M30S(or 900M30S) 1W LoRa Module for another DIY version.
@@ -50,6 +52,7 @@ ____________________________________________________
 
 ## Timeline (Versions):
 
+- 2024.10.25 Added QRP Labs LightGateway 1.0 support.
 - 2024.10.21 Boards with GPS can now send Real-GPS Beacon (also posible: GPS ambiguity of ~ 1 km).
 - 2024.10.14 Received Packets in WebUI show real Local Time (NTP with GMT offset).
 - 2024.10.08 New EcoMode for Remote Digirepeaters without WiFi/WiFiAP, Screen, Leds (Example: LILYGO LoRa32 uses only 24mA, with WifiAP and all was 150mA). APRS Message/Queries can start/stop this mode too.

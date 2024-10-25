@@ -73,6 +73,8 @@ jobs:
                       chip: esp32c3
                     - name: ESP32_C3_OctopusLab_LoRa
                       chip: esp32c3
+                    - name: QRPLabs_LightGateway_1_0
+                      chip: esp32s3
         steps:
             - uses: actions/checkout@v3
 
