@@ -310,4 +310,22 @@ DIO0                        26
 REST                        14
 GND                         -  */
 
+
+#ifdef TTGO_T_LORA32_T3S3_V1_2_915
+    #define RADIO_SCLK_PIN      5       // SX1262 SCK
+    #define RADIO_MISO_PIN      3       // SX1262 MISO
+    #define RADIO_MOSI_PIN      6       // SX1262 MOSI
+    #define RADIO_CS_PIN        7       // SX1262 NSS
+    #define RADIO_RST_PIN       8       // SX1262 RST
+    #define RADIO_DIO1_PIN      33      // SX1262 DIO1
+    #define RADIO_BUSY_PIN      34      // SX1262 BUSY
+
+    #define OLED_SDA            18  //17?   
+    #define OLED_SCL            17  //18?
+    #define OLED_RST            -1
+
+    #define INTERNAL_LED_PIN    37      // Green Led
+    #define BATTERY_PIN         1
+#endif
+
 #endif
