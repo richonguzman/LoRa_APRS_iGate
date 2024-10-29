@@ -205,7 +205,7 @@ namespace POWER_Utils {
             Wire1.begin(BOARD_I2C_SDA, BOARD_I2C_SCL);
         #endif
 
-        #if defined(HELTEC_V3) || defined(HELTEC_WS) || defined(LIGHTGATEWAY_1_0) || defined(TTGO_T_LORA32_T3S3_V1_2_915)
+        #if defined(HELTEC_V3) || defined(HELTEC_WS) || defined(LIGHTGATEWAY_1_0) || defined(TTGO_LORA32_T3S3_V1_2)
             Wire.begin(OLED_SDA, OLED_SCL);
         #endif
         
