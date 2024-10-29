@@ -71,9 +71,7 @@ void displaySetup() {
 
                 if(display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) {
                     displayFound = true;
-                    if (Config.display.turn180) {
-                    display.setRotation(2);
-                    }
+                    if (Config.display.turn180) display.setRotation(2);
                     display.clearDisplay();
                     display.setTextColor(WHITE);
                     display.setTextSize(1);
