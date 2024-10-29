@@ -32,11 +32,11 @@ ____________________________________________________
 
 (NOTE: all boards with 433-868-915 MHz versions)
 
-- TTGO Lilygo LoRa32 v2.1 / v1.6 (they work the same).
+- TTGO Lilygo LoRa32 T3S3 V1.2 and LoRa32 V2.1 (V1.6 is the same).
 
-- TTGO T-Beam v1.0 , v1.1, v1.2 (also variations with SX1262 and SX1268 LoRa Modules).
+- TTGO T-Beam V1.0 , V1.1, V1.2 (also variations with SX1262 and SX1268 LoRa Modules).
 
-- HELTEC V2, V3 , Wireless Stick, Wireless Stick Lite, HT-CT62, Wireless Tracker.
+- HELTEC V2, V3 , Wireless Stick, Wireless Stick Lite, HT-CT62, Wireless Tracker, Wireless Paper.
 
 - QRP Labs LightGateway 1.0.
 
@@ -52,6 +52,7 @@ ____________________________________________________
 
 ## Timeline (Versions):
 
+- 2024.10.29 Added LILYGO Lora32 T3S3 support.
 - 2024.10.25 Added QRP Labs LightGateway 1.0 support.
 - 2024.10.21 Boards with GPS can now send Real-GPS Beacon (also posible: GPS ambiguity of ~ 1 km).
 - 2024.10.14 Received Packets in WebUI show real Local Time (NTP with GMT offset).
