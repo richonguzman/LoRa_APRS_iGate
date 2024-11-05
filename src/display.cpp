@@ -1,6 +1,6 @@
 #include <Wire.h>
 #include "configuration.h"
-#include "boards_pinout.h"
+#include "board_pinout.h"
 #include "display.h"
 
 

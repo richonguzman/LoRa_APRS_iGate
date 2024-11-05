@@ -2,7 +2,7 @@
 #include <WiFi.h>
 #include "configuration.h"
 #include "aprs_is_utils.h"
-#include "boards_pinout.h"
+#include "board_pinout.h"
 #include "syslog_utils.h"
 #include "ntp_utils.h"
 #include "display.h"
