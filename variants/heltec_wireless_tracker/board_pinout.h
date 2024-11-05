@@ -5,7 +5,7 @@
     #define HAS_DISPLAY
     #define HAS_TFT
     #define HAS_GPS
-    #define GPS_BAUDRATE=115200
+    #define GPS_BAUDRATE 115200
 
     /*#undef  OLED_SDA
     #undef  OLED_SCL

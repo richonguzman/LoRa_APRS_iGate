@@ -16,7 +16,7 @@
             #define lineSpacing     12
         #endif
     #else
-        #if HAS_EPAPER
+        #ifdef HAS_EPAPER
             //
         #else
             #include <Adafruit_GFX.h>
@@ -59,7 +59,7 @@ void displaySetup() {
             tft.setTextFont(0);
             tft.fillScreen(TFT_BLACK);
         #else
-            #if HAS_EPAPER
+            #ifdef HAS_EPAPER
                 //
             #else
                 #ifdef OLED_DISPLAY_HAS_RST_PIN
@@ -92,7 +92,7 @@ void displayToggle(bool toggle) {
             #ifdef HAS_TFT
                 digitalWrite(TFT_BL, HIGH);
             #else
-                #if HAS_EPAPER
+                #ifdef HAS_EPAPER
                     // ... to be continued
                 #else
                     if (displayFound) display.ssd1306_command(SSD1306_DISPLAYON);
@@ -102,7 +102,7 @@ void displayToggle(bool toggle) {
             #ifdef HAS_TFT
                 digitalWrite(TFT_BL, LOW);
             #else
-                #if HAS_EPAPER
+                #ifdef HAS_EPAPER
                     // ... to be continued
                 #else
                     if (displayFound) display.ssd1306_command(SSD1306_DISPLAYOFF);
