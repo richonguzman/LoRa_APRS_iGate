@@ -1,7 +1,7 @@
 #ifndef BOARD_PINOUT_H_
 #define BOARD_PINOUT_H_
 
-    #define HAS_SX1262
+    #define HAS_SX1278
     #define HAS_DISPLAY
 
     #undef  OLED_SDA

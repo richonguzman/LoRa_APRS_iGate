@@ -3,6 +3,7 @@
 
     #define HAS_SX1262
     #define HAS_DISPLAY
+    #define HAS_EPAPER
 
     #undef  OLED_SDA
     #undef  OLED_SCL
