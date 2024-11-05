@@ -1,6 +1,6 @@
 #include <WiFi.h>
 #include "configuration.h"
-#include "boards_pinout.h"
+#include "board_pinout.h"
 #include "wifi_utils.h"
 #include "display.h"
 #include "utils.h"

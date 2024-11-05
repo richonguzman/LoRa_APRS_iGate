@@ -1,6 +1,6 @@
 #include "configuration.h"
 #include "battery_utils.h"
-#include "boards_pinout.h"
+#include "board_pinout.h"
 #include "power_utils.h"
 
 #if defined(HAS_AXP192) || defined(HAS_AXP2101)

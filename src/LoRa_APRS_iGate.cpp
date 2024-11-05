@@ -21,8 +21,8 @@ ________________________________________________________________________________
 #include "battery_utils.h"
 #include "aprs_is_utils.h"
 #include "station_utils.h"
-#include "boards_pinout.h"
 #include "battery_utils.h"
+#include "board_pinout.h"
 #include "syslog_utils.h"
 #include "query_utils.h"
 #include "power_utils.h"
@@ -40,7 +40,7 @@ ________________________________________________________________________________
     #include "A7670_utils.h"
 #endif
 
-String              versionDate             = "2024.10.29";
+String              versionDate             = "2024.11.05";
 Configuration       Config;
 WiFiClient          espClient;
 #ifdef HAS_GPS

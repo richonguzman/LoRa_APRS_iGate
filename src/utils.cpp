@@ -4,7 +4,7 @@
 #include "station_utils.h"
 #include "battery_utils.h"
 #include "aprs_is_utils.h"
-#include "boards_pinout.h"
+#include "board_pinout.h"
 #include "syslog_utils.h"
 #include "A7670_utils.h"
 #include "lora_utils.h"

@@ -1,6 +1,6 @@
 #include "configuration.h"
 #include "aprs_is_utils.h"
-#include "boards_pinout.h"
+#include "board_pinout.h"
 #include "A7670_utils.h"
 #include "lora_utils.h"
 #include "display.h"
