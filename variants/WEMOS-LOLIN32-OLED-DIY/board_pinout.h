@@ -12,9 +12,6 @@
     #define OLED_SCL                4
     #define OLED_RST                -1
 
-    #define INTERNAL_LED_PIN        37
-    #define BATTERY_PIN             1
-
     #define RADIO_SCLK_PIN          15
     #define RADIO_MISO_PIN          13
     #define RADIO_MOSI_PIN          12

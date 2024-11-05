@@ -5,23 +5,35 @@
     #define HAS_DISPLAY
     #define HAS_EPAPER
 
-    #undef  OLED_SDA
+    /*#undef  OLED_SDA
     #undef  OLED_SCL
     #undef  OLED_RST
 
     #define OLED_SDA                18
     #define OLED_SCL                17
-    #define OLED_RST                -1      // Reset pin # (or -1 if sharing Arduino reset pin)
+    #define OLED_RST                -1      // Reset pin # (or -1 if sharing Arduino reset pin)*/
 
-    #define INTERNAL_LED_PIN        37      // Green Led
-    #define BATTERY_PIN             1
+    #define INTERNAL_LED_PIN        18
+    #define BATTERY_PIN             20
 
-    #define RADIO_SCLK_PIN          5
-    #define RADIO_MISO_PIN          3
-    #define RADIO_MOSI_PIN          6
-    #define RADIO_CS_PIN            7
-    #define RADIO_RST_PIN           8
-    #define RADIO_DIO1_PIN          33
-    #define RADIO_BUSY_PIN          34 
+    #define RADIO_SCLK_PIN          9
+    #define RADIO_MISO_PIN          11
+    #define RADIO_MOSI_PIN          10
+    #define RADIO_CS_PIN            8
+    #define RADIO_RST_PIN           12
+    #define RADIO_DIO1_PIN          14
+    #define RADIO_BUSY_PIN          13
+
+    #define ADC_CTRL                19
+    #define VEXT_CTRL               45
+    #define BOARD_I2C_SDA           37
+    #define BOARD_I2C_SCL           36
+
+    #define EPAPER_BUSY             7
+    #define EPAPER_RST              6
+    #define EPAPER_DC               5
+    #define EPAPER_CS               4
+    #define EPAPER_SCL              3
+    #define EPAPER_SDA              2
 
 #endif

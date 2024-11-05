@@ -22,6 +22,5 @@
     #define RADIO_CS_PIN            18
     #define RADIO_RST_PIN           14
     #define RADIO_BUSY_PIN          26
-    
 
 #endif
