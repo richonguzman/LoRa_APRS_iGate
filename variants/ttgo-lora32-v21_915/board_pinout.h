@@ -1,14 +1,13 @@
 #ifndef BOARD_PINOUT_H_
 #define BOARD_PINOUT_H_
 
-
     #define HAS_SX1276
     #define HAS_DISPLAY
 	#define HAS_ADC_CALIBRATION
 
-    #undef OLED_SDA
-    #undef OLED_SCL
-    #undef OLED_RST
+    #undef  OLED_SDA
+    #undef  OLED_SCL
+    #undef  OLED_RST
 
     #define OLED_SDA                21
     #define OLED_SCL                22
