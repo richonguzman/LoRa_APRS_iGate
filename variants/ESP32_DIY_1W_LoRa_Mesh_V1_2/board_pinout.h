@@ -21,8 +21,8 @@
     #undef  OLED_SCL
     #undef  OLED_RST
 
-    #define OLED_SDA                22
-    #define OLED_SCL                21
+    #define OLED_SDA                21
+    #define OLED_SCL                22
     #define OLED_RST                -1      // Reset pin # (or -1 if sharing Arduino reset pin)
 
 #endif

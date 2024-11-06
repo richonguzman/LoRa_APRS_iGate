@@ -22,9 +22,5 @@
     #define OLED_SDA                0
     #define OLED_SCL                1
     #define OLED_RST                -1      // Reset pin # (or -1 if sharing Arduino reset pin)
-
-    //  Aditional Config
-    #define INTERNAL_LED_PIN        25      // Green Led
-    #define BATTERY_PIN             35    
     
 #endif
