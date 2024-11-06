@@ -34,6 +34,7 @@ extern const unsigned char favicon_data[] asm("_binary_data_embed_favicon_png_gz
 extern const unsigned char favicon_data_end[] asm("_binary_data_embed_favicon_png_gz_end");
 extern const size_t favicon_data_len = favicon_data_end - favicon_data;
 
+
 namespace WEB_Utils {
 
     AsyncWebServer server(80);
@@ -136,7 +137,7 @@ namespace WEB_Utils {
 
         Config.beacon.gpsActive             = request->hasParam("beacon.gpsActive", true);
         Config.beacon.gpsAmbiguity          = request->hasParam("beacon.gpsAmbiguity", true);
-        
+
 
         Config.digi.mode                    = request->getParam("digi.mode", true)->value().toInt();
         Config.digi.ecoMode                 = request->hasParam("digi.ecoMode", true);
@@ -186,7 +187,7 @@ namespace WEB_Utils {
             Config.syslog.server            = request->getParam("syslog.server", true)->value();
             Config.syslog.port              = request->getParam("syslog.port", true)->value().toInt();
         }
-        
+
         Config.tnc.enableServer             = request->hasParam("tnc.enableServer", true);
         Config.tnc.enableSerial             = request->hasParam("tnc.enableSerial", true);
         Config.tnc.acceptOwn                = request->hasParam("tnc.acceptOwn", true);

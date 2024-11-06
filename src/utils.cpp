@@ -83,7 +83,7 @@ namespace Utils {
             return "- BACKUP DIGI MODE -";
         } else {
             return "IP :  " + String(WiFi.localIP()[0]) + "." + String(WiFi.localIP()[1]) + "." + String(WiFi.localIP()[2]) + "." + String(WiFi.localIP()[3]);
-        }        
+        }
     }
 
     void setupDisplay() {
@@ -122,10 +122,14 @@ namespace Utils {
         baseAPRSISTelemetryPacket += ":";
 
         String baseRFTelemetryPacket = Config.callsign;
-        baseRFTelemetryPacket += ">APLRG1,WIDE1-1::";
+        baseRFTelemetryPacket += ">APLRG1";
+        if (Config.beacon.path.indexOf("WIDE") != -1) {
+            baseRFTelemetryPacket += ",";
+            baseRFTelemetryPacket += Config.beacon.path;
+        }
+        baseRFTelemetryPacket += "::";
         baseRFTelemetryPacket += sender;
         baseRFTelemetryPacket += ":";
-
 
         String telemetryPacket1 = "EQNS.";
         if (Config.battery.sendInternalVoltage) {
@@ -177,7 +181,7 @@ namespace Utils {
             delay(3000);
         }
         sendStartTelemetry = false;
-    }            
+    }
 
     void checkBeaconInterval() {
         uint32_t lastTx = millis() - lastBeaconTx;
@@ -200,7 +204,7 @@ namespace Utils {
             if (sendStartTelemetry && Config.battery.sendVoltageAsTelemetry && !Config.wxsensor.active && (Config.battery.sendInternalVoltage || Config.battery.sendExternalVoltage)) {
                 sendInitialTelemetryPackets();
             }
-            
+
             STATION_Utils::deleteNotHeard();
 
             activeStations();
@@ -250,7 +254,7 @@ namespace Utils {
                             secondaryBeaconPacket   += " Batt=";
                             secondaryBeaconPacket   += internalVoltageInfo;
                         }
-                    }      
+                    }
                 }
             #endif
 
@@ -273,8 +277,8 @@ namespace Utils {
                             beaconPacket            += externalVoltageInfo;
                             secondaryBeaconPacket   += " Ext=";
                             secondaryBeaconPacket   += externalVoltageInfo;
-                        }                        
-                    }                    
+                        }
+                    }
                 }
             #endif
 
@@ -286,7 +290,7 @@ namespace Utils {
 
             if (Config.aprs_is.active && Config.beacon.sendViaAPRSIS && !backUpDigiMode) {
                 Utils::println("-- Sending Beacon to APRSIS --");
-                displayShow(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING IGATE BEACON", 0); 
+                displayShow(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING IGATE BEACON", 0);
                 seventhLine = "     listening...";
                 #ifdef HAS_A7670
                     A7670_Utils::uploadToAPRSIS(beaconPacket);
@@ -338,7 +342,7 @@ namespace Utils {
             case 1: // APRS-LoRa
                 fifthLine = "APRS-IS ----> LoRa Tx";
                 break;
-            case 2: // Digi
+            case 2: // Digipeater
                 fifthLine = "LoRa Rx ----> LoRa Tx";
                 break;
         }

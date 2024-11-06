@@ -19,6 +19,7 @@ WiFiServer tncServer(TNC_PORT);
 String inputServerBuffer[INPUT_BUFFER_SIZE];
 String inputSerialBuffer = "";
 
+
 namespace TNC_Utils {
     
     void setup() {

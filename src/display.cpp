@@ -11,9 +11,9 @@
         TFT_eSPI tft = TFT_eSPI(); 
 
         #ifdef HELTEC_WIRELESS_TRACKER
-            #define bigSizeFont     2.5
-            #define smallSizeFont   1.5
-            #define lineSpacing     12
+            #define bigSizeFont     2
+            #define smallSizeFont   1
+            #define lineSpacing     10
         #endif
     #else
         #ifdef HAS_EPAPER
@@ -79,7 +79,7 @@ void displaySetup() {
                     display.ssd1306_command(SSD1306_SETCONTRAST);
                     display.ssd1306_command(1);
                     display.display();
-                }                
+                }
             #endif
         #endif
         delay(1000);

@@ -16,7 +16,6 @@ struct LastHeardStation {
     String      station;
 };
 
-
 namespace STATION_Utils {
 
     void deleteNotHeard();

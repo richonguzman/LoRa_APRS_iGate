@@ -125,7 +125,7 @@ namespace WX_Utils {
                             break;
                     }
                 }
-            }            
+            }
         }
     }
 
@@ -232,7 +232,7 @@ namespace WX_Utils {
                 presStr = ".....";
             } else {
                 presStr = generatePresString(newPress + (Config.wxsensor.heightCorrection/CORRECTION_FACTOR));
-            }           
+            }
             
             fifthLine = "BME-> ";
             fifthLine += String(int(newTemp + Config.wxsensor.temperatureCorrection));

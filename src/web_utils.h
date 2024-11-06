@@ -13,10 +13,6 @@ namespace WEB_Utils {
     void handleNotFound(AsyncWebServerRequest *request);
     void handleStatus(AsyncWebServerRequest *request);
     void handleHome(AsyncWebServerRequest *request);
-
-    //void handleReadConfiguration(AsyncWebServerRequest *request);
-    //void handleWriteConfiguration(AsyncWebServerRequest *request);
-
     void handleStyle(AsyncWebServerRequest *request);
     void handleScript(AsyncWebServerRequest *request);
     void handleBootstrapStyle(AsyncWebServerRequest *request);

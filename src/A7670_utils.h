@@ -3,6 +3,7 @@
 
 #include <Arduino.h>
 
+
 namespace A7670_Utils {
 
     bool checkModemOn();

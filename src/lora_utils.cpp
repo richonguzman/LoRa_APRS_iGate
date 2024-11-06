@@ -40,6 +40,7 @@ bool transmitFlag    = true;
 int rssi, freqError;
 float snr;
 
+
 namespace LoRa_Utils {
 
     void setFlag(void) {
@@ -204,7 +205,7 @@ namespace LoRa_Utils {
                         }
                         lastRxTime = millis();
                         return packet;
-                    }                
+                    }
                 } else if (state == RADIOLIB_ERR_CRC_MISMATCH) {
                     rssi        = radio.getRSSI();
                     snr         = radio.getSNR();

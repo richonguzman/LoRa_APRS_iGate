@@ -5,6 +5,7 @@
 
 #define SCREEN_ADDRESS  0x3C    ///< See datasheet for Address; 0x3D for 128x64, 0x3C for 128x32
 
+
 void cleanTFT();
 void displaySetup();
 void displayToggle(bool toggle);

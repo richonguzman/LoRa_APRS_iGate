@@ -101,7 +101,7 @@ namespace APRS_IS_Utils {
             if(aprsisState == "--" && !Config.display.alwaysOn && Config.display.timeout != 0) {
                 displayToggle(true);
                 lastScreenOn = millis();
-            }            
+            }
         }
         secondLine = "WiFi: ";
         secondLine += wifiState;
@@ -176,7 +176,7 @@ namespace APRS_IS_Utils {
     void processLoRaPacket(const String& packet) {
         if (espClient.connected() || modemLoggedToAPRSIS) {
             if (packet != "") {
-                if ((packet.substring(0, 3) == "\x3c\xff\x01")  && (packet.indexOf("NOGATE") == -1) && (packet.indexOf("RFONLY") == -1)) {                    
+                if ((packet.substring(0, 3) == "\x3c\xff\x01")  && (packet.indexOf("NOGATE") == -1) && (packet.indexOf("RFONLY") == -1)) {
                     int firstColonIndex = packet.indexOf(":");
                     if (firstColonIndex > 5 && firstColonIndex < (packet.length() - 1) && packet[firstColonIndex + 1] != '}' && packet.indexOf("TCPIP") == -1) {
                         const String& Sender = packet.substring(3, packet.indexOf(">"));
@@ -207,7 +207,7 @@ namespace APRS_IS_Utils {
                                 displayShow(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
                             }
                         }
-                    }                    
+                    }
                 }
             }
         }
@@ -285,7 +285,7 @@ namespace APRS_IS_Utils {
                             A7670_Utils::uploadToAPRSIS(ackPacket);
                         #else
                             upload(ackPacket);
-                        #endif                        
+                        #endif
                         receivedMessage = AddresseeAndMessage.substring(AddresseeAndMessage.indexOf(":") + 1, AddresseeAndMessage.indexOf("{"));
                     } else {
                         receivedMessage = AddresseeAndMessage.substring(AddresseeAndMessage.indexOf(":") + 1);

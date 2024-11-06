@@ -126,7 +126,7 @@ namespace BATTERY_Utils {
                             sample = 0;
                         #endif
                     #endif
-                #endif                
+                #endif
                 sampleSum += sample;
                 delayMicroseconds(50); 
             }
@@ -182,7 +182,7 @@ namespace BATTERY_Utils {
 
         float extVoltage;
         #ifdef HAS_ADC_CALIBRATION
-            if (calibrationEnable){       
+            if (calibrationEnable){
                 extVoltage = esp_adc_cal_raw_to_voltage(sampleSum / 100, &adc_chars) * voltageDividerTransformation; // in mV
                 extVoltage /= 1000;
             } else {
@@ -240,7 +240,7 @@ namespace BATTERY_Utils {
                     tempValue = value;
                     break;
             }
-        }        
+        }
 
         int firstByte   = tempValue / 91;
         tempValue       -= firstByte * 91;
