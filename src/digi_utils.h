@@ -7,7 +7,7 @@
 namespace DIGI_Utils {
 
     String  buildPacket(const String& path, const String& packet, bool thirdParty, bool crossFreq);
-    String  generateDigiRepeatedPacket(const String& packet, bool thirdParty);
+    String  generateDigipeatedPacket(const String& packet, bool thirdParty);
     void    processLoRaPacket(const String& packet);
     void    checkEcoMode();
 

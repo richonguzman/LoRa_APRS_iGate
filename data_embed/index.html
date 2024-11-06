@@ -121,7 +121,7 @@
                                 <div class="row">
                                     <div class="col-12">
                                         <label for="callsign" class="form-label"
-                                            >Callsign and SSID</label
+                                            >Callsign - SSID</label
                                         >
                                         <input
                                             type="text"
@@ -152,7 +152,7 @@
                                         <label
                                             for="beacon.path"
                                             class="form-label"
-                                            >Beacon path</label
+                                            >Beacon Path</label
                                         >
                                         <input
                                             type="text"
@@ -492,8 +492,7 @@
                                             <label
                                                 for="beacon.sendViaAPRSIS"
                                                 class="form-label"
-                                                >Send beacon to
-                                                APRS-IS
+                                                >Send beacon via APRS-IS
                                             </label>
                                         </div>
                                     </div>
@@ -516,12 +515,12 @@
                                         <button class="btn btn-primary" id="send-beacon">Send beacon now</button>
                                     </div>
                                 </div>
-                                <div class="row mt-3">
+                                <div class="row mt-4">
                                     <div class="col-12">
                                         <label
                                             for="beacon.interval"
                                             class="form-label"
-                                            >Interval
+                                            >Beacon Interval
                                         </label>
                                         <div class="input-group">
                                             <input
@@ -626,7 +625,7 @@
                                             <label
                                                 for="digi.ecoMode"
                                                 class="form-label"
-                                                >Eco Mode<small> This will disable WiFi, Display, Leds and lower CPU Speed for Low Power Digirepeater. (<strong>Caution:</strong> Active means No WebUI Configuration, so <strong>ONLY</strong> activate this for Remote Digirepeater)</small></label
+                                                >Eco Mode<small> This will disable WiFi, Display, Leds and lower CPU Speed for Low Power Digipeater. (<strong>Caution:</strong> Active means No WebUI Configuration, so <strong>ONLY</strong> activate this for Remote Digipeater)</small></label
                                             >
                                         </div>
                                     </div>
@@ -1198,7 +1197,7 @@
                                                 class="form-label"
                                                 ><b>Activate Wx Telemetry</b>
                                                 <small
-                                                    >Requires a BME/BMP280, BME680 or Si7021 sensor installed</small
+                                                    >Requires a BME/BMP280, BME680 or Si7021 sensor.</small
                                                 ></label
                                             >
                                         </div>
@@ -1296,7 +1295,7 @@
                                             type="text"
                                             name="syslog.server"
                                             id="syslog.server"
-                                            placeholder="192.168.0.100"
+                                            placeholder="lora.link9.net"
                                             class="form-control"
                                             disabled
                                         />
@@ -1744,7 +1743,7 @@
                                     <div class="col-12">
                                         <div class="form-check form-switch">
                                             <div class="form-text">
-                                                When "only" iGate Mode loses WiFi, it will change into a Digirepeater Mode and after 15 min check if WiFi available and return to "only" iGate Mode.
+                                                When "only" iGate Mode loses WiFi, it will change into a Digipeater Mode and after 15 min check if WiFi available and return to "only" iGate Mode.
                                             </div>
                                             <input
                                                 type="checkbox"
@@ -1755,7 +1754,7 @@
                                             <label
                                                 for="other.backupDigiMode"
                                                 class="form-label"
-                                                >Backup Digirepeater Mode</label
+                                                >Backup Digipeater Mode</label
                                             >
                                         </div>
                                     </div>

@@ -51,15 +51,15 @@ namespace QUERY_Utils {
             // agregar callsign para completar donde esta X callsign --> posicion
             Serial.println("estaciones escuchadas directo (ultimos 30 min)");
             answer.concat("?WHERE on development 73!");
-        } else if (queryQuestion.indexOf("?APRSEEM") == 0 && Config.digi.ecoMode == true) {    // Exit DigiRepeater EcoMode
+        } else if (queryQuestion.indexOf("?APRSEEM") == 0 && Config.digi.ecoMode == true) {    // Exit Digipeater EcoMode
             answer = "DigiEcoMode:Stop";
             Config.digi.ecoMode     = false;
             Config.display.alwaysOn = true;
             Config.display.timeout  = 10;
-        } else if (queryQuestion.indexOf("?APRSSEM") == 0 && Config.digi.ecoMode == false) {    // Start DigiRepeater EcoMode
+        } else if (queryQuestion.indexOf("?APRSSEM") == 0 && Config.digi.ecoMode == false) {    // Start Digipeater EcoMode
             answer = "DigiEcoMode:Start";
             Config.digi.ecoMode     = true;
-        } else if (queryQuestion.indexOf("?APRSEMS") == 0) {    // DigiRepeater EcoMode Status
+        } else if (queryQuestion.indexOf("?APRSEMS") == 0) {    // Digipeater EcoMode Status
             answer = (Config.digi.ecoMode) ? "DigiEcoMode:ON" : "DigiEcoMode:OFF";
         }
 

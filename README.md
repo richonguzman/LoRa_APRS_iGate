@@ -1,4 +1,4 @@
-# CA2RXU LoRa APRS iGate/Digirepeater
+# CA2RXU LoRa APRS iGate/Digipeater
 
 This firmware is for using ESP32 based boards with LoRa Modules and GPS to live in the APRS world.
 
@@ -56,14 +56,14 @@ ____________________________________________________
 - 2024.10.25 Added QRP Labs LightGateway 1.0 support.
 - 2024.10.21 Boards with GPS can now send Real-GPS Beacon (also posible: GPS ambiguity of ~ 1 km).
 - 2024.10.14 Received Packets in WebUI show real Local Time (NTP with GMT offset).
-- 2024.10.08 New EcoMode for Remote Digirepeaters without WiFi/WiFiAP, Screen, Leds (Example: LILYGO LoRa32 uses only 24mA, with WifiAP and all was 150mA). APRS Message/Queries can start/stop this mode too.
-- 2024.10.06 Cross Frequency Digirepeater Rules added.
+- 2024.10.08 New EcoMode for Remote Digipeaters without WiFi/WiFiAP, Screen, Leds (Example: LILYGO LoRa32 uses only 24mA, with WifiAP and all was 150mA). APRS Message/Queries can start/stop this mode too.
+- 2024.10.06 Cross Frequency Digipeater Rules added.
 - 2024.09.23 Libraries Update for SDK3
 - 2024.09.23 Added Enconded Telemetry for Battery (+ External Voltage) in Station GPS Beacon Packet. 
 - 2024.08.23 Wemos S2 Mini DIY LoRa added.
 - 2024.08.19 HELTEC Wireless Paper working (still missing Epaper code).
 - 2024.08.13 Web Authentication for WebUI. Thanks Mitja S57PNX.
-- 2024.08.05 WIDE2-n added to WIDE1-n in Digirepeater Modes.
+- 2024.08.05 WIDE2-n added to WIDE1-n in Digipeater Modes.
 - 2024.06.27 External Voltage Divider Resistor configuration on WebUI. Thanks Tilen S54B.
 - 2024.06.26 Personal Note information on WebUI for the Station. Thanks Tilen S54B.
 - 2024.06.24 Callsign Validation fix. Thanks Helge SA7SKY.
@@ -74,7 +74,7 @@ ____________________________________________________
 - 2024.06.08 Callsign Validation for all Station that iGate/Digi hears.
 - 2024.05.27 Battery Monitor for internal and External Voltages (to make board sleep and avoid low discharge of batterys) T-Beam boards now with Battery readings as well.
 - 2024.05.23 Forced Reboot Mode added.
-- 2024.05.22 Experimental backup-Digirepeater-Mode when "only" iGate mode loses WiFi connection added.
+- 2024.05.22 Experimental backup-Digipeater-Mode when "only" iGate mode loses WiFi connection added.
 - 2024.05.20 WebConfig update to control whether Messages and Objects should be Tx to RF.
 - 2024.05.17 HELTEC Wireless Stick Lite v3 support added.
 - 2024.05.14 BME modules will be autodetected (I2C Address and if it is BME280/BMP280/BME680).
@@ -86,12 +86,12 @@ ____________________________________________________
 - 2024.04.21 WEB INSTALLER (thanks Damian SQ2CPA).
 - 2024.04.20 New Output Buffer process: no more packets lost.
 - 2024.04.13 Received Packets added on WebUI.
-- 2024.04.09 iGate/Digirepeater own GPS beacon is encoded (Base91) now.
+- 2024.04.09 iGate/Digipeater own GPS beacon is encoded (Base91) now.
 - 2024.03.18 OE5HWN MeshCom board support added.
 - 2024.02.25 New Web Configuration UI with WiFi AP (thanks Damian SQ2CPA).
 - 2023.01.28 Updated to ElegantOTA v.3 (AsyncElegantOTA was deprecated).
 - 2024.01.19 TextSerialOutputForApp added to get text from Serial-Output over USB into PC for PinPoint App (https://www.pinpointaprs.com) and APRSIS32 App (http://aprsisce.wikidot.com)
-- 2024.01.12 Added iGate Mode to also repeat packets (like a iGate+DigiRepeater) in stationMode 2 and 5.
+- 2024.01.12 Added iGate Mode to also repeat packets (like a iGate+Digipeater) in stationMode 2 and 5.
 - 2024.01.11 Added iGate Mode to enable APRS-IS and LoRa beacon report at the same time.
 - 2024.01.05 Lilygo TTGO T-Beam V1, V1.2, V1 + SX1268, V1.2 + SX1262 support added.
 - 2024.01.02 EByte 400M30S 1 Watt LoRa module for DIY ESP32 iGate support added.
@@ -100,18 +100,18 @@ ____________________________________________________
 - 2023.12.07 MIC-E process and Syslog added.
 - 2023.12.06 HELTEC V2 board support added.
 - 2023.11.26 Small correction to enable Syslog in stationMode5.
-- 2023.10.09 Added "WIDE1-1" to Tx packets from iGate to be *repeated* by Digirepeaters.
+- 2023.10.09 Added "WIDE1-1" to Tx packets from iGate to be *repeated* by Digipeaters.
 - 2023.10.09 BMP280 module support added.
 - 2023.08.20 Added External Voltage Measurement (Max 15V!)
 - 2023.08.05 Ground Height Correction for Pressure readings added.
-- 2023.07.31 StationMode5 added: iGate when WiFi and APRS available, DigiRepeater when not.
+- 2023.07.31 StationMode5 added: iGate when WiFi and APRS available, Digipeater when not.
 - 2023.07.16 Small OTA, BME module update.
 - 2023.07.05 Adding monitor info of Battery connected.
 - 2023.06.18 Info on Oled Screen mayor update, added RSSI and Distance to Listened Station.
 - 2023.06.17 BME280 Module (Temperature, Humidity, Pressure) support added.
 - 2023.06.12 Syslog added.
 - 2023.06.10 OTA update support for Firmware and Filesystem.
-- 2023.06.08 Adding Digirepeater Functions.
+- 2023.06.08 Adding Digipeater Functions.
 - 2023.06.06 Full repack of Code and adding _enableTx_ only for Ham Ops.
 - 2023.05.23 Processing Query's from RF/LoRa or APRS-IS (Send "Help" Message to test).
 - 2023.05.19 Saving Last-Heard Stations for validating Tx Responses.

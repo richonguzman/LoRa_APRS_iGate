@@ -54,7 +54,7 @@ namespace DIGI_Utils {
                 packetToRepeat += APRS_IS_Utils::checkForStartingBytes(packet.substring(packet.indexOf(":")));
             }
             return packetToRepeat;
-        } else {   // CrossFreq Digirepeater
+        } else {   // CrossFreq Digipeater
             String suffix = thirdParty ? ":}" : ":";
             String packetToRepeat = packet.substring(0, packet.indexOf(suffix));
             
@@ -73,7 +73,7 @@ namespace DIGI_Utils {
         }
     }
 
-    String generateDigiRepeatedPacket(const String& packet, bool thirdParty){
+    String generateDigipeatedPacket(const String& packet, bool thirdParty){
         String temp;
         if (thirdParty) { // only header is used
             const String& header = packet.substring(0, packet.indexOf(":}"));
@@ -147,7 +147,7 @@ namespace DIGI_Utils {
                             }
                         }
                         if (!queryMessage) {
-                            String loraPacket = generateDigiRepeatedPacket(packet.substring(3), thirdPartyPacket);
+                            String loraPacket = generateDigipeatedPacket(packet.substring(3), thirdPartyPacket);
                             if (loraPacket != "") {
                                 if (Config.lowPowerMode) {
                                     LoRa_Utils::sendNewPacket(loraPacket);

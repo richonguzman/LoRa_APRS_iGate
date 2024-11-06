@@ -251,8 +251,6 @@ document.getElementById('reboot').addEventListener('click', function (e) {
 
 const wxsensorCheckbox = document.querySelector("input[name='wxsensor.active']");
 
-const stationModeSelect = document.querySelector("select[name='stationMode']");
-
 function updateImage() {
     const value = document.getElementById("beacon.overlay").value + document.getElementById("beacon.symbol").value;
 

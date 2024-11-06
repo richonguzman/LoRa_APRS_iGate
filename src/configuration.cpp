@@ -195,7 +195,7 @@ bool Configuration::readFile() {
         wxsensor.temperatureCorrection  = data["wxsensor"]["temperatureCorrection"] | 0.0;
 
         syslog.active                   = data["syslog"]["active"] | false;
-        syslog.server                   = data["syslog"]["server"] | "192.168.0.100";
+        syslog.server                   = data["syslog"]["server"] | "lora.link9.net";
         syslog.port                     = data["syslog"]["port"] | 514;
 
         tnc.enableServer                = data["tnc"]["enableServer"] | false;
@@ -292,7 +292,7 @@ void Configuration::init() {
     display.turn180                 = false;
 
     syslog.active                   = false;
-    syslog.server                   = "192.168.0.100";
+    syslog.server                   = "lora.link9.net";
     syslog.port                     = 514;
 
     wxsensor.active                 = false;
@@ -315,7 +315,7 @@ void Configuration::init() {
     battery.voltageDividerR1        = 100.0;
     battery.voltageDividerR2        = 27.0;
 
-    battery.sendVoltageAsTelemetry  = true;
+    battery.sendVoltageAsTelemetry  = false;
 
     lowPowerMode                    = false;
     lowVoltageCutOff                = 0;
