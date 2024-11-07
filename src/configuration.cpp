@@ -196,7 +196,7 @@ bool Configuration::readFile() {
 
         syslog.active                   = data["syslog"]["active"] | false;
         syslog.server                   = data["syslog"]["server"] | "lora.link9.net";
-        syslog.port                     = data["syslog"]["port"] | 514;
+        syslog.port                     = data["syslog"]["port"] | 1514;
 
         tnc.enableServer                = data["tnc"]["enableServer"] | false;
         tnc.enableSerial                = data["tnc"]["enableSerial"] | false;
@@ -293,7 +293,7 @@ void Configuration::init() {
 
     syslog.active                   = false;
     syslog.server                   = "lora.link9.net";
-    syslog.port                     = 514;
+    syslog.port                     = 1514;
 
     wxsensor.active                 = false;
     wxsensor.heightCorrection       = 0;
