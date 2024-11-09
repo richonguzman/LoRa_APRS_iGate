@@ -115,6 +115,7 @@ namespace WEB_Utils {
         Config.wifiAutoAP.password      = request->getParam("wifi.autoAP.password", true)->value();
         Config.wifiAutoAP.timeout       = request->getParam("wifi.autoAP.timeout", true)->value().toInt();
         
+        Config.ethernet.use_lan         = request->getParam("ethernet.use_lan", true);  
 
         Config.aprs_is.active           = request->hasParam("aprs_is.active", true);
         Config.aprs_is.passcode         = request->getParam("aprs_is.passcode", true)->value();

@@ -7,6 +7,9 @@
         },
         "AP": []
     },
+    "ethernet": {
+        "use_lan": false
+    },
     "beacon": {
         "latitude": 0.0,
         "longitude": 0.0,
