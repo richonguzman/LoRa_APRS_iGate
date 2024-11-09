@@ -9,6 +9,7 @@
 #include "A7670_utils.h"
 #include "lora_utils.h"
 #include "wifi_utils.h"
+#include <ETH.h>
 #include "gps_utils.h"
 #include "wx_utils.h"
 #include "display.h"
@@ -37,6 +38,7 @@ extern int                  wxModuleType;
 extern bool                 backUpDigiMode;
 extern bool                 shouldSleepLowVoltage;
 extern bool                 transmitFlag;
+extern bool                 EthConnected;
 
 extern std::vector<LastHeardStation>    lastHeardStations;
 
@@ -58,7 +60,7 @@ namespace Utils {
             status.concat(",");
             status.concat(Config.beacon.path);
         }
-        if (WiFi.status() == WL_CONNECTED && Config.aprs_is.active && Config.beacon.sendViaAPRSIS) {
+        if ((WiFi.status() == WL_CONNECTED || EthConnected) && Config.aprs_is.active && Config.beacon.sendViaAPRSIS) {
             delay(1000);
             status.concat(",qAC:>https://github.com/richonguzman/LoRa_APRS_iGate ");
             status.concat(versionDate);
@@ -76,14 +78,16 @@ namespace Utils {
 
     String getLocalIP() {
         if (Config.digi.ecoMode) {
-            return "** WiFi AP  Killed **";
-        } else if (!WiFiConnected) {
+            return "** WiFi EcoMode **";
+        } else if (!WiFiConnected && !Config.ethernet.use_lan) {
             return "IP :  192.168.4.1";
         } else if (backUpDigiMode) {
             return "- BACKUP DIGI MODE -";
+        } else if (Config.ethernet.use_lan && EthConnected) {
+            return "IP :  " + String(ETH.localIP()[0]) + "." + String(ETH.localIP()[1]) + "." + String(ETH.localIP()[2]) + "." + String(ETH.localIP()[3]);
         } else {
             return "IP :  " + String(WiFi.localIP()[0]) + "." + String(WiFi.localIP()[1]) + "." + String(WiFi.localIP()[2]) + "." + String(WiFi.localIP()[3]);
-        }
+        } 
     }
 
     void setupDisplay() {
