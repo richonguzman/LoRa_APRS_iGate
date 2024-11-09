@@ -48,6 +48,8 @@ ____________________________________________________
 
 - Wemos Lolin32 Oled + SX1278 DIY Version.
 
+- Olimex ESP32-PoE-ISO Board with DIY-LoRa
+
 <br />
 
 ## Timeline (Versions):
