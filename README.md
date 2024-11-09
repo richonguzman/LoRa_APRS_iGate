@@ -52,6 +52,7 @@ ____________________________________________________
 
 ## Timeline (Versions):
 
+- 2024.11.09 Added Olimex-PoE-Iso Board with DIY-LoRa (https://github.com/dl1lmh/LoRa-Board-for-Olimex-UEXT)
 - 2024.11.06 (Silent Update) Working now with Board "VARIANTS".
 - 2024.10.29 Added LILYGO Lora32 T3S3 support.
 - 2024.10.25 Added QRP Labs LightGateway 1.0 support.
