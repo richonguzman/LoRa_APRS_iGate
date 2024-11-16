@@ -72,32 +72,21 @@ namespace STATION_Utils {
     }
 
     void clean25SegBuffer() {
-        if (!packet25SegBuffer.empty()) {
-            if ((millis() - packet25SegBuffer[0].receivedTime) >  25 * 1000) {
-                packet25SegBuffer.erase(packet25SegBuffer.begin());
-            }
-        }
+        if (!packet25SegBuffer.empty() && (millis() - packet25SegBuffer[0].receivedTime) >  25 * 1000) packet25SegBuffer.erase(packet25SegBuffer.begin());
     }
 
     bool check25SegBuffer(const String& station, const String& textMessage) {
-        bool shouldBeIgnored = false;
         if (!packet25SegBuffer.empty()) {
             for (int i = 0; i < packet25SegBuffer.size(); i++) {
-                if (packet25SegBuffer[i].station == station && packet25SegBuffer[i].payload == textMessage) {
-                    shouldBeIgnored = true;
-                }
+                if (packet25SegBuffer[i].station == station && packet25SegBuffer[i].payload == textMessage) return false;
             }
         }
-        if (shouldBeIgnored) {
-            return false;
-        } else {
-            Packet25SegBuffer packet;
-            packet.receivedTime = millis();
-            packet.station      = station;
-            packet.payload      = textMessage;
-            packet25SegBuffer.push_back(packet);
-            return true;
-        }
+        Packet25SegBuffer   packet;
+        packet.receivedTime = millis();
+        packet.station      = station;
+        packet.payload      = textMessage;
+        packet25SegBuffer.push_back(packet);
+        return true;
     }
 
     void processOutputPacketBuffer() {
