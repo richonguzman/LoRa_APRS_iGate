@@ -70,7 +70,6 @@ namespace STATION_Utils {
         Utils::println(" ---> Station not Heard for last 30 min (Not Tx)\n");
         return false;
     }
-
     void clean25SegBuffer() {
         if (!packet25SegBuffer.empty() && (millis() - packet25SegBuffer[0].receivedTime) >  25 * 1000) packet25SegBuffer.erase(packet25SegBuffer.begin());
     }
