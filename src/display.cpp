@@ -21,9 +21,6 @@
         #else
             #include <Adafruit_GFX.h>
             #include <Adafruit_SSD1306.h>
-            #if defined(HELTEC_V3) || defined(HELTEC_WS)
-                #define OLED_DISPLAY_HAS_RST_PIN
-            #endif
             #ifdef HELTEC_WSL_V3_DISPLAY
                 Adafruit_SSD1306 display(128, 64, &Wire1, OLED_RST);
             #else
