@@ -36,6 +36,7 @@ ___________________________________________________________________*/
 #include "power_utils.h"
 #include "lora_utils.h"
 #include "wifi_utils.h"
+#include "eth_utils.h"
 #include "digi_utils.h"
 #include "gps_utils.h"
 #include "web_utils.h"
@@ -65,6 +66,8 @@ uint32_t            lastBatteryCheck        = 0;
 
 bool                backUpDigiMode          = false;
 bool                modemLoggedToAPRSIS     = false;
+
+extern bool         EthConnected;
 
 std::vector<ReceivedPacket> receivedPackets;
 
@@ -127,6 +130,7 @@ void setup() {
     #endif
     DIGI_Utils::checkEcoMode();
     WIFI_Utils::setup();
+    ETH_Utils::setup();
     NTP_Utils::setup();
     SYSLOG_Utils::setup();
     WX_Utils::setup();
@@ -152,12 +156,14 @@ void loop() {
 
     thirdLine = Utils::getLocalIP();
 
-    WIFI_Utils::checkWiFi();
+    if (!Config.ethernet.use_lan) WIFI_Utils::checkWiFi();
+    if (Config.ethernet.use_lan) ETH_Utils::checkETH();
 
     #ifdef HAS_A7670
         if (Config.aprs_is.active && !modemLoggedToAPRSIS) A7670_Utils::APRS_IS_connect();
     #else
-        if (Config.aprs_is.active && (WiFi.status() == WL_CONNECTED) && !espClient.connected()) APRS_IS_Utils::connect();
+        if (!Config.ethernet.use_lan && Config.aprs_is.active && (WiFi.status() == WL_CONNECTED) && !espClient.connected()) APRS_IS_Utils::connect();
+        if (Config.ethernet.use_lan && Config.aprs_is.active && EthConnected && !espClient.connected()) APRS_IS_Utils::connect();
     #endif
 
     NTP_Utils::update();
