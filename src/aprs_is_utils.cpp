@@ -22,7 +22,8 @@ extern String               seventhLine;
 extern bool                 modemLoggedToAPRSIS;
 extern bool                 backUpDigiMode;
 
-uint32_t lastRxTime         = millis();
+uint32_t    lastRxTime      = millis();
+bool        passcodeValid   = false;
 
 #ifdef HAS_A7670
     extern bool                 stationBeacon;
@@ -50,11 +51,9 @@ namespace APRS_IS_Utils {
         }
         if (count == 20) {
             Serial.println("Tried: " + String(count) + " FAILED!");
-        }
-        else {
+        } else {
             Serial.println("Connected!\n(Server: " + String(Config.aprs_is.server) + " / Port: " + String(Config.aprs_is.port) + ")");
             // String filter = "t/m/" + Config.callsign + "/" + (String)Config.aprs_is.reportingDistance;
-
             String aprsAuth = "user ";
             aprsAuth += Config.callsign;
             aprsAuth += " pass ";
@@ -62,7 +61,6 @@ namespace APRS_IS_Utils {
             aprsAuth += " vers CA2RXU_LoRa_iGate 2.0 filter ";
             aprsAuth += Config.aprs_is.filter;
             upload(aprsAuth);
-            delay(200);
         }
     }
 
@@ -174,7 +172,7 @@ namespace APRS_IS_Utils {
     }
 
     void processLoRaPacket(const String& packet) {
-        if (espClient.connected() || modemLoggedToAPRSIS) {
+        if (passcodeValid && (espClient.connected() || modemLoggedToAPRSIS)) {
             if (packet != "") {
                 if ((packet.substring(0, 3) == "\x3c\xff\x01")  && (packet.indexOf("NOGATE") == -1) && (packet.indexOf("RFONLY") == -1)) {
                     int firstColonIndex = packet.indexOf(":");
@@ -259,13 +257,22 @@ namespace APRS_IS_Utils {
     }
 
     void processAPRSISPacket(const String& packet) {
-        if (!packet.startsWith("#")) {
+        if (!passcodeValid && packet.indexOf(Config.callsign) != -1) {
+            if (packet.indexOf("unverified") != -1 ) {
+                Serial.println("\n****APRS PASSCODE NOT VALID****\n");
+                displayShow(firstLine, "", "    APRS PASSCODE", "    NOT VALID !!!", "", "", "", 0);
+                while (1) {};
+            } else if (packet.indexOf("verified") != -1 ) {
+                passcodeValid = true;
+            }
+        }
+        if (passcodeValid && !packet.startsWith("#")) {
             if (Config.aprs_is.messagesToRF && packet.indexOf("::") > 0) {
                 String Sender = packet.substring(0, packet.indexOf(">"));
                 const String& AddresseeAndMessage = packet.substring(packet.indexOf("::") + 2);
                 String Addressee = AddresseeAndMessage.substring(0, AddresseeAndMessage.indexOf(":"));
                 Addressee.trim();
-                if (Addressee == Config.callsign) {             // its for me!
+                if (Addressee == Config.callsign) {                 // its for me!
                     String receivedMessage;
                     if (AddresseeAndMessage.indexOf("{") > 0) {     // ack?
                         String ackMessage = "ack";
@@ -348,6 +355,15 @@ namespace APRS_IS_Utils {
                 }
             }
         #endif
+    }
+
+    void firstConnection() {
+        if (Config.aprs_is.active && (WiFi.status() == WL_CONNECTED) && !espClient.connected()) {
+            connect();
+            while (!passcodeValid) {
+                listenAPRSIS();
+            }
+        }
     }
 
 }

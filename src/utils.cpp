@@ -37,12 +37,13 @@ extern int                  wxModuleType;
 extern bool                 backUpDigiMode;
 extern bool                 shouldSleepLowVoltage;
 extern bool                 transmitFlag;
+extern bool                 passcodeValid;
 
 extern std::vector<LastHeardStation>    lastHeardStations;
 
 bool        statusAfterBoot     = true;
 bool        sendStartTelemetry  = true;
-bool        beaconUpdate        = true;
+bool        beaconUpdate        = false;
 uint32_t    lastBeaconTx        = 0;
 uint32_t    lastScreenOn        = millis();
 String      beaconPacket;
@@ -185,7 +186,7 @@ namespace Utils {
 
     void checkBeaconInterval() {
         uint32_t lastTx = millis() - lastBeaconTx;
-        if (lastBeaconTx == 0 || lastTx >= Config.beacon.interval * 60 * 1000) {
+        if (passcodeValid && (lastBeaconTx == 0 || lastTx >= Config.beacon.interval * 60 * 1000)) {
             beaconUpdate = true;    
         }
 

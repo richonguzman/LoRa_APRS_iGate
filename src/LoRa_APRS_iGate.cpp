@@ -48,7 +48,7 @@ ___________________________________________________________________*/
     #include "A7670_utils.h"
 #endif
 
-String              versionDate             = "2024.12.04";
+String              versionDate             = "2024.12.06";
 Configuration       Config;
 WiFiClient          espClient;
 #ifdef HAS_GPS
@@ -136,6 +136,7 @@ void setup() {
         A7670_Utils::setup();
     #endif
     Utils::checkRebootMode();
+    APRS_IS_Utils::firstConnection();
 }
 
 void loop() {
@@ -149,14 +150,13 @@ void loop() {
     if (Config.lowVoltageCutOff > 0) {
         BATTERY_Utils::checkIfShouldSleep();
     }
-
+    
     thirdLine = Utils::getLocalIP();
-
-    WIFI_Utils::checkWiFi();
 
     #ifdef HAS_A7670
         if (Config.aprs_is.active && !modemLoggedToAPRSIS) A7670_Utils::APRS_IS_connect();
     #else
+        WIFI_Utils::checkWiFi();
         if (Config.aprs_is.active && (WiFi.status() == WL_CONNECTED) && !espClient.connected()) APRS_IS_Utils::connect();
     #endif
 
@@ -191,10 +191,10 @@ void loop() {
         }
     }
 
-    if (Config.aprs_is.active) { // If APRSIS enabled
+    if (Config.aprs_is.active) {
         APRS_IS_Utils::listenAPRSIS(); // listen received packet from APRSIS
     }
-    
+
     STATION_Utils::processOutputPacketBuffer();
 
     displayShow(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);

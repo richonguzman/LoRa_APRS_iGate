@@ -8,6 +8,7 @@ namespace APRS_IS_Utils {
 
     void    upload(const String& line);
     void    connect();
+    
     void    checkStatus();
     String  checkForStartingBytes(const String& packet);
     
@@ -18,6 +19,8 @@ namespace APRS_IS_Utils {
     String  buildPacketToTx(const String& aprsisPacket, uint8_t packetType);
     void    processAPRSISPacket(const String& packet);
     void    listenAPRSIS();
+
+    void    firstConnection();
 
 }
 
