@@ -197,7 +197,8 @@ namespace GPS_Utils {
             encodedBytePosition = packet.indexOf(":=") + 14;
         }
         if (encodedBytePosition != 0) {
-            if (String(packet[encodedBytePosition]) == "G" || String(packet[encodedBytePosition]) == "Q" || String(packet[encodedBytePosition]) == "[" || String(packet[encodedBytePosition]) == "H") {
+            char currentChar = packet[encodedBytePosition];
+            if (currentChar == 'G' || currentChar == 'Q' || currentChar == '[' || currentChar == 'H' || currentChar == 'X') {
                 return decodeEncodedGPS(packet);
             } else {
                 return getReceivedGPS(packet);
