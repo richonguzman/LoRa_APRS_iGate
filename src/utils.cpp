@@ -186,7 +186,7 @@ namespace Utils {
 
     void checkBeaconInterval() {
         uint32_t lastTx = millis() - lastBeaconTx;
-        if (passcodeValid && (lastBeaconTx == 0 || lastTx >= Config.beacon.interval * 60 * 1000)) {
+        if (((Config.aprs_is.active && passcodeValid) || Config.digi.mode != 0) && (lastBeaconTx == 0 || lastTx >= Config.beacon.interval * 60 * 1000)) {
             beaconUpdate = true;    
         }
 
