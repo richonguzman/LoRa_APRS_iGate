@@ -52,6 +52,8 @@ ____________________________________________________
 
 ## Timeline (Versions):
 
+- 2024.12.30 Fixed missing validation for correct Digipeater mode when not connected to APRS-IS.
+- 2024.12.06 APRS-IS connnection and passcode validation added.
 - 2024.11.06 (Silent Update) Working now with Board "VARIANTS".
 - 2024.10.29 Added LILYGO Lora32 T3S3 support.
 - 2024.10.25 Added QRP Labs LightGateway 1.0 support.
