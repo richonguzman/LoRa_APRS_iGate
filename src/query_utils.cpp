@@ -1,4 +1,5 @@
 #include "configuration.h"
+#include "battery_utils.h"
 #include "station_utils.h"
 #include "query_utils.h"
 #include "lora_utils.h"
@@ -10,6 +11,8 @@ extern String                           versionDate;
 extern int                              rssi;
 extern float                            snr;
 extern int                              freqError;
+extern bool                             shouldSleepLowVoltage;
+extern bool                             saveNewDigiEcoModeConfig;
 
 
 namespace QUERY_Utils {
@@ -53,12 +56,16 @@ namespace QUERY_Utils {
             answer.concat("?WHERE on development 73!");
         } else if (queryQuestion.indexOf("?APRSEEM") == 0 && Config.digi.ecoMode == true) {    // Exit Digipeater EcoMode
             answer = "DigiEcoMode:Stop";
-            Config.digi.ecoMode     = false;
-            Config.display.alwaysOn = true;
-            Config.display.timeout  = 10;
+            Config.digi.ecoMode         = false;
+            Config.display.alwaysOn     = true;
+            Config.display.timeout      = 10;
+            shouldSleepLowVoltage       = true;     // to make sure all packets in outputPacketBuffer are sended before restart.
+            saveNewDigiEcoModeConfig    = true;
         } else if (queryQuestion.indexOf("?APRSSEM") == 0 && Config.digi.ecoMode == false) {    // Start Digipeater EcoMode
             answer = "DigiEcoMode:Start";
-            Config.digi.ecoMode     = true;
+            Config.digi.ecoMode         = true;
+            shouldSleepLowVoltage       = true;     // to make sure all packets in outputPacketBuffer are sended before restart.
+            saveNewDigiEcoModeConfig    = true;
         } else if (queryQuestion.indexOf("?APRSEMS") == 0) {    // Digipeater EcoMode Status
             answer = (Config.digi.ecoMode) ? "DigiEcoMode:ON" : "DigiEcoMode:OFF";
         }

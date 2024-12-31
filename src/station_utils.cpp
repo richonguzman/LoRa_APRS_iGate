@@ -17,6 +17,8 @@ std::vector<LastHeardStation>   lastHeardStations;
 std::vector<String>             outputPacketBuffer;
 std::vector<Packet25SegBuffer>  packet25SegBuffer;
 
+bool saveNewDigiEcoModeConfig   = false;
+
 
 namespace STATION_Utils {
 
@@ -92,13 +94,8 @@ namespace STATION_Utils {
         int timeToWait                  = 3 * 1000;      // 3 segs between packet Tx and also Rx ???
         uint32_t lastRx                 = millis() - lastRxTime;
         uint32_t lastTx                 = millis() - lastTxTime;
-        bool saveNewDigiEcoModeConfig   = false;
         if (outputPacketBuffer.size() > 0 && lastTx > timeToWait && lastRx > timeToWait) {
             LoRa_Utils::sendNewPacket(outputPacketBuffer[0]);
-            if (outputPacketBuffer[0].indexOf("DigiEcoMode:Start") != -1 || outputPacketBuffer[0].indexOf("DigiEcoMode:Stop") != -1) {
-                saveNewDigiEcoModeConfig    = true;
-                shouldSleepLowVoltage       = true; // to make sure all packets in outputPacketBuffer are sended before restart.
-            }
             outputPacketBuffer.erase(outputPacketBuffer.begin());
             lastTxTime = millis();
         }
@@ -110,7 +107,9 @@ namespace STATION_Utils {
             }
         }
         if (saveNewDigiEcoModeConfig) {
+            setCpuFrequencyMhz(80);
             Config.writeFile();
+            delay(1000);
             displayToggle(false);
             ESP.restart();
         }
