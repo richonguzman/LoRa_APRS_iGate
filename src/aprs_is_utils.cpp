@@ -178,7 +178,7 @@ namespace APRS_IS_Utils {
                     int firstColonIndex = packet.indexOf(":");
                     if (firstColonIndex > 5 && firstColonIndex < (packet.length() - 1) && packet[firstColonIndex + 1] != '}' && packet.indexOf("TCPIP") == -1) {
                         const String& Sender = packet.substring(3, packet.indexOf(">"));
-                        if (Sender != Config.callsign && Utils::checkValidCallsign(Sender)) {
+                        if (Sender != Config.callsign && Utils::checkValidCallsign(Sender) && !STATION_Utils::checkBlackList(Sender)) {
                             STATION_Utils::updateLastHeard(Sender);
                             Utils::typeOfPacket(packet.substring(3), 0);  // LoRa-APRS
                             const String& AddresseeAndMessage = packet.substring(packet.indexOf("::") + 2);

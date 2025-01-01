@@ -90,7 +90,8 @@
         "lowVoltageCutOff": 0,
         "backupDigiMode": false,
         "rebootMode": false,
-        "rebootModeTime": 6
+        "rebootModeTime": 6,
+        "blackList": ""
     },
     "personalNote": ""
 }

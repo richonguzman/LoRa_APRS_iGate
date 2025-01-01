@@ -16,11 +16,46 @@ uint32_t lastTxTime             = millis();
 std::vector<LastHeardStation>   lastHeardStations;
 std::vector<String>             outputPacketBuffer;
 std::vector<Packet25SegBuffer>  packet25SegBuffer;
+std::vector<String>             blackList;
 
 bool saveNewDigiEcoModeConfig   = false;
 
 
 namespace STATION_Utils {
+
+    void loadBlackList() {
+        if (Config.blackList != "") {
+            String callsigns    = Config.blackList;
+            int spaceIndex      = callsigns.indexOf(" ");
+
+            while (spaceIndex >= 0) {
+                blackList.push_back(callsigns.substring(0, spaceIndex));
+                callsigns   = callsigns.substring(spaceIndex + 1);
+                spaceIndex  = callsigns.indexOf(" ");
+            }
+            callsigns.trim();
+            if (callsigns.length() > 0) blackList.push_back(callsigns); // Add the last word if available
+
+
+            // Print the vector
+            if (!blackList.empty()) {
+                for (int i = 0; i < blackList.size(); i++) {
+                    Serial.println(blackList[i]);
+                }
+            }
+            //
+        }
+    }
+
+    bool checkBlackList(const String& callsign) {
+        if (!blackList.empty()) {
+            for (int i = 0; i < blackList.size(); i++) {
+                if (blackList[i] == callsign) return true;
+            }
+        }
+        return false;
+    }
+
 
     void deleteNotHeard() {
         std::vector<LastHeardStation>  lastHeardStation_temp;
@@ -72,6 +107,7 @@ namespace STATION_Utils {
         Utils::println(" ---> Station not Heard for last 30 min (Not Tx)\n");
         return false;
     }
+
     void clean25SegBuffer() {
         if (!packet25SegBuffer.empty() && (millis() - packet25SegBuffer[0].receivedTime) >  25 * 1000) packet25SegBuffer.erase(packet25SegBuffer.begin());
     }

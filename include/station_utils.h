@@ -18,6 +18,8 @@ struct LastHeardStation {
 
 namespace STATION_Utils {
 
+    void loadBlackList();
+    bool checkBlackList(const String& callsign);
     void deleteNotHeard();
     void updateLastHeard(const String& station);
     bool wasHeard(const String& station);

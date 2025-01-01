@@ -99,6 +99,8 @@ void Configuration::writeFile() {
 
     data["personalNote"]                        = personalNote;
 
+    data["blackList"]                           = blackList;
+
     data["webadmin"]["active"]                  = webadmin.active;
     data["webadmin"]["username"]                = webadmin.username;
     data["webadmin"]["password"]                = webadmin.password;
@@ -221,6 +223,8 @@ bool Configuration::readFile() {
 
         personalNote    	            = data["personalNote"] | "personal note here...";
 
+        blackList                       = data["blackList"] | "";
+
         if (wifiAPs.size() == 0) { // If we don't have any WiFi's from config we need to add "empty" SSID for AUTO AP
             WiFi_AP wifiap;
             wifiap.ssid = "";
@@ -326,6 +330,8 @@ void Configuration::init() {
     rebootModeTime                  = 0;
 
     personalNote                    = "";
+
+    blackList                       = "";
 
     webadmin.active                 = false;
     webadmin.username               = "admin";

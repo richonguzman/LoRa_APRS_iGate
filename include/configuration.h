@@ -50,7 +50,6 @@ public:
     bool    ecoMode;
 };
 
-
 class LoraModule {
 public:
     long    txFreq;
@@ -135,6 +134,7 @@ public:
     bool                    rebootMode;
     int                     rebootModeTime;
     String                  personalNote;
+    String                  blackList;
     std::vector<WiFi_AP>    wifiAPs;
     WiFi_Auto_AP            wifiAutoAP;
     BEACON                  beacon;

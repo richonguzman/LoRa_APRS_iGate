@@ -130,7 +130,7 @@ namespace DIGI_Utils {
                     temp    = packet.substring(3);
                     Sender  = packet.substring(3, packet.indexOf(">"));
                 }
-                if (Sender != Config.callsign) {        // Avoid listening to own packets
+                if (Sender != Config.callsign && !STATION_Utils::checkBlackList(Sender)) {        // Avoid listening to own packets
                     if (!thirdPartyPacket && !Utils::checkValidCallsign(Sender)) {
                         return;
                     }

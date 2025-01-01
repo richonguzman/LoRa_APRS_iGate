@@ -48,7 +48,7 @@ ___________________________________________________________________*/
     #include "A7670_utils.h"
 #endif
 
-String              versionDate             = "2024.12.31";
+String              versionDate             = "2025.01.01";
 Configuration       Config;
 WiFiClient          espClient;
 #ifdef HAS_GPS
@@ -79,6 +79,7 @@ void setup() {
     LoRa_Utils::setup();
     Utils::validateFreqs();
     GPS_Utils::setup();
+    STATION_Utils::loadBlackList();
 
     #ifdef STARTUP_DELAY    // (TEST) just to wait for WiFi init of Routers
         displayShow("", "  STARTUP DELAY ...", "", "", 0);
