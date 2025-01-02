@@ -206,6 +206,8 @@ namespace WEB_Utils {
 
         Config.personalNote                 = request->getParam("personalNote", true)->value();
 
+        Config.blackList                    = request->getParam("blackList", true)->value();
+
         Config.webadmin.active              = request->hasParam("webadmin.active", true);
         if (Config.webadmin.active) {
             Config.webadmin.username        = request->getParam("webadmin.username", true)->value();

@@ -35,23 +35,17 @@ namespace STATION_Utils {
             }
             callsigns.trim();
             if (callsigns.length() > 0) blackList.push_back(callsigns); // Add the last word if available
-
-
-            // Print the vector
-            if (!blackList.empty()) {
-                for (int i = 0; i < blackList.size(); i++) {
-                    Serial.println(blackList[i]);
-                }
-            }
-            //
         }
     }
 
     bool checkBlackList(const String& callsign) {
-        if (!blackList.empty()) {
-            for (int i = 0; i < blackList.size(); i++) {
+        for (int i = 0; i < blackList.size(); i++) {
+            if (blackList[i].indexOf("*") >= 0) {   // use wild card
+                String wildCard = blackList[i].substring(0, blackList[i].indexOf("*"));
+                if (callsign.startsWith(wildCard))return true;
+            } else {
                 if (blackList[i] == callsign) return true;
-            }
+            }                
         }
         return false;
     }

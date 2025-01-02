@@ -137,6 +137,9 @@ function loadSettings(settings) {
     document.getElementById("beacon.gpsActive").checked                 = settings.beacon.gpsActive;
     document.getElementById("beacon.gpsAmbiguity").checked              = settings.beacon.gpsAmbiguity;
 
+    // Black List
+    document.getElementById("blackList").value                          = settings.blackList;
+
     // Digi
     document.getElementById("digi.mode").value                          = settings.digi.mode;
     document.getElementById("digi.ecoMode").checked                     = settings.digi.ecoMode;

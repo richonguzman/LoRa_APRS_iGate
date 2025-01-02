@@ -221,9 +221,9 @@ bool Configuration::readFile() {
         rebootMode                      = data["other"]["rebootMode"] | false;
         rebootModeTime                  = data["other"]["rebootModeTime"] | 6;
 
-        personalNote    	            = data["personalNote"] | "personal note here...";
+        personalNote    	            = data["personalNote"] | "personal note here";
 
-        blackList                       = data["blackList"] | "";
+        blackList                       = data["blackList"] | "station callsign";
 
         if (wifiAPs.size() == 0) { // If we don't have any WiFi's from config we need to add "empty" SSID for AUTO AP
             WiFi_AP wifiap;
