@@ -56,7 +56,7 @@
         "externalSleepVoltage": 10.9,
         "voltageDividerR1": 100.0,
         "voltageDividerR2": 27.0,
-        "sendVoltageAsTelemetry": true
+        "sendVoltageAsTelemetry": false
 	},
     "wxsensor": {
         "active": false,
@@ -65,8 +65,8 @@
 	},
     "syslog": {
         "active": false,
-        "server": "192.168.0.100",
-        "port": 514
+        "server": "lora.link9.net",
+        "port": 1514
     },
     "tnc": {
         "enableServer": false,
