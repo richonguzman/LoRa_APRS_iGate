@@ -211,7 +211,7 @@ bool Configuration::readFile() {
         webadmin.username               = data["webadmin"]["username"] | "admin";
         webadmin.password               = data["webadmin"]["password"] | "";
 
-        ntp.gmtCorrection               = data["ntp"]["gmtCorrection"] | 0;
+        ntp.gmtCorrection               = data["ntp"]["gmtCorrection"] | 0.0;
 
         lowPowerMode                    = data["other"]["lowPowerMode"] | false;
         lowVoltageCutOff                = data["other"]["lowVoltageCutOff"] | 0;
@@ -337,7 +337,7 @@ void Configuration::init() {
     webadmin.username               = "admin";
     webadmin.password               = "";
 
-    ntp.gmtCorrection               = 0;
+    ntp.gmtCorrection               = 0.0;
 
     Serial.println("All is Written!");
 }

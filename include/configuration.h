@@ -119,9 +119,8 @@ public:
 
 class NTP {
 public:
-    int     gmtCorrection;
+    float   gmtCorrection;
 };
-
 
 
 class Configuration {
