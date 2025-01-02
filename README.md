@@ -52,6 +52,7 @@ ____________________________________________________
 
 ## Timeline (Versions):
 
+- 2025.01.02 Callsign Black List added.
 - 2024.12.30 Fixed missing validation for correct Digipeater mode when not connected to APRS-IS.
 - 2024.12.06 APRS-IS connnection and passcode validation added.
 - 2024.11.06 (Silent Update) Working now with Board "VARIANTS".
