@@ -214,7 +214,7 @@ namespace WEB_Utils {
             Config.webadmin.password        = request->getParam("webadmin.password", true)->value();
         }
 
-        Config.ntp.gmtCorrection            = request->getParam("ntp.gmtCorrection", true)->value().toInt();
+        Config.ntp.gmtCorrection            = request->getParam("ntp.gmtCorrection", true)->value().toFloat();
 
         Config.writeFile();
 

@@ -82,7 +82,7 @@
         "password": ""
     },
     "ntp": {
-        "gmtCorrection": 0
+        "gmtCorrection": 0.0
     },
     "other": {
         "rememberStationTime": 30,
