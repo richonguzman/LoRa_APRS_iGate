@@ -21,6 +21,11 @@
     #define OLED_SCL            22
     #define OLED_RST            -1
 
+    //  GPS
+    #define HAS_GPS
+    #define GPS_RX              12
+    #define GPS_TX              34
+
     //  OTHER
     #define INTERNAL_LED_PIN    2
     #define BATTERY_PIN         35
