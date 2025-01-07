@@ -186,7 +186,7 @@ namespace Utils {
 
     void checkBeaconInterval() {
         uint32_t lastTx = millis() - lastBeaconTx;
-        if (((Config.aprs_is.active && passcodeValid) || Config.digi.mode != 0) && (lastBeaconTx == 0 || lastTx >= Config.beacon.interval * 60 * 1000)) {
+        if (lastBeaconTx == 0 || lastTx >= Config.beacon.interval * 60 * 1000) {
             beaconUpdate = true;    
         }
 
@@ -198,9 +198,7 @@ namespace Utils {
         #endif
 
         if (beaconUpdate) {
-            if (!Config.display.alwaysOn && Config.display.timeout != 0) {
-                displayToggle(true);
-            }
+            if (!Config.display.alwaysOn && Config.display.timeout != 0) displayToggle(true);
 
             if (sendStartTelemetry && Config.battery.sendVoltageAsTelemetry && !Config.wxsensor.active && (Config.battery.sendInternalVoltage || Config.battery.sendExternalVoltage)) {
                 sendInitialTelemetryPackets();
@@ -289,7 +287,7 @@ namespace Utils {
                 secondaryBeaconPacket += encodedTelemetry;
             }
 
-            if (Config.aprs_is.active && Config.beacon.sendViaAPRSIS && !backUpDigiMode) {
+            if (Config.beacon.sendViaAPRSIS && Config.aprs_is.active && passcodeValid && !backUpDigiMode) {
                 Utils::println("-- Sending Beacon to APRSIS --");
                 displayShow(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING IGATE BEACON", 0);
                 seventhLine = "     listening...";

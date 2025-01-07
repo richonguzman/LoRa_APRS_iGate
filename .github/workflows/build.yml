@@ -78,7 +78,9 @@ jobs:
                     - name: QRPLabs_LightGateway_1_0
                       chip: esp32s3
                     - name: XIAO_ESP32S3_WIO_SX1262
-                      chip: esp32s3                    
+                      chip: esp32s3
+                    - name: TROY_LoRa_APRS
+                      chip: esp32                    
         steps:
             - uses: actions/checkout@v3
 
