@@ -48,7 +48,7 @@ ___________________________________________________________________*/
     #include "A7670_utils.h"
 #endif
 
-String              versionDate             = "2025.01.07";
+String              versionDate             = "2025.01.08";
 Configuration       Config;
 WiFiClient          espClient;
 #ifdef HAS_GPS
