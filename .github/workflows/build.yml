@@ -21,6 +21,8 @@ jobs:
                       chip: esp32
                     - name: heltec_wifi_lora_32_V3
                       chip: esp32s3
+                    - name: heltec_wifi_lora_32_V3_2
+                      chip: esp32s3
                     - name: heltec_wireless_stick
                       chip: esp32s3
                     - name: heltec_wireless_stick_lite_v3
