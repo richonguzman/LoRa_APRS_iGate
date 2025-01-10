@@ -16,7 +16,7 @@ float newHum, newTemp, newPress, newGas;
 
 
 Adafruit_BME280     bme280;
-#ifdef HELTEC_V3
+#if defined(HELTEC_V3) || defined(HELTEC_V3_2)
 Adafruit_BMP280     bmp280(&Wire1);
 Adafruit_Si7021     sensor = Adafruit_Si7021();
 #else
@@ -32,7 +32,7 @@ namespace WX_Utils {
     void getWxModuleAddres() {
         uint8_t err, addr;
         for(addr = 1; addr < 0x7F; addr++) {
-            #if defined(HELTEC_V3) || defined(HELTEC_WSL_V3) || defined(HELTEC_WSL_V3_DISPLAY)
+            #if defined(HELTEC_V3) || defined(HELTEC_V3_2) || defined(HELTEC_WSL_V3) || defined(HELTEC_WSL_V3_DISPLAY)
                 Wire1.beginTransmission(addr);
                 err = Wire1.endTransmission();
             #else
@@ -58,7 +58,7 @@ namespace WX_Utils {
             if (wxModuleAddress != 0x00) {
                 bool wxModuleFound = false;
                 if (wxModuleAddress == 0x76 || wxModuleAddress == 0x77) {
-                    #if defined(HELTEC_V3) || defined(HELTEC_WSL_V3) || defined(HELTEC_WSL_V3_DISPLAY)
+                    #if defined(HELTEC_V3) || defined(HELTEC_V3_2) || defined(HELTEC_WSL_V3) || defined(HELTEC_WSL_V3_DISPLAY)
                         if (bme280.begin(wxModuleAddress, &Wire1)) {
                             Serial.println("BME280 sensor found");
                             wxModuleType = 1;
@@ -115,7 +115,7 @@ namespace WX_Utils {
                             Serial.println("BMP280 Module init done!");
                             break;
                         case 3:
-                            #ifndef HELTEC_V3
+                            #if !defined(HELTEC_V3) && !defined(HELTEC_V3_2)
                                 bme680.setTemperatureOversampling(BME680_OS_1X);
                                 bme680.setHumidityOversampling(BME680_OS_1X);
                                 bme680.setPressureOversampling(BME680_OS_1X);
@@ -195,7 +195,7 @@ namespace WX_Utils {
                 newHum      = 0;
                 break;
             case 3: // BME680
-                #ifndef HELTEC_V3
+                #if !defined(HELTEC_V3) && !defined(HELTEC_V3_2)
                     bme680.performReading();
                     delay(50);
                     if (bme680.endReading()) {
