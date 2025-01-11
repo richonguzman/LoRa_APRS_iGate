@@ -52,6 +52,7 @@ ____________________________________________________
 
 ## Timeline (Versions):
 
+- 2025.01.11 Added HELTEC V3.2 board support.
 - 2025.01.07 TROY_LoRa_APRS board added. GMT in quarter hour fix and Beacon fix for TNC.
 - 2025.01.02 Callsign Black List added.
 - 2024.12.30 Fixed missing validation for correct Digipeater mode when not connected to APRS-IS.
