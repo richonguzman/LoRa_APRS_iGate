@@ -52,7 +52,7 @@ ____________________________________________________
 
 ## Timeline (Versions):
 
-- 2025-01.22 Added LILYGO T-DECK PLUS (and DIY+GPS version) board support.
+- 2025.01.22 Added LILYGO T-DECK PLUS (and DIY+GPS version) board support.
 - 2025.01.11 Added HELTEC V3.2 board support.
 - 2025.01.07 TROY_LoRa_APRS board added. GMT in quarter hour fix and Beacon fix for TNC.
 - 2025.01.02 Callsign Black List added.
