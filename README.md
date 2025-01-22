@@ -36,7 +36,7 @@ ____________________________________________________
 
 - TTGO T-Beam V1.0 , V1.1, V1.2 (also variations with SX1262 and SX1268 LoRa Modules).
 
-- T-Deck Plus (and also regular T-Deck with/without GPS added).
+- T-Deck Plus (and also regular T-Deck with/without GPS).
 
 - HELTEC V2, V3 , Wireless Stick, Wireless Stick Lite, HT-CT62, Wireless Tracker, Wireless Paper.
 
