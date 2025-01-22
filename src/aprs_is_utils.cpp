@@ -324,7 +324,7 @@ namespace APRS_IS_Utils {
                     }
                 } else {
                     Utils::print("Received Message from APRS-IS  : " + packet);
-                    if (STATION_Utils::wasHeard(Addressee)) {
+                    if (STATION_Utils::wasHeard(Addressee) && packet.indexOf("EQNS.") == -1 && packet.indexOf("UNIT.") == -1 && packet.indexOf("PARM.") == -1) {
                         STATION_Utils::addToOutputPacketBuffer(buildPacketToTx(packet, 1));
                         displayToggle(true);
                         lastScreenOn = millis();
