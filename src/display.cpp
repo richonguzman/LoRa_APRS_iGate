@@ -15,6 +15,11 @@
             #define smallSizeFont   1
             #define lineSpacing     10
         #endif
+        #if defined(TTGO_T_DECK_GPS) || defined(TTGO_T_DECK_PLUS)
+            #define bigSizeFont     5
+            #define smallSizeFont   2
+            #define lineSpacing     22
+        #endif
     #else
         #ifdef HAS_EPAPER
             //

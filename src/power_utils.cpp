@@ -207,7 +207,23 @@ namespace POWER_Utils {
 
         #if defined(HELTEC_V3) || defined(HELTEC_V3_2) || defined(HELTEC_WP) || defined(HELTEC_WSL_V3) || defined(HELTEC_WSL_V3_DISPLAY)
             Wire1.begin(BOARD_I2C_SDA, BOARD_I2C_SCL);
-        #endif        
+        #endif      
+
+        #if defined(TTGO_T_DECK_GPS) || defined(TTGO_T_DECK_PLUS)
+            pinMode(BOARD_POWERON, OUTPUT);
+            digitalWrite(BOARD_POWERON, HIGH);
+
+            pinMode(BOARD_SDCARD_CS, OUTPUT);
+            pinMode(RADIO_CS_PIN, OUTPUT);
+            pinMode(TFT_CS, OUTPUT);
+
+            digitalWrite(BOARD_SDCARD_CS, HIGH);
+            digitalWrite(RADIO_CS_PIN, HIGH);
+            digitalWrite(TFT_CS, HIGH);
+
+            delay(500);
+            Wire.begin(BOARD_I2C_SDA, BOARD_I2C_SCL);
+        #endif  
         
         delay(1000);
         BATTERY_Utils::setup();
