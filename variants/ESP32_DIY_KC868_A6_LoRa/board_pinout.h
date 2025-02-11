@@ -4,7 +4,7 @@
 // 
 // https://www.kincony.com/download/KC868-A6-schematic.pdf
 //
-// Adds support for the Kincony KC868-A6 with LoRa SX1278 daughter board. If no SX1278 board, init will halt durring boot. 
+// Adds support for the Kincony KC868-A6 with LoRa SX1278 daughter board. If no SX1278 board, init will halt during boot. 
 // nRF24L01 support out of scope. It is not supported when LoRa daughter board installed
 // GPS support 
 // OLED screen support
@@ -35,7 +35,7 @@
     #define HAS_GPS
     #define GPS_BAUDRATE          4800  //Set to match your GPS board
     #define GPS_RX                  -1  //
-    #define GPS_TX                  13  //Data TX from GPS module. IO13 is on the breakout connector. IO12 is connected to GNS with a pullup
+    #define GPS_TX                  13  //Data TX from GPS module. IO13 is on the breakout connector. IO12 is connected to GND with a pullup
 
     // PCF8574
     // https://mischianti.org/category/my-libraries/pcf8574/
