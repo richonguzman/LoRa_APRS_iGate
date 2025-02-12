@@ -103,20 +103,15 @@ namespace Utils {
     }
 
     void activeStations() {
-        fourthLine = "Stations (";
-        fourthLine.concat(String(Config.rememberStationTime));
-        fourthLine.concat("min) = ");
-        if (lastHeardStations.size() < 10) {
-            fourthLine += " ";
-        }
-        fourthLine.concat(String(lastHeardStations.size()));
+        char buffer[30]; // Adjust size as needed
+        sprintf(buffer, "Stations (%dmin) = %2d", Config.rememberStationTime, lastHeardStations.size());
+        fourthLine = buffer;
     }
 
     void sendInitialTelemetryPackets() {
-        String sender = Config.callsign;
-        for (int i = sender.length(); i < 9; i++) {
-            sender += ' ';
-        }
+        char sender[10];                                                    // 9 characters + null terminator
+        snprintf(sender, sizeof(sender), "%-9s", Config.callsign.c_str());  // Left-align with spaces
+
         String baseAPRSISTelemetryPacket = Config.callsign;
         baseAPRSISTelemetryPacket += ">APLRG1,TCPIP,qAC::";
         baseAPRSISTelemetryPacket += sender;
@@ -137,7 +132,7 @@ namespace Utils {
             telemetryPacket1 += "0,0.01,0";
         }
         if (Config.battery.sendExternalVoltage) {
-            telemetryPacket1 += String(Config.battery.sendInternalVoltage ? "," : "") + "0,0.02,0";
+            telemetryPacket1 += String(Config.battery.sendInternalVoltage ? ",0,0.02,0" : "0,0.02,0");
         }
 
         String telemetryPacket2 = "UNIT.";
@@ -145,7 +140,7 @@ namespace Utils {
             telemetryPacket2 += "VDC";
         }
         if (Config.battery.sendExternalVoltage) {
-            telemetryPacket2 += String(Config.battery.sendInternalVoltage ? "," : "") + "VDC";
+            telemetryPacket2 += String(Config.battery.sendInternalVoltage ? ",VDC" : "VDC");
         }
 
         String telemetryPacket3 = "PARM.";
@@ -153,7 +148,7 @@ namespace Utils {
             telemetryPacket3 += "V_Batt";
         }
         if (Config.battery.sendExternalVoltage) {
-            telemetryPacket3 += String(Config.battery.sendInternalVoltage ? "," : "") + "V_Ext";
+            telemetryPacket3 += String(Config.battery.sendInternalVoltage ? ",V_Ext" : "V_Ext");
         }
 
         if (Config.beacon.sendViaAPRSIS) {
@@ -222,13 +217,10 @@ namespace Utils {
                 }
             #endif
 
-            if (Config.wxsensor.active && wxModuleType != 0) {
-                String sensorData = WX_Utils::readDataSensor();
-                beaconPacket += sensorData;
-                secondaryBeaconPacket += sensorData;
-            } else if (Config.wxsensor.active && wxModuleType == 0) {
-                beaconPacket += ".../...g...t...";
-                secondaryBeaconPacket += ".../...g...t...";
+            if (Config.wxsensor.active) {
+                const char* sensorData = (wxModuleType == 0) ? ".../...g...t..." : WX_Utils::readDataSensor().c_str();
+                beaconPacket            += sensorData;
+                secondaryBeaconPacket   += sensorData;
             }
             beaconPacket            += Config.beacon.comment;
             secondaryBeaconPacket   += Config.beacon.comment;
@@ -242,11 +234,14 @@ namespace Utils {
                         shouldSleepLowVoltage   = true;
                     }
 
-                    String internalVoltageInfo  = String(internalVoltage,2) + "V";
                     if (Config.battery.sendInternalVoltage) {
-                        sixthLine               = "    (Batt=";
-                        sixthLine               += internalVoltageInfo;
-                        sixthLine               += ")";
+                        char internalVoltageInfo[10];   // Enough to hold "xx.xxV\0"
+                        snprintf(internalVoltageInfo, sizeof(internalVoltageInfo), "%.2fV", internalVoltage);
+
+                        char sixthLineBuffer[25];       // Enough to hold "    (Batt=xx.xxV)"
+                        snprintf(sixthLineBuffer, sizeof(sixthLineBuffer), "    (Batt=%s)", internalVoltageInfo);
+                        sixthLine = sixthLineBuffer;
+
                         if (!Config.battery.sendVoltageAsTelemetry) {
                             beaconPacket            += " Batt=";
                             beaconPacket            += internalVoltageInfo;
@@ -266,11 +261,14 @@ namespace Utils {
                         shouldSleepLowVoltage   = true;
                     }
 
-                    String externalVoltageInfo  = String(externalVoltage,2) + "V";
                     if (Config.battery.sendExternalVoltage) {
-                        sixthLine               = "    (Ext V=";
-                        sixthLine               += externalVoltageInfo;
-                        sixthLine               += ")";
+                        char externalVoltageInfo[10];  // "xx.xxV\0" (max 7 chars)
+                        snprintf(externalVoltageInfo, sizeof(externalVoltageInfo), "%.2fV", externalVoltage);
+                    
+                        char sixthLineBuffer[25];  // Ensure enough space
+                        snprintf(sixthLineBuffer, sizeof(sixthLineBuffer), "    (Ext V=%s)", externalVoltageInfo);
+                        sixthLine = sixthLineBuffer;
+
                         if (!Config.battery.sendVoltageAsTelemetry) {
                             beaconPacket            += " Ext=";
                             beaconPacket            += externalVoltageInfo;
@@ -345,54 +343,45 @@ namespace Utils {
                 fifthLine = "LoRa Rx ----> LoRa Tx";
                 break;
         }
+
+        int firstColonIndex = packet.indexOf(":");
+        char nextChar       = packet[firstColonIndex + 1];
+
         for (int i = sender.length(); i < 9; i++) {
             sender += " ";
         }
         sixthLine = sender;
-        String seventhLineHelper = "RSSI:";
-        seventhLineHelper += String(rssi);
-        seventhLineHelper += "dBm SNR: ";
-        seventhLineHelper += String(snr);
-        seventhLineHelper += "dBm";
 
-        int firstColonIndex = packet.indexOf(":");
-        if (packet[firstColonIndex + 1] == ':') {
+        if (nextChar == ':') {
             sixthLine += "> MESSAGE";
-            seventhLine = seventhLineHelper;
-        } else if (packet[firstColonIndex + 1] == '>') {
+        } else if (nextChar == '>') {
             sixthLine += "> NEW STATUS";
-            seventhLine = seventhLineHelper;
-        } else if (packet[firstColonIndex + 1] == '!' || packet[firstColonIndex + 1] == '=' || packet[firstColonIndex + 1] == '@') {
+        } else if (nextChar == '!' || nextChar == '=' || nextChar == '@') {
             sixthLine += "> GPS BEACON";
-            if (!Config.syslog.active) {
-                GPS_Utils::getDistanceAndComment(packet);       // to be checked!!!
-            }
+            if (!Config.syslog.active) GPS_Utils::getDistanceAndComment(packet);       // to be checked!!!
             seventhLine = "RSSI:";
             seventhLine += String(rssi);
             seventhLine += "dBm";
-            if (rssi <= -100) {
-                seventhLine += " ";
-            } else {
-                seventhLine += "  ";
-            }
-            if (distance.indexOf(".") == 1) {
-                seventhLine += " ";
-            }
+            seventhLine += (rssi <= -100) ? " " : "  ";
+            if (distance.indexOf(".") == 1) seventhLine += " ";
             seventhLine += "D:";
             seventhLine += distance;
             seventhLine += "km";
-        } else if (packet[firstColonIndex + 1] == '`' || packet[firstColonIndex + 1] == '\'') {
+        } else if (nextChar == '`' || nextChar == '\'') {
             sixthLine += ">  MIC-E";
-            seventhLine = seventhLineHelper;
-        } else if (packet[firstColonIndex + 1] == ';') {
+        } else if (nextChar == ';') {
             sixthLine += ">  OBJECT";
-            seventhLine = seventhLineHelper;
         } else if (packet.indexOf(":T#") >= 10 && packet.indexOf(":=/") == -1) {
             sixthLine += "> TELEMETRY";
-            seventhLine = seventhLineHelper;
         } else {
             sixthLine += "> ??????????";
-            seventhLine = seventhLineHelper;
+        }
+        if (nextChar != '!' && nextChar != '=' && nextChar != '@') {    // Common assignment for non-GPS cases
+            seventhLine = "RSSI:";
+            seventhLine += String(rssi);
+            seventhLine += "dBm SNR: ";
+            seventhLine += String(snr);
+            seventhLine += "dBm";
         }
     }
 

@@ -227,13 +227,8 @@ namespace WX_Utils {
                 humStr  = "..";
             }
             
-            String presStr;
-            if (wxModuleAddress == 4) {
-                presStr = ".....";
-            } else {
-                presStr = generatePresString(newPress + (Config.wxsensor.heightCorrection/CORRECTION_FACTOR));
-            }
-            
+            String presStr = (wxModuleAddress == 4) ? "....." : generatePresString(newPress + (Config.wxsensor.heightCorrection/CORRECTION_FACTOR));
+                       
             fifthLine = "BME-> ";
             fifthLine += String(int(newTemp + Config.wxsensor.temperatureCorrection));
             fifthLine += "C ";
