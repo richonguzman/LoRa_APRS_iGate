@@ -48,13 +48,13 @@ namespace OTA_Utils {
     void onOTAEnd(bool success) {
         displayToggle(true);
         lastScreenOn = millis();
-        if (success) {
-            Serial.println("OTA update finished successfully!");
-            displayShow("", "", " OTA update success!", "", "    Rebooting ...", "", "", 4000);
-        } else {
-            Serial.println("There was an error during OTA update!");
-            displayShow("", "", " OTA update fail!", "", "", "", "", 4000);
-        }
+
+        String statusMessage = success ? "OTA update success!" : "OTA update fail!";
+        String rebootMessage = success ? "Rebooting ..." : "";
+
+        Serial.println(success ? "OTA update finished successfully!" : "There was an error during OTA update!");
+        displayShow("", "", statusMessage, "", rebootMessage, "", "", 4000);
+        
         isUpdatingOTA = false;
     }
     

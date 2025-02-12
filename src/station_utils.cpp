@@ -81,13 +81,9 @@ namespace STATION_Utils {
             lastHeardStations.push_back(lastStation);
         }
 
-        fourthLine = "Stations (";
-        fourthLine += String(Config.rememberStationTime);
-        fourthLine += "min) = ";
-        if (lastHeardStations.size() < 10) {
-            fourthLine += " ";
-        }
-        fourthLine += String(lastHeardStations.size());
+        char buffer[30]; // Adjust size as needed
+        sprintf(buffer, "Stations (%dmin) = %2d", Config.rememberStationTime, lastHeardStations.size());
+        fourthLine = buffer;
     }
 
     bool wasHeard(const String& station) {

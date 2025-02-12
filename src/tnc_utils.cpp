@@ -44,16 +44,9 @@ namespace TNC_Utils {
     }
 
     void handleInputData(char character, int bufferIndex) {
-        String* data;
-        if (bufferIndex == -1) {
-            data = &inputSerialBuffer;
-        } else {
-            data = &inputServerBuffer[bufferIndex];
-        }
-        if (data->length() == 0 && character != (char)FEND) {
-            return;
-        }
-
+        String* data = (bufferIndex == -1) ? &inputSerialBuffer : &inputServerBuffer[bufferIndex];
+        if (data->length() == 0 && character != (char)FEND) return;
+        
         data->concat(character);
 
         if (character == (char)FEND && data->length() > 3) {

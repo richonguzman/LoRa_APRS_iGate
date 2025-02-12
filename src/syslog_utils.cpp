@@ -20,6 +20,10 @@ namespace SYSLOG_Utils {
             char signalData[35];
             snprintf(signalData, sizeof(signalData), " / %ddBm / %.2fdB / %dHz", rssi, snr, freqError);
 
+            int colonIndex  = packet.indexOf(":");
+            char nextChar   = packet[colonIndex + 1];
+            String sender   = packet.substring(3, packet.indexOf(">"));
+
             switch (type) {
                 case 0:     // CRC
                     syslogPacket.concat("CRC / CRC-ERROR / ");
@@ -28,59 +32,56 @@ namespace SYSLOG_Utils {
                     break;
                 case 1:     // RX
                     syslogPacket.concat("RX / ");
-                    if (packet.indexOf("::") > 10) {
+                    if (nextChar == ':') {
                         syslogPacket.concat("MESSAGE / ");
-                        syslogPacket.concat(packet.substring(3, packet.indexOf(">")));
-                        syslogPacket.concat(" ---> "); syslogPacket.concat(packet.substring(packet.indexOf("::") + 2));
-                        syslogPacket.concat(signalData);
-                    } else if (packet.indexOf(":!") > 10 || packet.indexOf(":=") > 10) {
+                        syslogPacket.concat(sender);
+                        syslogPacket.concat(" ---> "); 
+                        syslogPacket.concat(packet.substring(colonIndex + 2));
+                    } else if (nextChar == '!' || nextChar == '=') {
                         syslogPacket.concat("GPS / ");
-                        syslogPacket.concat(packet.substring(3, packet.indexOf(">")));
+                        syslogPacket.concat(sender);
                         syslogPacket.concat(" / ");
                         if (packet.indexOf("WIDE1-1") > 10) {
                             syslogPacket.concat(packet.substring(packet.indexOf(">") + 1, packet.indexOf(",")));
                             syslogPacket.concat(" / WIDE1-1");
                         } else {
-                            syslogPacket.concat(packet.substring(packet.indexOf(">") + 1, packet.indexOf(":")));
+                            syslogPacket.concat(packet.substring(packet.indexOf(">") + 1, colonIndex));
                             syslogPacket.concat(" / -");
                         }
-                        syslogPacket.concat(signalData);
-                        syslogPacket.concat(" / ");
-                        syslogPacket.concat(GPS_Utils::getDistanceAndComment(packet));
-                    } else if (packet.indexOf(":>") > 10) {
+                    } else if (nextChar == '>') {
                         syslogPacket.concat("STATUS / ");
-                        syslogPacket.concat(packet.substring(3, packet.indexOf(">")));
+                        syslogPacket.concat(sender);
                         syslogPacket.concat(" ---> ");
-                        syslogPacket.concat(packet.substring(packet.indexOf(":>") + 2));
-                        syslogPacket.concat(signalData);
-                    } else if (packet.indexOf(":`") > 10) {
+                        syslogPacket.concat(packet.substring(colonIndex + 2));
+                    } else if (nextChar == '`') {
                         syslogPacket.concat("MIC-E / ");
-                        syslogPacket.concat(packet.substring(3, packet.indexOf(">")));
+                        syslogPacket.concat(sender);
                         syslogPacket.concat(" ---> ");
-                        syslogPacket.concat(packet.substring(packet.indexOf(":`") + 2));
-                        syslogPacket.concat(signalData);
+                        syslogPacket.concat(packet.substring(colonIndex + 2));
+                    } else if (nextChar == ';') {
+                        syslogPacket.concat("OBJECT / ");
+                        syslogPacket.concat(sender);
+                        syslogPacket.concat(" ---> ");
+                        syslogPacket.concat(packet.substring(colonIndex + 2));
                     } else if (packet.indexOf(":T#") >= 10 && packet.indexOf(":=/") == -1) {
                         syslogPacket.concat("TELEMETRY / ");
-                        syslogPacket.concat(packet.substring(3, packet.indexOf(">")));
+                        syslogPacket.concat(sender);
                         syslogPacket.concat(" ---> ");
                         syslogPacket.concat(packet.substring(packet.indexOf(":T#") + 3));
-                        syslogPacket.concat(signalData);
-                    } else if (packet.indexOf(":;") > 10) {
-                        syslogPacket.concat("OBJECT / ");
-                        syslogPacket.concat(packet.substring(3, packet.indexOf(">")));
-                        syslogPacket.concat(" ---> ");
-                        syslogPacket.concat(packet.substring(packet.indexOf(":;") + 2));
-                        syslogPacket.concat(signalData);
                     } else {
                         syslogPacket.concat(packet);
-                        syslogPacket.concat(signalData);
+                    }
+                    syslogPacket.concat(signalData);
+                    if (nextChar == '!' || nextChar == '=') {
+                        syslogPacket.concat(" / ");
+                        syslogPacket.concat(GPS_Utils::getDistanceAndComment(packet));
                     }
                     break;
                 case 2:     // APRSIS TX
                     syslogPacket.concat("APRSIS TX / ");
-                    if (packet.indexOf(":>") > 10) {
+                    if (nextChar == '>') {
                         syslogPacket.concat("StartUp_Status / ");
-                        syslogPacket.concat(packet.substring(packet.indexOf(":>") + 2));
+                        syslogPacket.concat(packet.substring(colonIndex + 2));
                     } else {
                         syslogPacket.concat("QUERY / ");
                         syslogPacket.concat(packet);
@@ -91,11 +92,11 @@ namespace SYSLOG_Utils {
                     if (packet.indexOf("RFONLY") > 10) {
                         syslogPacket.concat("RFONLY / ");
                         syslogPacket.concat(packet);
-                    } else if (packet.indexOf("::") > 10) {
+                    } else if (nextChar == ':') {
                         syslogPacket.concat("MESSAGE / ");
-                        syslogPacket.concat(packet.substring(0,packet.indexOf(">")));
+                        syslogPacket.concat(sender);
                         syslogPacket.concat(" ---> ");
-                        syslogPacket.concat(packet.substring(packet.indexOf("::") + 2));
+                        syslogPacket.concat(packet.substring(colonIndex + 2));
                     } else {
                         syslogPacket.concat(packet);
                     }
