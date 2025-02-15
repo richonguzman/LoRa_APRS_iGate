@@ -24,7 +24,8 @@
         uint16_t redColor           = 0xc8a2;
     #else
         #ifdef HAS_EPAPER
-            //
+        #include <heltec-eink-modules.h>
+        EInkDisplay_WirelessPaperV1_1 display;
         #else
             #include <Adafruit_GFX.h>
             #include <Adafruit_SSD1306.h>
@@ -63,7 +64,9 @@ void displaySetup() {
             #endif
         #else
             #ifdef HAS_EPAPER
-                //
+            display.landscape();
+            display.printCenter("LoRa APRS iGate Initialising...");
+            display.update();
             #else
                 #ifdef OLED_DISPLAY_HAS_RST_PIN
                     pinMode(OLED_RST, OUTPUT);
@@ -96,7 +99,8 @@ void displayToggle(bool toggle) {
                 digitalWrite(TFT_BL, HIGH);
             #else
                 #ifdef HAS_EPAPER
-                    // ... to be continued
+                    display.printCenter("EPAPER Display Disabled by toggle...");
+                    display.update();
                 #else
                     if (displayFound) display.ssd1306_command(SSD1306_DISPLAYON);
                 #endif
@@ -106,7 +110,8 @@ void displayToggle(bool toggle) {
                 digitalWrite(TFT_BL, LOW);
             #else
                 #ifdef HAS_EPAPER
-                    // ... to be continued
+                    display.printCenter("Enabled EPAPER Display...");
+                    display.update();
                 #else
                     if (displayFound) display.ssd1306_command(SSD1306_DISPLAYOFF);
                 #endif
@@ -141,7 +146,13 @@ void displayShow(const String& header, const String& line1, const String& line2,
             sprite.pushSprite(0,0);
         #else
             #ifdef HAS_EPAPER
-                // ... to be continued
+                display.clearMemory();
+                display.setCursor(5, 20);  
+                display.println(header);
+                display.println(line1);
+                display.println(line2);
+                display.println(line3);
+                display.update();
             #else
                 if (displayFound) {
                     display.clearDisplay();
@@ -189,7 +200,16 @@ void displayShow(const String& header, const String& line1, const String& line2,
             sprite.pushSprite(0,0);
         #else
             #ifdef HAS_EPAPER
-                // ... to be continued
+                display.clearMemory();
+                display.setCursor(5, 20);  
+                display.println(header);
+                display.println(line1);
+                display.println(line2);
+                display.println(line3);
+                display.println(line4);
+                display.println(line5);
+                display.println(line6);
+                display.update();
             #else
                 if (displayFound) {
                     display.clearDisplay();

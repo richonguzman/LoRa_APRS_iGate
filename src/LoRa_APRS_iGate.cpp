@@ -70,6 +70,10 @@ std::vector<ReceivedPacket> receivedPackets;
 
 String firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine;
 
+#ifdef HAS_EPAPER
+unsigned long last_time = 0;
+String prevText;
+#endif
 //#define STARTUP_DELAY 5 //min
 
 void setup() {
@@ -198,7 +202,27 @@ void loop() {
 
     STATION_Utils::processOutputPacketBuffer();
 
+    #ifdef HAS_EPAPER
+    /*
+        the runtime currently calls displayShow() in every loop iteration, even
+        even without any actual changes to what needs to be displayed, and this
+        is bad for an ePaper display.
+    */
+    // Only consider updating every 10 seconds
+    if(last_time == 0) last_time = micros();
+    unsigned long now_time = micros();
+    if(now_time - last_time > 10000000) {
+        last_time = now_time;
+        String allText = firstLine + secondLine + thirdLine + fourthLine + fifthLine + sixthLine + seventhLine;
+        // Only update display if text has changed since last update
+        if(prevText == allText) {
+            displayShow(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
+            prevText = allText;
+        }
+    }
+    #else
     displayShow(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
+    #endif
     Utils::checkRebootTime();
     Utils::checkSleepByLowBatteryVoltage(1);
 }
