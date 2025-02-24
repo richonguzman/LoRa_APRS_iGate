@@ -1,4 +1,6 @@
+#include <TinyGPS++.h>
 #include "configuration.h"
+#include "board_pinout.h"
 #include "wx_utils.h"
 #include "display.h"
 
@@ -8,6 +10,9 @@
 
 extern Configuration            Config;
 extern String                   fifthLine;
+#ifdef HAS_GPS
+extern TinyGPSPlus              gps;
+#endif
 
 int         wxModuleType        = 0;
 uint8_t     wxModuleAddress     = 0x00;
@@ -227,7 +232,13 @@ namespace WX_Utils {
                 humStr  = "..";
             }
             
-            String presStr = (wxModuleAddress == 4) ? "....." : generatePresString(newPress + (Config.wxsensor.heightCorrection/CORRECTION_FACTOR));
+            String presStr = (wxModuleAddress == 4) 
+                ? "....." 
+            #ifdef HAS_GPS
+                : generatePresString(newPress + (gps.altitude.meters() / CORRECTION_FACTOR));
+            #else
+                : generatePresString(newPress + (Config.wxsensor.heightCorrection / CORRECTION_FACTOR));
+            #endif
                        
             fifthLine = "BME-> ";
             fifthLine += String(int(newTemp + Config.wxsensor.temperatureCorrection));
