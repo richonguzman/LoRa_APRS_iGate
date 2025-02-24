@@ -349,7 +349,7 @@ namespace APRS_IS_Utils {
             if (espClient.connected()) {
                 if (espClient.available()) {
                     String aprsisPacket = espClient.readStringUntil('\r');
-                    // Serial.println(aprsisPacket);
+                    aprsisPacket.trim();    // Serial.println(aprsisPacket);
                     processAPRSISPacket(aprsisPacket);
                     lastRxTime = millis();
                 }
