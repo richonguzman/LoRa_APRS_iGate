@@ -48,12 +48,14 @@ ___________________________________________________________________*/
     #include "A7670_utils.h"
 #endif
 
-String              versionDate             = "2025.02.12";
+String              versionDate             = "2025.02.24";
 Configuration       Config;
 WiFiClient          espClient;
 #ifdef HAS_GPS
     HardwareSerial  gpsSerial(1);
     TinyGPSPlus     gps;
+    uint32_t        gpsSatelliteTime        = 0;
+    bool            gpsInfoToggle           = false;
 #endif
 
 uint8_t             myWiFiAPIndex           = 0;
@@ -152,7 +154,26 @@ void loop() {
         BATTERY_Utils::checkIfShouldSleep();
     }
     
-    thirdLine = Utils::getLocalIP();
+    #ifdef HAS_GPS
+        if (Config.beacon.gpsActive) {
+            if (millis() - gpsSatelliteTime > 5000) {
+                gpsInfoToggle = !gpsInfoToggle;
+                gpsSatelliteTime = millis();
+            }
+            if (gpsInfoToggle) {
+                thirdLine = "Satellite(s): ";
+                String gpsData = String(gps.satellites.value());
+                if (gpsData.length() < 2) gpsData = "0" + gpsData;  // Ensure two-digit formatting
+                thirdLine += gpsData;
+            } else {
+                thirdLine = Utils::getLocalIP();
+            }
+        } else {
+            thirdLine = Utils::getLocalIP();
+        }
+    #else
+        thirdLine = Utils::getLocalIP();
+    #endif
 
     #ifdef HAS_A7670
         if (Config.aprs_is.active && !modemLoggedToAPRSIS) A7670_Utils::APRS_IS_connect();

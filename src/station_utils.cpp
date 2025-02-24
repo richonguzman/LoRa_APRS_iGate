@@ -80,10 +80,7 @@ namespace STATION_Utils {
             lastStation.station         = station;
             lastHeardStations.push_back(lastStation);
         }
-
-        char buffer[30]; // Adjust size as needed
-        sprintf(buffer, "Stations (%dmin) = %2d", Config.rememberStationTime, lastHeardStations.size());
-        fourthLine = buffer;
+        Utils::activeStations();
     }
 
     bool wasHeard(const String& station) {
