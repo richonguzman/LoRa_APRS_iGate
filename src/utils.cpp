@@ -195,7 +195,12 @@ namespace Utils {
         if (beaconUpdate) {
             if (!Config.display.alwaysOn && Config.display.timeout != 0) displayToggle(true);
 
-            if (sendStartTelemetry && Config.battery.sendVoltageAsTelemetry && !Config.wxsensor.active && (Config.battery.sendInternalVoltage || Config.battery.sendExternalVoltage)) {
+            if (sendStartTelemetry && 
+                Config.battery.sendVoltageAsTelemetry &&
+                !Config.wxsensor.active && 
+                (Config.battery.sendInternalVoltage || Config.battery.sendExternalVoltage) &&
+                (lastBeaconTx > 0)) {
+                //(!Config.digi.ecoMode || lastBeaconTx > 0)) {
                 sendInitialTelemetryPackets();
             }
 
