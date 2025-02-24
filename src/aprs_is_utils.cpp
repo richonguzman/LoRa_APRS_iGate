@@ -211,6 +211,22 @@ namespace APRS_IS_Utils {
         }
     }
 
+    bool checkObjectPacketToReject(const String packet) {   // to filter out some objects
+        if (packet.indexOf("APDG01") != -1) {
+            Serial.println("*** REJ ***");            
+            return true;
+        }
+        
+        int objectIDIndex = packet.indexOf(":;");
+        String payload = packet.substring(objectIDIndex + 2);
+        if (payload.indexOf("EL-") == 0) {
+            Serial.println("*** REJ ***");       
+            return true;
+        }
+
+        return false;
+    }
+
     String buildPacketToTx(const String& aprsisPacket, uint8_t packetType) {
         String packet = aprsisPacket;
         packet.trim();
@@ -334,10 +350,12 @@ namespace APRS_IS_Utils {
                 displayShow(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
             } else if (Config.aprs_is.objectsToRF && packet.indexOf(":;") > 0) {
                 Utils::println("Received Object from APRS-IS  : " + packet);
-                STATION_Utils::addToOutputPacketBuffer(buildPacketToTx(packet, 5));
-                displayToggle(true);
-                lastScreenOn = millis();
-                Utils::typeOfPacket(packet, 1); // APRS-LoRa
+                if (!checkObjectPacketToReject(packet)) {
+                    STATION_Utils::addToOutputPacketBuffer(buildPacketToTx(packet, 5));
+                    displayToggle(true);
+                    lastScreenOn = millis();
+                    Utils::typeOfPacket(packet, 1); // APRS-LoRa
+                }
             }
         }
     }
