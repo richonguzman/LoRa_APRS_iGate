@@ -54,6 +54,7 @@ ____________________________________________________
 
 ## Timeline (Versions):
 
+- 2025.02.25 Objects Rules updated and GPS Boards: Satellites in Screen, Wx Height Correction from GPS Data.
 - 2025.01.22 Added LILYGO T-DECK PLUS (and DIY+GPS version) board support.
 - 2025.01.11 Added HELTEC V3.2 board support.
 - 2025.01.07 TROY_LoRa_APRS board added. GMT in quarter hour fix and Beacon fix for TNC.
