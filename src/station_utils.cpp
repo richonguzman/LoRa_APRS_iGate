@@ -51,7 +51,7 @@ namespace STATION_Utils {
         return false;
     }
 
-    void cleanObjectHeard() {
+    void cleanObjectsHeard() {
         for (auto it = lastHeardObjects.begin(); it != lastHeardObjects.end(); ) {
             if (millis() - it->lastHeardTime >= 9.75 * 60 * 1000) { // 9.75 = 9min 45secs
                 it = lastHeardObjects.erase(it);    // erase() returns the next valid iterator
@@ -62,7 +62,7 @@ namespace STATION_Utils {
     }
 
     bool checkObjectTime(const String& packet) {
-        cleanObjectHeard();
+        cleanObjectsHeard();
 
         int objectIDIndex = packet.indexOf(":;");
         String object = packet.substring(objectIDIndex + 2, objectIDIndex + 11);
