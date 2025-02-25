@@ -111,7 +111,7 @@ namespace STATION_Utils {
                 return true;
             }
         }
-        Utils::println(" ---> Station not Heard in " + String(Config.rememberStationTime) + " min: No Tx\n");
+        Utils::println(" ---> Station not Heard in " + String(Config.rememberStationTime) + " min: No Tx");
         return false;
     }
 
