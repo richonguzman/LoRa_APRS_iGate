@@ -17,6 +17,7 @@ std::vector<LastHeardStation>   lastHeardStations;
 std::vector<String>             outputPacketBuffer;
 std::vector<Packet25SegBuffer>  packet25SegBuffer;
 std::vector<String>             blackList;
+std::vector<LastHeardStation>   lastHeardObjects;
 
 bool saveNewDigiEcoModeConfig   = false;
 
@@ -50,7 +51,30 @@ namespace STATION_Utils {
         return false;
     }
 
+    void cleanObjectHeard() {
+        for (auto it = lastHeardObjects.begin(); it != lastHeardObjects.end(); ) {
+            if (millis() - it->lastHeardTime >= 9.75 * 60 * 1000) { // 9.75 = 9min 45secs
+                it = lastHeardObjects.erase(it);    // erase() returns the next valid iterator
+            } else {
+                ++it;                               // Only increment if not erasing
+            }
+        }
+    }
 
+    bool checkObjectTime(const String& packet) {
+        cleanObjectHeard();
+
+        int objectIDIndex = packet.indexOf(":;");
+        String object = packet.substring(objectIDIndex + 2, objectIDIndex + 11);
+        object.trim();
+
+        for (int i = 0; i < lastHeardObjects.size(); i++) {                 // Check if i should Tx object
+            if (lastHeardObjects[i].station == object) return false;
+        }
+        lastHeardObjects.emplace_back(LastHeardStation{millis(), object});  // Add new object and Tx
+        return true;
+    }
+    
     void deleteNotHeard() {
         std::vector<LastHeardStation>  lastHeardStation_temp;
         for (int i = 0; i < lastHeardStations.size(); i++) {
@@ -72,14 +96,10 @@ namespace STATION_Utils {
             if (lastHeardStations[i].station == station) {
                 lastHeardStations[i].lastHeardTime = millis();
                 stationHeard = true;
+                break;
             }
         }
-        if (!stationHeard) {
-            LastHeardStation lastStation;
-            lastStation.lastHeardTime   = millis();
-            lastStation.station         = station;
-            lastHeardStations.push_back(lastStation);
-        }
+        if (!stationHeard) lastHeardStations.emplace_back(LastHeardStation{millis(), station});
         Utils::activeStations();
     }
 
@@ -91,7 +111,7 @@ namespace STATION_Utils {
                 return true;
             }
         }
-        Utils::println(" ---> Station not Heard for last 30 min (Not Tx)\n");
+        Utils::println(" ---> Station not Heard in " + String(Config.rememberStationTime) + " min: No Tx\n");
         return false;
     }
 
@@ -105,11 +125,7 @@ namespace STATION_Utils {
                 if (packet25SegBuffer[i].station == station && packet25SegBuffer[i].payload == textMessage) return false;
             }
         }
-        Packet25SegBuffer   packet;
-        packet.receivedTime = millis();
-        packet.station      = station;
-        packet.payload      = textMessage;
-        packet25SegBuffer.push_back(packet);
+        packet25SegBuffer.emplace_back(Packet25SegBuffer{millis(), station, textMessage});
         return true;
     }
 

@@ -139,7 +139,7 @@ namespace LoRa_Utils {
             if (Config.syslog.active && WiFi.status() == WL_CONNECTED) {
                 SYSLOG_Utils::log(3, newPacket, 0, 0.0, 0);    // TX
             }
-            Utils::print("---> LoRa Packet Tx    : ");
+            Utils::print("---> LoRa Packet Tx : ");
             Utils::println(newPacket);
         } else {
             Utils::print(F("failed, code "));
@@ -185,7 +185,7 @@ namespace LoRa_Utils {
                         rssi        = radio.getRSSI();
                         snr         = radio.getSNR();
                         freqError   = radio.getFrequencyError();
-                        Utils::println("<--- LoRa Packet Rx    : " + packet.substring(3));
+                        Utils::println("<--- LoRa Packet Rx : " + packet.substring(3));
                         Utils::println("(RSSI:" + String(rssi) + " / SNR:" + String(snr) + " / FreqErr:" + String(freqError) + ")");
 
                         if (!Config.lowPowerMode && !Config.digi.ecoMode) {

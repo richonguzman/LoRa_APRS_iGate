@@ -20,6 +20,7 @@ namespace STATION_Utils {
 
     void loadBlackList();
     bool checkBlackList(const String& callsign);
+    bool checkObjectTime(const String& packet);
     void deleteNotHeard();
     void updateLastHeard(const String& station);
     bool wasHeard(const String& station);

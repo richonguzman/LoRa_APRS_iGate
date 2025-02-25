@@ -211,16 +211,6 @@ namespace APRS_IS_Utils {
         }
     }
 
-    bool checkObjectPacketToReject(const String packet) {   // to filter out some objects
-        if (packet.indexOf("APDG01") != -1) return true;
-        
-        int objectIDIndex = packet.indexOf(":;");
-        String payload = packet.substring(objectIDIndex + 2);
-        if (payload.indexOf("EL-") == 0) return true;
-
-        return false;
-    }
-
     String buildPacketToTx(const String& aprsisPacket, uint8_t packetType) {
         String packet = aprsisPacket;
         packet.trim();
@@ -308,7 +298,7 @@ namespace APRS_IS_Utils {
                         receivedMessage = AddresseeAndMessage.substring(AddresseeAndMessage.indexOf(":") + 1);
                     }
                     if (receivedMessage.indexOf("?") == 0) {
-                        Utils::println("Received Query APRS-IS : " + packet);
+                        Utils::println("Rx Query (APRS-IS)  : " + packet);
                         String queryAnswer = QUERY_Utils::process(receivedMessage, Sender, true, false);
                         //Serial.println("---> QUERY Answer : " + queryAnswer.substring(0,queryAnswer.indexOf("\n")));
                         if (!Config.display.alwaysOn && Config.display.timeout != 0) {
@@ -333,7 +323,7 @@ namespace APRS_IS_Utils {
                         seventhLine += receivedMessage;
                     }
                 } else {
-                    Utils::print("Received Message from APRS-IS  : " + packet);
+                    Utils::print("Rx Message (APRS-IS): " + packet);
                     if (STATION_Utils::wasHeard(Addressee) && packet.indexOf("EQNS.") == -1 && packet.indexOf("UNIT.") == -1 && packet.indexOf("PARM.") == -1) {
                         STATION_Utils::addToOutputPacketBuffer(buildPacketToTx(packet, 1));
                         displayToggle(true);
@@ -343,15 +333,15 @@ namespace APRS_IS_Utils {
                 }
                 displayShow(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
             } else if (Config.aprs_is.objectsToRF && packet.indexOf(":;") > 0) {
-                Utils::print("Received Object from APRS-IS  : " + packet);
-                if (!checkObjectPacketToReject(packet)) {
+                Utils::print("Rx Object (APRS-IS) : " + packet);
+                if (STATION_Utils::checkObjectTime(packet)) {
                     STATION_Utils::addToOutputPacketBuffer(buildPacketToTx(packet, 5));
                     displayToggle(true);
                     lastScreenOn = millis();
                     Utils::typeOfPacket(packet, 1); // APRS-LoRa
                     Serial.println();
                 } else {
-                    Serial.println(" ---> Object Rej (Not Tx)");
+                    Serial.println(" ---> Rejected (Time): No Tx");
                 }
             }
         }
