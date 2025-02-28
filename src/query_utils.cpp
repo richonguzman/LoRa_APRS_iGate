@@ -68,6 +68,18 @@ namespace QUERY_Utils {
             saveNewDigiEcoModeConfig    = true;
         } else if (queryQuestion.indexOf("?APRSEMS") == 0) {    // Digipeater EcoMode Status
             answer = (Config.digi.ecoMode) ? "DigiEcoMode:ON" : "DigiEcoMode:OFF";
+        } else if (STATION_Utils::isManager(station) && (!queryFromAPRSIS || !Config.aprsRemote.rfOnly)) {
+            if (queryQuestion.indexOf("?TX=ON") == 0) {
+                Config.loramodule.txActive = true;
+                Serial.println("TX=ON");
+            } else if (queryQuestion.indexOf("?TX=OFF") == 0) {
+                Config.loramodule.txActive = false;
+                Serial.println("TX=OFF");
+            } else if (queryQuestion.indexOf("?TX=?") == 0) {
+                answer = (Config.loramodule.txActive) ? "TX=ON" : "TX=OFF";
+            } else if (queryQuestion.indexOf("?COMMIT") == 0) {
+                Config.writeFile();
+            }
         }
 
         String queryAnswer = Config.callsign;

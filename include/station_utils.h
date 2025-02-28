@@ -19,7 +19,9 @@ struct LastHeardStation {
 namespace STATION_Utils {
 
     void loadBlackList();
+    void loadManagers();
     bool checkBlackList(const String& callsign);
+    bool isManager(const String& callsign);
     bool checkObjectTime(const String& packet);
     void deleteNotHeard();
     void updateLastHeard(const String& station);
