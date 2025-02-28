@@ -54,8 +54,8 @@ ____________________________________________________
 
 ## Timeline (Versions):
 
-- 2025.02.28 Heltec Wireless Paper now has Epaper working. Thanks SzymonPriv for pointing to the right library.
-- 2025.02.25 Objects Rules updated and GPS Boards: Satellites in Screen, Wx Height Correction from GPS Data.
+- 2025.02.28 Heltec Wireless Paper with Epaper working. Thanks SzymonPriv for pointing to the right library.
+- 2025.02.25 Objects Rules update, GPS Boards: Satellites on Screen, Wx Height Correction from GPS Data.
 - 2025.01.22 Added LILYGO T-DECK PLUS (and DIY+GPS version) board support.
 - 2025.01.11 Added HELTEC V3.2 board support.
 - 2025.01.07 TROY_LoRa_APRS board added. GMT in quarter hour fix and Beacon fix for TNC.
@@ -67,7 +67,7 @@ ____________________________________________________
 - 2024.10.25 Added QRP Labs LightGateway 1.0 support.
 - 2024.10.21 Boards with GPS can now send Real-GPS Beacon (also posible: GPS ambiguity of ~ 1 km).
 - 2024.10.14 Received Packets in WebUI show real Local Time (NTP with GMT offset).
-- 2024.10.08 New EcoMode for Remote Digipeaters without WiFi/WiFiAP, Screen, Leds (Example: LILYGO LoRa32 uses only 24mA, with WifiAP and all was 150mA). APRS Message/Queries can start/stop this mode too.
+- 2024.10.08 New EcoMode for Remote Digipeaters without WiFi/WiFiAP, Screen, Leds (Example: LILYGO LoRa32 uses only 24mA, with WifiAP 150mA). APRS Message/Queries can start/stop this mode too.
 - 2024.10.06 Cross Frequency Digipeater Rules added.
 - 2024.09.23 Libraries Update for SDK3
 - 2024.09.23 Added Enconded Telemetry for Battery (+ External Voltage) in Station GPS Beacon Packet. 
