@@ -54,6 +54,7 @@ ____________________________________________________
 
 ## Timeline (Versions):
 
+- 2025.02.28 Heltec Wireless Paper now has Epaper working. Thanks SzymonPriv for pointing to the right library.
 - 2025.02.25 Objects Rules updated and GPS Boards: Satellites in Screen, Wx Height Correction from GPS Data.
 - 2025.01.22 Added LILYGO T-DECK PLUS (and DIY+GPS version) board support.
 - 2025.01.11 Added HELTEC V3.2 board support.
