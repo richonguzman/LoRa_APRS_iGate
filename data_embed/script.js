@@ -223,6 +223,10 @@ function loadSettings(settings) {
     document.getElementById("other.lowPowerMode").checked               = settings.other.lowPowerMode;
     document.getElementById("other.lowVoltageCutOff").value             = settings.other.lowVoltageCutOff || 0
 
+    // Management over APRS
+    document.getElementById("aprsRemote.managers").value                = settings.aprsRemote.managers;
+    document.getElementById("aprsRemote.rfOnly").checked                = settings.aprsRemote.rfOnly;
+
     updateImage();
     refreshSpeedStandard();
     toggleFields();

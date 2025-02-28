@@ -93,5 +93,9 @@
         "rebootModeTime": 6
     },
     "personalNote": "",
-    "blackList": ""
+    "blackList": "",
+    "aprsRemote": {
+        "managers": "",
+        "rfOnly": true
+    }
 }

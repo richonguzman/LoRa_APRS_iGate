@@ -122,6 +122,11 @@ public:
     float   gmtCorrection;
 };
 
+class APRSRemote {
+public:
+    String  managers;
+    bool    rfOnly;
+};
 
 class Configuration {
 public:
@@ -148,6 +153,7 @@ public:
     OTA                     ota;
     WEBADMIN                webadmin;
     NTP                     ntp;
+    APRSRemote              aprsRemote;
   
     void init();
     void writeFile();

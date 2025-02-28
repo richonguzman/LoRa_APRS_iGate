@@ -17,6 +17,7 @@ std::vector<LastHeardStation>   lastHeardStations;
 std::vector<String>             outputPacketBuffer;
 std::vector<Packet25SegBuffer>  packet25SegBuffer;
 std::vector<String>             blackList;
+std::vector<String>             managers;
 std::vector<LastHeardStation>   lastHeardObjects;
 
 bool saveNewDigiEcoModeConfig   = false;
@@ -24,31 +25,57 @@ bool saveNewDigiEcoModeConfig   = false;
 
 namespace STATION_Utils {
 
-    void loadBlackList() {
-        if (Config.blackList != "") {
-            String callsigns    = Config.blackList;
+    std::vector<String> loadCallSignList(String list) {
+        std::vector<String> result;
+
+        if (list != "") {
+            String callsigns    = list;
             int spaceIndex      = callsigns.indexOf(" ");
 
             while (spaceIndex >= 0) {
-                blackList.push_back(callsigns.substring(0, spaceIndex));
+                result.push_back(callsigns.substring(0, spaceIndex));
                 callsigns   = callsigns.substring(spaceIndex + 1);
                 spaceIndex  = callsigns.indexOf(" ");
             }
+
             callsigns.trim();
-            if (callsigns.length() > 0) blackList.push_back(callsigns); // Add the last word if available
+
+            if (callsigns.length() > 0)
+                result.push_back(callsigns);
         }
+
+        return result;
     }
 
-    bool checkBlackList(const String& callsign) {
-        for (int i = 0; i < blackList.size(); i++) {
-            if (blackList[i].indexOf("*") >= 0) {   // use wild card
-                String wildCard = blackList[i].substring(0, blackList[i].indexOf("*"));
-                if (callsign.startsWith(wildCard))return true;
+    bool checkCallSignList(const std::vector<String> list, const String& callsign) {
+        for (int i = 0; i < list.size(); i++) {
+            if (list[i].indexOf("*") >= 0) {
+                String wildCard = list[i].substring(0, list[i].indexOf("*"));
+                if (callsign.startsWith(wildCard))
+                    return true;
             } else {
-                if (blackList[i] == callsign) return true;
+                if (list[i] == callsign)
+                    return true;
             }                
         }
         return false;
+    }
+
+
+    void loadBlackList() {
+        blackList = loadCallSignList(Config.blackList);
+    }
+
+    void loadManagers() {
+        managers = loadCallSignList(Config.aprsRemote.managers);
+    }
+
+    bool checkBlackList(const String& callsign) {
+        return checkCallSignList(blackList, callsign);
+    }
+
+    bool isManager(const String& callsign) {
+        return checkCallSignList(managers, callsign);
     }
 
     void cleanObjectsHeard() {

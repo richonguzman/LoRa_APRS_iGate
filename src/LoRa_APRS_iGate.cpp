@@ -86,6 +86,7 @@ void setup() {
     Utils::validateFreqs();
     GPS_Utils::setup();
     STATION_Utils::loadBlackList();
+    STATION_Utils::loadManagers();
 
     #ifdef STARTUP_DELAY    // (TEST) just to wait for WiFi init of Routers
         displayShow("", "  STARTUP DELAY ...", "", "", 0);
