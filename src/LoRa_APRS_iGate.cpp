@@ -48,7 +48,7 @@ ___________________________________________________________________*/
     #include "A7670_utils.h"
 #endif
 
-String              versionDate             = "2025.02.25";
+String              versionDate             = "2025.02.28";
 Configuration       Config;
 WiFiClient          espClient;
 #ifdef HAS_GPS
@@ -68,10 +68,14 @@ uint32_t            lastBatteryCheck        = 0;
 bool                backUpDigiMode          = false;
 bool                modemLoggedToAPRSIS     = false;
 
+#ifdef HAS_EPAPER
+    uint32_t        lastEpaperTime          = 0;
+    extern String   lastEpaperText;
+#endif
+
 std::vector<ReceivedPacket> receivedPackets;
 
 String firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine;
-
 //#define STARTUP_DELAY 5 //min
 
 void setup() {
@@ -219,7 +223,19 @@ void loop() {
 
     STATION_Utils::processOutputPacketBuffer();
 
-    displayShow(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
+    #ifdef HAS_EPAPER   // Only consider updating every 10 seconds (when data to show is different from before)
+        if(lastEpaperTime == 0 || millis() - lastEpaperTime > 10000) {
+            String posibleEpaperText = firstLine + secondLine + thirdLine + fourthLine + fifthLine + sixthLine + seventhLine;
+            if (lastEpaperText != posibleEpaperText) {
+                displayShow(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
+                lastEpaperText = posibleEpaperText;
+                lastEpaperTime = millis();
+            }
+        }
+    #else
+        displayShow(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
+    #endif
+
     Utils::checkRebootTime();
     Utils::checkSleepByLowBatteryVoltage(1);
 }

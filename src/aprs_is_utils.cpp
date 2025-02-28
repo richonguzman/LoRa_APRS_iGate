@@ -322,6 +322,7 @@ namespace APRS_IS_Utils {
                         seventhLine = "QUERY = ";
                         seventhLine += receivedMessage;
                     }
+                    displayShow(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
                 } else {
                     Utils::print("Rx Message (APRS-IS): " + packet);
                     if (STATION_Utils::wasHeard(Addressee) && packet.indexOf("EQNS.") == -1 && packet.indexOf("UNIT.") == -1 && packet.indexOf("PARM.") == -1) {
@@ -329,9 +330,9 @@ namespace APRS_IS_Utils {
                         displayToggle(true);
                         lastScreenOn = millis();
                         Utils::typeOfPacket(packet, 1); // APRS-LoRa
+                        displayShow(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
                     }
                 }
-                displayShow(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
             } else if (Config.aprs_is.objectsToRF && packet.indexOf(":;") > 0) {
                 Utils::print("Rx Object (APRS-IS) : " + packet);
                 if (STATION_Utils::checkObjectTime(packet)) {
