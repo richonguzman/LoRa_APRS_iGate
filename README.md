@@ -54,6 +54,7 @@ ____________________________________________________
 
 ## Timeline (Versions):
 
+- 2025.03.03 T-Beam Supreme board added and more BlackList rules added.
 - 2025.02.28 Heltec Wireless Paper with Epaper working. Thanks SzymonPriv for pointing to the right library.
 - 2025.02.25 Objects Rules update, GPS Boards: Satellites on Screen, Wx Height Correction from GPS Data.
 - 2025.01.22 Added LILYGO T-DECK PLUS (and DIY+GPS version) board support.
