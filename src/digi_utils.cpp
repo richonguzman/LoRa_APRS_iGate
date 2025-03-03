@@ -117,46 +117,44 @@ namespace DIGI_Utils {
     }
 
     void processLoRaPacket(const String& packet) {        
-        if (packet != "") {
-            if ((packet.substring(0, 3) == "\x3c\xff\x01") && (packet.indexOf("NOGATE") == -1)) {
-                bool thirdPartyPacket = false;
-                String temp, Sender;
-                int firstColonIndex = packet.indexOf(":");
-                if (firstColonIndex > 5 && firstColonIndex < (packet.length() - 1) && packet[firstColonIndex + 1] == '}' && packet.indexOf("TCPIP") > 0) {   // 3rd Party 
-                    thirdPartyPacket = true;
-                    temp    = packet.substring(packet.indexOf(":}") + 2);
-                    Sender  = temp.substring(0, temp.indexOf(">"));
-                } else {
-                    temp    = packet.substring(3);
-                    Sender  = packet.substring(3, packet.indexOf(">"));
+        if (packet.indexOf("NOGATE") == -1) {
+            bool thirdPartyPacket = false;
+            String temp, Sender;
+            int firstColonIndex = packet.indexOf(":");
+            if (firstColonIndex > 5 && firstColonIndex < (packet.length() - 1) && packet[firstColonIndex + 1] == '}' && packet.indexOf("TCPIP") > 0) {   // 3rd Party 
+                thirdPartyPacket = true;
+                temp    = packet.substring(packet.indexOf(":}") + 2);
+                Sender  = temp.substring(0, temp.indexOf(">"));
+            } else {
+                temp    = packet.substring(3);
+                Sender  = packet.substring(3, packet.indexOf(">"));
+            }
+            if (Sender != Config.callsign) {        // Avoid listening to own packets
+                if (!thirdPartyPacket && !Utils::checkValidCallsign(Sender)) {
+                    return;
                 }
-                if (Sender != Config.callsign && !STATION_Utils::checkBlackList(Sender)) {        // Avoid listening to own packets
-                    if (!thirdPartyPacket && !Utils::checkValidCallsign(Sender)) {
-                        return;
-                    }
-                    if (STATION_Utils::check25SegBuffer(Sender, temp.substring(temp.indexOf(":") + 2)) || Config.lowPowerMode) {
-                        STATION_Utils::updateLastHeard(Sender);
-                        Utils::typeOfPacket(temp, 2);    // Digi
-                        bool queryMessage = false;
-                        if (temp.indexOf("::") > 10) {   // it's a message
-                            String AddresseeAndMessage  = temp.substring(temp.indexOf("::") + 2);
-                            String Addressee            = AddresseeAndMessage.substring(0, AddresseeAndMessage.indexOf(":"));
-                            Addressee.trim();
-                            if (Addressee == Config.callsign) {     // it's a message for me!
-                                queryMessage = APRS_IS_Utils::processReceivedLoRaMessage(Sender, AddresseeAndMessage, thirdPartyPacket);
-                            }
+                if (STATION_Utils::check25SegBuffer(Sender, temp.substring(temp.indexOf(":") + 2)) || Config.lowPowerMode) {
+                    STATION_Utils::updateLastHeard(Sender);
+                    Utils::typeOfPacket(temp, 2);    // Digi
+                    bool queryMessage = false;
+                    if (temp.indexOf("::") > 10) {   // it's a message
+                        String AddresseeAndMessage  = temp.substring(temp.indexOf("::") + 2);
+                        String Addressee            = AddresseeAndMessage.substring(0, AddresseeAndMessage.indexOf(":"));
+                        Addressee.trim();
+                        if (Addressee == Config.callsign) {     // it's a message for me!
+                            queryMessage = APRS_IS_Utils::processReceivedLoRaMessage(Sender, AddresseeAndMessage, thirdPartyPacket);
                         }
-                        if (!queryMessage) {
-                            String loraPacket = generateDigipeatedPacket(packet.substring(3), thirdPartyPacket);
-                            if (loraPacket != "") {
-                                if (Config.lowPowerMode) {
-                                    LoRa_Utils::sendNewPacket(loraPacket);
-                                } else {
-                                    STATION_Utils::addToOutputPacketBuffer(loraPacket);
-                                }
-                                displayToggle(true);
-                                lastScreenOn = millis();
+                    }
+                    if (!queryMessage) {
+                        String loraPacket = generateDigipeatedPacket(packet.substring(3), thirdPartyPacket);
+                        if (loraPacket != "") {
+                            if (Config.lowPowerMode) {
+                                LoRa_Utils::sendNewPacket(loraPacket);
+                            } else {
+                                STATION_Utils::addToOutputPacketBuffer(loraPacket);
                             }
+                            displayToggle(true);
+                            lastScreenOn = millis();
                         }
                     }
                 }

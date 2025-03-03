@@ -2,6 +2,7 @@
 #include <WiFi.h>
 #include "configuration.h"
 #include "aprs_is_utils.h"
+#include "station_utils.h"
 #include "board_pinout.h"
 #include "syslog_utils.h"
 #include "ntp_utils.h"
@@ -182,27 +183,33 @@ namespace LoRa_Utils {
                 int state = radio.readData(packet);
                 if (state == RADIOLIB_ERR_NONE) {
                     if (packet != "") {
-                        rssi        = radio.getRSSI();
-                        snr         = radio.getSNR();
-                        freqError   = radio.getFrequencyError();
-                        Utils::println("<--- LoRa Packet Rx : " + packet.substring(3));
-                        Utils::println("(RSSI:" + String(rssi) + " / SNR:" + String(snr) + " / FreqErr:" + String(freqError) + ")");
 
-                        if (!Config.lowPowerMode && !Config.digi.ecoMode) {
-                            if (receivedPackets.size() >= 10) {
-                                receivedPackets.erase(receivedPackets.begin());
+                        String sender   = packet.substring(3, packet.indexOf(">"));
+                        if (packet.substring(0,3) == "\x3c\xff\x01" && !STATION_Utils::checkBlackList(sender)){   // avoid processing BlackListed stations
+                            rssi        = radio.getRSSI();
+                            snr         = radio.getSNR();
+                            freqError   = radio.getFrequencyError();
+                            Utils::println("<--- LoRa Packet Rx : " + packet.substring(3));
+                            Utils::println("(RSSI:" + String(rssi) + " / SNR:" + String(snr) + " / FreqErr:" + String(freqError) + ")");
+
+                            if (!Config.lowPowerMode && !Config.digi.ecoMode) {
+                                if (receivedPackets.size() >= 10) {
+                                    receivedPackets.erase(receivedPackets.begin());
+                                }
+                                ReceivedPacket receivedPacket;
+                                receivedPacket.rxTime   = NTP_Utils::getFormatedTime();
+                                receivedPacket.packet   = packet.substring(3);
+                                receivedPacket.RSSI     = rssi;
+                                receivedPacket.SNR      = snr;
+                                receivedPackets.push_back(receivedPacket);
                             }
-                            ReceivedPacket receivedPacket;
-                            receivedPacket.rxTime   = NTP_Utils::getFormatedTime();
-                            receivedPacket.packet   = packet.substring(3);
-                            receivedPacket.RSSI     = rssi;
-                            receivedPacket.SNR      = snr;
-                            receivedPackets.push_back(receivedPacket);
-                        }
 
-                        if (Config.syslog.active && WiFi.status() == WL_CONNECTED) {
-                            SYSLOG_Utils::log(1, packet, rssi, snr, freqError); // RX
-                        }
+                            if (Config.syslog.active && WiFi.status() == WL_CONNECTED) {
+                                SYSLOG_Utils::log(1, packet, rssi, snr, freqError); // RX
+                            }
+                        } else {
+                            packet = "";
+                        }                        
                         lastRxTime = millis();
                         return packet;
                     }
