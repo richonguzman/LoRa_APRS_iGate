@@ -262,6 +262,7 @@ void displayShow(const String& header, const String& line1, const String& line2,
                     display.setTextSize(2);
                     display.setCursor(0, 0);
                     display.println(header);
+                    display.setTextSize(1);
                     for (int i = 0; i < 6; i++) {
                         display.setCursor(0, 16 + (8 * i));
                         display.println(*lines[i]);
