@@ -4,9 +4,17 @@
 #include "power_utils.h"
 
 #if defined(HAS_AXP192) || defined(HAS_AXP2101)
-    #define I2C_SDA 21
-    #define I2C_SCL 22
-    #define IRQ_PIN 35
+    #ifdef TTGO_T_Beam_S3_SUPREME_V3
+        #define I2C0_SDA 17
+        #define I2C0_SCL 18
+        #define I2C1_SDA 42
+        #define I2C1_SCL 41
+        #define IRQ_PIN  40
+    #else
+        #define I2C_SDA 21
+        #define I2C_SCL 22
+        #define IRQ_PIN 35
+    #endif
 #endif
 
 #ifdef HAS_AXP192
@@ -54,8 +62,13 @@ namespace POWER_Utils {
         #endif
 
         #ifdef HAS_AXP2101
+            #ifdef TTGO_T_Beam_S3_SUPREME_V3
+                PMU.setALDO4Voltage(3300);
+                PMU.enableALDO4();
+            #else
                 PMU.setALDO3Voltage(3300);
                 PMU.enableALDO3();
+            #endif
         #endif
         #ifdef HELTEC_WIRELESS_TRACKER
             digitalWrite(VEXT_CTRL, HIGH);
@@ -69,7 +82,11 @@ namespace POWER_Utils {
         #endif
 
         #ifdef HAS_AXP2101
-            PMU.disableALDO3();
+            #ifdef TTGO_T_Beam_S3_SUPREME_V3
+                PMU.disableALDO4();
+            #else
+                PMU.disableALDO3();
+            #endif
         #endif
         #ifdef HELTEC_WIRELESS_TRACKER
             digitalWrite(VEXT_CTRL, LOW);
@@ -83,8 +100,13 @@ namespace POWER_Utils {
             PMU.enableLDO2();
         #endif
         #ifdef HAS_AXP2101
-            PMU.setALDO2Voltage(3300);
-            PMU.enableALDO2();
+            #ifdef TTGO_T_Beam_S3_SUPREME_V3
+                PMU.setALDO3Voltage(3300);
+                PMU.enableALDO3();
+            #else
+                PMU.setALDO2Voltage(3300);
+                PMU.enableALDO2();
+            #endif
         #endif
     }
 
@@ -93,7 +115,11 @@ namespace POWER_Utils {
             PMU.disableLDO2();
         #endif
         #ifdef HAS_AXP2101
-            PMU.disableALDO2();
+            #ifdef TTGO_T_Beam_S3_SUPREME_V3
+                PMU.disableALDO3();
+            #else
+                PMU.disableALDO2();
+            #endif
         #endif
     }
 
@@ -111,20 +137,29 @@ namespace POWER_Utils {
             }
             return result;
         #elif defined(HAS_AXP2101)
-            bool result = PMU.begin(Wire, AXP2101_SLAVE_ADDRESS, I2C_SDA, I2C_SCL);
+            #ifdef TTGO_T_Beam_S3_SUPREME_V3
+                bool result = PMU.begin(Wire1, AXP2101_SLAVE_ADDRESS, I2C1_SDA, I2C1_SCL);
+            #else
+                bool result = PMU.begin(Wire, AXP2101_SLAVE_ADDRESS, I2C_SDA, I2C_SCL);
+            #endif
             if (result) {
                 PMU.disableDC2();
                 PMU.disableDC3();
                 PMU.disableDC4();
                 PMU.disableDC5();
-                PMU.disableALDO1();
-                PMU.disableALDO4();
+                #ifndef TTGO_T_Beam_S3_SUPREME_V3
+                    PMU.disableALDO1();
+                    PMU.disableALDO4();
+                #endif
                 PMU.disableBLDO1();
                 PMU.disableBLDO2();
                 PMU.disableDLDO1();
                 PMU.disableDLDO2();
                 PMU.setDC1Voltage(3300);
                 PMU.enableDC1();
+                #ifdef TTGO_T_Beam_S3_SUPREME_V3
+                    PMU.setALDO1Voltage(3300);
+                #endif
                 PMU.setButtonBatteryChargeVoltage(3300);
                 PMU.enableButtonBatteryCharge();
                 PMU.disableIRQ(XPOWERS_AXP2101_ALL_IRQ);
@@ -152,8 +187,16 @@ namespace POWER_Utils {
         #endif
 
         #ifdef HAS_AXP2101
-            Wire.begin(SDA, SCL);
-            if (begin(Wire)) {
+            bool beginStatus = false;
+            #ifdef TTGO_T_Beam_S3_SUPREME_V3
+                Wire1.begin(I2C1_SDA, I2C1_SCL);
+                Wire.begin(I2C0_SDA, I2C0_SCL);
+                if (begin(Wire1)) beginStatus = true;
+            #else
+                Wire.begin(SDA, SCL);
+                if (begin(Wire)) beginStatus = true;
+            #endif
+            if (beginStatus) {
                 Serial.println("AXP2101 init done!");
             } else {
                 Serial.println("AXP2101 init failed!");
