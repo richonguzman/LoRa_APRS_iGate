@@ -107,6 +107,9 @@ void Configuration::writeFile() {
 
     data["ntp"]["gmtCorrection"]                = ntp.gmtCorrection;
 
+    data["aprsRemote"]["managers"]              = aprsRemote.managers;
+    data["aprsRemote"]["rfOnly"]                = aprsRemote.rfOnly;
+
     serializeJson(data, configFile);
 
     configFile.close();
@@ -225,6 +228,9 @@ bool Configuration::readFile() {
 
         blackList                       = data["blackList"] | "station callsign";
 
+        aprsRemote.managers             = data["aprsRemote"]["managers"] | "";
+        aprsRemote.rfOnly               = data["aprsRemote"]["rfOnly"] | true;
+
         if (wifiAPs.size() == 0) { // If we don't have any WiFi's from config we need to add "empty" SSID for AUTO AP
             WiFi_AP wifiap;
             wifiap.ssid = "";
@@ -338,6 +344,9 @@ void Configuration::init() {
     webadmin.password               = "";
 
     ntp.gmtCorrection               = 0.0;
+
+    aprsRemote.managers             = "";
+    aprsRemote.rfOnly               = true;
 
     Serial.println("All is Written!");
 }
