@@ -23,7 +23,6 @@ ___________________________________________________________________*/
 #include <ElegantOTA.h>
 #include <TinyGPS++.h>
 #include <Arduino.h>
-#include <WiFi.h>
 #include <vector>
 #include "configuration.h"
 #include "battery_utils.h"
@@ -35,7 +34,13 @@ ___________________________________________________________________*/
 #include "query_utils.h"
 #include "power_utils.h"
 #include "lora_utils.h"
-#include "wifi_utils.h"
+#ifdef HAS_ETHERNET
+    #include <Ethernet.h>
+    #include "ethernet_utils.h"
+#else
+    #include <WiFi.h>
+    #include "wifi_utils.h"
+#endif
 #include "digi_utils.h"
 #include "gps_utils.h"
 #include "web_utils.h"
@@ -48,9 +53,15 @@ ___________________________________________________________________*/
     #include "A7670_utils.h"
 #endif
 
-String              versionDate             = "2025.03.03";
+String              versionDate             = "2025.03.06";
 Configuration       Config;
-WiFiClient          espClient;
+
+#ifdef HAS_ETHERNET
+    EthernetClient      espClient;
+#else
+    WiFiClient          espClient;
+#endif
+
 #ifdef HAS_GPS
     HardwareSerial  gpsSerial(1);
     TinyGPSPlus     gps;
@@ -80,9 +91,10 @@ String firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seven
 
 void setup() {
     Serial.begin(115200);
+    delay(5000);
     POWER_Utils::setup();
     Utils::setupDisplay();
-    LoRa_Utils::setup();
+    //LoRa_Utils::setup();
     Utils::validateFreqs();
     GPS_Utils::setup();
     STATION_Utils::loadBlackList();
@@ -133,7 +145,12 @@ void setup() {
         }
     #endif
     DIGI_Utils::checkEcoMode();
-    WIFI_Utils::setup();
+    #ifdef HAS_ETHERNET
+        ETHERNET_Utils::setup();
+    #else
+        WIFI_Utils::setup();
+    #endif
+    LoRa_Utils::setup();
     NTP_Utils::setup();
     SYSLOG_Utils::setup();
     WX_Utils::setup();
@@ -147,14 +164,16 @@ void setup() {
 }
 
 void loop() {
-    WIFI_Utils::checkAutoAPTimeout();
+    #ifndef HAS_ETHERNET
+        WIFI_Utils::checkAutoAPTimeout();
+    #endif
 
-    if (isUpdatingOTA) {
+    /*if (isUpdatingOTA) {
         ElegantOTA.loop();
         return; // Don't process IGate and Digi during OTA update
-    }
+    }*/
 
-    if (Config.lowVoltageCutOff > 0) {
+    /*if (Config.lowVoltageCutOff > 0) {
         BATTERY_Utils::checkIfShouldSleep();
     }
     
@@ -182,8 +201,12 @@ void loop() {
     #ifdef HAS_A7670
         if (Config.aprs_is.active && !modemLoggedToAPRSIS) A7670_Utils::APRS_IS_connect();
     #else
-        WIFI_Utils::checkWiFi();
-        if (Config.aprs_is.active && (WiFi.status() == WL_CONNECTED) && !espClient.connected()) APRS_IS_Utils::connect();
+        #ifdef HAS_ETHERNET
+        if (Config.aprs_is.active && !espClient.connected()) APRS_IS_Utils::connect();
+        #else
+            WIFI_Utils::checkWiFi();
+            if (Config.aprs_is.active && (WiFi.status() == WL_CONNECTED) && !espClient.connected()) APRS_IS_Utils::connect();
+        #endif
     #endif
 
     NTP_Utils::update();
@@ -237,5 +260,5 @@ void loop() {
     #endif
 
     Utils::checkRebootTime();
-    Utils::checkSleepByLowBatteryVoltage(1);
+    Utils::checkSleepByLowBatteryVoltage(1);*/
 }

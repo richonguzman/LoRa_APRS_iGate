@@ -1,7 +1,7 @@
-#include <WiFi.h>
 #include "configuration.h"
 #include "aprs_is_utils.h"
 #include "station_utils.h"
+#include "board_pinout.h"
 #include "syslog_utils.h"
 #include "query_utils.h"
 #include "A7670_utils.h"
@@ -10,7 +10,15 @@
 #include "utils.h"
 
 extern Configuration        Config;
-extern WiFiClient           espClient;
+
+#ifdef HAS_ETHERNET
+    #include <Ethernet.h>
+    extern EthernetClient       espClient;
+#else
+    #include <WiFi.h>
+    extern WiFiClient           espClient;
+#endif
+
 extern uint32_t             lastScreenOn;
 extern String               firstLine;
 extern String               secondLine;
@@ -58,7 +66,7 @@ namespace APRS_IS_Utils {
             aprsAuth += Config.callsign;
             aprsAuth += " pass ";
             aprsAuth += Config.aprs_is.passcode;
-            aprsAuth += " vers CA2RXU_LoRa_iGate 2.0 filter ";
+            aprsAuth += " vers CA2RXU_LoRa_iGate 2.1 filter ";
             aprsAuth += Config.aprs_is.filter;
             upload(aprsAuth);
         }
@@ -66,8 +74,14 @@ namespace APRS_IS_Utils {
 
     void checkStatus() {
         String wifiState, aprsisState;
-        if (WiFi.status() == WL_CONNECTED) {
-            wifiState = "OK";
+        if (true) {
+        /*#ifdef HAS_ETHERNET
+            if (Ethernet.linkStatus() == LinkON) {
+                wifiState = "ET";
+        #else
+            if (WiFi.status() == WL_CONNECTED) {
+                wifiState = "OK";
+        #endif*/
         } else {
             if (backUpDigiMode || Config.digi.ecoMode) {
                 wifiState = "--";
@@ -362,7 +376,12 @@ namespace APRS_IS_Utils {
     }
 
     void firstConnection() {
-        if (Config.aprs_is.active && (WiFi.status() == WL_CONNECTED) && !espClient.connected()) {
+
+        //#ifdef HAS_ETHERNET
+        if (Config.aprs_is.active && !espClient.connected()) {
+        //#else
+        //    if (Config.aprs_is.active && (WiFi.status() == WL_CONNECTED) && !espClient.connected()) {
+        //#endif       
             connect();
             while (!passcodeValid) {
                 listenAPRSIS();
