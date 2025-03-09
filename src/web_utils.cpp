@@ -216,6 +216,9 @@ namespace WEB_Utils {
 
         Config.ntp.gmtCorrection            = request->getParam("ntp.gmtCorrection", true)->value().toFloat();
 
+        Config.remoteManagement.managers    = request->getParam("remoteManagement.managers", true)->value();
+        Config.remoteManagement.rfOnly      = request->getParam("remoteManagement.rfOnly", true);
+
         Config.writeFile();
 
         AsyncWebServerResponse *response    = request->beginResponse(302, "text/html", "");
