@@ -122,6 +122,11 @@ public:
     float   gmtCorrection;
 };
 
+class REMOTE_MANAGEMENT {
+public:
+    String  managers;
+    bool    rfOnly;
+};
 
 class Configuration {
 public:
@@ -133,7 +138,7 @@ public:
     bool                    rebootMode;
     int                     rebootModeTime;
     String                  personalNote;
-    String                  blackList;
+    String                  blacklist;
     std::vector<WiFi_AP>    wifiAPs;
     WiFi_Auto_AP            wifiAutoAP;
     BEACON                  beacon;
@@ -147,7 +152,8 @@ public:
     TNC                     tnc;  
     OTA                     ota;
     WEBADMIN                webadmin;
-    NTP                     ntp;
+    NTP                     ntp;    
+    REMOTE_MANAGEMENT       remoteManagement;
   
     void init();
     void writeFile();

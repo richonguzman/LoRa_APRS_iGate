@@ -99,13 +99,16 @@ void Configuration::writeFile() {
 
     data["personalNote"]                        = personalNote;
 
-    data["blackList"]                           = blackList;
+    data["blacklist"]                           = blacklist;
 
     data["webadmin"]["active"]                  = webadmin.active;
     data["webadmin"]["username"]                = webadmin.username;
     data["webadmin"]["password"]                = webadmin.password;
 
     data["ntp"]["gmtCorrection"]                = ntp.gmtCorrection;
+
+    data["remoteManagement"]["managers"]        = remoteManagement.managers;
+    data["remoteManagement"]["rfOnly"]          = remoteManagement.rfOnly;
 
     serializeJson(data, configFile);
 
@@ -223,7 +226,10 @@ bool Configuration::readFile() {
 
         personalNote    	            = data["personalNote"] | "personal note here";
 
-        blackList                       = data["blackList"] | "station callsign";
+        blacklist                       = data["blacklist"] | "station callsign";
+
+        remoteManagement.managers       = data["remoteManagement"]["managers"] | "";
+        remoteManagement.rfOnly         = data["remoteManagement"]["rfOnly"] | true;
 
         if (wifiAPs.size() == 0) { // If we don't have any WiFi's from config we need to add "empty" SSID for AUTO AP
             WiFi_AP wifiap;
@@ -331,13 +337,16 @@ void Configuration::init() {
 
     personalNote                    = "";
 
-    blackList                       = "";
+    blacklist                       = "";
 
     webadmin.active                 = false;
     webadmin.username               = "admin";
     webadmin.password               = "";
 
     ntp.gmtCorrection               = 0.0;
+
+    remoteManagement.managers       = "";
+    remoteManagement.rfOnly         = true;
 
     Serial.println("All is Written!");
 }

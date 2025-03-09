@@ -16,7 +16,8 @@ uint32_t lastTxTime             = millis();
 std::vector<LastHeardStation>   lastHeardStations;
 std::vector<String>             outputPacketBuffer;
 std::vector<Packet25SegBuffer>  packet25SegBuffer;
-std::vector<String>             blackList;
+std::vector<String>             blacklist;
+std::vector<String>             managers;
 std::vector<LastHeardStation>   lastHeardObjects;
 
 bool saveNewDigiEcoModeConfig   = false;
@@ -24,31 +25,52 @@ bool saveNewDigiEcoModeConfig   = false;
 
 namespace STATION_Utils {
 
-    void loadBlackList() {
-        if (Config.blackList != "") {
-            String callsigns    = Config.blackList;
-            int spaceIndex      = callsigns.indexOf(" ");
+    std::vector<String> loadCallSignList(const String& list) {
+        std::vector<String> loadedList;
 
-            while (spaceIndex >= 0) {
-                blackList.push_back(callsigns.substring(0, spaceIndex));
-                callsigns   = callsigns.substring(spaceIndex + 1);
-                spaceIndex  = callsigns.indexOf(" ");
+        String callsigns = list;
+        callsigns.trim();
+
+        while (callsigns.length() > 0) {    // != ""
+            int spaceIndex = callsigns.indexOf(" ");
+            if (spaceIndex == -1) {         // No more spaces, add the last part
+                loadedList.push_back(callsigns);
+                break;
             }
-            callsigns.trim();
-            if (callsigns.length() > 0) blackList.push_back(callsigns); // Add the last word if available
+            loadedList.push_back(callsigns.substring(0, spaceIndex));
+            callsigns = callsigns.substring(spaceIndex + 1);
+            callsigns.trim();               // Trim in case of multiple spaces
         }
+        return loadedList;
     }
 
-    bool checkBlackList(const String& callsign) {
-        for (int i = 0; i < blackList.size(); i++) {
-            if (blackList[i].indexOf("*") >= 0) {   // use wild card
-                String wildCard = blackList[i].substring(0, blackList[i].indexOf("*"));
-                if (callsign.startsWith(wildCard))return true;
+    void loadBlacklist() {
+        blacklist = loadCallSignList(Config.blacklist);
+    }
+
+    void loadManagers() {
+        managers = loadCallSignList(Config.remoteManagement.managers);
+    }
+
+    bool checkCallsignList(const std::vector<String>& list, const String& callsign) {
+        for (int i = 0; i < list.size(); i++) {
+            int wildcardIndex = list[i].indexOf("*");
+            if (wildcardIndex >= 0) {
+                String wildcard = list[i].substring(0, wildcardIndex);
+                if (callsign.startsWith(wildcard)) return true;
             } else {
-                if (blackList[i] == callsign) return true;
+                if (list[i] == callsign) return true;
             }                
         }
         return false;
+    }    
+
+    bool isBlacklisted(const String& callsign) {
+        return checkCallsignList(blacklist, callsign);
+    }
+
+    bool isManager(const String& callsign) {
+        return checkCallsignList(managers, callsign);
     }
 
     void cleanObjectsHeard() {

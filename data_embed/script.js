@@ -138,7 +138,7 @@ function loadSettings(settings) {
     document.getElementById("beacon.gpsAmbiguity").checked              = settings.beacon.gpsAmbiguity;
 
     // Black List
-    document.getElementById("blackList").value                          = settings.blackList;
+    document.getElementById("blacklist").value                          = settings.blacklist;
 
     // Digi
     document.getElementById("digi.mode").value                          = settings.digi.mode;
