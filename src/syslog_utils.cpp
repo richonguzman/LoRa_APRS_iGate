@@ -4,6 +4,7 @@
 #include "syslog_utils.h"
 #include "gps_utils.h"
 
+
 extern Configuration    Config;
 
 WiFiUDP udpClient;

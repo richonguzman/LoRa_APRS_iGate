@@ -9,6 +9,7 @@
 #include "display.h"
 #include "utils.h"
 
+
 extern Configuration        Config;
 extern WiFiClient           espClient;
 extern uint32_t             lastScreenOn;

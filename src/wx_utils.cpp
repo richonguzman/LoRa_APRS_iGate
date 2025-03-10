@@ -31,7 +31,6 @@ Adafruit_Si7021     sensor = Adafruit_Si7021();
 #endif
 
 
-
 namespace WX_Utils {
 
     void getWxModuleAddres() {

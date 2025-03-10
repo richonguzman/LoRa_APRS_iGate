@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include "kiss_protocol.h"
 
+
 bool validateTNC2Frame(const String& tnc2FormattedFrame) {
     return (tnc2FormattedFrame.indexOf(':') != -1) && (tnc2FormattedFrame.indexOf('>') != -1);
 }

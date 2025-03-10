@@ -5,6 +5,7 @@
 #include "ota_utils.h"
 #include "display.h"
 
+
 extern Configuration        Config;
 extern uint32_t             lastScreenOn;
 extern bool                 isUpdatingOTA;

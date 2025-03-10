@@ -2,13 +2,13 @@
 #include "configuration.h"
 #include "station_utils.h"
 #include "aprs_is_utils.h"
-#include "query_utils.h"
 #include "digi_utils.h"
 #include "wifi_utils.h"
 #include "lora_utils.h"
 #include "gps_utils.h"
 #include "display.h"
 #include "utils.h"
+
 
 extern Configuration    Config;
 extern uint32_t         lastScreenOn;

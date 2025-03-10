@@ -5,6 +5,7 @@
 #include "power_utils.h"
 #include "utils.h"
 
+
 extern  Configuration                   Config;
 extern  uint32_t                        lastBatteryCheck;
 

@@ -71,17 +71,20 @@ namespace QUERY_Utils {
         } else if (STATION_Utils::isManager(station) && (!queryFromAPRSIS || !Config.remoteManagement.rfOnly)) {
             if (queryQuestion.indexOf("?TX=ON") == 0) {
                 Config.loramodule.txActive = true;
+                //
                 Serial.println("TX=ON");
-                // send answer?
+                answer = "TX=ON";
                 // change status?
             } else if (queryQuestion.indexOf("?TX=OFF") == 0) {
                 Config.loramodule.txActive = false;
+                //
                 Serial.println("TX=OFF");
-                // send answer?
+                answer = "TX=OFF";
                 // change status?
             } else if (queryQuestion.indexOf("?TX=?") == 0) {
                 answer = (Config.loramodule.txActive) ? "TX=ON" : "TX=OFF";
             } else if (queryQuestion.indexOf("?COMMIT") == 0) {     // when, after changing state????
+                answer = "New Config Saved";
                 Config.writeFile();
             }
         }

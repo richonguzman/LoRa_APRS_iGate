@@ -7,6 +7,7 @@
 #include "utils.h"
 #include <vector>
 
+
 extern Configuration            Config;
 extern uint32_t                 lastRxTime;
 extern String                   fourthLine;
