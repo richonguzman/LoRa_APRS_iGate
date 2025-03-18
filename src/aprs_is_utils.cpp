@@ -59,7 +59,7 @@ namespace APRS_IS_Utils {
             aprsAuth += Config.callsign;
             aprsAuth += " pass ";
             aprsAuth += Config.aprs_is.passcode;
-            aprsAuth += " vers CA2RXU_LoRa_iGate 2.0 filter ";
+            aprsAuth += " vers CA2RXU_iGate 2.3 filter ";
             aprsAuth += Config.aprs_is.filter;
             upload(aprsAuth);
         }
@@ -298,6 +298,7 @@ namespace APRS_IS_Utils {
                     }
                     if (receivedMessage.indexOf("?") == 0) {
                         Utils::println("Rx Query (APRS-IS)  : " + packet);
+                        Sender.trim();
                         String queryAnswer = QUERY_Utils::process(receivedMessage, Sender, true, false);
                         //Serial.println("---> QUERY Answer : " + queryAnswer.substring(0,queryAnswer.indexOf("\n")));
                         if (!Config.display.alwaysOn && Config.display.timeout != 0) {
