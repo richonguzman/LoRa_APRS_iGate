@@ -110,22 +110,30 @@ namespace GPS_Utils {
     }
 
     String decodeEncodedGPS(const String& packet) {
-        const String& GPSPacket         = packet.substring(packet.indexOf(":!")+3);
-        const String& encodedLatitude   = GPSPacket.substring(0,4);
-        const String& encodedLongtitude = GPSPacket.substring(4,8);
-        const String& comment           = GPSPacket.substring(12);
+        int indexOfExclamation  = packet.indexOf(":!");
+        int indexOfEqual        = packet.indexOf(":=");
 
-        int Y1 = int(encodedLatitude[0]);
-        int Y2 = int(encodedLatitude[1]);
-        int Y3 = int(encodedLatitude[2]);
-        int Y4 = int(encodedLatitude[3]);
-        float decodedLatitude = 90.0 - ((((Y1-33) * pow(91,3)) + ((Y2-33) * pow(91,2)) + ((Y3-33) * 91) + Y4-33) / 380926.0);
-        
-        int X1 = int(encodedLongtitude[0]);
-        int X2 = int(encodedLongtitude[1]);
-        int X3 = int(encodedLongtitude[2]);
-        int X4 = int(encodedLongtitude[3]);
-        float decodedLongitude = -180.0 + ((((X1-33) * pow(91,3)) + ((X2-33) * pow(91,2)) + ((X3-33) * 91) + X4-33) / 190463.0);
+        const uint8_t OFFSET = 3;     // Offset for encoded data in the packet
+        String GPSPacket;
+        if (indexOfExclamation > 10) {
+            GPSPacket = packet.substring(indexOfExclamation + OFFSET);
+        } else if (indexOfEqual > 10) {
+            GPSPacket = packet.substring(indexOfEqual + OFFSET);
+        }
+
+        String encodedLatitude = GPSPacket.substring(0,4);
+        int Y1 = encodedLatitude[0] - 33;
+        int Y2 = encodedLatitude[1] - 33;
+        int Y3 = encodedLatitude[2] - 33;
+        int Y4 = encodedLatitude[3] - 33;
+        float decodedLatitude = 90.0 - (((Y1 * pow(91,3)) + (Y2 * pow(91,2)) + (Y3 * 91) + Y4) / 380926.0);
+
+        String encodedLongitude = GPSPacket.substring(4,8);
+        int X1 = encodedLongitude[0] - 33;
+        int X2 = encodedLongitude[1] - 33;
+        int X3 = encodedLongitude[2] - 33;
+        int X4 = encodedLongitude[3] - 33;
+        float decodedLongitude = -180.0 + (((X1 * pow(91,3)) + (X2 * pow(91,2)) + (X3 * 91) + X4) / 190463.0);
 
         distance = String(calculateDistanceTo(decodedLatitude, decodedLongitude),1);
 
@@ -136,6 +144,7 @@ namespace GPS_Utils {
         decodedGPS += distance;
         decodedGPS += "km";
 
+        String comment = GPSPacket.substring(12);
         if (comment != "") {
             decodedGPS += " / ";
             decodedGPS += comment;
@@ -144,33 +153,30 @@ namespace GPS_Utils {
     }
 
     String getReceivedGPS(const String& packet) {
-        String infoGPS;
-        if (packet.indexOf(":!") > 10) {
-            infoGPS = packet.substring(packet.indexOf(":!") + 2);
-        } else if (packet.indexOf(":=") > 10) {
-            infoGPS = packet.substring(packet.indexOf(":=") + 2);
-        }
-        const String& Latitude      = infoGPS.substring(0,8);
-        const String& Longitude     = infoGPS.substring(9,18);
-        const String& comment       = infoGPS.substring(19);  
-        
-        float convertedLatitude, convertedLongitude;
-        const String& firstLatPart   = Latitude.substring(0,2);
-        const String& secondLatPart  = Latitude.substring(2,4);
-        const String& thirdLatPart   = Latitude.substring(Latitude.indexOf(".") + 1, Latitude.indexOf(".") + 3);
-        convertedLatitude     = firstLatPart.toFloat() + (secondLatPart.toFloat()/60) + (thirdLatPart.toFloat()/(60*100));
+        int indexOfExclamation  = packet.indexOf(":!");
+        int indexOfEqual        = packet.indexOf(":=");
+        int indexOfAt           = packet.indexOf(":@");
 
-        const String& firstLngPart   = Longitude.substring(0,3);
-        const String& secondLngPart  = Longitude.substring(3,5);
-        const String& thirdLngPart   = Longitude.substring(Longitude.indexOf(".") + 1, Longitude.indexOf(".") + 3);        
-        convertedLongitude    = firstLngPart.toFloat() + (secondLngPart.toFloat()/60) + (thirdLngPart.toFloat()/(60*100));
-        
-        if (String(Latitude[7]) == "S") {
-            convertedLatitude = -convertedLatitude;
-        } 
-        if (String(Longitude[8]) == "W") {
-            convertedLongitude = -convertedLongitude;
+        String infoGPS;
+        if (indexOfExclamation > 10) {
+            infoGPS = packet.substring(indexOfExclamation + 2);
+        } else if (indexOfEqual > 10) {
+            infoGPS = packet.substring(indexOfEqual + 2);
+        } else if (indexOfAt > 10) {
+            infoGPS = packet.substring(indexOfAt + 9);  // 9 = 2+7 (when 7 is timestamp characters)
         }
+
+        String Latitude             = infoGPS.substring(0,8);                   // First 8 characters are Latitude
+        float convertedLatitude     = Latitude.substring(0,2).toFloat();        // First 2 digits (Degrees)
+        convertedLatitude += Latitude.substring(2,4).toFloat() / 60;            // Next 2 digits (Minutes)
+        convertedLatitude += Latitude.substring(Latitude.indexOf(".") + 1, Latitude.indexOf(".") + 3).toFloat() / (60*100);
+        if (Latitude.endsWith("S")) convertedLatitude = -convertedLatitude;     // Handle Southern Hemisphere
+
+        String Longitude            = infoGPS.substring(9,18);                  // Next 9 characters are Longitude
+        float convertedLongitude    = Longitude.substring(0,3).toFloat();       // First 3 digits (Degrees)
+        convertedLongitude += Longitude.substring(3,5).toFloat() / 60;          // Next 2 digits (Minutes)
+        convertedLongitude += Longitude.substring(Longitude.indexOf(".") + 1, Longitude.indexOf(".") + 3).toFloat() / (60*100);
+        if (Longitude.endsWith("W")) convertedLongitude = -convertedLongitude;  // Handle Western Hemisphere
         
         distance = String(calculateDistanceTo(convertedLatitude, convertedLongitude),1);
 
@@ -181,6 +187,7 @@ namespace GPS_Utils {
         decodedGPS += distance;
         decodedGPS += "km";
 
+        String comment = infoGPS.substring(19);  
         if (comment != "") {
             decodedGPS += " / ";
             decodedGPS += comment;
@@ -189,22 +196,30 @@ namespace GPS_Utils {
     }
 
     String getDistanceAndComment(const String& packet) {
-        uint8_t encodedBytePosition = 0;
-        if (packet.indexOf(":!") > 10) {
-            encodedBytePosition = packet.indexOf(":!") + 14;
-        }
-        if (packet.indexOf(":=") > 10) {
-            encodedBytePosition = packet.indexOf(":=") + 14;
-        }
-        if (encodedBytePosition != 0) {
-            char currentChar = packet[encodedBytePosition];
-            if (currentChar == 'G' || currentChar == 'Q' || currentChar == '[' || currentChar == 'H' || currentChar == 'X') {
-                return decodeEncodedGPS(packet);
-            } else {
-                return getReceivedGPS(packet);
-            }
+        int indexOfAt = packet.indexOf(":@");
+        if (indexOfAt > 10) {
+            return getReceivedGPS(packet);
         } else {
-            return " _ / _ / _ ";
+            const uint8_t ENCODED_BYTE_OFFSET = 14;     // Offset for encoded data in the packet
+            int indexOfExclamation  = packet.indexOf(":!");
+            int indexOfEqual        = packet.indexOf(":=");
+            uint8_t encodedBytePosition = 0;
+            if (indexOfExclamation > 10) {              // Determine the position where encoded data starts
+                encodedBytePosition = indexOfExclamation + ENCODED_BYTE_OFFSET;
+            } else if (indexOfEqual > 10) {
+                encodedBytePosition = indexOfEqual + ENCODED_BYTE_OFFSET;
+            }
+
+            if (encodedBytePosition != 0) {
+                char currentChar = packet[encodedBytePosition];
+                if (currentChar == 'G' || currentChar == 'Q' || currentChar == '[' || currentChar == 'H' || currentChar == 'X' || currentChar == '3' || currentChar == 'S') {
+                    return decodeEncodedGPS(packet);    // If valid encoded data position is found, decode it
+                } else {
+                    return getReceivedGPS(packet);
+                }
+            } else {
+                return " _ / _ / _ ";
+            }
         }
     }
 
