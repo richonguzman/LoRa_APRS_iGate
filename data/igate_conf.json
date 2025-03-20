@@ -16,7 +16,8 @@
         "symbol": "a",
         "path": "WIDE1-1",
         "sendViaAPRSIS": false,
-        "sendViaRF": false
+        "sendViaRF": false,
+        "gpsActive": false
     },
     "aprs_is": {
         "active": false,

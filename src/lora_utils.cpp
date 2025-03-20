@@ -30,7 +30,11 @@ bool transmitFlag    = true;
     #endif
 #endif
 #ifdef HAS_SX1278
-    SX1278 radio = new Module(RADIO_CS_PIN, RADIO_BUSY_PIN, RADIO_RST_PIN);
+    #if defined(ESP32_DIY_KC868_A6_LoRa)
+        SX1278 radio = new Module(RADIO_CS_PIN, RADIO_DIO0_PIN, RADIO_RST_PIN);
+    #else
+        SX1278 radio = new Module(RADIO_CS_PIN, RADIO_BUSY_PIN, RADIO_RST_PIN);
+    #endif
 #endif
 #ifdef HAS_SX1276
     SX1276 radio = new Module(RADIO_CS_PIN, RADIO_BUSY_PIN, RADIO_RST_PIN);
