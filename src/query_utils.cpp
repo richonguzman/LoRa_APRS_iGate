@@ -57,7 +57,7 @@ namespace QUERY_Utils {
         } */
         else if (STATION_Utils::isManager(station) && (!queryFromAPRSIS || !Config.remoteManagement.rfOnly)) {
             if (queryQuestion.indexOf("?EM=OFF") == 0) {
-                if ((Config.digi.mode == 2 || Config.digi.mode == 3) && Config.loramodule.txActive && Config.loramodule.rxActive) {
+                if ((Config.digi.mode == 2 || Config.digi.mode == 3) && Config.loramodule.txActive && Config.loramodule.rxActive && !Config.aprs_is.active) {
                     if (Config.digi.ecoMode) {    // Exit Digipeater EcoMode
                         answer = "DigiEcoMode:OFF";
                         Config.digi.ecoMode         = false;
@@ -72,7 +72,7 @@ namespace QUERY_Utils {
                     answer = "DigiEcoMode control not possible";
                 }
             } else if (queryQuestion.indexOf("?EM=ON") == 0) {
-                if ((Config.digi.mode == 2 || Config.digi.mode == 3) && Config.loramodule.txActive && Config.loramodule.rxActive) {
+                if ((Config.digi.mode == 2 || Config.digi.mode == 3) && Config.loramodule.txActive && Config.loramodule.rxActive && !Config.aprs_is.active) {
                     if (!Config.digi.ecoMode) {     // Start Digipeater EcoMode
                         answer = "DigiEcoMode:ON";
                         Config.digi.ecoMode         = true;
