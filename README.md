@@ -54,7 +54,7 @@ ____________________________________________________
 
 ## Timeline (Versions):
 
-- 2025.03.20 Manager List added to enable/disable DigiEcoMode and Tx Control.
+- 2025.03.20 Manager List added to enable/disable DigiEcoMode and Tx Control. Thanks LB5JJ.
 - 2025.03.03 T-Beam Supreme board added and more BlackList rules added.
 - 2025.02.28 Heltec Wireless Paper with Epaper working. Thanks SzymonPriv for pointing to the right library.
 - 2025.02.25 Objects Rules update, GPS Boards: Satellites on Screen, Wx Height Correction from GPS Data.
