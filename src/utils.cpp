@@ -16,7 +16,7 @@
 
 
 extern Configuration        Config;
-extern WiFiClient           espClient;
+extern WiFiClient           aprsIsClient;
 extern TinyGPSPlus          gps;
 extern String               versionDate;
 extern String               firstLine;

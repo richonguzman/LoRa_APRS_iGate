@@ -1770,6 +1770,104 @@
                         <div class="row my-5 d-flex align-items-top">
                             <div class="col-lg-3 col-sm-12">
                                 <h5>
+<!--                                    TODO Logo SVG -->
+                                    MQTT
+                                </h5>
+                                <small>Set your MQTT server</small>
+                            </div>
+                            <div class="col-lg-9 col-sm-12">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="form-check form-switch">
+                                            <input
+                                                type="checkbox"
+                                                name="mqtt.active"
+                                                id="mqtt.active"
+                                                class="form-check-input"
+                                            />
+                                            <label
+                                                for="mqtt.active"
+                                                class="form-label"
+                                                >Enable</label
+                                            >
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <label for="mqtt.server" class="form-label"
+                                        >Server</label
+                                        >
+                                        <input
+                                                type="text"
+                                                name="mqtt.server"
+                                                id="mqtt.server"
+                                                class="form-control"
+                                        />
+                                    </div>
+                                    <div class="col-12">
+                                        <label for="mqtt.topic" class="form-label"
+                                        >Topic</label
+                                        >
+                                        <input
+                                                type="text"
+                                                name="mqtt.topic"
+                                                id="mqtt.topic"
+                                                class="form-control"
+                                                placeholder="aprs-igate"
+                                        />
+                                        <div class="form-text">
+                                            Default is <strong>aprs-igate</strong>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <label for="mqtt.username" class="form-label"
+                                        >Username</label
+                                        >
+                                        <input
+                                                type="text"
+                                                name="mqtt.username"
+                                                id="mqtt.username"
+                                                class="form-control"
+                                        />
+                                    </div>
+                                    <div class="col-12 mt-3">
+                                        <label for="mqtt.password" class="form-label"
+                                        >Password</label
+                                        >
+                                        <input
+                                                type="password"
+                                                name="mqtt.password"
+                                                id="mqtt.password"
+                                                class="form-control"
+                                        />
+                                    </div>
+                                    <div class="col-12 mt-3">
+                                        <label
+                                                for="mqtt.port"
+                                                class="form-label"
+                                        >Port</label
+                                        >
+                                        <input
+                                                type="number"
+                                                name="mqtt.port"
+                                                id="mqtt.port"
+                                                class="form-control"
+                                                placeholder="1883"
+                                                required=""
+                                                step="1"
+                                                min="0"
+                                        />
+                                        <div class="form-text">
+                                            Default is <strong>1883</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr />
+
+                        <div class="row my-5 d-flex align-items-top">
+                            <div class="col-lg-3 col-sm-12">
+                                <h5>
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
                                         width="20"

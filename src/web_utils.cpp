@@ -220,6 +220,13 @@ namespace WEB_Utils {
         Config.remoteManagement.managers    = request->getParam("remoteManagement.managers", true)->value();
         Config.remoteManagement.rfOnly      = request->getParam("remoteManagement.rfOnly", true);
 
+        Config.mqtt.active                  = request->getParam("mqtt.active", true);
+        Config.mqtt.server                  = request->getParam("mqtt.server", true)->value();
+        Config.mqtt.topic                   = request->getParam("mqtt.topic", true)->value();
+        Config.mqtt.username                = request->getParam("mqtt.username", true)->value();
+        Config.mqtt.password                = request->getParam("mqtt.password", true)->value();
+        Config.mqtt.port                    = request->getParam("mqtt.port", true)->value().toInt();
+
         Config.writeFile();
 
         AsyncWebServerResponse *response    = request->beginResponse(302, "text/html", "");
