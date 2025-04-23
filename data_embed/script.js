@@ -217,6 +217,14 @@ function loadSettings(settings) {
     // NTP
     document.getElementById("ntp.gmtCorrection").value                  = settings.ntp.gmtCorrection;
 
+    // MQTT
+    document.getElementById("mqtt.active").checked                      = settings.mqtt.active;
+    document.getElementById("mqtt.server").value                        = settings.mqtt.server;
+    document.getElementById("mqtt.topic").value                         = settings.mqtt.topic;
+    document.getElementById("mqtt.username").value                      = settings.mqtt.username;
+    document.getElementById("mqtt.password").value                      = settings.mqtt.password;
+    document.getElementById("mqtt.port").value                          = settings.mqtt.port;
+
     // Experimental
     document.getElementById("other.backupDigiMode").checked             = settings.other.backupDigiMode;
 
@@ -346,6 +354,33 @@ WebadminCheckbox.addEventListener("change", function () {
     WebadminUsername.disabled = !this.checked;
     WebadminPassword.disabled = !this.checked;
 });
+
+const MqttCheckbox = document.querySelector(
+    'input[name="mqtt.active"]'
+);
+const MqttServer = document.querySelector(
+    'input[name="mqtt.server"]'
+);
+const MqttTopic = document.querySelector(
+    'input[name="mqtt.topic"]'
+);
+const MqttUsername = document.querySelector(
+    'input[name="mqtt.username"]'
+);
+const MqttPassword = document.querySelector(
+    'input[name="mqtt.password"]'
+);
+const MqttPort = document.querySelector(
+    'input[name="mqtt.port"]'
+);
+MqttCheckbox.addEventListener("change", function () {
+    MqttServer.disabled = !this.checked;
+    MqttTopic.disabled = !this.checked;
+    MqttUsername.disabled = !this.checked;
+    MqttPassword.disabled = !this.checked;
+    MqttPort.disabled = !this.checked;
+});
+
 
 document.querySelector(".new button").addEventListener("click", function () {
     const networksContainer = document.querySelector(".list-networks");

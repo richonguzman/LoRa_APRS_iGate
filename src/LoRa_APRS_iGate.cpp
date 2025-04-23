@@ -23,6 +23,7 @@ ___________________________________________________________________*/
 #include <ElegantOTA.h>
 #include <TinyGPS++.h>
 #include <Arduino.h>
+#include <mqtt_utils.h>
 #include <WiFi.h>
 #include <vector>
 #include "configuration.h"
@@ -49,7 +50,8 @@ ___________________________________________________________________*/
 
 String              versionDate             = "2025.03.20";
 Configuration       Config;
-WiFiClient          espClient;
+WiFiClient          aprsIsClient;
+WiFiClient          mqttClient;
 #ifdef HAS_GPS
     HardwareSerial  gpsSerial(1);
     TinyGPSPlus     gps;
@@ -140,6 +142,7 @@ void setup() {
     WX_Utils::setup();
     WEB_Utils::setup();
     TNC_Utils::setup();
+    MQTT_Utils::setup(mqttClient);
     #ifdef HAS_A7670
         A7670_Utils::setup();
     #endif
@@ -184,11 +187,13 @@ void loop() {
         if (Config.aprs_is.active && !modemLoggedToAPRSIS) A7670_Utils::APRS_IS_connect();
     #else
         WIFI_Utils::checkWiFi();
-        if (Config.aprs_is.active && (WiFi.status() == WL_CONNECTED) && !espClient.connected()) APRS_IS_Utils::connect();
+        if (Config.aprs_is.active && (WiFi.status() == WL_CONNECTED) && !aprsIsClient.connected()) APRS_IS_Utils::connect();
+        if (Config.mqtt.active && (WiFi.status() == WL_CONNECTED) && !mqttClient.connected()) MQTT_Utils::connect();
     #endif
 
     NTP_Utils::update();
     TNC_Utils::loop();
+    MQTT_Utils::loop();
 
     Utils::checkDisplayInterval();
     Utils::checkBeaconInterval();
@@ -215,6 +220,9 @@ void loop() {
         }
         if (Config.tnc.enableSerial) { // If Serial KISS enabled
             TNC_Utils::sendToSerial(packet); // Send received packet to Serial KISS
+        }
+        if (Config.mqtt.active) { // If MQTT enabled
+            MQTT_Utils::sendToMqtt(packet); // Send received packet to MQTT
         }
     }
 
