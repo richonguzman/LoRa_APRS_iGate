@@ -206,7 +206,8 @@ void loop() {
 }
 
 
-// HWT
+// HWT not sleeping!
+
 // ESP32C3 : 
-//    -   HT-CT62
+//    -   HT-CT62 ??
 //    -  and others?
