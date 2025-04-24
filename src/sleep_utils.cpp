@@ -51,6 +51,9 @@ namespace SLEEP_Utils {
         uint32_t timeToSleep = getSecondsToSleep();
         esp_sleep_enable_timer_wakeup(timeToSleep * 1000000);   // 1 min = 60sec
         Serial.print("(Sleeping : "); Serial.print(timeToSleep); Serial.println("seconds)");
+
+        //esp_sleep_enable_timer_wakeup(getSecondsToSleep() * 1000000);   // 1 min = 60sec
+
         delay(100);
         LoRa_Utils::wakeRadio();
         esp_light_sleep_start();

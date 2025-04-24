@@ -271,6 +271,7 @@ namespace POWER_Utils {
         delay(1000);
         BATTERY_Utils::setup();
         BATTERY_Utils::startupBatteryHealth();
+        setCpuFrequencyMhz(80);
     }
 
 }

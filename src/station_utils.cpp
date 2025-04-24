@@ -184,7 +184,6 @@ namespace STATION_Utils {
             }
         }
         if (saveNewDigiEcoModeConfig) {
-            //setCpuFrequencyMhz(80);
             Config.writeFile();
             delay(1000);
             displayToggle(false);
