@@ -86,8 +86,7 @@ void setup() {
     LoRa_Utils::setup();
     Utils::validateFreqs();
     GPS_Utils::setup();
-    STATION_Utils::loadBlacklist();
-    STATION_Utils::loadManagers();
+    STATION_Utils::loadBlacklistAndManagers();
 
     #ifdef STARTUP_DELAY    // (TEST) just to wait for WiFi init of Routers
         displayShow("", "  STARTUP DELAY ...", "", "", 0);

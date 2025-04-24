@@ -45,12 +45,9 @@ namespace STATION_Utils {
         return loadedList;
     }
 
-    void loadBlacklist() {
-        blacklist = loadCallSignList(Config.blacklist);
-    }
-
-    void loadManagers() {
-        managers = loadCallSignList(Config.remoteManagement.managers);
+    void loadBlacklistAndManagers() {
+        blacklist   = loadCallSignList(Config.blacklist);
+        managers    = loadCallSignList(Config.remoteManagement.managers);
     }
 
     bool checkCallsignList(const std::vector<String>& list, const String& callsign) {
