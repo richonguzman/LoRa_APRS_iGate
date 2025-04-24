@@ -149,7 +149,7 @@ namespace DIGI_Utils {
                         String loraPacket = generateDigipeatedPacket(packet.substring(3), thirdPartyPacket);
                         if (loraPacket != "") {
                             STATION_Utils::addToOutputPacketBuffer(loraPacket);
-                            displayToggle(true);
+                            if (Config.digi.ecoMode != 1) displayToggle(true);
                             lastScreenOn = millis();
                         }
                     }

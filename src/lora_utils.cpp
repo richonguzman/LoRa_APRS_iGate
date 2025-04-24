@@ -133,7 +133,8 @@ namespace LoRa_Utils {
         }
         
         #ifdef INTERNAL_LED_PIN
-            if (Config.digi.ecoMode != 1) digitalWrite(INTERNAL_LED_PIN, HIGH);     // disabled in Ultra Eco Mode
+            //if (Config.digi.ecoMode != 1) 
+            digitalWrite(INTERNAL_LED_PIN, HIGH);     // disabled in Ultra Eco Mode
         #endif
         int state = radio.transmit("\x3c\xff\x01" + newPacket);
         transmitFlag = true;
@@ -148,7 +149,8 @@ namespace LoRa_Utils {
             Utils::println(String(state));
         }
         #ifdef INTERNAL_LED_PIN
-            if (Config.digi.ecoMode != 1) digitalWrite(INTERNAL_LED_PIN, LOW);      // disabled in Ultra Eco Mode
+            //if (Config.digi.ecoMode != 1) 
+            digitalWrite(INTERNAL_LED_PIN, LOW);      // disabled in Ultra Eco Mode
         #endif
         if (Config.loramodule.txFreq != Config.loramodule.rxFreq) {
             changeFreqRx();
@@ -163,7 +165,7 @@ namespace LoRa_Utils {
         String packet = "";
         int state = radio.readData(packet);
         if (state == RADIOLIB_ERR_NONE) {
-            //                                 
+            Utils::println("<--- LoRa Packet Rx : " + packet.substring(3));
         } else {
             packet = "";
         }

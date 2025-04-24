@@ -370,6 +370,7 @@ namespace APRS_IS_Utils {
                 listenAPRSIS();
             }
         }
+        if (Config.digi.ecoMode == 1) displayToggle(false);
     }
 
 }
