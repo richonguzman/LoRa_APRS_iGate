@@ -133,7 +133,7 @@ namespace DIGI_Utils {
                 if (!thirdPartyPacket && !Utils::checkValidCallsign(Sender)) {
                     return;
                 }
-                if (STATION_Utils::check25SegBuffer(Sender, temp.substring(temp.indexOf(":") + 2)) || Config.lowPowerMode) {
+                if (STATION_Utils::check25SegBuffer(Sender, temp.substring(temp.indexOf(":") + 2))) {
                     STATION_Utils::updateLastHeard(Sender);
                     Utils::typeOfPacket(temp, 2);    // Digi
                     bool queryMessage = false;

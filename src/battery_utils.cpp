@@ -198,15 +198,6 @@ namespace BATTERY_Utils {
         // return mapVoltage(voltage, 5.05, 6.32, 4.5, 5.5); // mapped voltage
     }
 
-    void checkIfShouldSleep() {
-        if (lastBatteryCheck == 0 || millis() - lastBatteryCheck >= 15 * 60 * 1000) {
-            lastBatteryCheck = millis();            
-            if (checkInternalVoltage() < Config.lowVoltageCutOff) {
-                ESP.deepSleep(1800000000); // 30 min sleep (60s = 60e6)
-            }
-        }
-    }
-
     void startupBatteryHealth() {
         #ifdef BATTERY_PIN
             if (Config.battery.monitorInternalVoltage && checkInternalVoltage() < Config.battery.internalSleepVoltage + 0.1) {

@@ -93,6 +93,7 @@ void setup() {
         delay(STARTUP_DELAY * 60 * 1000);
     #endif
 
+    // ????? kill ?????
     #ifdef HELTEC_HTCT62
         if (Config.lowPowerMode) {
             gpio_wakeup_enable(GPIO_NUM_3, GPIO_INTR_HIGH_LEVEL);
@@ -133,6 +134,7 @@ void setup() {
             Config.loramodule.rxActive = false;
         }
     #endif
+
     SLEEP_Utils::setup();
     WIFI_Utils::setup();
     NTP_Utils::setup();
@@ -152,6 +154,7 @@ void loop() {
         SLEEP_Utils::checkWakeUpFlag();
         Utils::checkBeaconInterval();
         STATION_Utils::processOutputPacketBufferUltraEcoMode();
+        Utils::checkSleepByLowBatteryVoltage(1);
         SLEEP_Utils::startSleeping();
     } else {
         WIFI_Utils::checkAutoAPTimeout();
@@ -159,10 +162,6 @@ void loop() {
         if (isUpdatingOTA) {
             ElegantOTA.loop();
             return; // Don't process IGate and Digi during OTA update
-        }
-
-        if (Config.lowVoltageCutOff > 0) {
-            BATTERY_Utils::checkIfShouldSleep();
         }
         
         #ifdef HAS_GPS
