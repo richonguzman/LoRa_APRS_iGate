@@ -4,6 +4,9 @@
 #include "display.h"
 
 
+bool shouldSleepStop = true;
+
+
 void Configuration::writeFile() {
     Serial.println("Saving config...");
 
@@ -166,6 +169,7 @@ bool Configuration::readFile() {
 
         digi.mode                       = data["digi"]["mode"] | 0;
         digi.ecoMode                    = data["digi"]["ecoMode"] | 0;
+        if (digi.ecoMode == 1) shouldSleepStop = false;
 
         loramodule.txFreq               = data["lora"]["txFreq"] | 433775000;
         loramodule.rxFreq               = data["lora"]["rxFreq"] | 433775000;
