@@ -93,48 +93,6 @@ void setup() {
         delay(STARTUP_DELAY * 60 * 1000);
     #endif
 
-    // ????? kill ?????
-    #ifdef HELTEC_HTCT62
-        if (Config.lowPowerMode) {
-            gpio_wakeup_enable(GPIO_NUM_3, GPIO_INTR_HIGH_LEVEL);
-            esp_deep_sleep_enable_gpio_wakeup(GPIO_NUM_3, ESP_GPIO_WAKEUP_GPIO_HIGH);
-            long lastBeacon = 0;
-            LoRa_Utils::startReceive();
-            while (true) {
-                auto wakeup_reason = esp_sleep_get_wakeup_cause();
-                if (wakeup_reason == 7) { // packet received
-                    Serial.println("Received packet");
-                    String packet = LoRa_Utils::receivePacket();
-                    Serial.println(packet);
-                    if (Config.digi.mode == 2) DIGI_Utils::processLoRaPacket(packet);
-
-                    if (packet.indexOf(Config.callsign + ":?APRSELP{") != -1) { // Send `?APRSELP` to exit low power
-                        Serial.println("Got ?APRSELP message, exiting from low power mode");
-                        break;
-                    };
-                }
-                long time = esp_timer_get_time() / 1000000;
-                if (lastBeacon == 0 || time - lastBeacon >= Config.beacon.interval * 60) {
-                    Serial.println("Sending beacon");
-                    String comment = Config.beacon.comment;
-                    if (Config.battery.sendInternalVoltage) comment += " Batt=" + String(BATTERY_Utils::checkInternalVoltage(),2) + "V";
-                    if (Config.battery.sendExternalVoltage) comment += " Ext=" + String(BATTERY_Utils::checkExternalVoltage(),2) + "V";
-                    LoRa_Utils::sendNewPacket(GPS_Utils::getiGateLoRaBeaconPacket() + comment);
-                    lastBeacon = time;
-                }
-
-                LoRa_Utils::startReceive();
-                Serial.println("Sleeping");
-                long sleep = (Config.beacon.interval * 60) - (time - lastBeacon);
-                Serial.flush();
-                esp_sleep_enable_timer_wakeup(sleep * 1000000);
-                esp_light_sleep_start();
-                Serial.println("Waked up");
-            }
-            Config.loramodule.rxActive = false;
-        }
-    #endif
-
     SLEEP_Utils::setup();
     WIFI_Utils::setup();
     NTP_Utils::setup();
