@@ -204,3 +204,9 @@ void loop() {
         Utils::checkSleepByLowBatteryVoltage(1);
     }
 }
+
+
+// HWT
+// ESP32C3 : 
+//    -   HT-CT62
+//    -  and others?
