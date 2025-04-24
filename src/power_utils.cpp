@@ -267,14 +267,6 @@ namespace POWER_Utils {
             delay(500);
             Wire.begin(BOARD_I2C_SDA, BOARD_I2C_SCL);
         #endif
-
-        //  PIN Ultra Eco Mode definitions
-
-
-
-
-
-        //
         
         delay(1000);
         BATTERY_Utils::setup();

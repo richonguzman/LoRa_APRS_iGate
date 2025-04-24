@@ -155,9 +155,20 @@ namespace LoRa_Utils {
         }
     }
 
-    void startReceive() {
+    /*void startReceive() {
         radio.startReceive();
-    }
+    }*/
+
+    /*String receiveFromSleep() {
+        String packet = "";
+        int state = radio.readData(packet);
+        if (state == RADIOLIB_ERR_NONE) {
+            //                                 
+        } else {
+            packet = "";
+        }
+        return packet;
+    }*/
 
     String receivePacket() {
         String packet = "";
@@ -217,6 +228,10 @@ namespace LoRa_Utils {
             }
         }
         return packet;
+    }
+
+    void wakeRadio() {
+        radio.startReceive();
     }
 
     void sleepRadio() {

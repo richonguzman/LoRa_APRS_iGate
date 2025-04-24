@@ -10,6 +10,8 @@
     #define RADIO_RST_PIN           12      // SX1262 RST
     #define RADIO_DIO1_PIN          14      // SX1262 DIO1
     #define RADIO_BUSY_PIN          13      // SX1262 BUSY
+    #define RADIO_WAKEUP_PIN        RADIO_DIO1_PIN
+    #define GPIO_WAKEUP_PIN         GPIO_SEL_14
     
     //  Display
     #define HAS_DISPLAY

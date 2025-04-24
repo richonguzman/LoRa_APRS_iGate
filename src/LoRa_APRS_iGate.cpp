@@ -32,6 +32,7 @@ ___________________________________________________________________*/
 #include "board_pinout.h"
 #include "syslog_utils.h"
 #include "power_utils.h"
+#include "sleep_utils.h"
 #include "lora_utils.h"
 #include "wifi_utils.h"
 #include "digi_utils.h"
@@ -133,6 +134,7 @@ void setup() {
             Config.loramodule.rxActive = false;
         }
     #endif
+    SLEEP_Utils::setup();
     WIFI_Utils::setup();
     NTP_Utils::setup();
     SYSLOG_Utils::setup();
