@@ -88,7 +88,7 @@ namespace Utils {
     }
 
     void setupDisplay() {
-        displaySetup();
+        if (Config.digi.ecoMode != 1) displaySetup();
         #ifdef INTERNAL_LED_PIN
             digitalWrite(INTERNAL_LED_PIN,HIGH);
         #endif

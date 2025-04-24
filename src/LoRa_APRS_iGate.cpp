@@ -48,7 +48,7 @@ ___________________________________________________________________*/
 #endif
 
 
-String              versionDate             = "2025-04-24";
+String              versionDate             = "2025-04-25";
 Configuration       Config;
 WiFiClient          espClient;
 #ifdef HAS_GPS
@@ -205,8 +205,7 @@ void loop() {
     }
 }
 
-
-// HWT not sleeping!
+// ESP32 (and ESPS3) work?
 
 // ESP32C3 : 
 //    -     HT-CT62 sleeps??
