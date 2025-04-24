@@ -167,7 +167,7 @@ bool Configuration::readFile() {
         aprs_is.objectsToRF             = data["aprs_is"]["objectsToRF"] | false;
 
         digi.mode                       = data["digi"]["mode"] | 0;
-        digi.ecoMode                    = data["digi"]["ecoMode"] | false;
+        digi.ecoMode                    = data["digi"]["ecoMode"] | 0;
 
         loramodule.txFreq               = data["lora"]["txFreq"] | 433775000;
         loramodule.rxFreq               = data["lora"]["rxFreq"] | 433775000;
@@ -274,7 +274,7 @@ void Configuration::init() {
     beacon.gpsAmbiguity             = false;
 
     digi.mode                       = 0;
-    digi.ecoMode                    = false;
+    digi.ecoMode                    = 0;
 
     tnc.enableServer                = false;
     tnc.enableSerial                = false;

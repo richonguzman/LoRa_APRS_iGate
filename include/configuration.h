@@ -47,7 +47,7 @@ public:
 class DIGI {
 public:
     int     mode;
-    bool    ecoMode;
+    int     ecoMode;        // 0 = Not Active | 1 = Ultra EcoMode | 2 = Not Active (WiFi OFF, Serial ON)
 };
 
 class LoraModule {

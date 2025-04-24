@@ -141,7 +141,7 @@ namespace WEB_Utils {
 
 
         Config.digi.mode                    = request->getParam("digi.mode", true)->value().toInt();
-        Config.digi.ecoMode                 = request->hasParam("digi.ecoMode", true);
+        Config.digi.ecoMode                 = request->getParam("digi.ecoMode", true)->value().toInt();;
 
 
         Config.loramodule.txFreq            = request->getParam("lora.txFreq", true)->value().toInt();
@@ -271,7 +271,7 @@ namespace WEB_Utils {
     }
 
     void setup() {
-        if (!Config.digi.ecoMode) {
+        if (Config.digi.ecoMode == 0) {
             server.on("/", HTTP_GET, handleHome);
             server.on("/status", HTTP_GET, handleStatus);
             server.on("/received-packets.json", HTTP_GET, handleReceivedPackets);

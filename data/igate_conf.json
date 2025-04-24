@@ -29,7 +29,7 @@
     },
     "digi": {
         "mode": 0,
-        "ecoMode": false
+        "ecoMode": 0
     },
     "lora": {
         "txFreq": 433775000,

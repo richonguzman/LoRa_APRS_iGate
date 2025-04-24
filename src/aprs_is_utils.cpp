@@ -70,7 +70,7 @@ namespace APRS_IS_Utils {
         if (WiFi.status() == WL_CONNECTED) {
             wifiState = "OK";
         } else {
-            if (backUpDigiMode || Config.digi.ecoMode) {
+            if (backUpDigiMode || Config.digi.ecoMode == 1 || Config.digi.ecoMode == 2) {
                 wifiState = "--";
             } else {
                 wifiState = "AP";

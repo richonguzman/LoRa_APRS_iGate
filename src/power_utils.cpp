@@ -250,7 +250,7 @@ namespace POWER_Utils {
 
         #if defined(HELTEC_V3) || defined(HELTEC_V3_2) || defined(HELTEC_WP) || defined(HELTEC_WSL_V3) || defined(HELTEC_WSL_V3_DISPLAY)
             Wire1.begin(BOARD_I2C_SDA, BOARD_I2C_SCL);
-        #endif      
+        #endif
 
         #if defined(TTGO_T_DECK_GPS) || defined(TTGO_T_DECK_PLUS)
             pinMode(BOARD_POWERON, OUTPUT);
@@ -266,7 +266,15 @@ namespace POWER_Utils {
 
             delay(500);
             Wire.begin(BOARD_I2C_SDA, BOARD_I2C_SCL);
-        #endif  
+        #endif
+
+        //  PIN Ultra Eco Mode definitions
+
+
+
+
+
+        //
         
         delay(1000);
         BATTERY_Utils::setup();

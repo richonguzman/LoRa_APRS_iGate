@@ -58,9 +58,9 @@ namespace QUERY_Utils {
         else if (STATION_Utils::isManager(station) && (!queryFromAPRSIS || !Config.remoteManagement.rfOnly)) {
             if (queryQuestion.indexOf("?EM=OFF") == 0) {
                 if ((Config.digi.mode == 2 || Config.digi.mode == 3) && Config.loramodule.txActive && Config.loramodule.rxActive && !Config.aprs_is.active) {
-                    if (Config.digi.ecoMode) {    // Exit Digipeater EcoMode
+                    if (Config.digi.ecoMode == 1) {     // Exit Digipeater EcoMode
                         answer = "DigiEcoMode:OFF";
-                        Config.digi.ecoMode         = false;
+                        Config.digi.ecoMode         = 0;
                         Config.display.alwaysOn     = true;
                         Config.display.timeout      = 10;
                         shouldSleepLowVoltage       = true;     // to make sure all packets in outputPacketBuffer are sended before restart.
@@ -73,9 +73,9 @@ namespace QUERY_Utils {
                 }
             } else if (queryQuestion.indexOf("?EM=ON") == 0) {
                 if ((Config.digi.mode == 2 || Config.digi.mode == 3) && Config.loramodule.txActive && Config.loramodule.rxActive && !Config.aprs_is.active) {
-                    if (!Config.digi.ecoMode) {     // Start Digipeater EcoMode
+                    if (Config.digi.ecoMode == 0) {     // Start Digipeater EcoMode
                         answer = "DigiEcoMode:ON";
-                        Config.digi.ecoMode         = true;
+                        Config.digi.ecoMode         = 1;
                         shouldSleepLowVoltage       = true;     // to make sure all packets in outputPacketBuffer are sended before restart.
                         saveNewDigiEcoModeConfig    = true;
                     } else {
@@ -85,7 +85,13 @@ namespace QUERY_Utils {
                     answer = "DigiEcoMode control not possible";
                 }
             } else if (queryQuestion.indexOf("?EM=?") == 0) {    // Digipeater EcoMode Status
-                answer = (Config.digi.ecoMode) ? "DigiEcoMode:ON" : "DigiEcoMode:OFF";
+                if (Config.digi.ecoMode == 0) {
+                    answer = "DigiEcoMode:OFF";
+                } else if (Config.digi.ecoMode == 1) {
+                    answer = "DigiEcoMode:ON";
+                } else {
+                    answer = "DigiEcoMode:OFF/Only Serial Output";
+                }
             } else  if (queryQuestion.indexOf("?TX=ON") == 0) {
                 if (Config.loramodule.txActive) {
                     answer = "TX was ON";

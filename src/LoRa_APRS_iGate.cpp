@@ -47,7 +47,7 @@ ___________________________________________________________________*/
 #endif
 
 
-String              versionDate             = "2025.03.20";
+String              versionDate             = "2025.04.24";
 Configuration       Config;
 WiFiClient          espClient;
 #ifdef HAS_GPS
@@ -133,7 +133,6 @@ void setup() {
             Config.loramodule.rxActive = false;
         }
     #endif
-    DIGI_Utils::checkEcoMode();
     WIFI_Utils::setup();
     NTP_Utils::setup();
     SYSLOG_Utils::setup();

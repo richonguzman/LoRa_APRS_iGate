@@ -76,7 +76,7 @@ namespace Utils {
     }
 
     String getLocalIP() {
-        if (Config.digi.ecoMode) {
+        if (Config.digi.ecoMode == 1 || Config.digi.ecoMode == 2) {
             return "** WiFi AP  Killed **";
         } else if (!WiFiConnected) {
             return "IP :  192.168.4.1";
@@ -93,7 +93,14 @@ namespace Utils {
             digitalWrite(INTERNAL_LED_PIN,HIGH);
         #endif
         Serial.println("\nStarting Station: " + Config.callsign + "   Version: " + versionDate);
-        Serial.println((Config.digi.ecoMode) ? "(DigiEcoMode: ON)" : "(DigiEcoMode: OFF)");
+        Serial.print("(DigiEcoMode: ");
+        if (Config.digi.ecoMode == 0) {
+            Serial.println("OFF)");
+        } else if (Config.digi.ecoMode == 1) {
+            Serial.println("ON)");
+        } else {
+            Serial.println("ON / Only Serial Output)");
+        }
         displayShow(" LoRa APRS", "", "", "   ( iGATE & DIGI )", "", "" , "  CA2RXU  " + versionDate, 4000);
         #ifdef INTERNAL_LED_PIN
             digitalWrite(INTERNAL_LED_PIN,LOW);
@@ -200,7 +207,6 @@ namespace Utils {
                 !Config.wxsensor.active && 
                 (Config.battery.sendInternalVoltage || Config.battery.sendExternalVoltage) &&
                 (lastBeaconTx > 0)) {
-                //(!Config.digi.ecoMode || lastBeaconTx > 0)) {
                 sendInitialTelemetryPackets();
             }
 
@@ -211,7 +217,7 @@ namespace Utils {
             beaconPacket            = iGateBeaconPacket;
             secondaryBeaconPacket   = iGateLoRaBeaconPacket;
             #ifdef HAS_GPS
-                if (Config.beacon.gpsActive && !Config.digi.ecoMode) {
+                if (Config.beacon.gpsActive && Config.digi.ecoMode == 0) {
                     GPS_Utils::getData();
                     if (gps.location.isUpdated() && gps.location.lat() != 0.0 && gps.location.lng() != 0.0) {
                         GPS_Utils::generateBeaconFirstPart();

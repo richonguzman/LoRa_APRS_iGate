@@ -133,7 +133,7 @@ namespace LoRa_Utils {
         }
         
         #ifdef INTERNAL_LED_PIN
-            if (!Config.digi.ecoMode) digitalWrite(INTERNAL_LED_PIN, HIGH);
+            if (Config.digi.ecoMode != 1) digitalWrite(INTERNAL_LED_PIN, HIGH);     // disabled in Ultra Eco Mode
         #endif
         int state = radio.transmit("\x3c\xff\x01" + newPacket);
         transmitFlag = true;
@@ -148,26 +148,12 @@ namespace LoRa_Utils {
             Utils::println(String(state));
         }
         #ifdef INTERNAL_LED_PIN
-            if (!Config.digi.ecoMode) digitalWrite(INTERNAL_LED_PIN, LOW);
+            if (Config.digi.ecoMode != 1) digitalWrite(INTERNAL_LED_PIN, LOW);      // disabled in Ultra Eco Mode
         #endif
         if (Config.loramodule.txFreq != Config.loramodule.rxFreq) {
             changeFreqRx();
         }
     }
-
-    /*String packetSanitization(const String& packet) {
-        String sanitizedPacket = packet;
-        if (packet.indexOf("\0") > 0) {
-            sanitizedPacket.replace("\0", "");
-        }
-        if (packet.indexOf("\r") > 0) {
-            sanitizedPacket.replace("\r", "");
-        }
-        if (packet.indexOf("\n") > 0) {
-            sanitizedPacket.replace("\n", "");
-        }
-        return sanitizedPacket;
-    }*/
 
     void startReceive() {
         radio.startReceive();
@@ -193,7 +179,7 @@ namespace LoRa_Utils {
                             Utils::println("<--- LoRa Packet Rx : " + packet.substring(3));
                             Utils::println("(RSSI:" + String(rssi) + " / SNR:" + String(snr) + " / FreqErr:" + String(freqError) + ")");
 
-                            if (!Config.lowPowerMode && !Config.digi.ecoMode) {
+                            if (!Config.lowPowerMode && Config.digi.ecoMode == 0) {
                                 if (receivedPackets.size() >= 10) {
                                     receivedPackets.erase(receivedPackets.begin());
                                 }
