@@ -159,7 +159,7 @@ namespace LoRa_Utils {
         radio.startReceive();
     }*/
 
-    /*String receiveFromSleep() {
+    String receivePacketFromSleep() {
         String packet = "";
         int state = radio.readData(packet);
         if (state == RADIOLIB_ERR_NONE) {
@@ -168,13 +168,13 @@ namespace LoRa_Utils {
             packet = "";
         }
         return packet;
-    }*/
+    }
 
     String receivePacket() {
         String packet = "";
-        if (operationDone || Config.lowPowerMode) {
+        if (operationDone) {
             operationDone = false;
-            if (transmitFlag && !Config.lowPowerMode) {
+            if (transmitFlag) {
                 radio.startReceive();
                 transmitFlag = false;
             } else {
@@ -190,7 +190,7 @@ namespace LoRa_Utils {
                             Utils::println("<--- LoRa Packet Rx : " + packet.substring(3));
                             Utils::println("(RSSI:" + String(rssi) + " / SNR:" + String(snr) + " / FreqErr:" + String(freqError) + ")");
 
-                            if (!Config.lowPowerMode && Config.digi.ecoMode == 0) {
+                            if (Config.digi.ecoMode == 0) {
                                 if (receivedPackets.size() >= 10) {
                                     receivedPackets.erase(receivedPackets.begin());
                                 }

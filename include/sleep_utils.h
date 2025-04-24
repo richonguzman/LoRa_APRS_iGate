@@ -4,8 +4,10 @@
 #include <Arduino.h>
 
 namespace SLEEP_Utils {
-
-    void    setup();
+    
+    void setup();
+    void checkWakeUpFlag();
+    void startSleeping();
 
 }
 

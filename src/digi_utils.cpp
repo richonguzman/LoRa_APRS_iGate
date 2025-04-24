@@ -148,11 +148,7 @@ namespace DIGI_Utils {
                     if (!queryMessage) {
                         String loraPacket = generateDigipeatedPacket(packet.substring(3), thirdPartyPacket);
                         if (loraPacket != "") {
-                            if (Config.lowPowerMode) {
-                                LoRa_Utils::sendNewPacket(loraPacket);
-                            } else {
-                                STATION_Utils::addToOutputPacketBuffer(loraPacket);
-                            }
+                            STATION_Utils::addToOutputPacketBuffer(loraPacket);
                             displayToggle(true);
                             lastScreenOn = millis();
                         }

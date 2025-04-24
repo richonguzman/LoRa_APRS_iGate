@@ -1,10 +1,12 @@
 #include "configuration.h"
 #include "board_pinout.h"
 #include "sleep_utils.h"
+#include "digi_utils.h"
 #include "lora_utils.h"
 
 
 extern  Configuration   Config;
+extern  uint32_t        lastBeaconTx;
 
 bool    wakeUpFlag      = false;
 
@@ -15,6 +17,16 @@ namespace SLEEP_Utils {
         wakeUpFlag = true;
     }
 
+    void checkWakeUpFlag() {
+        if (wakeUpFlag) {
+            String packet = LoRa_Utils::receivePacketFromSleep();
+            if (packet != "") {
+                DIGI_Utils::processLoRaPacket(packet);
+            }
+            wakeUpFlag = false;
+        }
+    }
+    
     void setup() {
         if (Config.digi.ecoMode == 1) {
             pinMode(RADIO_WAKEUP_PIN, INPUT);
@@ -27,6 +39,19 @@ namespace SLEEP_Utils {
                 esp_deep_sleep_enable_gpio_wakeup(1ULL << GPIO_WAKEUP_PIN, ESP_GPIO_WAKEUP_GPIO_HIGH);
             #endif
         }
+    }
+
+    uint32_t getSecondsToSleep() {
+        uint32_t elapsedTime    = (millis() - lastBeaconTx) / 1000; // in secs
+        uint32_t intervalTime   = Config.beacon.interval * 60;      // in secs
+        return (elapsedTime < intervalTime) ? (intervalTime - elapsedTime) : 0;
+    }
+
+    void startSleeping() {
+        esp_sleep_enable_timer_wakeup(getSecondsToSleep() * 1000000);   // 1 min = 60sec
+        delay(100);
+        LoRa_Utils::wakeRadio();
+        esp_light_sleep_start();
     }
 
 }

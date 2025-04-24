@@ -148,95 +148,102 @@ void setup() {
 }
 
 void loop() {
-    WIFI_Utils::checkAutoAPTimeout();
+    if (Config.digi.ecoMode == 1) {
+        SLEEP_Utils::checkWakeUpFlag();
+        Utils::checkBeaconInterval();
+        STATION_Utils::processOutputPacketBufferUltraEcoMode();
+        SLEEP_Utils::startSleeping();
+    } else {
+        WIFI_Utils::checkAutoAPTimeout();
 
-    if (isUpdatingOTA) {
-        ElegantOTA.loop();
-        return; // Don't process IGate and Digi during OTA update
-    }
+        if (isUpdatingOTA) {
+            ElegantOTA.loop();
+            return; // Don't process IGate and Digi during OTA update
+        }
 
-    if (Config.lowVoltageCutOff > 0) {
-        BATTERY_Utils::checkIfShouldSleep();
-    }
-    
-    #ifdef HAS_GPS
-        if (Config.beacon.gpsActive) {
-            if (millis() - gpsSatelliteTime > 5000) {
-                gpsInfoToggle = !gpsInfoToggle;
-                gpsSatelliteTime = millis();
-            }
-            if (gpsInfoToggle) {
-                thirdLine = "Satellite(s): ";
-                String gpsData = String(gps.satellites.value());
-                if (gpsData.length() < 2) gpsData = "0" + gpsData;  // Ensure two-digit formatting
-                thirdLine += gpsData;
+        if (Config.lowVoltageCutOff > 0) {
+            BATTERY_Utils::checkIfShouldSleep();
+        }
+        
+        #ifdef HAS_GPS
+            if (Config.beacon.gpsActive) {
+                if (millis() - gpsSatelliteTime > 5000) {
+                    gpsInfoToggle = !gpsInfoToggle;
+                    gpsSatelliteTime = millis();
+                }
+                if (gpsInfoToggle) {
+                    thirdLine = "Satellite(s): ";
+                    String gpsData = String(gps.satellites.value());
+                    if (gpsData.length() < 2) gpsData = "0" + gpsData;  // Ensure two-digit formatting
+                    thirdLine += gpsData;
+                } else {
+                    thirdLine = Utils::getLocalIP();
+                }
             } else {
                 thirdLine = Utils::getLocalIP();
             }
-        } else {
+        #else
             thirdLine = Utils::getLocalIP();
-        }
-    #else
-        thirdLine = Utils::getLocalIP();
-    #endif
+        #endif
 
-    #ifdef HAS_A7670
-        if (Config.aprs_is.active && !modemLoggedToAPRSIS) A7670_Utils::APRS_IS_connect();
-    #else
-        WIFI_Utils::checkWiFi();
-        if (Config.aprs_is.active && (WiFi.status() == WL_CONNECTED) && !espClient.connected()) APRS_IS_Utils::connect();
-    #endif
+        #ifdef HAS_A7670
+            if (Config.aprs_is.active && !modemLoggedToAPRSIS) A7670_Utils::APRS_IS_connect();
+        #else
+            WIFI_Utils::checkWiFi();
+            if (Config.aprs_is.active && (WiFi.status() == WL_CONNECTED) && !espClient.connected()) APRS_IS_Utils::connect();
+        #endif
 
-    NTP_Utils::update();
-    TNC_Utils::loop();
+        NTP_Utils::update();
+        TNC_Utils::loop();
 
-    Utils::checkDisplayInterval();
-    Utils::checkBeaconInterval();
-    
-    APRS_IS_Utils::checkStatus(); // Need that to update display, maybe split this and send APRSIS status to display func?
+        Utils::checkDisplayInterval();
+        Utils::checkBeaconInterval();
+        
+        APRS_IS_Utils::checkStatus(); // Need that to update display, maybe split this and send APRSIS status to display func?
 
-    String packet = "";
-    if (Config.loramodule.rxActive) {
-        packet = LoRa_Utils::receivePacket(); // We need to fetch LoRa packet above APRSIS and Digi
-    }
-
-    if (packet != "") {
-        if (Config.aprs_is.active) { // If APRSIS enabled
-            APRS_IS_Utils::processLoRaPacket(packet); // Send received packet to APRSIS
+        String packet = "";
+        if (Config.loramodule.rxActive) {
+            packet = LoRa_Utils::receivePacket(); // We need to fetch LoRa packet above APRSIS and Digi
         }
 
-        if (Config.loramodule.txActive && (Config.digi.mode == 2 || Config.digi.mode == 3 || backUpDigiMode)) { // If Digi enabled
-            STATION_Utils::clean25SegBuffer();
-            DIGI_Utils::processLoRaPacket(packet); // Send received packet to Digi
-        }
+        if (packet != "") {
+            if (Config.aprs_is.active) { // If APRSIS enabled
+                APRS_IS_Utils::processLoRaPacket(packet); // Send received packet to APRSIS
+            }
 
-        if (Config.tnc.enableServer) { // If TNC server enabled
-            TNC_Utils::sendToClients(packet); // Send received packet to TNC KISS
-        }
-        if (Config.tnc.enableSerial) { // If Serial KISS enabled
-            TNC_Utils::sendToSerial(packet); // Send received packet to Serial KISS
-        }
-    }
+            if (Config.loramodule.txActive && (Config.digi.mode == 2 || Config.digi.mode == 3 || backUpDigiMode)) { // If Digi enabled
+                STATION_Utils::clean25SegBuffer();
+                DIGI_Utils::processLoRaPacket(packet); // Send received packet to Digi
+            }
 
-    if (Config.aprs_is.active) {
-        APRS_IS_Utils::listenAPRSIS(); // listen received packet from APRSIS
-    }
-
-    STATION_Utils::processOutputPacketBuffer();
-
-    #ifdef HAS_EPAPER   // Only consider updating every 10 seconds (when data to show is different from before)
-        if(lastEpaperTime == 0 || millis() - lastEpaperTime > 10000) {
-            String posibleEpaperText = firstLine + secondLine + thirdLine + fourthLine + fifthLine + sixthLine + seventhLine;
-            if (lastEpaperText != posibleEpaperText) {
-                displayShow(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
-                lastEpaperText = posibleEpaperText;
-                lastEpaperTime = millis();
+            if (Config.tnc.enableServer) { // If TNC server enabled
+                TNC_Utils::sendToClients(packet); // Send received packet to TNC KISS
+            }
+            if (Config.tnc.enableSerial) { // If Serial KISS enabled
+                TNC_Utils::sendToSerial(packet); // Send received packet to Serial KISS
             }
         }
-    #else
-        displayShow(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
-    #endif
 
-    Utils::checkRebootTime();
-    Utils::checkSleepByLowBatteryVoltage(1);
+        if (Config.aprs_is.active) {
+            APRS_IS_Utils::listenAPRSIS(); // listen received packet from APRSIS
+        }
+
+        STATION_Utils::processOutputPacketBuffer();
+
+        #ifdef HAS_EPAPER   // Only consider updating every 10 seconds (when data to show is different from before)
+            if(lastEpaperTime == 0 || millis() - lastEpaperTime > 10000) {
+                String posibleEpaperText = firstLine + secondLine + thirdLine + fourthLine + fifthLine + sixthLine + seventhLine;
+                if (lastEpaperText != posibleEpaperText) {
+                    displayShow(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
+                    lastEpaperText = posibleEpaperText;
+                    lastEpaperTime = millis();
+                }
+            }
+        #else
+            displayShow(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
+        #endif
+
+        Utils::checkRebootTime();
+        Utils::checkSleepByLowBatteryVoltage(1);
+    }
 }

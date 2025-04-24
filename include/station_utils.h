@@ -27,6 +27,7 @@ namespace STATION_Utils {
     bool wasHeard(const String& station);
     void clean25SegBuffer();
     bool check25SegBuffer(const String& station, const String& textMessage);
+    void processOutputPacketBufferUltraEcoMode();
     void processOutputPacketBuffer();
     void addToOutputPacketBuffer(const String& packet);
 

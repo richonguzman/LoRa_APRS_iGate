@@ -149,6 +149,24 @@ namespace STATION_Utils {
         return true;
     }
 
+    void processOutputPacketBufferUltraEcoMode() { 
+        size_t currentIndex = 0;
+        while (currentIndex < outputPacketBuffer.size()) {                  // this sends all packets from output buffer
+            delay(3000);                                                    // and cleans buffer to avoid sending packets with time offset
+            LoRa_Utils::sendNewPacket(outputPacketBuffer[currentIndex]);    // next time it wakes up
+            currentIndex++;
+        }                               
+        outputPacketBuffer.clear();
+        //
+        if (saveNewDigiEcoModeConfig) {
+            Config.writeFile();
+            delay(1000);
+            displayToggle(false);
+            ESP.restart();
+        }
+        //
+    }
+
     void processOutputPacketBuffer() {
         int timeToWait                  = 3 * 1000;      // 3 segs between packet Tx and also Rx ???
         uint32_t lastRx                 = millis() - lastRxTime;
@@ -166,7 +184,7 @@ namespace STATION_Utils {
             }
         }
         if (saveNewDigiEcoModeConfig) {
-            setCpuFrequencyMhz(80);
+            //setCpuFrequencyMhz(80);
             Config.writeFile();
             delay(1000);
             displayToggle(false);
