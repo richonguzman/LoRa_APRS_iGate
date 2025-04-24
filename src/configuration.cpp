@@ -94,9 +94,6 @@ void Configuration::writeFile() {
 
     data["other"]["backupDigiMode"]             = backupDigiMode;
 
-    data["other"]["lowPowerMode"]               = lowPowerMode;
-    data["other"]["lowVoltageCutOff"]           = lowVoltageCutOff;
-
     data["personalNote"]                        = personalNote;
 
     data["blacklist"]                           = blacklist;
@@ -216,9 +213,6 @@ bool Configuration::readFile() {
 
         ntp.gmtCorrection               = data["ntp"]["gmtCorrection"] | 0.0;
 
-        lowPowerMode                    = data["other"]["lowPowerMode"] | false;
-        lowVoltageCutOff                = data["other"]["lowVoltageCutOff"] | 0;
-
         backupDigiMode                  = data["other"]["backupDigiMode"] | false;
 
         rebootMode                      = data["other"]["rebootMode"] | false;
@@ -326,9 +320,6 @@ void Configuration::init() {
     battery.voltageDividerR2        = 27.0;
 
     battery.sendVoltageAsTelemetry  = false;
-
-    lowPowerMode                    = false;
-    lowVoltageCutOff                = 0;
 
     backupDigiMode                  = false;
 

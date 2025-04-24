@@ -132,8 +132,6 @@ class Configuration {
 public:
     String                  callsign;
     int                     rememberStationTime;
-    bool                    lowPowerMode;
-    double                  lowVoltageCutOff;
     bool                    backupDigiMode;
     bool                    rebootMode;
     int                     rebootModeTime;

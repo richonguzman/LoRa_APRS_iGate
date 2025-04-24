@@ -202,8 +202,6 @@ namespace WEB_Utils {
         Config.rememberStationTime          = request->getParam("other.rememberStationTime", true)->value().toInt();
 
         Config.backupDigiMode               = request->hasParam("other.backupDigiMode", true);
-        Config.lowPowerMode                 = request->hasParam("other.lowPowerMode", true);
-        Config.lowVoltageCutOff             = request->getParam("other.lowVoltageCutOff", true)->value().toDouble();
 
         Config.personalNote                 = request->getParam("personalNote", true)->value();
 
