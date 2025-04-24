@@ -224,7 +224,7 @@ namespace POWER_Utils {
 
         #ifdef VEXT_CTRL
             pinMode(VEXT_CTRL,OUTPUT); // GPS + TFT on HELTEC Wireless_Tracker and only for Oled in HELTEC V3
-            #if defined(HELTEC_WIRELESS_TRACKER) || defined(HELTEC_V3) 
+            #if defined(HELTEC_WIRELESS_TRACKER) || defined(HELTEC_V3)
                 digitalWrite(VEXT_CTRL, HIGH);
             #endif
             #if defined(HELTEC_WP) || defined(HELTEC_WS) || defined(HELTEC_V3_2)
@@ -233,7 +233,7 @@ namespace POWER_Utils {
         #endif
         
         #ifdef HAS_GPS
-            if (Config.beacon.gpsActive) activateGPS();
+            if (Config.beacon.gpsActive && Config.digi.ecoMode != 1) activateGPS();
         #endif
 
         #ifdef ADC_CTRL

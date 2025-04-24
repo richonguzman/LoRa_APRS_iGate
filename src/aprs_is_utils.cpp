@@ -2,6 +2,7 @@
 #include "configuration.h"
 #include "aprs_is_utils.h"
 #include "station_utils.h"
+#include "board_pinout.h"
 #include "syslog_utils.h"
 #include "query_utils.h"
 #include "A7670_utils.h"
@@ -370,7 +371,17 @@ namespace APRS_IS_Utils {
                 listenAPRSIS();
             }
         }
-        if (Config.digi.ecoMode == 1) displayToggle(false);
+        if (Config.digi.ecoMode == 1) {
+            displayToggle(false);
+            #ifdef VEXT_CTRL
+                #if defined(HELTEC_WIRELESS_TRACKER) || defined(HELTEC_V3) 
+                    digitalWrite(VEXT_CTRL, LOW);
+                #endif
+                #if defined(HELTEC_WP) || defined(HELTEC_WS) || defined(HELTEC_V3_2)
+                    digitalWrite(VEXT_CTRL, HIGH);
+                #endif
+            #endif
+        }
     }
 
 }

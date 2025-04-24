@@ -225,7 +225,7 @@ namespace GPS_Utils {
 
     void setup() {
         #ifdef HAS_GPS
-            if (Config.beacon.gpsActive) {
+            if (Config.beacon.gpsActive && Config.digi.ecoMode != 1) {
                 gpsSerial.begin(GPS_BAUD, SERIAL_8N1, GPS_TX, GPS_RX);
             }
         #endif
