@@ -224,6 +224,7 @@ namespace WEB_Utils {
         response->addHeader("Location", "/");
         request->send(response);
         displayToggle(false);
+        delay(200);
         ESP.restart();
     }
 

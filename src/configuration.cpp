@@ -5,7 +5,7 @@
 
 
 void Configuration::writeFile() {
-    Serial.println("Saving config..");
+    Serial.println("Saving config...");
 
     StaticJsonDocument<2560> data;
     File configFile = SPIFFS.open("/igate_conf.json", "w");
@@ -112,6 +112,7 @@ void Configuration::writeFile() {
     configFile.close();
 
     Serial.println("Config saved");
+    delay(200);
 }
 
 bool Configuration::readFile() {
