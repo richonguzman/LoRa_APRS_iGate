@@ -8,6 +8,7 @@ namespace SLEEP_Utils {
     void setup();
     void checkWakeUpFlag();
     void startSleeping();
+    void checkSerial();
 
 }
 

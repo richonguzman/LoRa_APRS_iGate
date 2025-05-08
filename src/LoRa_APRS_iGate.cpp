@@ -48,7 +48,7 @@ ___________________________________________________________________*/
 #endif
 
 
-String              versionDate             = "2025-04-25";
+String              versionDate             = "2025-05-08";
 Configuration       Config;
 WiFiClient          espClient;
 #ifdef HAS_GPS
@@ -105,6 +105,7 @@ void setup() {
     #endif
     Utils::checkRebootMode();
     APRS_IS_Utils::firstConnection();
+    SLEEP_Utils::checkSerial();
 }
 
 void loop() {

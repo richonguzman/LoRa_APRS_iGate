@@ -216,6 +216,7 @@ namespace POWER_Utils {
 
         #ifdef INTERNAL_LED_PIN
             pinMode(INTERNAL_LED_PIN, OUTPUT);
+            digitalWrite(INTERNAL_LED_PIN, LOW);
         #endif
 
         if (Config.battery.sendExternalVoltage || Config.battery.monitorExternalVoltage) {
@@ -223,15 +224,13 @@ namespace POWER_Utils {
         }
 
         #ifdef VEXT_CTRL
-            if (Config.digi.ecoMode != 1) {
-                pinMode(VEXT_CTRL,OUTPUT); // GPS + TFT on HELTEC Wireless_Tracker and only for Oled in HELTEC V3
-                #if defined(HELTEC_WIRELESS_TRACKER) || defined(HELTEC_V3)
-                    digitalWrite(VEXT_CTRL, HIGH);
-                #endif
-                #if defined(HELTEC_WP) || defined(HELTEC_WS) || defined(HELTEC_V3_2)
-                    digitalWrite(VEXT_CTRL, LOW);
-                #endif
-            }
+            pinMode(VEXT_CTRL,OUTPUT); // GPS + TFT on HELTEC Wireless_Tracker and only for Oled in HELTEC V3
+            #if defined(HELTEC_WIRELESS_TRACKER) || defined(HELTEC_V3)
+                digitalWrite(VEXT_CTRL, Config.digi.ecoMode == 1 ? LOW : HIGH);
+            #endif
+            #if defined(HELTEC_WP) || defined(HELTEC_WS) || defined(HELTEC_V3_2) || defined(HELTEC_WSL_V3)
+                digitalWrite(VEXT_CTRL, Config.digi.ecoMode == 1 ? HIGH : LOW);
+            #endif
         #endif
         
         #ifdef HAS_GPS
@@ -240,6 +239,12 @@ namespace POWER_Utils {
 
         #ifdef ADC_CTRL
             pinMode(ADC_CTRL, OUTPUT);
+            #if defined(HELTEC_WIRELESS_TRACKER) || defined(HELTEC_V3_2)
+                digitalWrite(ADC_CTRL, LOW);
+            #endif
+            #if defined(HELTEC_V3) || defined(HELTEC_V2) || defined(HELTEC_WSL_V3) || defined(HELTEC_WP)
+                digitalWrite(ADC_CTRL, HIGH);
+            #endif
         #endif
 
         #if defined(HELTEC_WIRELESS_TRACKER)
