@@ -69,11 +69,7 @@ namespace LoRa_Utils {
             while (true);
         }
         #if defined(HAS_SX1262) || defined(HAS_SX1268) || defined(HAS_LLCC68)
-            //if (!Config.lowPowerMode) {
             radio.setDio1Action(setFlag);
-            /*} else {
-                radio.setDIOMapping(1, RADIOLIB_SX126X_IRQ_RX_DONE);
-            }*/
         #endif
         #if defined(HAS_SX1278) || defined(HAS_SX1276)
             radio.setDio0Action(setFlag, RISING);
