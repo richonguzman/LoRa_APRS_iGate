@@ -29,7 +29,7 @@ namespace TNC_Utils {
             tncServer.stop();
             tncServer.begin();
             MDNS.begin("kiss-tnc");
-            MDNS.addService("kiss-tnc", "tcp", 8001);
+            MDNS.addService("kiss-tnc", "tcp", TNC_PORT);
         }
     }
 
