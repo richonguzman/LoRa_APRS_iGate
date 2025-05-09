@@ -4,6 +4,7 @@
 #include "configuration.h"
 #include "station_utils.h"
 #include "utils.h"
+#include "ESPmDNS.h"
 
 
 extern Configuration        Config;
@@ -27,6 +28,8 @@ namespace TNC_Utils {
         if (Config.tnc.enableServer && !Config.digi.ecoMode) {
             tncServer.stop();
             tncServer.begin();
+            MDNS.begin("kiss-tnc");
+            MDNS.addService("kiss-tnc", "tcp", 8001);
         }
     }
 
