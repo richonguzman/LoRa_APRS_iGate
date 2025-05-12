@@ -60,7 +60,7 @@ namespace APRS_IS_Utils {
             aprsAuth += Config.callsign;
             aprsAuth += " pass ";
             aprsAuth += Config.aprs_is.passcode;
-            aprsAuth += " vers CA2RXU_iGate 2.3 filter ";
+            aprsAuth += " vers CA2RXU_iGate 3.0 filter ";
             aprsAuth += Config.aprs_is.filter;
             upload(aprsAuth);
         }
