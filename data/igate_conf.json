@@ -37,7 +37,7 @@
         "spreadingFactor": 12,
         "signalBandwidth": 125000,
         "codingRate4": 5,
-        "power": 20,
+        "power": 10,
         "txActive": false,
         "rxActive": true
     },
