@@ -10,6 +10,7 @@ extern  Configuration                   Config;
 extern  uint32_t                        lastBatteryCheck;
 
 bool    shouldSleepLowVoltage           = false;
+bool    INA219Init                      = false;
 
 float   adcReadingTransformation        = (3.3/4095);
 float   voltageDividerCorrection        = 0.288;
@@ -40,6 +41,15 @@ int     telemetryCounter                = random(1,999);
     #endif
 
     esp_adc_cal_characteristics_t adc_chars;
+#endif
+
+#if defined(HAS_INA219)
+    #include <Adafruit_INA219.h>
+    #include <Wire.h>
+    #ifndef INA219_ADDR
+        #define INA219_ADDR 0x40
+    #endif
+    Adafruit_INA219 ina219(INA219_ADDR);
 #endif
 
 bool calibrationEnable = false;
@@ -89,6 +99,16 @@ namespace BATTERY_Utils {
                 adcCalibration();
             }
         #endif
+
+        #if defined(HAS_INA219)
+            if (ina219.begin()) {
+                INA219Init = true;
+                Serial.println("Found INA219 on address:" + String(INA219_ADDR));
+            }
+            else {
+                Serial.println("Failed to find INA219");
+            }
+        #endif
     }
 
     float checkInternalVoltage() { 
@@ -98,7 +118,11 @@ namespace BATTERY_Utils {
             } else {
                 return 0.0;
             }
-        #else
+        #endif
+        #if defined(HAS_INA219)
+            return ina219.getBusVoltage_V();
+        #endif
+        #if  !defined(HAS_AXP192) && !defined(HAS_AXP2101) && !defined(HAS_INA219)
             int sample;
             int sampleSum = 0;
             #ifdef ADC_CTRL
@@ -113,6 +137,7 @@ namespace BATTERY_Utils {
             for (int i = 0; i < 100; i++) {
                 #if defined(ESP32_DIY_LoRa) || defined(ESP32_DIY_LoRa_915) || defined(ESP32_DIY_1W_LoRa) || defined(ESP32_DIY_1W_LoRa_915)
                     sample = 0;
+                    break;
                 #else
                     #ifdef HAS_ADC_CALIBRATION
                         if (calibrationEnable){
@@ -125,6 +150,7 @@ namespace BATTERY_Utils {
                             sample = analogRead(BATTERY_PIN);
                         #else
                             sample = 0;
+                            break;
                         #endif
                     #endif
                 #endif
