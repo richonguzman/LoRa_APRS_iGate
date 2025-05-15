@@ -103,7 +103,7 @@ namespace BATTERY_Utils {
         #if defined(HAS_INA219)
             if (ina219.begin()) {
                 INA219Init = true;
-                Serial.println("Found INA219 on address:" + String(INA219_ADDR));
+                Serial.println("Found INA219 on address:" + String(int(INA219_ADDR),HEX));
             }
             else {
                 Serial.println("Failed to find INA219");
@@ -118,11 +118,7 @@ namespace BATTERY_Utils {
             } else {
                 return 0.0;
             }
-        #endif
-        #if defined(HAS_INA219)
-            return ina219.getBusVoltage_V();
-        #endif
-        #if  !defined(HAS_AXP192) && !defined(HAS_AXP2101) && !defined(HAS_INA219)
+        #else
             int sample;
             int sampleSum = 0;
             #ifdef ADC_CTRL
@@ -191,6 +187,9 @@ namespace BATTERY_Utils {
     }
 
     float checkExternalVoltage() {
+        #if defined(HAS_INA219)
+            return ina219.getBusVoltage_V();
+        #else
         int sample;
         int sampleSum = 0;
         for (int i = 0; i < 100; i++) {
@@ -220,7 +219,7 @@ namespace BATTERY_Utils {
         #endif
         
         return extVoltage; // raw voltage without mapping
-
+        #endif
         // return mapVoltage(voltage, 5.05, 6.32, 4.5, 5.5); // mapped voltage
     }
 
@@ -285,7 +284,11 @@ namespace BATTERY_Utils {
             telemetryCounter = 0;
         }
         if (Config.battery.sendInternalVoltage) telemetry += generateEncodedTelemetryBytes(checkInternalVoltage(), false, 0);
-        if (Config.battery.sendExternalVoltage) telemetry += generateEncodedTelemetryBytes(checkExternalVoltage(), false, 1);
+        #ifdef HAS_INA219
+            if (Config.battery.sendExternalVoltage) telemetry += generateEncodedTelemetryBytes(checkExternalVoltage(), false, 2);
+        #else
+            if (Config.battery.sendExternalVoltage) telemetry += generateEncodedTelemetryBytes(checkExternalVoltage(), false, 1);
+        #endif
         telemetry += "|";
         return telemetry;
     }

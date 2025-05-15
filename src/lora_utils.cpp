@@ -79,7 +79,12 @@ namespace LoRa_Utils {
             radio.setDio0Action(setFlag, RISING);
         #endif
         #ifdef SX126X_DIO3_TCXO_VOLTAGE
-            radio.setTCXO(float(SX126X_DIO3_TCXO_VOLTAGE));
+            if (radio.setTCXO(float(SX126X_DIO3_TCXO_VOLTAGE)) == RADIOLIB_ERR_NONE) {
+                Utils::println("Set LoRa Module TCXO Voltage to:" + String(SX126X_DIO3_TCXO_VOLTAGE));
+            } else {
+                Utils::println("Set LoRa Module TCXO Voltage! State: " + String(state));
+            while (true);
+        }
         #endif
         radio.setSpreadingFactor(Config.loramodule.spreadingFactor);
         float signalBandwidth = Config.loramodule.signalBandwidth/1000;
