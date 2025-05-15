@@ -284,10 +284,7 @@ namespace BATTERY_Utils {
             telemetryCounter = 0;
         }
         if (Config.battery.sendInternalVoltage) telemetry += generateEncodedTelemetryBytes(checkInternalVoltage(), false, 0);
-        #ifdef HAS_INA219
-            if (Config.battery.sendExternalVoltage) telemetry += generateEncodedTelemetryBytes(checkExternalVoltage(), false, 2);
-        #else
-            if (Config.battery.sendExternalVoltage) telemetry += generateEncodedTelemetryBytes(checkExternalVoltage(), false, 1);
+        if (Config.battery.sendExternalVoltage) telemetry += generateEncodedTelemetryBytes(checkExternalVoltage(), false, 1);
         #endif
         telemetry += "|";
         return telemetry;
