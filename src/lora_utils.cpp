@@ -78,14 +78,22 @@ namespace LoRa_Utils {
         #if defined(HAS_SX1278) || defined(HAS_SX1276)
             radio.setDio0Action(setFlag, RISING);
         #endif
+        #ifdef SX126X_DIO3_TCXO_VOLTAGE
+            radio.setTCXO(float(SX126X_DIO3_TCXO_VOLTAGE));
+        #endif
         radio.setSpreadingFactor(Config.loramodule.spreadingFactor);
         float signalBandwidth = Config.loramodule.signalBandwidth/1000;
         radio.setBandwidth(signalBandwidth);
         radio.setCodingRate(Config.loramodule.codingRate4);
         radio.setCRC(true);
 
-        #if (defined(RADIO_RXEN) && defined(RADIO_TXEN)) || defined(LIGHTGATEWAY_1_0)   // QRP Labs LightGateway has 400M22S (SX1268)
-            radio.setRfSwitchPins(RADIO_RXEN, RADIO_TXEN);
+        #if defined(RADIO_RXEN) || defined(LIGHTGATEWAY_1_0)   // QRP Labs LightGateway has 400M22S (SX1268)
+            #ifdef RADIO_TXEN
+                radio.setRfSwitchPins(RADIO_RXEN, RADIO_TXEN);
+            #endif
+            #ifdef SX126X_DIO2_AS_RF_SWITCH
+                radio.setDio2AsRfSwitch(true);
+            #endif
         #endif
 
         #ifdef HAS_1W_LORA  // Ebyte E22 400M30S (SX1268) / 900M30S (SX1262) / Ebyte E220 400M30S (LLCC68)
