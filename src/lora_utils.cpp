@@ -82,8 +82,8 @@ namespace LoRa_Utils {
             if (radio.setTCXO(float(SX126X_DIO3_TCXO_VOLTAGE)) == RADIOLIB_ERR_NONE) {
                 Utils::println("Set LoRa Module TCXO Voltage to:" + String(SX126X_DIO3_TCXO_VOLTAGE));
             } else {
-                Utils::println("Set LoRa Module TCXO Voltage! State: " + String(state));
-            while (true);
+                Utils::println("Set LoRa Module TCXO Voltage failed! State: " + String(state));
+                while (true);
         }
         #endif
         radio.setSpreadingFactor(Config.loramodule.spreadingFactor);
