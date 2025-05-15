@@ -97,6 +97,7 @@ namespace LoRa_Utils {
                 radio.setRfSwitchPins(RADIO_RXEN, RADIO_TXEN);
             #endif
             #ifdef SX126X_DIO2_AS_RF_SWITCH
+                radio.setRfSwitchPins(RADIO_RXEN, RADIOLIB_NC);
                 radio.setDio2AsRfSwitch(true);
             #endif
         #endif
