@@ -30,7 +30,7 @@ Adafruit_Si7021     sensor  = Adafruit_Si7021();
 #else
 Adafruit_BMP280     bmp280;
 Adafruit_BME680     bme680;
-Adafruit_Si7021     sensor  = Adafruit_Si7021();
+Adafruit_Si7021     si7021  = Adafruit_Si7021();
 #endif
 #ifdef LIGHTGATEWAY_PLUS_1_0
 Adafruit_SHTC3      shtc3   = Adafruit_SHTC3();
@@ -103,7 +103,7 @@ namespace WX_Utils {
                         }
                     }
                 } else if (wxModuleAddress == 0x40) {
-                    if(sensor.begin()) {
+                    if(si7021.begin()) {
                         Serial.println("Si7021 sensor found");
                         wxModuleType    = 4;
                         wxModuleFound   = true;
@@ -230,8 +230,8 @@ namespace WX_Utils {
                 #endif
                 break;
             case 4: // Si7021
-                newTemp     = sensor.readTemperature();
-                newHum      = sensor.readHumidity();
+                newTemp     = si7021.readTemperature();
+                newHum      = si7021.readHumidity();
                 newPress    = 0;
                 break;
             case 5: // SHTC3
@@ -240,6 +240,7 @@ namespace WX_Utils {
                 newTemp     = temp.temperature;
                 newHum      = humidity.relative_humidity;
                 newPress    = 0;
+                break;
         }    
 
         if (isnan(newTemp) || isnan(newHum) || isnan(newPress)) {
@@ -263,7 +264,7 @@ namespace WX_Utils {
             #else
                 : generatePresString(newPress + (Config.wxsensor.heightCorrection / CORRECTION_FACTOR));
             #endif
-                       
+
             fifthLine = "BME-> ";
             fifthLine += String(int(newTemp + Config.wxsensor.temperatureCorrection));
             fifthLine += "C ";
