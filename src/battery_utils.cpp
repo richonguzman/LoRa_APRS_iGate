@@ -157,7 +157,12 @@ namespace BATTERY_Utils {
                         return (2 * (sampleSum/100) * adcReadingTransformation) + voltageDividerCorrection;  // raw voltage without mapping
                     }
                 #else
-                    return (2 * (sampleSum/100) * adcReadingTransformation) + voltageDividerCorrection;  // raw voltage without mapping
+                    #ifdef LIGHTGATEWAY_PLUS_1_0
+                        double inputDivider = (1.0 / (560.0 + 100.0)) * 100.0;  // The voltage divider is a 560k + 100k resistor in series, 100k on the low side.
+                        return (((sampleSum/100) * adcReadingTransformation) / inputDivider) + 0.41;
+                    #else
+                        return (2 * (sampleSum/100) * adcReadingTransformation) + voltageDividerCorrection;  // raw voltage without mapping
+                    #endif
                 #endif
             #endif
             // return mapVoltage(voltage, 3.34, 4.71, 3.0, 4.2); // mapped voltage
@@ -246,9 +251,7 @@ namespace BATTERY_Utils {
         String telemetry = "|";
         telemetry += generateEncodedTelemetryBytes(telemetryCounter, true, 0);
         telemetryCounter++;
-        if (telemetryCounter == 1000) {
-            telemetryCounter = 0;
-        }
+        if (telemetryCounter == 1000) telemetryCounter = 0;
         if (Config.battery.sendInternalVoltage) telemetry += generateEncodedTelemetryBytes(checkInternalVoltage(), false, 0);
         if (Config.battery.sendExternalVoltage) telemetry += generateEncodedTelemetryBytes(checkExternalVoltage(), false, 1);
         telemetry += "|";

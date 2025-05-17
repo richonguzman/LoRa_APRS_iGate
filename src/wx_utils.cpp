@@ -1,4 +1,7 @@
 #include <TinyGPS++.h>
+#ifdef LIGHTGATEWAY_PLUS_1_0
+#include "Adafruit_SHTC3.h"
+#endif
 #include "configuration.h"
 #include "board_pinout.h"
 #include "wx_utils.h"
@@ -23,11 +26,14 @@ float newHum, newTemp, newPress, newGas;
 Adafruit_BME280     bme280;
 #if defined(HELTEC_V3) || defined(HELTEC_V3_2)
 Adafruit_BMP280     bmp280(&Wire1);
-Adafruit_Si7021     sensor = Adafruit_Si7021();
+Adafruit_Si7021     sensor  = Adafruit_Si7021();
 #else
 Adafruit_BMP280     bmp280;
 Adafruit_BME680     bme680;
-Adafruit_Si7021     sensor = Adafruit_Si7021();
+Adafruit_Si7021     sensor  = Adafruit_Si7021();
+#endif
+#ifdef LIGHTGATEWAY_PLUS_1_0
+Adafruit_SHTC3      shtc3   = Adafruit_SHTC3();
 #endif
 
 
@@ -41,14 +47,21 @@ namespace WX_Utils {
                 err = Wire1.endTransmission();
             #else
                 Wire.beginTransmission(addr);
+                #ifdef LIGHTGATEWAY_PLUS_1_0
+                    Wire.write(0x35);
+                    Wire.write(0x17);
+                #endif
                 err = Wire.endTransmission();
             #endif
             if (err == 0) {
-                //Serial.println(addr); this shows any connected board to I2C
-                if (addr == 0x76 || addr == 0x77) { // BME/BMP
+                //Serial.println(addr); //this shows any connected board to I2C
+                if (addr == 0x76 || addr == 0x77) { // BME or BMP
                     wxModuleAddress = addr;
                     return;
                 } else if (addr == 0x40) {          // Si7011
+                    wxModuleAddress = addr;
+                    return;
+                } else if (addr == 0x70) {          // SHTC3
                     wxModuleAddress = addr;
                     return;
                 }
@@ -58,47 +71,53 @@ namespace WX_Utils {
 
     void setup() {
         if (Config.wxsensor.active) {
-            getWxModuleAddres();
+            getWxModuleAddres();            
             if (wxModuleAddress != 0x00) {
                 bool wxModuleFound = false;
                 if (wxModuleAddress == 0x76 || wxModuleAddress == 0x77) {
                     #if defined(HELTEC_V3) || defined(HELTEC_V3_2) || defined(HELTEC_WSL_V3) || defined(HELTEC_WSL_V3_DISPLAY)
                         if (bme280.begin(wxModuleAddress, &Wire1)) {
                             Serial.println("BME280 sensor found");
-                            wxModuleType = 1;
-                            wxModuleFound = true;
+                            wxModuleType    = 1;
+                            wxModuleFound   = true;
                         }
                     #else
                         if (bme280.begin(wxModuleAddress)) {
                             Serial.println("BME280 sensor found");
-                            wxModuleType = 1;
-                            wxModuleFound = true;
+                            wxModuleType    = 1;
+                            wxModuleFound   = true;
                         }
                         if (!wxModuleFound) {
                             if (bme680.begin(wxModuleAddress)) {
                                 Serial.println("BME680 sensor found");
-                                wxModuleType = 3;
-                                wxModuleFound = true;
+                                wxModuleType    = 3;
+                                wxModuleFound   = true;
                             }
                         }
                     #endif
                     if (!wxModuleFound) {
                         if (bmp280.begin(wxModuleAddress)) {
                             Serial.println("BMP280 sensor found");
-                            wxModuleType = 2;
-                            wxModuleFound = true;
+                            wxModuleType    = 2;
+                            wxModuleFound   = true;
                         }
                     }
                 } else if (wxModuleAddress == 0x40) {
                     if(sensor.begin()) {
                         Serial.println("Si7021 sensor found");
-                        wxModuleType = 4;
-                        wxModuleFound = true;
+                        wxModuleType    = 4;
+                        wxModuleFound   = true;
                     }
-                }                
+                } else if (wxModuleAddress == 0x70) {
+                    if (shtc3.begin()) {
+                        Serial.println("SHTC3 sensor found");
+                        wxModuleType    = 5;
+                        wxModuleFound   = true;
+                    }
+                }
                 if (!wxModuleFound) {
-                    displayShow("ERROR", "", "BME/BMP/Si7021 sensor active", "but no sensor found...", 2000);
-                    Serial.println("BME/BMP/Si7021 sensor Active in config but not found! Check Wiring");
+                    displayShow("ERROR", "", "BME/BMP/Si7021/SHTC3 sensor active", "but no sensor found...", 2000);
+                    Serial.println("BME/BMP/Si7021/SHTC3 sensor Active in config but not found! Check Wiring");
                 } else {
                     switch (wxModuleType) {
                         case 1:
@@ -212,9 +231,15 @@ namespace WX_Utils {
                 break;
             case 4: // Si7021
                 newTemp     = sensor.readTemperature();
-                newPress    = 0;
                 newHum      = sensor.readHumidity();
+                newPress    = 0;
                 break;
+            case 5: // SHTC3
+                sensors_event_t humidity, temp;
+                shtc3.getEvent(&humidity, &temp);
+                newTemp     = temp.temperature;
+                newHum      = humidity.relative_humidity;
+                newPress    = 0;
         }    
 
         if (isnan(newTemp) || isnan(newHum) || isnan(newPress)) {
@@ -225,13 +250,13 @@ namespace WX_Utils {
             String tempStr = generateTempString(((newTemp + Config.wxsensor.temperatureCorrection) * 1.8) + 32);
             
             String humStr;
-            if (wxModuleType == 1 || wxModuleType == 3 || wxModuleType == 4) {
+            if (wxModuleType == 1 || wxModuleType == 3 || wxModuleType == 4 || wxModuleType == 5) {
                 humStr  = generateHumString(newHum);
             } else if (wxModuleType == 2) {
                 humStr  = "..";
             }
             
-            String presStr = (wxModuleAddress == 4) 
+            String presStr = (wxModuleType == 4 || wxModuleType == 5) 
                 ? "....." 
             #ifdef HAS_GPS
                 : generatePresString(newPress + (gps.altitude.meters() / CORRECTION_FACTOR));

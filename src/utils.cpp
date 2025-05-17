@@ -229,7 +229,7 @@ namespace Utils {
             #endif
 
             if (Config.wxsensor.active) {
-                const char* sensorData = (wxModuleType == 0) ? ".../...g...t..." : WX_Utils::readDataSensor().c_str();
+                String sensorData = (wxModuleType == 0) ? ".../...g...t..." : WX_Utils::readDataSensor();
                 beaconPacket            += sensorData;
                 secondaryBeaconPacket   += sensorData;
             }
