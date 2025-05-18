@@ -71,7 +71,7 @@ namespace WX_Utils {
 
     void setup() {
         if (Config.wxsensor.active) {
-            getWxModuleAddres();            
+            getWxModuleAddres();
             if (wxModuleAddress != 0x00) {
                 bool wxModuleFound = false;
                 if (wxModuleAddress == 0x76 || wxModuleAddress == 0x77) {

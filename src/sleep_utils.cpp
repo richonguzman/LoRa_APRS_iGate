@@ -27,7 +27,7 @@ namespace SLEEP_Utils {
             wakeUpFlag = false;
         }
     }
-    
+
     void setup() {
         if (Config.digi.ecoMode == 1) {
             pinMode(RADIO_WAKEUP_PIN, INPUT);
@@ -56,7 +56,6 @@ namespace SLEEP_Utils {
             LoRa_Utils::wakeRadio();
             esp_light_sleep_start();
         }
-        
     }
 
     void checkSerial() {

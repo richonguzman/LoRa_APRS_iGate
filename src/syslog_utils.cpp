@@ -17,7 +17,7 @@ namespace SYSLOG_Utils {
             String syslogPacket = "<165>1 - ";
             syslogPacket.concat(Config.callsign);
             syslogPacket.concat(" CA2RXU_LoRa_iGate_3.0 - - - "); //RFC5424 The Syslog Protocol
-            
+
             char signalData[35];
             snprintf(signalData, sizeof(signalData), " / %ddBm / %.2fdB / %dHz", rssi, snr, freqError);
 

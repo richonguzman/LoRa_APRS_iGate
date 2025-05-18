@@ -58,10 +58,10 @@ namespace STATION_Utils {
                 if (callsign.startsWith(wildcard)) return true;
             } else {
                 if (list[i] == callsign) return true;
-            }                
+            }
         }
         return false;
-    }    
+    }
 
     bool isBlacklisted(const String& callsign) {
         return checkCallsignList(blacklist, callsign);
@@ -94,7 +94,7 @@ namespace STATION_Utils {
         lastHeardObjects.emplace_back(LastHeardStation{millis(), object});  // Add new object and Tx
         return true;
     }
-    
+
     void deleteNotHeard() {
         std::vector<LastHeardStation>  lastHeardStation_temp;
         for (int i = 0; i < lastHeardStations.size(); i++) {
@@ -149,13 +149,13 @@ namespace STATION_Utils {
         return true;
     }
 
-    void processOutputPacketBufferUltraEcoMode() { 
+    void processOutputPacketBufferUltraEcoMode() {
         size_t currentIndex = 0;
         while (currentIndex < outputPacketBuffer.size()) {                  // this sends all packets from output buffer
             delay(3000);                                                    // and cleans buffer to avoid sending packets with time offset
             LoRa_Utils::sendNewPacket(outputPacketBuffer[currentIndex]);    // next time it wakes up
             currentIndex++;
-        }                               
+        }
         outputPacketBuffer.clear();
         //
         if (saveNewDigiEcoModeConfig) {

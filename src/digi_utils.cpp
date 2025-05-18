@@ -116,7 +116,7 @@ namespace DIGI_Utils {
         }
     }
 
-    void processLoRaPacket(const String& packet) {        
+    void processLoRaPacket(const String& packet) {
         if (packet.indexOf("NOGATE") == -1) {
             bool thirdPartyPacket = false;
             String temp, Sender;

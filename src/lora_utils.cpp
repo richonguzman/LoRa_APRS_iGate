@@ -199,7 +199,7 @@ namespace LoRa_Utils {
                             }
                         } else {
                             packet = "";
-                        }                        
+                        }
                         lastRxTime = millis();
                         return packet;
                     }

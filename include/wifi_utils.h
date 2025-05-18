@@ -11,7 +11,7 @@ namespace WIFI_Utils {
     void startWiFi();
     void checkAutoAPTimeout();
     void setup();
-    
+
 }
 
 #endif

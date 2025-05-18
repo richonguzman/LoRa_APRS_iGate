@@ -113,7 +113,7 @@ namespace QUERY_Utils {
                 Config.writeFile();
             }
         }
-        
+
         if (answer == "") return "";
 
         String queryAnswer = Config.callsign;

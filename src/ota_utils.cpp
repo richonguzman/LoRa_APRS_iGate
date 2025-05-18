@@ -14,14 +14,14 @@ unsigned long ota_progress_millis = 0;
 
 
 namespace OTA_Utils {
-    
+
     void setup(AsyncWebServer *server) {
         if (Config.ota.username != ""  && Config.ota.password != "") {
             ElegantOTA.begin(server, Config.ota.username.c_str(), Config.ota.password.c_str());
         } else {
             ElegantOTA.begin(server);
         }
-        
+
         ElegantOTA.setAutoReboot(true);
         ElegantOTA.onStart(onOTAStart);
         ElegantOTA.onProgress(onOTAProgress);
@@ -55,8 +55,8 @@ namespace OTA_Utils {
 
         Serial.println(success ? "OTA update finished successfully!" : "There was an error during OTA update!");
         displayShow("", "", statusMessage, "", rebootMessage, "", "", 4000);
-        
+
         isUpdatingOTA = false;
     }
-    
+
 }

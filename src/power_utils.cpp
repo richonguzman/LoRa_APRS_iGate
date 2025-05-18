@@ -232,7 +232,7 @@ namespace POWER_Utils {
                 digitalWrite(VEXT_CTRL, Config.digi.ecoMode == 1 ? HIGH : LOW);
             #endif
         #endif
-        
+
         #ifdef HAS_GPS
             if (Config.beacon.gpsActive && Config.digi.ecoMode != 1) activateGPS();
         #endif
@@ -274,7 +274,7 @@ namespace POWER_Utils {
             delay(500);
             Wire.begin(BOARD_I2C_SDA, BOARD_I2C_SCL);
         #endif
-        
+
         delay(1000);
         BATTERY_Utils::setup();
         BATTERY_Utils::startupBatteryHealth();

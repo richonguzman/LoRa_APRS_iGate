@@ -8,7 +8,7 @@ namespace BATTERY_Utils {
 
     void    adcCalibration();
     void    adcCalibrationCheck();
-    
+
     void    setup();
     float   checkInternalVoltage();
     float   checkExternalVoltage();

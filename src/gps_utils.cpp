@@ -101,7 +101,7 @@ namespace GPS_Utils {
         }
         generateBeaconFirstPart();
         String encodedGPS       = encodeGPS(Config.beacon.latitude, Config.beacon.longitude, Config.beacon.overlay, Config.beacon.symbol);
-        iGateBeaconPacket       += encodedGPS;        
+        iGateBeaconPacket       += encodedGPS;
         iGateLoRaBeaconPacket   += encodedGPS;
     }
 

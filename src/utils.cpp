@@ -189,7 +189,7 @@ namespace Utils {
     void checkBeaconInterval() {
         uint32_t lastTx = millis() - lastBeaconTx;
         if (lastBeaconTx == 0 || lastTx >= Config.beacon.interval * 60 * 1000) {
-            beaconUpdate = true;    
+            beaconUpdate = true;
         }
 
         #ifdef HAS_GPS

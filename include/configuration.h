@@ -152,7 +152,7 @@ public:
     WEBADMIN                webadmin;
     NTP                     ntp;    
     REMOTE_MANAGEMENT       remoteManagement;
-  
+
     void init();
     void writeFile();
     Configuration();

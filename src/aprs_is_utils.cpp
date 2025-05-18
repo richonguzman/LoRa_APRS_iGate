@@ -28,7 +28,7 @@ uint32_t    lastRxTime      = millis();
 bool        passcodeValid   = false;
 
 #ifdef HAS_A7670
-    extern bool                 stationBeacon;
+    extern bool             stationBeacon;
 #endif
 
 
@@ -75,7 +75,7 @@ namespace APRS_IS_Utils {
                 wifiState = "--";
             } else {
                 wifiState = "AP";
-            }            
+            }
             if (!Config.display.alwaysOn && Config.display.timeout != 0) {
                 displayToggle(true);
             }
@@ -136,7 +136,7 @@ namespace APRS_IS_Utils {
             ackMessage.concat(packet.substring(packet.indexOf("{") + 1));
             ackMessage.trim();
             //Serial.println(ackMessage);
-            
+
             String addToBuffer = Config.callsign;
             addToBuffer += ">APLRG1";
             if (!thirdParty) addToBuffer += ",RFONLY";
