@@ -108,13 +108,16 @@ namespace WX_Utils {
                         wxModuleType    = 4;
                         wxModuleFound   = true;
                     }
-                } else if (wxModuleAddress == 0x70) {
+                } 
+                #ifdef LIGHTGATEWAY_PLUS_1_0
+                else if (wxModuleAddress == 0x70) {
                     if (shtc3.begin()) {
                         Serial.println("SHTC3 sensor found");
                         wxModuleType    = 5;
                         wxModuleFound   = true;
                     }
                 }
+                #endif
                 if (!wxModuleFound) {
                     displayShow("ERROR", "", "BME/BMP/Si7021/SHTC3 sensor active", "but no sensor found...", 2000);
                     Serial.println("BME/BMP/Si7021/SHTC3 sensor Active in config but not found! Check Wiring");
@@ -235,11 +238,13 @@ namespace WX_Utils {
                 newPress    = 0;
                 break;
             case 5: // SHTC3
-                sensors_event_t humidity, temp;
-                shtc3.getEvent(&humidity, &temp);
-                newTemp     = temp.temperature;
-                newHum      = humidity.relative_humidity;
-                newPress    = 0;
+                #ifdef LIGHTGATEWAY_PLUS_1_0
+                    sensors_event_t humidity, temp;
+                    shtc3.getEvent(&humidity, &temp);
+                    newTemp     = temp.temperature;
+                    newHum      = humidity.relative_humidity;
+                    newPress    = 0;
+                #endif
                 break;
         }    
 
