@@ -58,8 +58,8 @@ namespace QUERY_Utils {
         else if (STATION_Utils::isManager(station) && (!queryFromAPRSIS || !Config.remoteManagement.rfOnly)) {
             if (queryQuestion.indexOf("?EM=OFF") == 0) {
                 if ((Config.digi.mode == 2 || Config.digi.mode == 3) && Config.loramodule.txActive && Config.loramodule.rxActive && !Config.aprs_is.active) {
-                    if (Config.digi.ecoMode == 1) {     // Exit Digipeater EcoMode
-                        answer = "DigiEcoMode:OFF";
+                    if (Config.digi.ecoMode == 1 || Config.digi.ecoMode == 2) { // Exit Digipeater EcoMode or Digipeater without WiFiAP
+                        answer = (Config.digi.ecoMode == 1) ? "DigiEcoMode:OFF" : "Digipeater + WiFiAP enabled";
                         Config.digi.ecoMode         = 0;
                         Config.display.alwaysOn     = true;
                         Config.display.timeout      = 10;
@@ -69,7 +69,7 @@ namespace QUERY_Utils {
                         answer = "DigiEcoMode was OFF";
                     }
                 } else {
-                    answer = "DigiEcoMode control not possible";
+                    answer = "Digipeater Mode control not possible";
                 }
             } else if (queryQuestion.indexOf("?EM=ON") == 0) {
                 if ((Config.digi.mode == 2 || Config.digi.mode == 3) && Config.loramodule.txActive && Config.loramodule.rxActive && !Config.aprs_is.active) {
@@ -82,7 +82,7 @@ namespace QUERY_Utils {
                         answer = "DigiEcoMode was ON";
                     }
                 } else {
-                    answer = "DigiEcoMode control not possible";
+                    answer = "Digipeater Mode control not possible";
                 }
             } else if (queryQuestion.indexOf("?EM=?") == 0) {    // Digipeater EcoMode Status
                 if (Config.digi.ecoMode == 0) {
