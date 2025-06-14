@@ -188,7 +188,12 @@ namespace BATTERY_Utils {
 
     float checkExternalVoltage() {
         #if defined(HAS_INA219)
-            return ina219.getBusVoltage_V();
+            if(INA219Init) {
+                return ina219.getBusVoltage_V();
+            } else {
+                Serial.println("INA219 not Init!");
+                return 0.0f;
+            }
         #else
         int sample;
         int sampleSum = 0;
