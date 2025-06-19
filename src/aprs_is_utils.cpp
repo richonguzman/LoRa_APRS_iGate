@@ -345,6 +345,17 @@ namespace APRS_IS_Utils {
                 } else {
                     Serial.println(" ---> Rejected (Time): No Tx");
                 }
+            } else if (Config.aprs_is.objectsToRF && packet.indexOf(":=") > 0 && Config.loramodule.spreadingFactor <= 9) {
+                Utils::print("Rx Position (APRS-IS) : " + packet);
+                if (STATION_Utils::checkObjectTime(packet)) {
+                    STATION_Utils::addToOutputPacketBuffer(buildPacketToTx(packet, 0));
+                    displayToggle(true);
+                    lastScreenOn = millis();
+                    Utils::typeOfPacket(packet, 1); // APRS-LoRa
+                    Serial.println();
+                } else {
+                    Serial.println(" ---> Rejected (Time): No Tx");
+                } 
             }
         }
     }
