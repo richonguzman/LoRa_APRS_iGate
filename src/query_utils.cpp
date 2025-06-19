@@ -24,7 +24,7 @@ namespace QUERY_Utils {
         if (queryQuestion == "?APRS?" || queryQuestion == "H" || queryQuestion == "HELP" || queryQuestion=="?") {
             answer.concat("?APRSV ?APRSP ?APRSL ?APRSSSR ?EM=? ?TX=? "); // ?APRSH ?WHERE callsign
         } else if (queryQuestion == "?APRSV") {
-            answer.concat("CA2RXU_LoRa_iGate 2.3 v");
+            answer.concat("CA2RXU_LoRa_iGate 3.0 v");
             answer.concat(versionDate);
         } else if (queryQuestion == "?APRSP") {
             answer.concat("iGate QTH: ");
@@ -58,9 +58,9 @@ namespace QUERY_Utils {
         else if (STATION_Utils::isManager(station) && (!queryFromAPRSIS || !Config.remoteManagement.rfOnly)) {
             if (queryQuestion.indexOf("?EM=OFF") == 0) {
                 if ((Config.digi.mode == 2 || Config.digi.mode == 3) && Config.loramodule.txActive && Config.loramodule.rxActive && !Config.aprs_is.active) {
-                    if (Config.digi.ecoMode) {    // Exit Digipeater EcoMode
-                        answer = "DigiEcoMode:OFF";
-                        Config.digi.ecoMode         = false;
+                    if (Config.digi.ecoMode == 1 || Config.digi.ecoMode == 2) { // Exit Digipeater EcoMode or Digipeater without WiFiAP
+                        answer = (Config.digi.ecoMode == 1) ? "DigiEcoMode:OFF" : "Digipeater + WiFiAP enabled";
+                        Config.digi.ecoMode         = 0;
                         Config.display.alwaysOn     = true;
                         Config.display.timeout      = 10;
                         shouldSleepLowVoltage       = true;     // to make sure all packets in outputPacketBuffer are sended before restart.
@@ -69,23 +69,29 @@ namespace QUERY_Utils {
                         answer = "DigiEcoMode was OFF";
                     }
                 } else {
-                    answer = "DigiEcoMode control not possible";
+                    answer = "Digipeater Mode control not possible";
                 }
             } else if (queryQuestion.indexOf("?EM=ON") == 0) {
                 if ((Config.digi.mode == 2 || Config.digi.mode == 3) && Config.loramodule.txActive && Config.loramodule.rxActive && !Config.aprs_is.active) {
-                    if (!Config.digi.ecoMode) {     // Start Digipeater EcoMode
+                    if (Config.digi.ecoMode == 0) {     // Start Digipeater EcoMode
                         answer = "DigiEcoMode:ON";
-                        Config.digi.ecoMode         = true;
+                        Config.digi.ecoMode         = 1;
                         shouldSleepLowVoltage       = true;     // to make sure all packets in outputPacketBuffer are sended before restart.
                         saveNewDigiEcoModeConfig    = true;
                     } else {
                         answer = "DigiEcoMode was ON";
                     }
                 } else {
-                    answer = "DigiEcoMode control not possible";
+                    answer = "Digipeater Mode control not possible";
                 }
             } else if (queryQuestion.indexOf("?EM=?") == 0) {    // Digipeater EcoMode Status
-                answer = (Config.digi.ecoMode) ? "DigiEcoMode:ON" : "DigiEcoMode:OFF";
+                if (Config.digi.ecoMode == 0) {
+                    answer = "DigiEcoMode:OFF";
+                } else if (Config.digi.ecoMode == 1) {
+                    answer = "DigiEcoMode:ON";
+                } else {
+                    answer = "DigiEcoMode:OFF/Only Serial Output";
+                }
             } else  if (queryQuestion.indexOf("?TX=ON") == 0) {
                 if (Config.loramodule.txActive) {
                     answer = "TX was ON";
@@ -107,7 +113,7 @@ namespace QUERY_Utils {
                 Config.writeFile();
             }
         }
-        
+
         if (answer == "") return "";
 
         String queryAnswer = Config.callsign;

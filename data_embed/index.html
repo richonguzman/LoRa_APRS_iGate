@@ -646,7 +646,9 @@
                                             name="digi.mode"
                                             id="digi.mode"
                                         >
-                                            <option value="0">off</option>
+                                            <option value="0">
+                                                OFF
+                                            </option>
                                             <option value="2">
                                                 WIDE1 (fill-in) Digi
                                             </option>
@@ -655,20 +657,27 @@
                                             </option>
                                         </select>
                                     </div>
-                                    <div class="col-12 mt-5">
-                                        <div class="form-check form-switch">
-                                            <input
-                                                type="checkbox"
-                                                name="digi.ecoMode"
-                                                id="digi.ecoMode"
-                                                class="form-check-input"
-                                            />
-                                            <label
-                                                for="digi.ecoMode"
-                                                class="form-label"
-                                                >Eco Mode<small> This will disable WiFi, Display, Leds and lower CPU Speed for Low Power Digipeater. (<strong>Caution:</strong> Active means No WebUI Configuration, so <strong>ONLY</strong> activate this for Remote Digipeater)</small></label
-                                            >
-                                        </div>
+                                    <div class="col-12 mt-3">
+                                        <label
+                                            for="digi.ecoMode"
+                                            class="form-label"
+                                            >Eco Mode</label
+                                        >
+                                        <select
+                                            class="form-select form-select"
+                                            name="digi.ecoMode"
+                                            id="digi.ecoMode"
+                                        >
+                                            <option value="0">
+                                                OFF (Normal Mode - WiFiAP enabled)
+                                            </option>
+                                            <option value="1">
+                                                Ultra Eco Mode (Sleep till Packet Rx (WiFiAP/WebUI & Display disabled))
+                                            </option>
+                                            <option value="2">
+                                                OFF (Normal Mode - WiFiAP disabled)
+                                            </option>
+                                        </select>
                                     </div>
                                 </div>
                             </div>
@@ -1856,46 +1865,6 @@
                                                 class="form-label"
                                                 >Backup Digipeater Mode</label
                                             >
-                                        </div>
-                                    </div>
-                                    <div class="col-12">
-                                        <div class="form-check form-switch">
-                                            <div class="form-text">
-                                                WiFi disabled. Sleep mode. Best for solar Digi with SX126X.
-                                            </div>
-                                            <input
-                                                type="checkbox"
-                                                name="other.lowPowerMode"
-                                                id="other.lowPowerMode"
-                                                class="form-check-input"
-                                            />
-                                            <label
-                                                for="other.lowPowerMode"
-                                                class="form-label"
-                                                >Low power mode (only for HT-CT62)</label
-                                            >
-                                        </div>
-                                    </div>
-                                    <div class="col-12 mt-3">
-                                        <label
-                                            for="other.lowVoltageCutOff"
-                                            class="form-label"
-                                            >Low voltage cut off <small>(Deep sleep below specific voltage)</small></label
-                                        >
-                                        <input
-                                            type="text"
-                                            name="other.lowVoltageCutOff"
-                                            id="other.lowVoltageCutOff"
-                                            placeholder="0"
-                                            min="0"
-                                            step="0.01"
-                                            class="form-control"
-                                        />
-                                        <span class="input-group-text"
-                                                >Volts</span
-                                        >
-                                        <div class="form-text">
-                                            MCU will deep sleep when below provided battery voltage to save power. Set to <strong>0</strong> if you don't want this option. <u>Please calibrate your voltage reading first!</u>
                                         </div>
                                     </div>
                                 </div>

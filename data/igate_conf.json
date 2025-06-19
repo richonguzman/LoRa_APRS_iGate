@@ -29,7 +29,7 @@
     },
     "digi": {
         "mode": 0,
-        "ecoMode": false
+        "ecoMode": 0
     },
     "lora": {
         "txFreq": 433775000,
@@ -90,8 +90,6 @@
     },        
     "other": {
         "rememberStationTime": 30,
-        "lowPowerMode": false,
-        "lowVoltageCutOff": 0,
         "backupDigiMode": false,
         "rebootMode": false,
         "rebootModeTime": 6

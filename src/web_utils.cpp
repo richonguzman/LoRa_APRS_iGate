@@ -115,7 +115,7 @@ namespace WEB_Utils {
 
         Config.wifiAutoAP.password      = request->getParam("wifi.autoAP.password", true)->value();
         Config.wifiAutoAP.timeout       = request->getParam("wifi.autoAP.timeout", true)->value().toInt();
-        
+
 
         Config.aprs_is.active           = request->hasParam("aprs_is.active", true);
         Config.aprs_is.passcode         = request->getParam("aprs_is.passcode", true)->value();
@@ -141,7 +141,7 @@ namespace WEB_Utils {
 
 
         Config.digi.mode                    = request->getParam("digi.mode", true)->value().toInt();
-        Config.digi.ecoMode                 = request->hasParam("digi.ecoMode", true);
+        Config.digi.ecoMode                 = request->getParam("digi.ecoMode", true)->value().toInt();;
 
 
         Config.loramodule.txFreq            = request->getParam("lora.txFreq", true)->value().toInt();
@@ -175,7 +175,7 @@ namespace WEB_Utils {
         Config.battery.externalSleepVoltage     = request->getParam("battery.externalSleepVoltage", true)->value().toFloat();
 
         Config.battery.sendVoltageAsTelemetry   = request->hasParam("battery.sendVoltageAsTelemetry", true);
-        
+
         Config.wxsensor.active                  = request->hasParam("wxsensor.active", true);
         Config.wxsensor.heightCorrection        = request->getParam("wxsensor.heightCorrection", true)->value().toInt();
         Config.wxsensor.temperatureCorrection   = request->getParam("wxsensor.temperatureCorrection", true)->value().toFloat();
@@ -202,8 +202,6 @@ namespace WEB_Utils {
         Config.rememberStationTime          = request->getParam("other.rememberStationTime", true)->value().toInt();
 
         Config.backupDigiMode               = request->hasParam("other.backupDigiMode", true);
-        Config.lowPowerMode                 = request->hasParam("other.lowPowerMode", true);
-        Config.lowVoltageCutOff             = request->getParam("other.lowVoltageCutOff", true)->value().toDouble();
 
         Config.personalNote                 = request->getParam("personalNote", true)->value();
 
@@ -226,6 +224,7 @@ namespace WEB_Utils {
         response->addHeader("Location", "/");
         request->send(response);
         displayToggle(false);
+        delay(200);
         ESP.restart();
     }
 
@@ -271,7 +270,7 @@ namespace WEB_Utils {
     }
 
     void setup() {
-        if (!Config.digi.ecoMode) {
+        if (Config.digi.ecoMode == 0) {
             server.on("/", HTTP_GET, handleHome);
             server.on("/status", HTTP_GET, handleStatus);
             server.on("/received-packets.json", HTTP_GET, handleReceivedPackets);

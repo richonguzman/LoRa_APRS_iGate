@@ -10,6 +10,8 @@
     #define RADIO_RST_PIN       42
     #define RADIO_DIO1_PIN      39
     #define RADIO_BUSY_PIN      40
+    #define RADIO_WAKEUP_PIN        RADIO_DIO1_PIN
+    #define GPIO_WAKEUP_PIN         GPIO_SEL_39
 
     #define RADIO_HAS_RF_SWITCH //  DIO02
     #define RADIO_RF_SWITCH     38

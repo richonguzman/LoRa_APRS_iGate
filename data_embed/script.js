@@ -220,9 +220,6 @@ function loadSettings(settings) {
     // Experimental
     document.getElementById("other.backupDigiMode").checked             = settings.other.backupDigiMode;
 
-    document.getElementById("other.lowPowerMode").checked               = settings.other.lowPowerMode;
-    document.getElementById("other.lowVoltageCutOff").value             = settings.other.lowVoltageCutOff || 0
-
     // Management over APRS
     document.getElementById("remoteManagement.managers").value          = settings.remoteManagement.managers;
     document.getElementById("remoteManagement.rfOnly").checked          = settings.remoteManagement.rfOnly;

@@ -85,6 +85,8 @@ jobs:
                       chip: esp32c3
                     - name: QRPLabs_LightGateway_1_0
                       chip: esp32s3
+                    - name: QRPLabs_LightGateway_Plus_1_0
+                      chip: esp32s3
                     - name: XIAO_ESP32S3_WIO_SX1262
                       chip: esp32s3
                     - name: TROY_LoRa_APRS

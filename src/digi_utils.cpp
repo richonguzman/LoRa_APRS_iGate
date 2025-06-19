@@ -116,7 +116,7 @@ namespace DIGI_Utils {
         }
     }
 
-    void processLoRaPacket(const String& packet) {        
+    void processLoRaPacket(const String& packet) {
         if (packet.indexOf("NOGATE") == -1) {
             bool thirdPartyPacket = false;
             String temp, Sender;
@@ -133,7 +133,7 @@ namespace DIGI_Utils {
                 if (!thirdPartyPacket && !Utils::checkValidCallsign(Sender)) {
                     return;
                 }
-                if (STATION_Utils::check25SegBuffer(Sender, temp.substring(temp.indexOf(":") + 2)) || Config.lowPowerMode) {
+                if (STATION_Utils::check25SegBuffer(Sender, temp.substring(temp.indexOf(":") + 2))) {
                     STATION_Utils::updateLastHeard(Sender);
                     Utils::typeOfPacket(temp, 2);    // Digi
                     bool queryMessage = false;
@@ -148,25 +148,13 @@ namespace DIGI_Utils {
                     if (!queryMessage) {
                         String loraPacket = generateDigipeatedPacket(packet.substring(3), thirdPartyPacket);
                         if (loraPacket != "") {
-                            if (Config.lowPowerMode) {
-                                LoRa_Utils::sendNewPacket(loraPacket);
-                            } else {
-                                STATION_Utils::addToOutputPacketBuffer(loraPacket);
-                            }
-                            displayToggle(true);
+                            STATION_Utils::addToOutputPacketBuffer(loraPacket);
+                            if (Config.digi.ecoMode != 1) displayToggle(true);
                             lastScreenOn = millis();
                         }
                     }
                 }
             }
-        }
-    }
-
-    void checkEcoMode() {
-        if (Config.digi.ecoMode) {
-            Config.display.alwaysOn     = false;
-            Config.display.timeout      = 0;
-            setCpuFrequencyMhz(10);
         }
     }
 

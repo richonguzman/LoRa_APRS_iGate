@@ -11,6 +11,8 @@
     #define RADIO_DIO1_PIN          3
     #define RADIO_RST_PIN           -1
     #define RADIO_BUSY_PIN          8
+    #define RADIO_WAKEUP_PIN        RADIO_DIO1_PIN
+    #define GPIO_WAKEUP_PIN         GPIO_NUM_3
 
     //  Display
     #define HAS_DISPLAY

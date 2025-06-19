@@ -47,7 +47,7 @@ public:
 class DIGI {
 public:
     int     mode;
-    bool    ecoMode;
+    int     ecoMode;        // 0 = Not Active | 1 = Ultra EcoMode | 2 = Not Active (WiFi OFF, Serial ON)
 };
 
 class LoraModule {
@@ -132,8 +132,6 @@ class Configuration {
 public:
     String                  callsign;
     int                     rememberStationTime;
-    bool                    lowPowerMode;
-    double                  lowVoltageCutOff;
     bool                    backupDigiMode;
     bool                    rebootMode;
     int                     rebootModeTime;
@@ -154,7 +152,7 @@ public:
     WEBADMIN                webadmin;
     NTP                     ntp;    
     REMOTE_MANAGEMENT       remoteManagement;
-  
+
     void init();
     void writeFile();
     Configuration();
