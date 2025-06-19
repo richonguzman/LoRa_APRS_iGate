@@ -38,13 +38,15 @@ ____________________________________________________
 
 - T-Deck Plus (and also regular T-Deck with/without GPS).
 
-- HELTEC V2, V3, V3.2, T114 Wireless Stick, Wireless Stick Lite, HT-CT62, Wireless Tracker, Wireless Paper.
+- HELTEC V2, V3, V3.2, T114, Wireless Stick, Wireless Stick Lite, HT-CT62, Wireless Tracker, Wireless Paper.
 
 - RAK Wireless 4631 + 19007(19003)
 
 - Faketec (NRF52840 + Heltec HTRA62(SX1262))
 
 - QRP Labs LightGateway 1.0 and Plus 1.0.
+
+- Faketec V3 (NRF52840 + Heltec HTRA62 SX1262)
 
 - ESP32 Wroom + SX1278 LoRa Module or Ebyte 400M30S (or 900M30S) 1W LoRa Module for a DIY Versions.
 
