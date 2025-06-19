@@ -1,6 +1,7 @@
 #include <ArduinoJson.h>
 #include <SPIFFS.h>
 #include "configuration.h"
+#include "board_pinout.h"
 #include "display.h"
 
 
@@ -48,6 +49,9 @@ void Configuration::writeFile() {
 
     data["digi"]["mode"]                        = digi.mode;
     data["digi"]["ecoMode"]                     = digi.ecoMode;
+    #if defined(HAS_A7670)
+        if (digi.ecoMode == 1) data["digi"]["ecoMode"] = 2;
+    #endif
 
     data["lora"]["rxFreq"]                      = loramodule.rxFreq;
     data["lora"]["txFreq"]                      = loramodule.txFreq;
@@ -170,6 +174,10 @@ bool Configuration::readFile() {
         digi.mode                       = data["digi"]["mode"] | 0;
         digi.ecoMode                    = data["digi"]["ecoMode"] | 0;
         if (digi.ecoMode == 1) shouldSleepStop = false;
+
+        #if defined(HAS_A7670)
+            if (digi.ecoMode == 1) digi.ecoMode = 2;
+        #endif
 
         loramodule.txFreq               = data["lora"]["txFreq"] | 433775000;
         loramodule.rxFreq               = data["lora"]["rxFreq"] | 433775000;

@@ -29,6 +29,7 @@ namespace SLEEP_Utils {
     }
 
     void setup() {
+        #ifndef HAS_A7670
         if (Config.digi.ecoMode == 1) {
             pinMode(RADIO_WAKEUP_PIN, INPUT);
             attachInterrupt(digitalPinToInterrupt(RADIO_WAKEUP_PIN), wakeUpLoRaPacketReceived, RISING);
@@ -39,6 +40,7 @@ namespace SLEEP_Utils {
                 esp_deep_sleep_enable_gpio_wakeup(1ULL << GPIO_WAKEUP_PIN, ESP_GPIO_WAKEUP_GPIO_HIGH);
             #endif
         }
+        #endif
     }
 
     uint32_t getSecondsToSleep() {
