@@ -60,8 +60,9 @@ ____________________________________________________
 
 ## Timeline (Versions):
 
-- 2025.06.20 Digipeaters now with updated EcoMode (Board Sleeps until packet Rx reducing current consumption to almost 10% at idle).
-- 2025.06.19 DateVersion format Change. Licence changed into GNU GPLv3.
+- 2025-06-20 Digipeaters now with updated EcoMode (Board Sleeps until packet Rx reducing current consumption to almost 10% at idle).
+- 2025-06-20 New Boards Added: Heltec T114 MeshNode, Faketec V3 as Digipeaters and QRP Labs LightGateway Plus 1.0.
+- 2025-06-19 DateVersion format Change. Licence changed into GNU GPLv3.
 - 2025.03.20 Manager List added to enable/disable DigiEcoMode and Tx Control. Thanks LB5JJ.
 - 2025.03.03 T-Beam Supreme board added and more BlackList rules added.
 - 2025.02.28 Heltec Wireless Paper with Epaper working. Thanks SzymonPriv for pointing to the right library.
