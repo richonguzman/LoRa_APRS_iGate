@@ -38,9 +38,13 @@ ____________________________________________________
 
 - T-Deck Plus (and also regular T-Deck with/without GPS).
 
-- HELTEC V2, V3 , Wireless Stick, Wireless Stick Lite, HT-CT62, Wireless Tracker, Wireless Paper.
+- HELTEC V2, V3, V3.2, T114 Wireless Stick, Wireless Stick Lite, HT-CT62, Wireless Tracker, Wireless Paper.
 
-- QRP Labs LightGateway 1.0.
+- RAK Wireless 4631 + 19007(19003)
+
+- Faketec (NRF52840 + Heltec HTRA62(SX1262))
+
+- QRP Labs LightGateway 1.0 and Plus 1.0.
 
 - ESP32 Wroom + SX1278 LoRa Module or Ebyte 400M30S (or 900M30S) 1W LoRa Module for a DIY Versions.
 
@@ -54,7 +58,8 @@ ____________________________________________________
 
 ## Timeline (Versions):
 
-- 2025-04-20000000
+- 2025.06.20 Digipeaters now with updated EcoMode (Board Sleeps until packet Rx reducing current consumption to almost 10% at idle).
+- 2025.06.19 DateVersion format Change. Licence changed into GNU GPLv3.
 - 2025.03.20 Manager List added to enable/disable DigiEcoMode and Tx Control. Thanks LB5JJ.
 - 2025.03.03 T-Beam Supreme board added and more BlackList rules added.
 - 2025.02.28 Heltec Wireless Paper with Epaper working. Thanks SzymonPriv for pointing to the right library.
