@@ -106,6 +106,16 @@ namespace Utils {
         char buffer[30]; // Adjust size as needed
         sprintf(buffer, "Stations (%dmin) = %2d", Config.rememberStationTime, lastHeardStations.size());
         fourthLine = buffer;
+        String activefilter="";
+        int count = 0;
+        for (const auto& station : lastHeardStations) {
+            if(count<8) {
+        activefilter += "f/"+station.station + "/15 ";
+        count++;
+            } 
+        }
+        APRS_IS_Utils::upload("# filter "+activefilter+" "+Config.aprs_is.filter);
+        
     }
 
     void sendInitialTelemetryPackets() {
