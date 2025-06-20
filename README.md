@@ -10,8 +10,9 @@
   
 
 # coming next
-  
+
 * Websocket packet-display/logging of the iGate
 * more useability of the time-offset --> timezones-implementation
+* region-based selection of APRS-IS servers to prevent useless traffic via internet
 
 
