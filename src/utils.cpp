@@ -106,6 +106,7 @@ namespace Utils {
         char buffer[30]; // Adjust size as needed
         sprintf(buffer, "Stations (%dmin) = %2d", Config.rememberStationTime, lastHeardStations.size());
         fourthLine = buffer;
+        if (Config.aprs_is.objectsToRF &&  Config.loramodule.spreadingFactor <= 9) {
         String activefilter="";
         int count = 0;
         for (const auto& station : lastHeardStations) {
@@ -115,7 +116,7 @@ namespace Utils {
             } 
         }
         APRS_IS_Utils::upload("# filter "+activefilter+" "+Config.aprs_is.filter);
-        
+        }
     }
 
     void sendInitialTelemetryPackets() {
