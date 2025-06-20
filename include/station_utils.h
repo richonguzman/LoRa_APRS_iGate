@@ -18,8 +18,7 @@ struct LastHeardStation {
 
 namespace STATION_Utils {
 
-    void loadBlacklist();
-    void loadManagers();
+    void loadBlacklistAndManagers();
     bool isBlacklisted(const String& callsign);
     bool isManager(const String& callsign);
     bool checkObjectTime(const String& packet);
@@ -28,6 +27,7 @@ namespace STATION_Utils {
     bool wasHeard(const String& station);
     void clean25SegBuffer();
     bool check25SegBuffer(const String& station, const String& textMessage);
+    void processOutputPacketBufferUltraEcoMode();
     void processOutputPacketBuffer();
     void addToOutputPacketBuffer(const String& packet);
 

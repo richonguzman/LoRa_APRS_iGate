@@ -2,6 +2,7 @@
 #include "configuration.h"
 #include "aprs_is_utils.h"
 #include "station_utils.h"
+#include "board_pinout.h"
 #include "syslog_utils.h"
 #include "query_utils.h"
 #include "A7670_utils.h"
@@ -27,7 +28,7 @@ uint32_t    lastRxTime      = millis();
 bool        passcodeValid   = false;
 
 #ifdef HAS_A7670
-    extern bool                 stationBeacon;
+    extern bool             stationBeacon;
 #endif
 
 
@@ -59,7 +60,7 @@ namespace APRS_IS_Utils {
             aprsAuth += Config.callsign;
             aprsAuth += " pass ";
             aprsAuth += Config.aprs_is.passcode;
-            aprsAuth += " vers CA2RXU_iGate 2.3 filter ";
+            aprsAuth += " vers CA2RXU_iGate 3.0 filter ";
             aprsAuth += Config.aprs_is.filter;
             upload(aprsAuth);
         }
@@ -70,11 +71,11 @@ namespace APRS_IS_Utils {
         if (WiFi.status() == WL_CONNECTED) {
             wifiState = "OK";
         } else {
-            if (backUpDigiMode || Config.digi.ecoMode) {
+            if (backUpDigiMode || Config.digi.ecoMode == 1 || Config.digi.ecoMode == 2) {
                 wifiState = "--";
             } else {
                 wifiState = "AP";
-            }            
+            }
             if (!Config.display.alwaysOn && Config.display.timeout != 0) {
                 displayToggle(true);
             }
@@ -135,7 +136,7 @@ namespace APRS_IS_Utils {
             ackMessage.concat(packet.substring(packet.indexOf("{") + 1));
             ackMessage.trim();
             //Serial.println(ackMessage);
-            
+
             String addToBuffer = Config.callsign;
             addToBuffer += ">APLRG1";
             if (!thirdParty) addToBuffer += ",RFONLY";

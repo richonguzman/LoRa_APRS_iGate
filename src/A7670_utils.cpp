@@ -129,7 +129,7 @@
                         delayATMessage = 0;
                     } else if (ATMessage.indexOf(Config.callsign) >= 3 && !modemLoggedToAPRSIS && response.indexOf("OK") >= 0 && !stationBeacon) { // login info
                         validAT = true;
-                        delayATMessage = 0;       
+                        delayATMessage = 0;
                     } else if (ATMessage.indexOf(Config.callsign) == 0 && !beaconSended && response.indexOf("OK") >= 0 && !stationBeacon) {   // self beacon or querys
                         validAT = true;
                         i = 1;
@@ -203,4 +203,5 @@
             delay(1);
         }
     }
+    
 #endif

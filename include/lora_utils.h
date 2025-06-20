@@ -8,11 +8,11 @@ namespace LoRa_Utils {
 
     void    setup();
     void    sendNewPacket(const String& newPacket);
-    //String  packetSanitization(const String& packet);
+    String  receivePacketFromSleep();
     String  receivePacket();
     void    changeFreqTx();
     void    changeFreqRx();
-    void    startReceive();
+    void    wakeRadio();
     void    sleepRadio();
 
 }

@@ -17,6 +17,8 @@
     //#define SX126X_DIO2_AS_RF_SWITCH
     //Uncomment if using E22-400M30S
     //#define SX126X_DIO3_TCXO_VOLTAGE 2.2
+    #define RADIO_WAKEUP_PIN        RADIO_DIO1_PIN
+    #define GPIO_WAKEUP_PIN         GPIO_SEL_12
 
     //  Display
     #define HAS_DISPLAY
@@ -31,8 +33,8 @@
 
     //  Aditional Config
     #define INTERNAL_LED_PIN        2
-
     //Uncomment if using INA219
     //#define HAS_INA219
     //#define INA219_ADDR             0x40
+
 #endif

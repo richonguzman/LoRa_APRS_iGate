@@ -44,7 +44,7 @@
         #endif
     #endif
 #endif
-    
+
 extern  Configuration   Config;
 
 bool    displayFound    = false;

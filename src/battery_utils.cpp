@@ -179,7 +179,12 @@ namespace BATTERY_Utils {
                         return (2 * (sampleSum/100) * adcReadingTransformation) + voltageDividerCorrection;  // raw voltage without mapping
                     }
                 #else
-                    return (2 * (sampleSum/100) * adcReadingTransformation) + voltageDividerCorrection;  // raw voltage without mapping
+                    #ifdef LIGHTGATEWAY_PLUS_1_0
+                        double inputDivider = (1.0 / (560.0 + 100.0)) * 100.0;  // The voltage divider is a 560k + 100k resistor in series, 100k on the low side.
+                        return (((sampleSum/100) * adcReadingTransformation) / inputDivider) + 0.41;
+                    #else
+                        return (2 * (sampleSum/100) * adcReadingTransformation) + voltageDividerCorrection;  // raw voltage without mapping
+                    #endif
                 #endif
             #endif
             // return mapVoltage(voltage, 3.34, 4.71, 3.0, 4.2); // mapped voltage
@@ -226,15 +231,6 @@ namespace BATTERY_Utils {
         return extVoltage; // raw voltage without mapping
         #endif
         // return mapVoltage(voltage, 5.05, 6.32, 4.5, 5.5); // mapped voltage
-    }
-
-    void checkIfShouldSleep() {
-        if (lastBatteryCheck == 0 || millis() - lastBatteryCheck >= 15 * 60 * 1000) {
-            lastBatteryCheck = millis();            
-            if (checkInternalVoltage() < Config.lowVoltageCutOff) {
-                ESP.deepSleep(1800000000); // 30 min sleep (60s = 60e6)
-            }
-        }
     }
 
     void startupBatteryHealth() {
@@ -285,9 +281,7 @@ namespace BATTERY_Utils {
         String telemetry = "|";
         telemetry += generateEncodedTelemetryBytes(telemetryCounter, true, 0);
         telemetryCounter++;
-        if (telemetryCounter == 1000) {
-            telemetryCounter = 0;
-        }
+        if (telemetryCounter == 1000) telemetryCounter = 0;
         if (Config.battery.sendInternalVoltage) telemetry += generateEncodedTelemetryBytes(checkInternalVoltage(), false, 0);
         if (Config.battery.sendExternalVoltage) telemetry += generateEncodedTelemetryBytes(checkExternalVoltage(), false, 1);
         telemetry += "|";

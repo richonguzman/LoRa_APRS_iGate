@@ -24,7 +24,7 @@ uint32_t    lastBackupDigiTime  = millis();
 namespace WIFI_Utils {
 
     void checkWiFi() {
-        if (!Config.digi.ecoMode) {
+        if (Config.digi.ecoMode == 0) {
             if (backUpDigiMode) {
                 uint32_t WiFiCheck = millis() - lastBackupDigiTime;
                 if (WiFi.status() != WL_CONNECTED && WiFiCheck >= 15 * 60 * 1000) {
@@ -154,7 +154,7 @@ namespace WIFI_Utils {
     }
 
     void setup() {
-        if (!Config.digi.ecoMode) startWiFi();
+        if (Config.digi.ecoMode == 0) startWiFi();
         btStop();
     }
 

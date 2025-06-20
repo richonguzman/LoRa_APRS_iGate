@@ -13,5 +13,7 @@
     #define RADIO_BUSY_PIN          3
     #define RADIO_RXEN              6
     #define RADIO_TXEN              7
+    #define RADIO_WAKEUP_PIN        RADIO_DIO1_PIN
+    #define GPIO_WAKEUP_PIN         GPIO_NUM_2
 
 #endif

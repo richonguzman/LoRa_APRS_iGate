@@ -24,7 +24,7 @@ String inputSerialBuffer = "";
 namespace TNC_Utils {
     
     void setup() {
-        if (Config.tnc.enableServer && !Config.digi.ecoMode) {
+        if (Config.tnc.enableServer && Config.digi.ecoMode == 0) {
             tncServer.stop();
             tncServer.begin();
         }
@@ -47,7 +47,7 @@ namespace TNC_Utils {
     void handleInputData(char character, int bufferIndex) {
         String* data = (bufferIndex == -1) ? &inputSerialBuffer : &inputServerBuffer[bufferIndex];
         if (data->length() == 0 && character != (char)FEND) return;
-        
+
         data->concat(character);
 
         if (character == (char)FEND && data->length() > 3) {
@@ -128,7 +128,7 @@ namespace TNC_Utils {
     }
 
     void loop() {
-        if (!Config.digi.ecoMode) {
+        if (Config.digi.ecoMode == 0) {
             if (Config.tnc.enableServer) {
                 checkNewClients();
                 readFromClients();
