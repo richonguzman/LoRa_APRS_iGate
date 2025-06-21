@@ -38,6 +38,9 @@ bool transmitFlag    = true;
 #if defined(HAS_LLCC68)         //LLCC68 supports spreading factor only in range of 5-11!
     LLCC68 radio = new Module(RADIO_CS_PIN, RADIO_DIO1_PIN, RADIO_RST_PIN, RADIO_BUSY_PIN);
 #endif
+#if defined(HAS_LR1121)
+    LR1121 radio = new Module(RADIO_CS_PIN, RADIO_DIO1_PIN, RADIO_RST_PIN, RADIO_BUSY_PIN);
+#endif
 
 int rssi, freqError;
 float snr;
@@ -58,28 +61,41 @@ namespace LoRa_Utils {
             SPI.begin(RADIO_SCLK_PIN, RADIO_MISO_PIN, RADIO_MOSI_PIN);
         #endif
         float freq = (float)Config.loramodule.rxFreq / 1000000;
+        float signalBandwidth = Config.loramodule.signalBandwidth/1000;
         #if defined(RADIO_HAS_XTAL)
             radio.XTAL = true;
         #endif
-        int state = radio.begin(freq);
+        #ifdef HAS_LR1121
+            #if defined(V_TCXO)
+                int state = radio.begin(freq, signalBandwidth, Config.loramodule.spreadingFactor, Config.loramodule.codingRate4, 18, 1, 8, V_TCXO);
+            #else
+                int state = radio.begin(freq, signalBandwidth, Config.loramodule.spreadingFactor, Config.loramodule.codingRate4);
+            #endif
+        #else
+            #if defined(V_TCXO) || defined(USE_LDO)
+                int state = radio.begin(freq, signalBandwidth, Config.loramodule.spreadingFactor, Config.loramodule.codingRate4, 18, 1, 8, V_TCXO, USE_LDO);
+            #else
+                int state = radio.begin(freq, signalBandwidth, Config.loramodule.spreadingFactor, Config.loramodule.codingRate4);
+            #endif
+        #endif
         if (state == RADIOLIB_ERR_NONE) {
             Utils::println("Initializing LoRa Module");
         } else {
             Utils::println("Starting LoRa failed! State: " + String(state));
             while (true);
         }
+        radio.setCRC(true);
         #if defined(HAS_SX1262) || defined(HAS_SX1268) || defined(HAS_LLCC68)
             radio.setDio1Action(setFlag);
         #endif
         #if defined(HAS_SX1278) || defined(HAS_SX1276)
             radio.setDio0Action(setFlag, RISING);
         #endif
-        radio.setSpreadingFactor(Config.loramodule.spreadingFactor);
-        float signalBandwidth = Config.loramodule.signalBandwidth/1000;
-        radio.setBandwidth(signalBandwidth);
-        radio.setCodingRate(Config.loramodule.codingRate4);
-        radio.setCRC(true);
-
+        #if defined(HAS_LR1121)
+            radio.setRfSwitchTable(rfswitch_dio_pins, rfswitch_table);
+            radio.setIrqAction(setFlag);
+        #endif
+        
         #if (defined(RADIO_RXEN) && defined(RADIO_TXEN))    // QRP Labs LightGateway has 400M22S (SX1268)
             radio.setRfSwitchPins(RADIO_RXEN, RADIO_TXEN);
         #endif
@@ -96,15 +112,18 @@ namespace LoRa_Utils {
             state = radio.setOutputPower(Config.loramodule.power + 2); // values available: 10, 17, 22 --> if 20 in tracker_conf.json it will be updated to 22.
             radio.setCurrentLimit(140);
         #endif
+        #if defined(HAS_LR1121)
+            state = radio.setOutputPower(Config.loramodule.power); // values available: 10, 17, 22 --> if 20 in tracker_conf.json it will be updated to 22.
+        #endif
 
-        #if defined(HAS_SX1262) || defined(HAS_SX1268) || defined(HAS_LLCC68)
+        #if defined(HAS_SX1262) || defined(HAS_SX1268) || defined(HAS_LLCC68) || defined(HAS_LR1121)
             radio.setRxBoostedGainMode(true);
         #endif
 
         if (state == RADIOLIB_ERR_NONE) {
             Utils::println("init : LoRa Module    ...     done!");
         } else {
-            Utils::println("Starting LoRa failed! State: " + String(state));
+            Utils::println("Setting LoRa failed! State: " + String(state));
             while (true);
         }
     }

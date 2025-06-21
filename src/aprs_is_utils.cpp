@@ -45,7 +45,7 @@ namespace APRS_IS_Utils {
             Serial.println("Didn't connect with server...");
             delay(1000);
             espClient.stop();
-            espClient.flush();
+            espClient.clear();
             Serial.println("Run client.stop");
             Serial.println("Trying to connect with Server: " + String(Config.aprs_is.server) + " AprsServerPort: " + String(Config.aprs_is.port));
             count++;

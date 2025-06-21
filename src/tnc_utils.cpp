@@ -110,7 +110,7 @@ namespace TNC_Utils {
             if (client != nullptr) {
                 if (client->connected()) {
                     client->print(kissEncoded);
-                    client->flush();
+                    client->clear();
                 } else {
                     delete client;
                     clients[i] = nullptr;

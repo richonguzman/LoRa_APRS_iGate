@@ -14,7 +14,7 @@
     #define RADIO_RXEN              32
     #define RADIO_TXEN              25
     #define RADIO_WAKEUP_PIN        RADIO_DIO1_PIN
-    #define GPIO_WAKEUP_PIN         GPIO_SEL_12
+    #define GPIO_WAKEUP_PIN         GPIO_NUM_12
 
     //  Display
     #define HAS_DISPLAY    
