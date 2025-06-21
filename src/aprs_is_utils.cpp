@@ -59,7 +59,7 @@ namespace APRS_IS_Utils {
             aprsAuth += Config.callsign;
             aprsAuth += " pass ";
             aprsAuth += Config.aprs_is.passcode;
-            aprsAuth += " vers CA2RXU_iGate 2.3 filter ";
+            aprsAuth += " vers CA2RXU_iGate 2.3x++ filter ";
             aprsAuth += Config.aprs_is.filter;
             upload(aprsAuth);
         }
@@ -180,6 +180,9 @@ namespace APRS_IS_Utils {
                     const String& Sender = packet.substring(3, packet.indexOf(">"));
                     if (Sender != Config.callsign && Utils::checkValidCallsign(Sender)) {
                         STATION_Utils::updateLastHeard(Sender);
+
+                        STATION_Utils::updateLastHeardLoRa(Sender);
+                        
                         Utils::typeOfPacket(packet.substring(3), 0);  // LoRa-APRS
                         const String& AddresseeAndMessage = packet.substring(packet.indexOf("::") + 2);
                         String Addressee = AddresseeAndMessage.substring(0, AddresseeAndMessage.indexOf(":"));
@@ -231,6 +234,7 @@ namespace APRS_IS_Utils {
                 } else {
                     outputPacket += packet.substring(packet.indexOf(":!"));
                 }
+                outputPacket.replace("APLRG1","APLRG9"); 
                 break;
             case 1: // messages
                 outputPacket += packet.substring(packet.indexOf("::"));
@@ -346,15 +350,13 @@ namespace APRS_IS_Utils {
                 }
             } else if (Config.aprs_is.objectsToRF && packet.indexOf(":=") > 0 && Config.loramodule.spreadingFactor <= 9) {
                 Utils::print("Rx Position (APRS-IS) : " + packet);
-                if (STATION_Utils::checkObjectTime(packet)) {
+               
                     STATION_Utils::addToOutputPacketBuffer(buildPacketToTx(packet, 0));
                     displayToggle(true);
                     lastScreenOn = millis();
                     Utils::typeOfPacket(packet, 1); // APRS-LoRa
                     Serial.println();
-                } else {
-                    Serial.println(" ---> Rejected (Time): No Tx");
-                } 
+                
             }
         }
     }

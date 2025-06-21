@@ -40,6 +40,7 @@ extern bool                 transmitFlag;
 extern bool                 passcodeValid;
 
 extern std::vector<LastHeardStation>    lastHeardStations;
+extern std::vector<LastHeardStation>    lastHeardLoRa;
 
 bool        statusAfterBoot     = true;
 bool        sendStartTelemetry  = true;
@@ -94,7 +95,7 @@ namespace Utils {
         #endif
         Serial.println("\nStarting Station: " + Config.callsign + "   Version: " + versionDate);
         Serial.println((Config.digi.ecoMode) ? "(DigiEcoMode: ON)" : "(DigiEcoMode: OFF)");
-        displayShow(" LoRa APRS", "", "", "   ( iGATE & DIGI )", "", "" , "  CA2RXU  " + versionDate, 4000);
+        displayShow(" LoRa APRS", "", "", "   ( iGATE & DIGI )", "", "" , "CA2RXU++  " + versionDate, 4000);
         #ifdef INTERNAL_LED_PIN
             digitalWrite(INTERNAL_LED_PIN,LOW);
         #endif
@@ -109,7 +110,7 @@ namespace Utils {
         if (Config.aprs_is.objectsToRF &&  Config.loramodule.spreadingFactor <= 9) {
         String activefilter="";
         int count = 0;
-        for (const auto& station : lastHeardStations) {
+        for (const auto& station : lastHeardLoRa) {
             if(count<8) {
         activefilter += "f/"+station.station + "/15 ";
         count++;

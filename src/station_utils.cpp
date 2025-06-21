@@ -20,6 +20,7 @@ std::vector<Packet25SegBuffer>  packet25SegBuffer;
 std::vector<String>             blacklist;
 std::vector<String>             managers;
 std::vector<LastHeardStation>   lastHeardObjects;
+std::vector<LastHeardStation>   lastHeardLoRa;
 
 bool saveNewDigiEcoModeConfig   = false;
 
@@ -111,7 +112,19 @@ namespace STATION_Utils {
         }
         lastHeardStation_temp.clear();
     }
-
+    void deleteNotHeardLoRa() {
+        std::vector<LastHeardStation>  lastHeardStation_temp;
+        for (int i = 0; i < lastHeardLoRa.size(); i++) {
+            if (millis() - lastHeardLoRa[i].lastHeardTime < Config.rememberStationTime * 60 * 1000) {
+                lastHeardStation_temp.push_back(lastHeardLoRa[i]);
+            }
+        }
+        lastHeardLoRa.clear();
+        for (int j = 0; j < lastHeardStation_temp.size(); j++) {
+            lastHeardLoRa.push_back(lastHeardStation_temp[j]);
+        }
+        lastHeardStation_temp.clear();
+    }
     void updateLastHeard(const String& station) {
         deleteNotHeard();
         bool stationHeard = false;
@@ -123,6 +136,19 @@ namespace STATION_Utils {
             }
         }
         if (!stationHeard) lastHeardStations.emplace_back(LastHeardStation{millis(), station});
+        Utils::activeStations();
+    }
+    void updateLastHeardLoRa(const String& station) {
+        deleteNotHeardLoRa();
+        bool stationHeard = false;
+        for (int i = 0; i < lastHeardLoRa.size(); i++) {
+            if (lastHeardLoRa[i].station == station) {
+                lastHeardLoRa[i].lastHeardTime = millis();
+                stationHeard = true;
+                break;
+            }
+        }
+        if (!stationHeard) lastHeardLoRa.emplace_back(LastHeardStation{millis(), station});
         Utils::activeStations();
     }
 

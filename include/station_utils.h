@@ -24,7 +24,9 @@ namespace STATION_Utils {
     bool isManager(const String& callsign);
     bool checkObjectTime(const String& packet);
     void deleteNotHeard();
+    void deleteNotHeardLoRa();
     void updateLastHeard(const String& station);
+    void updateLastHeardLoRa(const String& station);
     bool wasHeard(const String& station);
     void clean25SegBuffer();
     bool check25SegBuffer(const String& station, const String& textMessage);
