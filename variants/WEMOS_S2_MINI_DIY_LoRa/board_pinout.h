@@ -10,7 +10,7 @@
     #define RADIO_RST_PIN           33
     #define RADIO_BUSY_PIN          38
     #define RADIO_WAKEUP_PIN        RADIO_BUSY_PIN
-    #define GPIO_WAKEUP_PIN         GPIO_SEL_38
+    #define GPIO_WAKEUP_PIN         GPIO_NUM_38
 
     //  Aditional Config
     #define INTERNAL_LED_PIN        15
