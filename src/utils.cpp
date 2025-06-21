@@ -434,7 +434,8 @@ namespace Utils {
                 displayToggle(false);
             }
             #ifdef VEXT_CTRL
-                #ifndef HELTEC_WSL_V3
+                #if defined(HELTEC_WSL_V3) || defined(EBYTE_EORA_HUB_400TB)
+                #else
                     digitalWrite(VEXT_CTRL, LOW);
                 #endif
             #endif

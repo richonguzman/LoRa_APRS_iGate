@@ -34,6 +34,8 @@ ____________________________________________________
 
 - TTGO Lilygo LoRa32 T3S3 V1.2 and LoRa32 V2.1 (V1.6 is the same).
 
+- TTGO Lilygo T-ETH-ELITE-POE with LLCC68/SX1262/LR1121 LoRa Shield.
+
 - TTGO T-Beam V1.0 , V1.1, V1.2 (also variations with SX1262 and SX1268 LoRa Modules).
 
 - T-Deck Plus (and also regular T-Deck with/without GPS).
@@ -48,11 +50,15 @@ ____________________________________________________
 
 - Faketec V3 (NRF52840 + Heltec HTRA62 SX1262)
 
+- EBYTE EoRa-HUB-400TB/EoRa-HUB-800TB with LR1121. 
+
 - ESP32 Wroom + SX1278 LoRa Module or Ebyte 400M30S (or 900M30S) 1W LoRa Module for a DIY Versions.
 
 - ESP32C3 + Ebyte 400M30S(or 900M30S) 1W LoRa Module for another DIY version.
 
 - ESP32 + 4G/LTE A7670 Modem + SX1278 DIY Version.
+
+- OLIMEX ESP32-POE-ISO with DL1LMH LoRa Shield.
 
 - Wemos Lolin32 Oled + SX1278 DIY Version.
 
@@ -60,6 +66,7 @@ ____________________________________________________
 
 ## Timeline (Versions):
 
+- 2025-06-21 New Boards Added: EBYTE EoRa-HUB-400TB, Olimex ESP32-POE with DL1LMH LoRa Shield, TTGO T-ETH-ELITE + SX1262 Shield. 
 - 2025-06-20 Digipeaters now with updated EcoMode (Board Sleeps until packet Rx reducing current consumption to almost 10% at idle).
 - 2025-06-20 New Boards Added: Heltec T114 MeshNode, Faketec V3 as Digipeaters and QRP Labs LightGateway Plus 1.0.
 - 2025-06-19 DateVersion format Change. Licence changed into GNU GPLv3.
