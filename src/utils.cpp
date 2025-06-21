@@ -115,7 +115,7 @@ namespace Utils {
         count++;
             } 
         }
-        APRS_IS_Utils::upload("# filter "+activefilter+" "+Config.aprs_is.filter);
+        APRS_IS_Utils::upload("# filter "+activefilter+Config.aprs_is.filter);
         }
     }
 
