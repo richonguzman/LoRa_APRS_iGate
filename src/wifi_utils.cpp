@@ -23,10 +23,11 @@ const uint32_t internetCheckInterval = 5 * 60 * 1000; // 5 minuta
 
 bool isInternetAvailable() {
     HTTPClient http;
-    http.begin("http://clients3.google.com/generate_204");
+    http.setTimeout(3000); // 3-second timeout to avoid blocking for too long
+    http.begin("http://rotate.aprs2.net:14580");
     int httpCode = http.GET();
     http.end();
-    return (httpCode == 204);
+    return (httpCode > 0 && httpCode < 400); // Accepting any 'OK' response
 }
 
 namespace WIFI_Utils {
@@ -34,7 +35,6 @@ namespace WIFI_Utils {
     void checkWiFi() {
         if (Config.digi.ecoMode == 0) {
 
-            // Provjera interneta iako je WiFi povezan
             if (!backUpDigiMode && (WiFi.status() == WL_CONNECTED) && ((millis() - lastInternetCheck) >= internetCheckInterval)) {
                 lastInternetCheck = millis();
                 if (!isInternetAvailable()) {
@@ -80,10 +80,8 @@ namespace WIFI_Utils {
 
     void startAutoAP() {
         WiFi.mode(WIFI_MODE_NULL);
-
         WiFi.mode(WIFI_AP);
         WiFi.softAP(Config.callsign + "-AP", Config.wifiAutoAP.password);
-
         WiFiAutoAPTime = millis();
         WiFiAutoAPStarted = true;
     }
@@ -139,4 +137,43 @@ namespace WIFI_Utils {
         if (WiFi.status() == WL_CONNECTED) {
             Serial.print("Connected as ");
             Serial.print(WiFi.localIP());
-            Serial.print(" / MAC Add
+            Serial.print(" / MAC Address: ");
+            Serial.println(WiFi.macAddress());
+            displayShow("", "     Connected!!", "" , "     loading ...", 1000);
+        } else {
+            startAP = true;
+            Serial.println("\nNot connected to WiFi! Starting Auto AP");
+            displayShow("", " WiFi Not Connected!", "" , "     loading ...", 1000);
+        }
+
+        WiFiConnected = !startAP;
+        if (startAP) {
+            Serial.println("\nNot connected to WiFi! Starting Auto AP");
+            displayShow("", "   Starting Auto AP", " Please connect to it " , "     loading ...", 1000);
+            startAutoAP();
+        }
+    }
+
+    void checkAutoAPTimeout() {
+        if (WiFiAutoAPStarted && Config.wifiAutoAP.timeout > 0) {
+            if (WiFi.softAPgetStationNum() > 0) {
+                WiFiAutoAPTime = 0;
+            } else {
+                if (WiFiAutoAPTime == 0) {
+                    WiFiAutoAPTime = millis();
+                } else if ((millis() - WiFiAutoAPTime) > Config.wifiAutoAP.timeout * 60 * 1000) {
+                    Serial.println("Stopping auto AP");
+                    WiFiAutoAPStarted = false;
+                    WiFi.softAPdisconnect(true);
+                    Serial.println("Auto AP stopped (timeout)");
+                }
+            }
+        }
+    }
+
+    void setup() {
+        if (Config.digi.ecoMode == 0) startWiFi();
+        btStop();
+    }
+
+}
