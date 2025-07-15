@@ -34,7 +34,7 @@
 
 
                        Ricardo Guzman - CA2RXU 
-          https://github.com/richonguzman/LoRa_APRS_Tracker
+           https://github.com/richonguzman/LoRa_APRS_iGate
              (donations : http://paypal.me/richonguzman)
 ___________________________________________________________________*/
 
