@@ -223,9 +223,3 @@ void loop() {
         Utils::checkSleepByLowBatteryVoltage(1);
     }
 }
-
-// ESP32 (and ESPS3) work?
-
-// ESP32C3 : 
-//    -     HT-CT62 sleeps??
-//    -     and others?
