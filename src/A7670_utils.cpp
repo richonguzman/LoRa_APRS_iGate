@@ -39,9 +39,9 @@
 
     bool modemStartUp       = false;
     bool serverStartUp      = false;
-    bool userBytesSended    = false;
-    bool beaconBytesSended  = false;
-    bool beaconSended       = false;
+    bool userBytesSent      = false;
+    bool beaconBytesSent    = false;
+    bool beaconSent         = false;
     bool stationBeacon      = false;
 
     extern bool modemLoggedToAPRSIS;
@@ -148,7 +148,7 @@
                     } else if (ATMessage.indexOf(Config.callsign) >= 3 && !modemLoggedToAPRSIS && response.indexOf("OK") >= 0 && !stationBeacon) { // login info
                         validAT = true;
                         delayATMessage = 0;
-                    } else if (ATMessage.indexOf(Config.callsign) == 0 && !beaconSended && response.indexOf("OK") >= 0 && !stationBeacon) {   // self beacon or querys
+                    } else if (ATMessage.indexOf(Config.callsign) == 0 && !beaconSent && response.indexOf("OK") >= 0 && !stationBeacon) {   // self beacon or querys
                         validAT = true;
                         i = 1;
                         delayATMessage = 0;
@@ -182,10 +182,10 @@
                 displayShow(firstLine, "Connecting APRS-IS...", " ", " ", 0);
                 serverStartUp = checkATResponse("AT+CIPOPEN=0,\"TCP\",\"" + String(Config.aprs_is.server) + "\"," + String(Config.aprs_is.port));
                 delay(2000);
-            } while (!userBytesSended) {
+            } while (!userBytesSent) {
                 Serial.print("Writing User Login Data       ");
                 displayShow(firstLine, "Connecting APRS-IS...", "---> User Login Data", " ", 0);
-                userBytesSended = checkATResponse("AT+CIPSEND=0," + String(loginInfo.length()+1));
+                userBytesSent = checkATResponse("AT+CIPSEND=0," + String(loginInfo.length()+1));
                 delay(2000);
             } while (!modemLoggedToAPRSIS) {
                 Serial.print(".");
@@ -195,19 +195,19 @@
         }
 
         void uploadToAPRSIS(const String& packet) {
-            beaconBytesSended = checkATResponse("AT+CIPSEND=0," + String(packet.length()+1));
+            beaconBytesSent = checkATResponse("AT+CIPSEND=0," + String(packet.length()+1));
             delay(2000);
-            if (beaconBytesSended) {
+            if (beaconBytesSent) {
                 Serial.print(".");
-                beaconSended = checkATResponse(packet);
+                beaconSent = checkATResponse(packet);
             } 
-            if (!beaconSended) {
+            if (!beaconSent) {
                 Serial.println("------------------------------------> UPLOAD FAILED!!!");
             } else {
                 Serial.println("Packet Uploaded to APRS-IS!");
             }
-            beaconBytesSended = false;
-            beaconSended = false;
+            beaconBytesSent = false;
+            beaconSent      = false;
         }
 
         void listenAPRSIS() {
