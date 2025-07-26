@@ -81,7 +81,7 @@ namespace QUERY_Utils {
                         Config.digi.ecoMode         = 0;
                         Config.display.alwaysOn     = true;
                         Config.display.timeout      = 10;
-                        shouldSleepLowVoltage       = true;     // to make sure all packets in outputPacketBuffer are sended before restart.
+                        shouldSleepLowVoltage       = true;     // to make sure all packets in outputPacketBuffer are sent before restart.
                         saveNewDigiEcoModeConfig    = true;
                     } else {
                         answer = "DigiEcoMode was OFF";
@@ -94,7 +94,7 @@ namespace QUERY_Utils {
                     if (Config.digi.ecoMode == 0) {     // Start Digipeater EcoMode
                         answer = "DigiEcoMode:ON";
                         Config.digi.ecoMode         = 1;
-                        shouldSleepLowVoltage       = true;     // to make sure all packets in outputPacketBuffer are sended before restart.
+                        shouldSleepLowVoltage       = true;     // to make sure all packets in outputPacketBuffer are sent before restart.
                         saveNewDigiEcoModeConfig    = true;
                     } else {
                         answer = "DigiEcoMode was ON";
