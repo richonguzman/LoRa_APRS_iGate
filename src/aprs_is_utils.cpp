@@ -136,15 +136,15 @@ namespace APRS_IS_Utils {
     }
 
     String buildPacketToUpload(const String& packet) {
-        String buildedPacket = packet.substring(3, packet.indexOf(":"));
-        if (!(Config.aprs_is.active && Config.digi.mode == 0)) { // Check if NOT only IGate
-            buildedPacket += ",qAR,";
+        String packetToUpload = packet.substring(3, packet.indexOf(":"));
+        if (Config.aprs_is.active && passcodeValid && Config.aprs_is.messagesToRF) {
+            packetToUpload += ",qAR,";
         } else {
-            buildedPacket += ",qAO,";
+            packetToUpload += ",qAO,";
         }
-        buildedPacket += Config.callsign;
-        buildedPacket += checkForStartingBytes(packet.substring(packet.indexOf(":")));
-        return buildedPacket;
+        packetToUpload += Config.callsign;
+        packetToUpload += checkForStartingBytes(packet.substring(packet.indexOf(":")));
+        return packetToUpload;
     }
 
     bool processReceivedLoRaMessage(const String& sender, const String& packet, bool thirdParty) {
