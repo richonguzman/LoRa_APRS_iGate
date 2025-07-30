@@ -224,6 +224,14 @@ namespace WX_Utils {
         }
     }
 
+    float getAltitudeCorrection() {
+        #ifdef HAS_GPS
+            return Config.beacon.gpsActive ? gps.altitude.meters() : Config.wxsensor.heightCorrection;
+        #else
+            return Config.wxsensor.heightCorrection;
+        #endif
+    }
+
     String readDataSensor() {
         switch (wxModuleType) {
             case 1: // BME280
@@ -282,11 +290,7 @@ namespace WX_Utils {
             
             String presStr = (wxModuleType == 4 || wxModuleType == 5) 
                 ? "....." 
-            #ifdef HAS_GPS
-                : generatePresString(newPress + (gps.altitude.meters() / CORRECTION_FACTOR));
-            #else
-                : generatePresString(newPress + (Config.wxsensor.heightCorrection / CORRECTION_FACTOR));
-            #endif
+                : generatePresString(newPress + getAltitudeCorrection() / CORRECTION_FACTOR);
 
             fifthLine = "BME-> ";
             fifthLine += String(int(newTemp + Config.wxsensor.temperatureCorrection));
