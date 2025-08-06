@@ -1,3 +1,21 @@
+/* Copyright (C) 2025 Ricardo Guzman - CA2RXU
+ * 
+ * This file is part of LoRa APRS iGate.
+ * 
+ * LoRa APRS iGate is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or 
+ * (at your option) any later version.
+ * 
+ * LoRa APRS iGate is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with LoRa APRS iGate. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 #include "configuration.h"
 #include "battery_utils.h"
 #include "station_utils.h"
@@ -63,7 +81,7 @@ namespace QUERY_Utils {
                         Config.digi.ecoMode         = 0;
                         Config.display.alwaysOn     = true;
                         Config.display.timeout      = 10;
-                        shouldSleepLowVoltage       = true;     // to make sure all packets in outputPacketBuffer are sended before restart.
+                        shouldSleepLowVoltage       = true;     // to make sure all packets in outputPacketBuffer are sent before restart.
                         saveNewDigiEcoModeConfig    = true;
                     } else {
                         answer = "DigiEcoMode was OFF";
@@ -76,7 +94,7 @@ namespace QUERY_Utils {
                     if (Config.digi.ecoMode == 0) {     // Start Digipeater EcoMode
                         answer = "DigiEcoMode:ON";
                         Config.digi.ecoMode         = 1;
-                        shouldSleepLowVoltage       = true;     // to make sure all packets in outputPacketBuffer are sended before restart.
+                        shouldSleepLowVoltage       = true;     // to make sure all packets in outputPacketBuffer are sent before restart.
                         saveNewDigiEcoModeConfig    = true;
                     } else {
                         answer = "DigiEcoMode was ON";

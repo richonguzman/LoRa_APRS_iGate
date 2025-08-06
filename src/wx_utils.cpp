@@ -1,3 +1,21 @@
+/* Copyright (C) 2025 Ricardo Guzman - CA2RXU
+ * 
+ * This file is part of LoRa APRS iGate.
+ * 
+ * LoRa APRS iGate is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or 
+ * (at your option) any later version.
+ * 
+ * LoRa APRS iGate is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with LoRa APRS iGate. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 #include <TinyGPS++.h>
 #ifdef LIGHTGATEWAY_PLUS_1_0
 #include "Adafruit_SHTC3.h"
@@ -206,6 +224,14 @@ namespace WX_Utils {
         }
     }
 
+    float getAltitudeCorrection() {
+        #ifdef HAS_GPS
+            return Config.beacon.gpsActive ? gps.altitude.meters() : Config.wxsensor.heightCorrection;
+        #else
+            return Config.wxsensor.heightCorrection;
+        #endif
+    }
+
     String readDataSensor() {
         switch (wxModuleType) {
             case 1: // BME280
@@ -264,11 +290,7 @@ namespace WX_Utils {
             
             String presStr = (wxModuleType == 4 || wxModuleType == 5) 
                 ? "....." 
-            #ifdef HAS_GPS
-                : generatePresString(newPress + (gps.altitude.meters() / CORRECTION_FACTOR));
-            #else
-                : generatePresString(newPress + (Config.wxsensor.heightCorrection / CORRECTION_FACTOR));
-            #endif
+                : generatePresString(newPress + getAltitudeCorrection() / CORRECTION_FACTOR);
 
             fifthLine = "BME-> ";
             fifthLine += String(int(newTemp + Config.wxsensor.temperatureCorrection));

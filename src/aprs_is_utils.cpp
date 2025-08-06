@@ -1,3 +1,21 @@
+/* Copyright (C) 2025 Ricardo Guzman - CA2RXU
+ * 
+ * This file is part of LoRa APRS iGate.
+ * 
+ * LoRa APRS iGate is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or 
+ * (at your option) any later version.
+ * 
+ * LoRa APRS iGate is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with LoRa APRS iGate. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 #include <WiFi.h>
 #include "configuration.h"
 #include "aprs_is_utils.h"
@@ -118,15 +136,15 @@ namespace APRS_IS_Utils {
     }
 
     String buildPacketToUpload(const String& packet) {
-        String buildedPacket = packet.substring(3, packet.indexOf(":"));
-        if (!(Config.aprs_is.active && Config.digi.mode == 0)) { // Check if NOT only IGate
-            buildedPacket += ",qAR,";
+        String packetToUpload = packet.substring(3, packet.indexOf(":"));
+        if (Config.aprs_is.active && passcodeValid && Config.aprs_is.messagesToRF) {
+            packetToUpload += ",qAR,";
         } else {
-            buildedPacket += ",qAO,";
+            packetToUpload += ",qAO,";
         }
-        buildedPacket += Config.callsign;
-        buildedPacket += checkForStartingBytes(packet.substring(packet.indexOf(":")));
-        return buildedPacket;
+        packetToUpload += Config.callsign;
+        packetToUpload += checkForStartingBytes(packet.substring(packet.indexOf(":")));
+        return packetToUpload;
     }
 
     bool processReceivedLoRaMessage(const String& sender, const String& packet, bool thirdParty) {

@@ -1,3 +1,21 @@
+/* Copyright (C) 2025 Ricardo Guzman - CA2RXU
+ * 
+ * This file is part of LoRa APRS iGate.
+ * 
+ * LoRa APRS iGate is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or 
+ * (at your option) any later version.
+ * 
+ * LoRa APRS iGate is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with LoRa APRS iGate. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 /*___________________________________________________________________
 
 ██╗      ██████╗ ██████╗  █████╗      █████╗ ██████╗ ██████╗ ███████╗
@@ -16,7 +34,7 @@
 
 
                        Ricardo Guzman - CA2RXU 
-          https://github.com/richonguzman/LoRa_APRS_Tracker
+           https://github.com/richonguzman/LoRa_APRS_iGate
              (donations : http://paypal.me/richonguzman)
 ___________________________________________________________________*/
 
@@ -48,7 +66,7 @@ ___________________________________________________________________*/
 #endif
 
 
-String              versionDate             = "2025-06-20";
+String              versionDate             = "2025-08-04";
 Configuration       Config;
 WiFiClient          espClient;
 #ifdef HAS_GPS
@@ -205,9 +223,3 @@ void loop() {
         Utils::checkSleepByLowBatteryVoltage(1);
     }
 }
-
-// ESP32 (and ESPS3) work?
-
-// ESP32C3 : 
-//    -     HT-CT62 sleeps??
-//    -     and others?
