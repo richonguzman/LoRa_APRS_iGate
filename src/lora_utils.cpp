@@ -92,6 +92,14 @@ namespace LoRa_Utils {
         #if defined(HAS_SX1278) || defined(HAS_SX1276)
             radio.setDio0Action(setFlag, RISING);
         #endif
+        #ifdef SX126X_DIO3_TCXO_VOLTAGE
+            if (radio.setTCXO(float(SX126X_DIO3_TCXO_VOLTAGE)) == RADIOLIB_ERR_NONE) {
+                Utils::println("Set LoRa Module TCXO Voltage to:" + String(SX126X_DIO3_TCXO_VOLTAGE));
+            } else {
+                Utils::println("Set LoRa Module TCXO Voltage failed! State: " + String(state));
+                while (true);
+        }
+        #endif
         radio.setSpreadingFactor(Config.loramodule.spreadingFactor);
         float signalBandwidth = Config.loramodule.signalBandwidth/1000;
         radio.setBandwidth(signalBandwidth);
@@ -99,8 +107,13 @@ namespace LoRa_Utils {
         radio.setCRC(true);
 
         #if (defined(RADIO_RXEN) && defined(RADIO_TXEN))    // QRP Labs LightGateway has 400M22S (SX1268)
-            radio.setRfSwitchPins(RADIO_RXEN, RADIO_TXEN);
+        radio.setRfSwitchPins(RADIO_RXEN, RADIO_TXEN);
         #endif
+        #ifdef SX126X_DIO2_AS_RF_SWITCH
+        radio.setRfSwitchPins(RADIO_RXEN, RADIOLIB_NC);
+        radio.setDio2AsRfSwitch(true);
+        #endif
+        
 
         #ifdef HAS_1W_LORA  // Ebyte E22 400M30S (SX1268) / 900M30S (SX1262) / Ebyte E220 400M30S (LLCC68)
             state = radio.setOutputPower(Config.loramodule.power); // max value 20dB for 1W modules as they have Low Noise Amp
