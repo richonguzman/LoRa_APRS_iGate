@@ -148,7 +148,7 @@ namespace BATTERY_Utils {
                 #endif
             #endif
 
-            for (int i = 0; i < 100; i++) {
+            for (int i = 0; i < 20; i++) {
                 #if defined(ESP32_DIY_LoRa) || defined(ESP32_DIY_LoRa_915) || defined(ESP32_DIY_1W_LoRa) || defined(ESP32_DIY_1W_LoRa_915)
                     sample = 0;
                     break;
@@ -169,7 +169,7 @@ namespace BATTERY_Utils {
                     #endif
                 #endif
                 sampleSum += sample;
-                delayMicroseconds(50); 
+                delay(3); 
             }
 
             #ifdef ADC_CTRL
