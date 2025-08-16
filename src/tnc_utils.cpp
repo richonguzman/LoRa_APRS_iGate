@@ -22,6 +22,7 @@
 #include "kiss_protocol.h"
 #include "kiss_utils.h"
 #include "utils.h"
+#include "ESPmDNS.h"
 
 
 extern Configuration        Config;
@@ -45,6 +46,8 @@ namespace TNC_Utils {
         if (Config.tnc.enableServer && Config.digi.ecoMode == 0) {
             tncServer.stop();
             tncServer.begin();
+            MDNS.begin("kiss-tnc");
+            MDNS.addService("kiss-tnc", "tcp", TNC_PORT);
         }
     }
 
