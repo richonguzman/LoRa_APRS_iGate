@@ -79,15 +79,15 @@ namespace Utils {
         }
         if (WiFi.status() == WL_CONNECTED && Config.aprs_is.active && Config.beacon.sendViaAPRSIS) {
             delay(1000);
-            status.concat(",qAC:>https://github.com/richonguzman/LoRa_APRS_iGate ");
-            status.concat(versionDate);
+            status.concat(",qAC:>");
+            status.concat(Config.beacon.statusPacket);
             APRS_IS_Utils::upload(status);
-            SYSLOG_Utils::log(2, status, 0, 0.0, 0);   // APRSIS TX
+            SYSLOG_Utils::log(2, status, 0, 0.0, 0);   // APRSIS TX 
             statusAfterBoot = false;
         }
         if (statusAfterBoot && !Config.beacon.sendViaAPRSIS && Config.beacon.sendViaRF) {
-            status.concat(":>https://github.com/richonguzman/LoRa_APRS_iGate ");
-            status.concat(versionDate);
+            status.concat(":>");
+            status.concat(Config.beacon.statusPacket);
             STATION_Utils::addToOutputPacketBuffer(status);
             statusAfterBoot = false;
         }
@@ -337,7 +337,7 @@ namespace Utils {
             beaconUpdate = false;
         }
 
-        if (statusAfterBoot) {
+        if (statusAfterBoot && Config.beacon.statusActive && !Config.beacon.statusPacket.isEmpty()) {
             processStatus();
         }
     }

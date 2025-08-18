@@ -49,6 +49,8 @@ public:
     bool    sendViaAPRSIS;
     bool    gpsActive;
     bool    gpsAmbiguity;
+    bool    statusActive;
+    String  statusPacket;
 };
 
 class APRS_IS {

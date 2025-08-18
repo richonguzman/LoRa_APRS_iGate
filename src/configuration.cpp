@@ -62,6 +62,9 @@ void Configuration::writeFile() {
     data["beacon"]["sendViaRF"]                 = beacon.sendViaRF;
     data["beacon"]["path"]                      = beacon.path;
 
+    data["beacon"]["statusActive"]              = beacon.statusActive;
+    data["beacon"]["statusPacket"]              = beacon.statusPacket;
+
     data["beacon"]["gpsActive"]                 = beacon.gpsActive;
     data["beacon"]["gpsAmbiguity"]              = beacon.gpsAmbiguity;
 
@@ -177,6 +180,9 @@ bool Configuration::readFile() {
         beacon.path                     = data["beacon"]["path"] | "WIDE1-1";
         beacon.sendViaAPRSIS            = data["beacon"]["sendViaAPRSIS"] | false;
         beacon.sendViaRF                = data["beacon"]["sendViaRF"] | false;
+
+        beacon.statusActive             = data["beacon"]["statusActive"] | false;
+        beacon.statusPacket             = data["beacon"]["statusPacket"] | "";
 
         beacon.gpsActive                = data["beacon"]["gpsActive"] | false;
         beacon.gpsAmbiguity             = data["beacon"]["gpsAmbiguity"] | false;
@@ -294,6 +300,9 @@ void Configuration::init() {
     beacon.sendViaAPRSIS            = true;
     beacon.sendViaRF                = false;
     beacon.path                     = "WIDE1-1";
+
+    beacon.statusActive             = false;
+    beacon.statusPacket             = "";
 
     beacon.gpsActive                = false;
     beacon.gpsAmbiguity             = false;

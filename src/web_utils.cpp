@@ -129,19 +129,19 @@ namespace WEB_Utils {
             Config.wifiAPs.push_back(wifiap);
         }
 
-        Config.callsign                 = request->getParam("callsign", true)->value();
+        Config.callsign                     = request->getParam("callsign", true)->value();
 
-        Config.wifiAutoAP.password      = request->getParam("wifi.autoAP.password", true)->value();
-        Config.wifiAutoAP.timeout       = request->getParam("wifi.autoAP.timeout", true)->value().toInt();
+        Config.wifiAutoAP.password          = request->getParam("wifi.autoAP.password", true)->value();
+        Config.wifiAutoAP.timeout           = request->getParam("wifi.autoAP.timeout", true)->value().toInt();
 
 
-        Config.aprs_is.active           = request->hasParam("aprs_is.active", true);
-        Config.aprs_is.passcode         = request->getParam("aprs_is.passcode", true)->value();
-        Config.aprs_is.server           = request->getParam("aprs_is.server", true)->value();
-        Config.aprs_is.port             = request->getParam("aprs_is.port", true)->value().toInt();
-        Config.aprs_is.filter           = request->getParam("aprs_is.filter", true)->value();
-        Config.aprs_is.messagesToRF     = request->hasParam("aprs_is.messagesToRF", true);
-        Config.aprs_is.objectsToRF      = request->hasParam("aprs_is.objectsToRF", true);
+        Config.aprs_is.active               = request->hasParam("aprs_is.active", true);
+        Config.aprs_is.passcode             = request->getParam("aprs_is.passcode", true)->value();
+        Config.aprs_is.server               = request->getParam("aprs_is.server", true)->value();
+        Config.aprs_is.port                 = request->getParam("aprs_is.port", true)->value().toInt();
+        Config.aprs_is.filter               = request->getParam("aprs_is.filter", true)->value();
+        Config.aprs_is.messagesToRF         = request->hasParam("aprs_is.messagesToRF", true);
+        Config.aprs_is.objectsToRF          = request->hasParam("aprs_is.objectsToRF", true);
 
 
         Config.beacon.interval              = request->getParam("beacon.interval", true)->value().toInt();
@@ -153,6 +153,9 @@ namespace WEB_Utils {
         Config.beacon.overlay               = request->getParam("beacon.overlay", true)->value();
         Config.beacon.symbol                = request->getParam("beacon.symbol", true)->value();
         Config.beacon.path                  = request->getParam("beacon.path", true)->value();
+
+        Config.beacon.statusActive          = request->hasParam("beacon.statusActive", true);
+        Config.beacon.statusPacket          = request->getParam("beacon.statusPacket", true)->value();
 
         Config.beacon.gpsActive             = request->hasParam("beacon.gpsActive", true);
         Config.beacon.gpsAmbiguity          = request->hasParam("beacon.gpsAmbiguity", true);
