@@ -134,6 +134,9 @@ function loadSettings(settings) {
     document.getElementById("beacon.sendViaAPRSIS").checked             = settings.beacon.sendViaAPRSIS;
     document.getElementById("beacon.sendViaRF").checked                 = settings.beacon.sendViaRF;
 
+    document.getElementById("beacon.statusActive").checked              = settings.beacon.statusActive;
+    document.getElementById("beacon.statusPacket").value                = settings.beacon.statusPacket;
+
     document.getElementById("beacon.gpsActive").checked                 = settings.beacon.gpsActive;
     document.getElementById("beacon.gpsAmbiguity").checked              = settings.beacon.gpsAmbiguity;
 
