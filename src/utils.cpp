@@ -323,7 +323,7 @@ namespace Utils {
                 #else
                     APRS_IS_Utils::upload(beaconPacket);
                 #endif
-                if (Config.syslog.logBeaconOverTCPIP) SYSLOG_Utils::log(2, beaconPacket, 0, 0.0, 0);   // APRSIS TX
+                if (Config.syslog.logBeaconOverTCPIP) SYSLOG_Utils::log(1, "tcp" + beaconPacket, 0, 0.0, 0);   // APRSIS TX
             }
 
             if (Config.beacon.sendViaRF || backUpDigiMode) {
