@@ -204,10 +204,11 @@ namespace WEB_Utils {
             Config.beacon.symbol = "_";
         }
 
-        Config.syslog.active                = request->hasParam("syslog.active", true);
+        Config.syslog.active                    = request->hasParam("syslog.active", true);
         if (Config.syslog.active) {
-            Config.syslog.server            = request->getParam("syslog.server", true)->value();
-            Config.syslog.port              = request->getParam("syslog.port", true)->value().toInt();
+            Config.syslog.server                = request->getParam("syslog.server", true)->value();
+            Config.syslog.port                  = request->getParam("syslog.port", true)->value().toInt();
+            Config.syslog.logBeaconOverTCPIP    = request->hasParam("syslog.logBeaconOverTCPIP", true);
         }
 
         Config.tnc.enableServer             = request->hasParam("tnc.enableServer", true);

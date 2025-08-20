@@ -107,6 +107,7 @@ void Configuration::writeFile() {
     data["syslog"]["active"]                    = syslog.active;
     data["syslog"]["server"]                    = syslog.server;
     data["syslog"]["port"]                      = syslog.port;
+    data["syslog"]["logBeaconOverTCPIP"]        = syslog.logBeaconOverTCPIP;
 
     data["tnc"]["enableServer"]                 = tnc.enableServer;
     data["tnc"]["enableSerial"]                 = tnc.enableSerial;
@@ -236,7 +237,8 @@ bool Configuration::readFile() {
         syslog.active                   = data["syslog"]["active"] | false;
         syslog.server                   = data["syslog"]["server"] | "lora.link9.net";
         syslog.port                     = data["syslog"]["port"] | 1514;
-
+        syslog.logBeaconOverTCPIP       = data["syslog"]["logBeaconOverTCPIP"] | false;
+        
         tnc.enableServer                = data["tnc"]["enableServer"] | false;
         tnc.enableSerial                = data["tnc"]["enableSerial"] | false;
         tnc.acceptOwn                   = data["tnc"]["acceptOwn"] | false;
@@ -338,6 +340,7 @@ void Configuration::init() {
     syslog.active                   = false;
     syslog.server                   = "lora.link9.net";
     syslog.port                     = 1514;
+    syslog.logBeaconOverTCPIP       = false;
 
     wxsensor.active                 = false;
     wxsensor.heightCorrection       = 0;

@@ -115,6 +115,7 @@ public:
     bool    active;
     String  server;
     int     port;
+    bool    logBeaconOverTCPIP;
 };
 
 class TNC {

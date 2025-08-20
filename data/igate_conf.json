@@ -68,7 +68,8 @@
     "syslog": {
         "active": false,
         "server": "lora.link9.net",
-        "port": 1514
+        "port": 1514,
+        "logBeaconOverTCPIP": false
     },
     "tnc": {
         "enableServer": false,

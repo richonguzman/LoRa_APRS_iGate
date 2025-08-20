@@ -62,13 +62,15 @@ alwaysOnCheckbox.addEventListener("change", function () {
 //     alwaysOnCheckbox.disabled = this.value !== "";
 // });
 
-const logCheckbox = document.querySelector('input[name="syslog.active"]');
-const serverField = document.querySelector('input[name="syslog.server"]');
-const portField = document.querySelector('input[name="syslog.port"]');
+const logCheckbox               = document.querySelector('input[name="syslog.active"]');
+const serverField               = document.querySelector('input[name="syslog.server"]');
+const portField                 = document.querySelector('input[name="syslog.port"]');
+const logBeaconOverTCPIPField   = document.querySelector('input[name="syslog.logBeaconOverTCPIP"]');
 
 logCheckbox.addEventListener("change", function () {
-    serverField.disabled = !this.checked;
-    portField.disabled = !this.checked;
+    serverField.disabled                = !this.checked;
+    portField.disabled                  = !this.checked;
+    logBeaconOverTCPIPField.disabled    = !this.checked
 });
 
 function loadSettings(settings) {
@@ -187,10 +189,12 @@ function loadSettings(settings) {
     document.getElementById("syslog.active").checked                    = settings.syslog.active;
     document.getElementById("syslog.server").value                      = settings.syslog.server;
     document.getElementById("syslog.port").value                        = settings.syslog.port;
+    document.getElementById("syslog.logBeaconOverTCPIP").checked        = settings.syslog.logBeaconOverTCPIP;
 
     if (settings.syslog.active) {
-        serverField.disabled = false;
-        portField.disabled = false;
+        serverField.disabled                = false;
+        portField.disabled                  = false;
+        logBeaconOverTCPIPField.disabled    = false;
     }
 
     // TNC
