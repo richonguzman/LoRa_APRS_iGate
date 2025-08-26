@@ -18,6 +18,7 @@
 
 #include <TinyGPS++.h>
 #include <WiFi.h>
+#include "telemetry_utils.h"
 #include "configuration.h"
 #include "station_utils.h"
 #include "battery_utils.h"
@@ -133,77 +134,6 @@ namespace Utils {
         fourthLine = buffer;
     }
 
-    void sendInitialTelemetryPackets() {
-        char sender[10];                                                    // 9 characters + null terminator
-        snprintf(sender, sizeof(sender), "%-9s", Config.callsign.c_str());  // Left-align with spaces
-
-        String baseAPRSISTelemetryPacket = Config.callsign;
-        baseAPRSISTelemetryPacket += ">APLRG1,TCPIP,qAC::";
-        baseAPRSISTelemetryPacket += sender;
-        baseAPRSISTelemetryPacket += ":";
-
-        String baseRFTelemetryPacket = Config.callsign;
-        baseRFTelemetryPacket += ">APLRG1";
-        if (Config.beacon.path.indexOf("WIDE") != -1) {
-            baseRFTelemetryPacket += ",";
-            baseRFTelemetryPacket += Config.beacon.path;
-        }
-        baseRFTelemetryPacket += "::";
-        baseRFTelemetryPacket += sender;
-        baseRFTelemetryPacket += ":";
-
-        String telemetryPacket1 = "EQNS.";
-        if (Config.battery.sendInternalVoltage) {
-            telemetryPacket1 += "0,0.01,0";
-        }
-        if (Config.battery.sendExternalVoltage) {
-            telemetryPacket1 += String(Config.battery.sendInternalVoltage ? ",0,0.02,0" : "0,0.02,0");
-        }
-
-        String telemetryPacket2 = "UNIT.";
-        if (Config.battery.sendInternalVoltage) {
-            telemetryPacket2 += "VDC";
-        }
-        if (Config.battery.sendExternalVoltage) {
-            telemetryPacket2 += String(Config.battery.sendInternalVoltage ? ",VDC" : "VDC");
-        }
-
-        String telemetryPacket3 = "PARM.";
-        if (Config.battery.sendInternalVoltage) {
-            telemetryPacket3 += "V_Batt";
-        }
-        if (Config.battery.sendExternalVoltage) {
-            telemetryPacket3 += String(Config.battery.sendInternalVoltage ? ",V_Ext" : "V_Ext");
-        }
-
-        if (Config.beacon.sendViaAPRSIS) {
-            #ifdef HAS_A7670
-                A7670_Utils::uploadToAPRSIS(baseAPRSISTelemetryPacket + telemetryPacket1);
-                delay(300);
-                A7670_Utils::uploadToAPRSIS(baseAPRSISTelemetryPacket + telemetryPacket2);
-                delay(300);
-                A7670_Utils::uploadToAPRSIS(baseAPRSISTelemetryPacket + telemetryPacket3);
-                delay(300);
-            #else
-                APRS_IS_Utils::upload(baseAPRSISTelemetryPacket + telemetryPacket1);
-                delay(300);
-                APRS_IS_Utils::upload(baseAPRSISTelemetryPacket + telemetryPacket2);
-                delay(300);
-                APRS_IS_Utils::upload(baseAPRSISTelemetryPacket + telemetryPacket3);
-                delay(300);
-            #endif
-            delay(300);
-        } else if (Config.beacon.sendViaRF) {
-            LoRa_Utils::sendNewPacket(baseRFTelemetryPacket + telemetryPacket1);
-            delay(3000);
-            LoRa_Utils::sendNewPacket(baseRFTelemetryPacket + telemetryPacket2);
-            delay(3000);
-            LoRa_Utils::sendNewPacket(baseRFTelemetryPacket + telemetryPacket3);
-            delay(3000);
-        }
-        sendStartTelemetry = false;
-    }
-
     void checkBeaconInterval() {
         uint32_t lastTx = millis() - lastBeaconTx;
         if (lastBeaconTx == 0 || lastTx >= Config.beacon.interval * 60 * 1000) {
@@ -225,7 +155,7 @@ namespace Utils {
                 !Config.wxsensor.active && 
                 (Config.battery.sendInternalVoltage || Config.battery.sendExternalVoltage) &&
                 (lastBeaconTx > 0)) {
-                sendInitialTelemetryPackets();
+                TELEMETRY_Utils::sendEquationsUnitsParameters();
             }
 
             STATION_Utils::deleteNotHeard();
@@ -309,7 +239,7 @@ namespace Utils {
             #endif
 
             if (Config.battery.sendVoltageAsTelemetry && !Config.wxsensor.active && (Config.battery.sendInternalVoltage || Config.battery.sendExternalVoltage)){
-                String encodedTelemetry = BATTERY_Utils::generateEncodedTelemetry();
+                String encodedTelemetry = TELEMETRY_Utils::generateEncodedTelemetry();
                 beaconPacket += encodedTelemetry;
                 secondaryBeaconPacket += encodedTelemetry;
             }

@@ -16,22 +16,18 @@
  * along with LoRa APRS iGate. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef BATTERY_UTILS_H_
-#define BATTERY_UTILS_H_
+#ifndef TELEMETRY_UTILS_H_
+#define TELEMETRY_UTILS_H_
 
 #include <Arduino.h>
 
 
-namespace BATTERY_Utils {
+namespace TELEMETRY_Utils {
 
-    void    adcCalibration();
-    void    adcCalibrationCheck();
-
-    void    setup();
-    float   checkInternalVoltage();
-    float   checkExternalVoltage();
-    void    startupBatteryHealth();
-
+    void    sendEquationsUnitsParameters();
+    String  generateEncodedTelemetryBytes(float value, bool counterBytes, byte telemetryType);
+    String  generateEncodedTelemetry();
+    
 }
 
 #endif
