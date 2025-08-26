@@ -31,6 +31,7 @@
 
 extern Configuration        Config;
 extern WiFiClient           espClient;
+extern QueueHandle_t        aprsIsRxQueue;
 extern uint32_t             lastScreenOn;
 extern String               firstLine;
 extern String               secondLine;
@@ -51,6 +52,9 @@ bool        passcodeValid   = false;
 
 
 namespace APRS_IS_Utils {
+
+    // Handle del task (opcional, para poder controlarlo después)
+    TaskHandle_t aprsisTaskHandle = NULL;
 
     void upload(const String& line) {
         espClient.print(line + "\r\n");
@@ -274,94 +278,102 @@ namespace APRS_IS_Utils {
         return outputPacket;
     }
 
-    void processAPRSISPacket(const String& packet) {
-        if (!passcodeValid && packet.indexOf(Config.callsign) != -1) {
-            if (packet.indexOf("unverified") != -1 ) {
-                Serial.println("\n****APRS PASSCODE NOT VALID****\n");
-                displayShow(firstLine, "", "    APRS PASSCODE", "    NOT VALID !!!", "", "", "", 0);
-                while (1) {};
-            } else if (packet.indexOf("verified") != -1 ) {
-                passcodeValid = true;
-            }
-        }
-        if (passcodeValid && !packet.startsWith("#")) {
-            if (Config.aprs_is.messagesToRF && packet.indexOf("::") > 0) {
-                String Sender = packet.substring(0, packet.indexOf(">"));
-                const String& AddresseeAndMessage = packet.substring(packet.indexOf("::") + 2);
-                String Addressee = AddresseeAndMessage.substring(0, AddresseeAndMessage.indexOf(":"));
-                Addressee.trim();
-                if (Addressee == Config.callsign) {                 // its for me!
-                    String receivedMessage;
-                    if (AddresseeAndMessage.indexOf("{") > 0) {     // ack?
-                        String ackMessage = "ack";
-                        ackMessage += AddresseeAndMessage.substring(AddresseeAndMessage.indexOf("{") + 1);
-                        ackMessage.trim();
-                        delay(4000);
-                        for (int i = Sender.length(); i < 9; i++) {
-                            Sender += ' ';
-                        }
+    //uint32_t lastLog = 0;
+    void processAPRSISPacket() {
+        /*Serial.println("processAPRSISPacket");
 
-                        String ackPacket = Config.callsign;
-                        ackPacket += ">APLRG1,TCPIP,qAC::";
-                        ackPacket += Sender;
-                        ackPacket += ":";
-                        ackPacket += ackMessage;
-                        #ifdef HAS_A7670
-                            A7670_Utils::uploadToAPRSIS(ackPacket);
-                        #else
-                            upload(ackPacket);
-                        #endif
-                        receivedMessage = AddresseeAndMessage.substring(AddresseeAndMessage.indexOf(":") + 1, AddresseeAndMessage.indexOf("{"));
+        if (millis() - lastLog > 5000) {  // Cada 5 segundos
+            UBaseType_t packets     = uxQueueMessagesWaiting(aprsIsRxQueue);
+            UBaseType_t spaces      = uxQueueSpacesAvailable(aprsIsRxQueue);
+            Serial.printf("[STATS] APRSIS Queue: %d/%d (%.1f%% full)\n", 
+                        packets, packets + spaces, 
+                        (packets * 100.0) / (packets + spaces));
+            lastLog = millis();
+        }*/
+
+
+        String packet;
+        if (xQueueReceive(aprsIsRxQueue, &packet, 0) == pdTRUE) {
+            
+            if (passcodeValid && !packet.startsWith("#")) {
+                if (Config.aprs_is.messagesToRF && packet.indexOf("::") > 0) {
+                    String Sender = packet.substring(0, packet.indexOf(">"));
+                    const String& AddresseeAndMessage = packet.substring(packet.indexOf("::") + 2);
+                    String Addressee = AddresseeAndMessage.substring(0, AddresseeAndMessage.indexOf(":"));
+                    Addressee.trim();
+                    if (Addressee == Config.callsign) {                 // its for me!
+                        String receivedMessage;
+                        if (AddresseeAndMessage.indexOf("{") > 0) {     // ack?
+                            String ackMessage = "ack";
+                            ackMessage += AddresseeAndMessage.substring(AddresseeAndMessage.indexOf("{") + 1);
+                            ackMessage.trim();
+                            delay(4000);
+                            for (int i = Sender.length(); i < 9; i++) {
+                                Sender += ' ';
+                            }
+
+                            String ackPacket = Config.callsign;
+                            ackPacket += ">APLRG1,TCPIP,qAC::";
+                            ackPacket += Sender;
+                            ackPacket += ":";
+                            ackPacket += ackMessage;
+                            #ifdef HAS_A7670
+                                A7670_Utils::uploadToAPRSIS(ackPacket);
+                            #else
+                                upload(ackPacket);
+                            #endif
+                            receivedMessage = AddresseeAndMessage.substring(AddresseeAndMessage.indexOf(":") + 1, AddresseeAndMessage.indexOf("{"));
+                        } else {
+                            receivedMessage = AddresseeAndMessage.substring(AddresseeAndMessage.indexOf(":") + 1);
+                        }
+                        if (receivedMessage.indexOf("?") == 0) {
+                            Utils::println("Rx Query (APRS-IS)  : " + packet);
+                            Sender.trim();
+                            String queryAnswer = QUERY_Utils::process(receivedMessage, Sender, true, false);
+                            //Serial.println("---> QUERY Answer : " + queryAnswer.substring(0,queryAnswer.indexOf("\n")));
+                            if (!Config.display.alwaysOn && Config.display.timeout != 0) {
+                                displayToggle(true);
+                            }
+                            lastScreenOn = millis();
+                            delay(500);
+                            #ifdef HAS_A7670
+                                A7670_Utils::uploadToAPRSIS(queryAnswer);
+                            #else
+                                upload(queryAnswer);
+                            #endif
+                            SYSLOG_Utils::log(2, queryAnswer, 0, 0.0, 0); // APRSIS TX
+                            fifthLine = "APRS-IS ----> APRS-IS";
+                            sixthLine = Config.callsign;
+                            for (int j = sixthLine.length();j < 9;j++) {
+                                sixthLine += " ";
+                            }
+                            sixthLine += "> ";
+                            sixthLine += Sender;
+                            seventhLine = "QUERY = ";
+                            seventhLine += receivedMessage;
+                        }
+                        displayShow(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
                     } else {
-                        receivedMessage = AddresseeAndMessage.substring(AddresseeAndMessage.indexOf(":") + 1);
-                    }
-                    if (receivedMessage.indexOf("?") == 0) {
-                        Utils::println("Rx Query (APRS-IS)  : " + packet);
-                        Sender.trim();
-                        String queryAnswer = QUERY_Utils::process(receivedMessage, Sender, true, false);
-                        //Serial.println("---> QUERY Answer : " + queryAnswer.substring(0,queryAnswer.indexOf("\n")));
-                        if (!Config.display.alwaysOn && Config.display.timeout != 0) {
+                        Utils::print("Rx Message (APRS-IS): " + packet);
+                        if (STATION_Utils::wasHeard(Addressee) && packet.indexOf("EQNS.") == -1 && packet.indexOf("UNIT.") == -1 && packet.indexOf("PARM.") == -1) {
+                            STATION_Utils::addToOutputPacketBuffer(buildPacketToTx(packet, 1));
                             displayToggle(true);
+                            lastScreenOn = millis();
+                            Utils::typeOfPacket(packet, 1); // APRS-LoRa
+                            displayShow(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
                         }
-                        lastScreenOn = millis();
-                        delay(500);
-                        #ifdef HAS_A7670
-                            A7670_Utils::uploadToAPRSIS(queryAnswer);
-                        #else
-                            upload(queryAnswer);
-                        #endif
-                        SYSLOG_Utils::log(2, queryAnswer, 0, 0.0, 0); // APRSIS TX
-                        fifthLine = "APRS-IS ----> APRS-IS";
-                        sixthLine = Config.callsign;
-                        for (int j = sixthLine.length();j < 9;j++) {
-                            sixthLine += " ";
-                        }
-                        sixthLine += "> ";
-                        sixthLine += Sender;
-                        seventhLine = "QUERY = ";
-                        seventhLine += receivedMessage;
                     }
-                    displayShow(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
-                } else {
-                    Utils::print("Rx Message (APRS-IS): " + packet);
-                    if (STATION_Utils::wasHeard(Addressee) && packet.indexOf("EQNS.") == -1 && packet.indexOf("UNIT.") == -1 && packet.indexOf("PARM.") == -1) {
-                        STATION_Utils::addToOutputPacketBuffer(buildPacketToTx(packet, 1));
+                } else if (Config.aprs_is.objectsToRF && packet.indexOf(":;") > 0) {
+                    Utils::print("Rx Object (APRS-IS) : " + packet);
+                    if (STATION_Utils::checkObjectTime(packet)) {
+                        STATION_Utils::addToOutputPacketBuffer(buildPacketToTx(packet, 5));
                         displayToggle(true);
                         lastScreenOn = millis();
                         Utils::typeOfPacket(packet, 1); // APRS-LoRa
-                        displayShow(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
+                        Serial.println();
+                    } else {
+                        Serial.println(" ---> Rejected (Time): No Tx");
                     }
-                }
-            } else if (Config.aprs_is.objectsToRF && packet.indexOf(":;") > 0) {
-                Utils::print("Rx Object (APRS-IS) : " + packet);
-                if (STATION_Utils::checkObjectTime(packet)) {
-                    STATION_Utils::addToOutputPacketBuffer(buildPacketToTx(packet, 5));
-                    displayToggle(true);
-                    lastScreenOn = millis();
-                    Utils::typeOfPacket(packet, 1); // APRS-LoRa
-                    Serial.println();
-                } else {
-                    Serial.println(" ---> Rejected (Time): No Tx");
                 }
             }
         }
@@ -374,8 +386,9 @@ namespace APRS_IS_Utils {
             if (espClient.connected()) {
                 if (espClient.available()) {
                     String aprsisPacket = espClient.readStringUntil('\r');
-                    aprsisPacket.trim();    // Serial.println(aprsisPacket);
-                    processAPRSISPacket(aprsisPacket);
+                    aprsisPacket.trim();    //Serial.println(aprsisPacket);
+                    xQueueSend(aprsIsRxQueue, &aprsisPacket, 0);
+                    //processAPRSISPacket(aprsisPacket);
                     lastRxTime = millis();
                 }
             }
@@ -386,8 +399,64 @@ namespace APRS_IS_Utils {
         if (Config.aprs_is.active && (WiFi.status() == WL_CONNECTED) && !espClient.connected()) {
             connect();
             while (!passcodeValid) {
-                listenAPRSIS();
+                if (espClient.connected() && espClient.available()) {
+                    String aprsisPacket = espClient.readStringUntil('\r');
+                    aprsisPacket.trim();
+                    if (!passcodeValid && aprsisPacket.indexOf(Config.callsign) != -1) {
+                        if (aprsisPacket.indexOf("unverified") != -1 ) {
+                            Serial.println("\n****APRS PASSCODE NOT VALID****\n");
+                            displayShow(firstLine, "", "    APRS PASSCODE", "    NOT VALID !!!", "", "", "", 0);
+                            while (1) {};
+                        } else if (aprsisPacket.indexOf("verified") != -1 ) {
+                            Serial.println("(APRS PASSCODE VALIDATED)");
+                            passcodeValid = true;
+                        }
+                    }
+                }
             }
+        }
+    }
+    
+    void aprsisListenerTask(void *parameter) {
+        while (true) {
+            listenAPRSIS();
+            vTaskDelay(pdMS_TO_TICKS(10)); // 10ms delay
+        }
+    }
+
+    // Función para iniciar el task
+    bool startListenerAPRSISTask(uint32_t stackSize, UBaseType_t priority) {
+        BaseType_t result = xTaskCreatePinnedToCore(
+            aprsisListenerTask,    // Función del task
+            "APRSIS_Listener",     // Nombre del task
+            stackSize,             // Stack size en words (no bytes)
+            NULL,                  // Parámetro pasado al task
+            priority,              // Prioridad
+            &aprsisTaskHandle,     // Handle del task
+            0
+        );
+        
+        return (result == pdPASS);
+    }
+
+    // Función opcional para detener el task
+    void stopListenerAPRSISTask() {
+        if (aprsisTaskHandle != NULL) {
+            vTaskDelete(aprsisTaskHandle);
+            aprsisTaskHandle = NULL;
+        }
+    }
+    
+    // Función opcional para suspender/reanudar el task
+    void suspendListenerAPRSISTask() {
+        if (aprsisTaskHandle != NULL) {
+            vTaskSuspend(aprsisTaskHandle);
+        }
+    }
+    
+    void resumeListenerAPRSISTask() {
+        if (aprsisTaskHandle != NULL) {
+            vTaskResume(aprsisTaskHandle);
         }
     }
 

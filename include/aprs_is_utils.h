@@ -35,10 +35,15 @@ namespace APRS_IS_Utils {
     void    processLoRaPacket(const String& packet);
 
     String  buildPacketToTx(const String& aprsisPacket, uint8_t packetType);
-    void    processAPRSISPacket(const String& packet);
+    void    processAPRSISPacket();//const String& packet);
     void    listenAPRSIS();
 
     void    firstConnection();
+
+    bool    startListenerAPRSISTask(uint32_t stackSize = 8192, UBaseType_t priority = 1);
+    void    stopListenerAPRSISTask();
+    void    suspendListenerAPRSISTask();
+    void    resumeListenerAPRSISTask();
 
 }
 

@@ -96,6 +96,11 @@ std::vector<ReceivedPacket> receivedPackets;
 String firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine;
 //#define STARTUP_DELAY 5 //min
 
+#ifdef HAS_TWO_CORES
+    QueueHandle_t aprsIsTxQueue = NULL;
+    QueueHandle_t aprsIsRxQueue = NULL;
+#endif
+
 
 void setup() {
     Serial.begin(115200);
@@ -122,11 +127,39 @@ void setup() {
         A7670_Utils::setup();
     #endif
     Utils::checkRebootMode();
+
     APRS_IS_Utils::firstConnection();
     SLEEP_Utils::checkSerial();
+
+    // Crear queues con verificación detallada
+    //Serial.println("Creando aprsIsTxQueue...");
+    aprsIsTxQueue = xQueueCreate(50, sizeof(String));
+    //Serial.printf("aprsIsTxQueue = %p\n", aprsIsTxQueue);
+
+    //Serial.println("Creando aprsIsRxQueue...");
+    aprsIsRxQueue = xQueueCreate(50, sizeof(String));
+    //Serial.printf("aprsIsRxQueue = %p\n", aprsIsRxQueue);
+
+    // Verificación crítica
+    if (aprsIsRxQueue == NULL || aprsIsTxQueue == NULL) {
+        Serial.println("FATAL: Error creando queues!");
+        while(1) {
+            Serial.println("STUCK - Queues failed");
+            delay(1000);
+        }
+    }
+    Serial.println("Queues creadas OK");
+
+    // Iniciar el task de APRSIS
+    if (!APRS_IS_Utils::startListenerAPRSISTask()) {
+        Serial.println("Error: No se pudo crear el task de APRSIS");
+    }
 }
 
 void loop() {
+    //Serial.println("Loop tick: " + String(millis()));
+    //delay(1000);
+
     if (Config.digi.ecoMode == 1) {
         SLEEP_Utils::checkWakeUpFlag();
         Utils::checkBeaconInterval();
@@ -201,7 +234,8 @@ void loop() {
         }
 
         if (Config.aprs_is.active) {
-            APRS_IS_Utils::listenAPRSIS(); // listen received packet from APRSIS
+            APRS_IS_Utils::processAPRSISPacket();
+            //APRS_IS_Utils::listenAPRSIS(); // listen received packet from APRSIS
         }
 
         STATION_Utils::processOutputPacketBuffer();
