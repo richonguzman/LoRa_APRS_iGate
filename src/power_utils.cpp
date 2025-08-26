@@ -88,6 +88,16 @@ namespace POWER_Utils {
         }
     #endif
 
+    #if defined(HAS_AXP192) || defined(HAS_AXP2101)
+        void activateMeasurement() {
+            PMU.disableTSPinMeasure();
+            PMU.enableBattDetection();
+            PMU.enableVbusVoltageMeasure();
+            PMU.enableBattVoltageMeasure();
+            PMU.enableSystemVoltageMeasure();
+        }
+    #endif
+
     double getBatteryVoltage() {
         #if defined(HAS_AXP192) || defined(HAS_AXP2101)
             return (PMU.getBattVoltage() / 1000.0);
@@ -102,17 +112,7 @@ namespace POWER_Utils {
         #else
             return false;
         #endif
-    }
-
-    void activateMeasurement() {
-        #if defined(HAS_AXP192) || defined(HAS_AXP2101)
-            PMU.disableTSPinMeasure();
-            PMU.enableBattDetection();
-            PMU.enableVbusVoltageMeasure();
-            PMU.enableBattVoltageMeasure();
-            PMU.enableSystemVoltageMeasure();
-        #endif
-    }
+    }    
 
     void activateGPS() {
         #ifdef HAS_AXP192
