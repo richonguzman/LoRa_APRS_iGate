@@ -238,9 +238,9 @@ namespace WEB_Utils {
         Config.ntp.gmtCorrection            = request->getParam("ntp.gmtCorrection", true)->value().toFloat();
 
         Config.remoteManagement.managers    = request->getParam("remoteManagement.managers", true)->value();
-        Config.remoteManagement.rfOnly      = request->getParam("remoteManagement.rfOnly", true);
+        Config.remoteManagement.rfOnly      = request->hasParam("remoteManagement.rfOnly", true);
 
-        Config.mqtt.active                  = request->getParam("mqtt.active", true);
+        Config.mqtt.active                  = request->hasParam("mqtt.active", true);
         Config.mqtt.server                  = request->getParam("mqtt.server", true)->value();
         Config.mqtt.topic                   = request->getParam("mqtt.topic", true)->value();
         Config.mqtt.username                = request->getParam("mqtt.username", true)->value();

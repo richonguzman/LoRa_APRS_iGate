@@ -93,7 +93,7 @@
     }, 
     "mqtt": {
         "active": false,
-        "host": "",
+        "server": "",
         "login": "",
         "password": "",
         "port": 1883
