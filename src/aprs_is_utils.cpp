@@ -30,7 +30,7 @@
 
 
 extern Configuration        Config;
-extern WiFiClient           espClient;
+extern WiFiClient           aprsIsClient;
 extern uint32_t             lastScreenOn;
 extern String               firstLine;
 extern String               secondLine;
@@ -53,17 +53,17 @@ bool        passcodeValid   = false;
 namespace APRS_IS_Utils {
 
     void upload(const String& line) {
-        espClient.print(line + "\r\n");
+        aprsIsClient.print(line + "\r\n");
     }
 
     void connect() {
         Serial.print("Connecting to APRS-IS ...     ");
         uint8_t count = 0;
-        while (!espClient.connect(Config.aprs_is.server.c_str(), Config.aprs_is.port) && count < 20) {
+        while (!aprsIsClient.connect(Config.aprs_is.server.c_str(), Config.aprs_is.port) && count < 20) {
             Serial.println("Didn't connect with server...");
             delay(1000);
-            espClient.stop();
-            espClient.flush();
+            aprsIsClient.stop();
+            aprsIsClient.flush();
             Serial.println("Run client.stop");
             Serial.println("Trying to connect with Server: " + String(Config.aprs_is.server) + " AprsServerPort: " + String(Config.aprs_is.port));
             count++;
@@ -110,7 +110,7 @@ namespace APRS_IS_Utils {
                     aprsisState = "--";
                 }
             #else
-                if (espClient.connected()) {
+                if (aprsIsClient.connected()) {
                     aprsisState = "OK";
                 } else {
                     aprsisState = "--";
@@ -192,7 +192,7 @@ namespace APRS_IS_Utils {
     }
 
     void processLoRaPacket(const String& packet) {
-        if (passcodeValid && (espClient.connected() || modemLoggedToAPRSIS)) {
+        if (passcodeValid && (aprsIsClient.connected() || modemLoggedToAPRSIS)) {
             if (packet.indexOf("NOGATE") == -1 && packet.indexOf("RFONLY") == -1) {
                 int firstColonIndex = packet.indexOf(":");
                 if (firstColonIndex > 5 && firstColonIndex < (packet.length() - 1) && packet[firstColonIndex + 1] != '}' && packet.indexOf("TCPIP") == -1) {
@@ -371,9 +371,9 @@ namespace APRS_IS_Utils {
         #ifdef HAS_A7670
             A7670_Utils::listenAPRSIS();
         #else
-            if (espClient.connected()) {
-                if (espClient.available()) {
-                    String aprsisPacket = espClient.readStringUntil('\r');
+            if (aprsIsClient.connected()) {
+                if (aprsIsClient.available()) {
+                    String aprsisPacket = aprsIsClient.readStringUntil('\r');
                     aprsisPacket.trim();    // Serial.println(aprsisPacket);
                     processAPRSISPacket(aprsisPacket);
                     lastRxTime = millis();
@@ -383,7 +383,7 @@ namespace APRS_IS_Utils {
     }
 
     void firstConnection() {
-        if (Config.aprs_is.active && (WiFi.status() == WL_CONNECTED) && !espClient.connected()) {
+        if (Config.aprs_is.active && (WiFi.status() == WL_CONNECTED) && !aprsIsClient.connected()) {
             connect();
             while (!passcodeValid) {
                 listenAPRSIS();

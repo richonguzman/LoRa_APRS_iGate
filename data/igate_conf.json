@@ -90,7 +90,14 @@
     "remoteManagement": {
         "managers": "",
         "rfOnly": true
-    },        
+    }, 
+    "mqtt": {
+        "active": false,
+        "host": "",
+        "login": "",
+        "password": "",
+        "port": 1883
+    },       
     "other": {
         "rememberStationTime": 30,
         "backupDigiMode": false,

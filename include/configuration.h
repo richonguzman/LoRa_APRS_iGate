@@ -149,6 +149,16 @@ public:
     bool    rfOnly;
 };
 
+class MQTT {
+public:
+    bool    active;
+    String  server;
+    String  topic;
+    String  username;
+    String  password;
+    int     port;
+};
+
 class Configuration {
 public:
     String                  callsign;
@@ -173,6 +183,7 @@ public:
     WEBADMIN                webadmin;
     NTP                     ntp;    
     REMOTE_MANAGEMENT       remoteManagement;
+    MQTT                    mqtt;
 
     void init();
     void writeFile();
