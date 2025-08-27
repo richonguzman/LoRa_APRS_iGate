@@ -16,26 +16,6 @@
  * along with LoRa APRS iGate. If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*#include <WiFiClientSecure.h>
-#include <PubSubClient.h>
-#include "wifi_utils.h"
-#include "mqtt_utils.h"
-
-
-extern String   mqttServer;
-extern int      mqttPort;
-extern String   mqttUser;
-extern String   mqttPassword;
-extern uint8_t  gatewayID;
-extern bool     subscribed;
-extern String   subscribeTopic;
-
-
-WiFiClientSecure    secureClient;
-PubSubClient        mqttClient(secureClient);
-
-bool                mqttConnected = false;*/
-
 #include <WiFiClientSecure.h>
 #include <PubSubClient.h>
 #include "configuration.h"
