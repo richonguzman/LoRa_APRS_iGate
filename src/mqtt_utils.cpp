@@ -65,7 +65,15 @@ namespace MQTT_Utils {
         }
         pubSub.setServer(Config.mqtt.server.c_str(), Config.mqtt.port);
         Serial.print("Trying to connect with MQTT Server: " + String(Config.mqtt.server) + " MqttServerPort: " + String(Config.mqtt.port));
-        if (pubSub.connect(Config.callsign.c_str(), Config.mqtt.username.c_str(), Config.mqtt.password.c_str())) {
+
+        bool connected = false;
+        if (!Config.mqtt.username.isEmpty()) {
+            connected = pubSub.connect(Config.callsign.c_str(), Config.mqtt.username.c_str(), Config.mqtt.password.c_str());
+        } else {
+            connected = pubSub.connect(Config.callsign.c_str());
+        }
+
+        if (connected) {
             Serial.println(" -> Connected !");
             const String subscribedTopic = Config.mqtt.topic + "/" + Config.callsign + "/#";
             if (!pubSub.subscribe(subscribedTopic.c_str())) {
@@ -74,7 +82,7 @@ namespace MQTT_Utils {
             Serial.print("Subscribed to MQTT topic : ");
             Serial.println(subscribedTopic);
         } else {
-            Serial.println(" -> Not Connected (Retry in 10 secs)");
+            Serial.println(" -> Not Connected (Retry in a few secs)");
         }
     }
 
