@@ -22,13 +22,15 @@
     },
     "aprs_is": {
         "active": false,
-        "passcode": "XYZVW",
-        "server": "rotate.aprs2.net",
-        "port": 14580,
-        "filter": "m/10",
         "messagesToRF": false,
-        "objectsToRF": false
+        "objectsToRF": false,
+        "server": "rotate.aprs2.net",
+        "passcode": "XYZVW",        
+        "port": 14580,
+        "filter": "m/10"        
     },
+    "personalNote": "",
+    "blacklist": "",
     "digi": {
         "mode": 0,
         "ecoMode": 0
@@ -76,6 +78,14 @@
         "enableSerial": false,
         "acceptOwn": false
     },
+    "mqtt": {
+        "active": false,
+        "server": "",
+        "topic": "",
+        "username": "",
+        "password": "",
+        "port": 1883
+    },
     "ota": {
         "username": "",
         "password": ""
@@ -84,27 +94,17 @@
         "username": "admin",
         "password": ""
     },
-    "ntp": {
-        "gmtCorrection": 0.0
-    },
     "remoteManagement": {
         "managers": "",
         "rfOnly": true
-    }, 
-    "mqtt": {
-        "active": false,
-        "server": "",
-        "topic": "",
-        "username": "",
-        "password": "",
-        "port": 1883
-    },       
+    },
+    "ntp": {
+        "gmtCorrection": 0.0
+    },
     "other": {
         "rememberStationTime": 30,
         "backupDigiMode": false,
         "rebootMode": false,
         "rebootModeTime": 6
-    },
-    "personalNote": "",
-    "blacklist": ""
+    }
 }

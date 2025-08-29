@@ -130,19 +130,20 @@ namespace WEB_Utils {
         }
 
         Config.callsign                     = request->getParam("callsign", true)->value();
-
+        
         Config.wifiAutoAP.password          = request->getParam("wifi.autoAP.password", true)->value();
         Config.wifiAutoAP.timeout           = request->getParam("wifi.autoAP.timeout", true)->value().toInt();
 
-
+        
         Config.aprs_is.active               = request->hasParam("aprs_is.active", true);
-        Config.aprs_is.passcode             = request->getParam("aprs_is.passcode", true)->value();
-        Config.aprs_is.server               = request->getParam("aprs_is.server", true)->value();
-        Config.aprs_is.port                 = request->getParam("aprs_is.port", true)->value().toInt();
-        Config.aprs_is.filter               = request->getParam("aprs_is.filter", true)->value();
-        Config.aprs_is.messagesToRF         = request->hasParam("aprs_is.messagesToRF", true);
-        Config.aprs_is.objectsToRF          = request->hasParam("aprs_is.objectsToRF", true);
-
+        if (Config.aprs_is.active) {
+            Config.aprs_is.messagesToRF     = request->hasParam("aprs_is.messagesToRF", true);
+            Config.aprs_is.objectsToRF      = request->hasParam("aprs_is.objectsToRF", true);
+            Config.aprs_is.server           = request->getParam("aprs_is.server", true)->value();
+            Config.aprs_is.passcode         = request->getParam("aprs_is.passcode", true)->value();
+            Config.aprs_is.port             = request->getParam("aprs_is.port", true)->value().toInt();
+            Config.aprs_is.filter           = request->getParam("aprs_is.filter", true)->value();  
+        }
 
         Config.beacon.interval              = request->getParam("beacon.interval", true)->value().toInt();
         Config.beacon.sendViaAPRSIS         = request->hasParam("beacon.sendViaAPRSIS", true);
@@ -155,15 +156,19 @@ namespace WEB_Utils {
         Config.beacon.path                  = request->getParam("beacon.path", true)->value();
 
         Config.beacon.statusActive          = request->hasParam("beacon.statusActive", true);
-        Config.beacon.statusPacket          = request->getParam("beacon.statusPacket", true)->value();
+        if (Config.beacon.statusActive) {
+            Config.beacon.statusPacket      = request->getParam("beacon.statusPacket", true)->value();
+        }
 
         Config.beacon.gpsActive             = request->hasParam("beacon.gpsActive", true);
         Config.beacon.gpsAmbiguity          = request->hasParam("beacon.gpsAmbiguity", true);
 
+        Config.personalNote                 = request->getParam("personalNote", true)->value();
+
+        Config.blacklist                    = request->getParam("blacklist", true)->value();
 
         Config.digi.mode                    = request->getParam("digi.mode", true)->value().toInt();
         Config.digi.ecoMode                 = request->getParam("digi.ecoMode", true)->value().toInt();;
-
 
         Config.loramodule.txFreq            = request->getParam("lora.txFreq", true)->value().toInt();
         Config.loramodule.rxFreq            = request->getParam("lora.rxFreq", true)->value().toInt();
@@ -175,16 +180,18 @@ namespace WEB_Utils {
         Config.loramodule.rxActive          = request->hasParam("lora.rxActive", true);
 
 
-        Config.display.alwaysOn                 = request->hasParam("display.alwaysOn", true);
+        Config.display.alwaysOn             = request->hasParam("display.alwaysOn", true);
         if (!Config.display.alwaysOn) {
-            Config.display.timeout  = request->getParam("display.timeout", true)->value().toInt();
+            Config.display.timeout          = request->getParam("display.timeout", true)->value().toInt();
         }
-        Config.display.turn180                  = request->hasParam("display.turn180", true);
+        Config.display.turn180              = request->hasParam("display.turn180", true);
 
 
         Config.battery.sendInternalVoltage      = request->hasParam("battery.sendInternalVoltage", true);
         Config.battery.monitorInternalVoltage   = request->hasParam("battery.monitorInternalVoltage", true);
-        Config.battery.internalSleepVoltage     = request->getParam("battery.internalSleepVoltage", true)->value().toFloat();
+        if (Config.battery.monitorInternalVoltage) {
+            Config.battery.internalSleepVoltage     = request->getParam("battery.internalSleepVoltage", true)->value().toFloat();
+        }        
 
         Config.battery.sendExternalVoltage      = request->hasParam("battery.sendExternalVoltage", true);
         if (Config.battery.sendExternalVoltage) {
@@ -193,16 +200,19 @@ namespace WEB_Utils {
             Config.battery.voltageDividerR2     = request->getParam("battery.voltageDividerR2", true)->value().toFloat();
         }
         Config.battery.monitorExternalVoltage   = request->hasParam("battery.monitorExternalVoltage", true);
-        Config.battery.externalSleepVoltage     = request->getParam("battery.externalSleepVoltage", true)->value().toFloat();
-
+        if (Config.battery.monitorExternalVoltage) {
+            Config.battery.externalSleepVoltage = request->getParam("battery.externalSleepVoltage", true)->value().toFloat();
+        }
         Config.battery.sendVoltageAsTelemetry   = request->hasParam("battery.sendVoltageAsTelemetry", true);
 
-        Config.wxsensor.active                  = request->hasParam("wxsensor.active", true);
-        Config.wxsensor.heightCorrection        = request->getParam("wxsensor.heightCorrection", true)->value().toInt();
-        Config.wxsensor.temperatureCorrection   = request->getParam("wxsensor.temperatureCorrection", true)->value().toFloat();
+
+        Config.wxsensor.active                      = request->hasParam("wxsensor.active", true);
         if (Config.wxsensor.active) {
+            Config.wxsensor.heightCorrection        = request->getParam("wxsensor.heightCorrection", true)->value().toInt();
+            Config.wxsensor.temperatureCorrection   = request->getParam("wxsensor.temperatureCorrection", true)->value().toFloat();
             Config.beacon.symbol = "_";
         }
+
 
         Config.syslog.active                    = request->hasParam("syslog.active", true);
         if (Config.syslog.active) {
@@ -211,23 +221,29 @@ namespace WEB_Utils {
             Config.syslog.logBeaconOverTCPIP    = request->hasParam("syslog.logBeaconOverTCPIP", true);
         }
 
-        Config.tnc.enableServer             = request->hasParam("tnc.enableServer", true);
-        Config.tnc.enableSerial             = request->hasParam("tnc.enableSerial", true);
-        Config.tnc.acceptOwn                = request->hasParam("tnc.acceptOwn", true);
 
-        Config.rebootMode                   = request->hasParam("other.rebootMode", true);
-        Config.rebootModeTime               = request->getParam("other.rebootModeTime", true)->value().toInt();
+        Config.tnc.enableServer     = request->hasParam("tnc.enableServer", true);
+        Config.tnc.enableSerial     = request->hasParam("tnc.enableSerial", true);
+        Config.tnc.acceptOwn        = request->hasParam("tnc.acceptOwn", true);
 
-        Config.ota.username                 = request->getParam("ota.username", true)->value();
-        Config.ota.password                 = request->getParam("ota.password", true)->value();
 
-        Config.rememberStationTime          = request->getParam("other.rememberStationTime", true)->value().toInt();
+        Config.mqtt.active          = request->hasParam("mqtt.active", true);
+        if (Config.mqtt.active) {
+            Config.mqtt.server      = request->getParam("mqtt.server", true)->value();
+            Config.mqtt.topic       = request->getParam("mqtt.topic", true)->value();
+            Config.mqtt.username    = request->getParam("mqtt.username", true)->value();
+            Config.mqtt.password    = request->getParam("mqtt.password", true)->value();
+            Config.mqtt.port        = request->getParam("mqtt.port", true)->value().toInt();
+        }
 
-        Config.backupDigiMode               = request->hasParam("other.backupDigiMode", true);
+        
+        Config.rebootMode           = request->hasParam("other.rebootMode", true);
+        if (Config.rebootMode) {
+            Config.rebootModeTime   = request->getParam("other.rebootModeTime", true)->value().toInt();
+        }
 
-        Config.personalNote                 = request->getParam("personalNote", true)->value();
-
-        Config.blacklist                    = request->getParam("blacklist", true)->value();
+        Config.ota.username         = request->getParam("ota.username", true)->value();
+        Config.ota.password         = request->getParam("ota.password", true)->value();
 
         Config.webadmin.active              = request->hasParam("webadmin.active", true);
         if (Config.webadmin.active) {
@@ -235,17 +251,14 @@ namespace WEB_Utils {
             Config.webadmin.password        = request->getParam("webadmin.password", true)->value();
         }
 
-        Config.ntp.gmtCorrection            = request->getParam("ntp.gmtCorrection", true)->value().toFloat();
-
         Config.remoteManagement.managers    = request->getParam("remoteManagement.managers", true)->value();
         Config.remoteManagement.rfOnly      = request->hasParam("remoteManagement.rfOnly", true);
 
-        Config.mqtt.active                  = request->hasParam("mqtt.active", true);
-        Config.mqtt.server                  = request->getParam("mqtt.server", true)->value();
-        Config.mqtt.topic                   = request->getParam("mqtt.topic", true)->value();
-        Config.mqtt.username                = request->getParam("mqtt.username", true)->value();
-        Config.mqtt.password                = request->getParam("mqtt.password", true)->value();
-        Config.mqtt.port                    = request->getParam("mqtt.port", true)->value().toInt();
+        Config.ntp.gmtCorrection            = request->getParam("ntp.gmtCorrection", true)->value().toFloat();
+
+        Config.rememberStationTime          = request->getParam("other.rememberStationTime", true)->value().toInt();
+
+        Config.backupDigiMode               = request->hasParam("other.backupDigiMode", true);
 
         Config.writeFile();
 

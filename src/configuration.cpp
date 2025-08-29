@@ -68,6 +68,10 @@ void Configuration::writeFile() {
     data["beacon"]["gpsActive"]                 = beacon.gpsActive;
     data["beacon"]["gpsAmbiguity"]              = beacon.gpsAmbiguity;
 
+    data["personalNote"]                        = personalNote;
+
+    data["blacklist"]                           = blacklist;
+
     data["digi"]["mode"]                        = digi.mode;
     data["digi"]["ecoMode"]                     = digi.ecoMode;
     #if defined(HAS_A7670)
@@ -113,35 +117,31 @@ void Configuration::writeFile() {
     data["tnc"]["enableSerial"]                 = tnc.enableSerial;
     data["tnc"]["acceptOwn"]                    = tnc.acceptOwn;
 
-    data["other"]["rebootMode"]                 = rebootMode;
-    data["other"]["rebootModeTime"]             = rebootModeTime;
-
-    data["ota"]["username"]                     = ota.username;
-    data["ota"]["password"]                     = ota.password;
-
-    data["other"]["rememberStationTime"]        = rememberStationTime;
-
-    data["other"]["backupDigiMode"]             = backupDigiMode;
-
-    data["personalNote"]                        = personalNote;
-
-    data["blacklist"]                           = blacklist;
-
-    data["webadmin"]["active"]                  = webadmin.active;
-    data["webadmin"]["username"]                = webadmin.username;
-    data["webadmin"]["password"]                = webadmin.password;
-
-    data["ntp"]["gmtCorrection"]                = ntp.gmtCorrection;
-
-    data["remoteManagement"]["managers"]        = remoteManagement.managers;
-    data["remoteManagement"]["rfOnly"]          = remoteManagement.rfOnly;
-
     data["mqtt"]["active"]                      = mqtt.active;
     data["mqtt"]["server"]                      = mqtt.server;
     data["mqtt"]["topic"]                       = mqtt.topic;
     data["mqtt"]["username"]                    = mqtt.username;
     data["mqtt"]["password"]                    = mqtt.password;
     data["mqtt"]["port"]                        = mqtt.port;
+
+    data["ota"]["username"]                     = ota.username;
+    data["ota"]["password"]                     = ota.password;
+
+    data["webadmin"]["active"]                  = webadmin.active;
+    data["webadmin"]["username"]                = webadmin.username;
+    data["webadmin"]["password"]                = webadmin.password;
+
+    data["remoteManagement"]["managers"]        = remoteManagement.managers;
+    data["remoteManagement"]["rfOnly"]          = remoteManagement.rfOnly;
+
+    data["ntp"]["gmtCorrection"]                = ntp.gmtCorrection;
+
+    data["other"]["rebootMode"]                 = rebootMode;
+    data["other"]["rebootModeTime"]             = rebootModeTime;
+
+    data["other"]["rememberStationTime"]        = rememberStationTime;
+
+    data["other"]["backupDigiMode"]             = backupDigiMode;
 
     serializeJson(data, configFile);
 
@@ -177,7 +177,16 @@ bool Configuration::readFile() {
         wifiAutoAP.timeout              = data["wifi"]["autoAP"]["timeout"] | 10;
 
         callsign                        = data["callsign"] | "NOCALL-10";
-        rememberStationTime             = data["other"]["rememberStationTime"] | 30;
+        
+
+        aprs_is.active                  = data["aprs_is"]["active"] | false;
+        aprs_is.passcode                = data["aprs_is"]["passcode"] | "XYZWV";
+        aprs_is.server                  = data["aprs_is"]["server"] | "rotate.aprs2.net";
+        aprs_is.port                    = data["aprs_is"]["port"] | 14580;
+        aprs_is.filter                  = data["aprs_is"]["filter"] | "m/10";
+        aprs_is.messagesToRF            = data["aprs_is"]["messagesToRF"] | false;
+        aprs_is.objectsToRF             = data["aprs_is"]["objectsToRF"] | false;
+
 
         beacon.latitude                 = data["beacon"]["latitude"] | 0.0;
         beacon.longitude                = data["beacon"]["longitude"] | 0.0;
@@ -188,20 +197,16 @@ bool Configuration::readFile() {
         beacon.path                     = data["beacon"]["path"] | "WIDE1-1";
         beacon.sendViaAPRSIS            = data["beacon"]["sendViaAPRSIS"] | false;
         beacon.sendViaRF                = data["beacon"]["sendViaRF"] | false;
-
+        
         beacon.statusActive             = data["beacon"]["statusActive"] | false;
         beacon.statusPacket             = data["beacon"]["statusPacket"] | "";
 
         beacon.gpsActive                = data["beacon"]["gpsActive"] | false;
         beacon.gpsAmbiguity             = data["beacon"]["gpsAmbiguity"] | false;
 
-        aprs_is.active                  = data["aprs_is"]["active"] | false;
-        aprs_is.passcode                = data["aprs_is"]["passcode"] | "XYZWV";
-        aprs_is.server                  = data["aprs_is"]["server"] | "rotate.aprs2.net";
-        aprs_is.port                    = data["aprs_is"]["port"] | 14580;
-        aprs_is.filter                  = data["aprs_is"]["filter"] | "m/10";
-        aprs_is.messagesToRF            = data["aprs_is"]["messagesToRF"] | false;
-        aprs_is.objectsToRF             = data["aprs_is"]["objectsToRF"] | false;
+        personalNote    	            = data["personalNote"] | "personal note here";
+
+        blacklist                       = data["blacklist"] | "station callsign";
 
         digi.mode                       = data["digi"]["mode"] | 0;
         digi.ecoMode                    = data["digi"]["ecoMode"] | 0;
@@ -245,31 +250,10 @@ bool Configuration::readFile() {
         syslog.server                   = data["syslog"]["server"] | "lora.link9.net";
         syslog.port                     = data["syslog"]["port"] | 1514;
         syslog.logBeaconOverTCPIP       = data["syslog"]["logBeaconOverTCPIP"] | false;
-        
+
         tnc.enableServer                = data["tnc"]["enableServer"] | false;
         tnc.enableSerial                = data["tnc"]["enableSerial"] | false;
         tnc.acceptOwn                   = data["tnc"]["acceptOwn"] | false;
-
-        ota.username                    = data["ota"]["username"] | "";
-        ota.password                    = data["ota"]["password"] | "";
-
-        webadmin.active                 = data["webadmin"]["active"] | false;
-        webadmin.username               = data["webadmin"]["username"] | "admin";
-        webadmin.password               = data["webadmin"]["password"] | "";
-
-        ntp.gmtCorrection               = data["ntp"]["gmtCorrection"] | 0.0;
-
-        backupDigiMode                  = data["other"]["backupDigiMode"] | false;
-
-        rebootMode                      = data["other"]["rebootMode"] | false;
-        rebootModeTime                  = data["other"]["rebootModeTime"] | 6;
-
-        personalNote    	            = data["personalNote"] | "personal note here";
-
-        blacklist                       = data["blacklist"] | "station callsign";
-
-        remoteManagement.managers       = data["remoteManagement"]["managers"] | "";
-        remoteManagement.rfOnly         = data["remoteManagement"]["rfOnly"] | true;
 
         mqtt.active                     = data["mqtt"]["active"] | false;
         mqtt.server                     = data["mqtt"]["server"] | "";
@@ -277,6 +261,25 @@ bool Configuration::readFile() {
         mqtt.username                   = data["mqtt"]["username"] | "";
         mqtt.password                   = data["mqtt"]["password"] | "";
         mqtt.port                       = data["mqtt"]["port"] | 1883;
+        
+        ota.username                    = data["ota"]["username"] | "";
+        ota.password                    = data["ota"]["password"] | "";
+
+        webadmin.active                 = data["webadmin"]["active"] | false;
+        webadmin.username               = data["webadmin"]["username"] | "admin";
+        webadmin.password               = data["webadmin"]["password"] | "";
+
+        remoteManagement.managers       = data["remoteManagement"]["managers"] | "";
+        remoteManagement.rfOnly         = data["remoteManagement"]["rfOnly"] | true;
+
+        ntp.gmtCorrection               = data["ntp"]["gmtCorrection"] | 0.0;
+
+        rebootMode                      = data["other"]["rebootMode"] | false;
+        rebootModeTime                  = data["other"]["rebootModeTime"] | 6;
+
+        rememberStationTime             = data["other"]["rememberStationTime"] | 30;
+
+        backupDigiMode                  = data["other"]["backupDigiMode"] | false;
 
         if (wifiAPs.size() == 0) { // If we don't have any WiFi's from config we need to add "empty" SSID for AUTO AP
             WiFi_AP wifiap;
@@ -307,6 +310,14 @@ void Configuration::init() {
 
     callsign                        = "N0CALL-10";
 
+    aprs_is.active                  = false;
+    aprs_is.passcode                = "XYZVW";
+    aprs_is.server                  = "rotate.aprs2.net";
+    aprs_is.port                    = 14580;
+    aprs_is.filter                  = "m/10";
+    aprs_is.messagesToRF            = false;
+    aprs_is.objectsToRF             = false;
+
     beacon.comment                  = "LoRa APRS";
     beacon.latitude                 = 0.0;
     beacon.longitude                = 0.0;
@@ -318,25 +329,17 @@ void Configuration::init() {
     beacon.path                     = "WIDE1-1";
 
     beacon.statusActive             = false;
-    beacon.statusPacket             = "";
+    beacon.statusPacket             = "";    
 
     beacon.gpsActive                = false;
     beacon.gpsAmbiguity             = false;
 
+    personalNote                    = "";   
+
+    blacklist                       = "";
+
     digi.mode                       = 0;
     digi.ecoMode                    = 0;
-
-    tnc.enableServer                = false;
-    tnc.enableSerial                = false;
-    tnc.acceptOwn                   = false;
-
-    aprs_is.active                  = false;
-    aprs_is.passcode                = "XYZVW";
-    aprs_is.server                  = "rotate.aprs2.net";
-    aprs_is.port                    = 14580;
-    aprs_is.filter                  = "m/10";
-    aprs_is.messagesToRF            = false;
-    aprs_is.objectsToRF             = false;
 
     loramodule.txFreq               = 433775000;
     loramodule.rxFreq               = 433775000;
@@ -350,21 +353,7 @@ void Configuration::init() {
     display.alwaysOn                = true;
     display.timeout                 = 4;
     display.turn180                 = false;
-
-    syslog.active                   = false;
-    syslog.server                   = "lora.link9.net";
-    syslog.port                     = 1514;
-    syslog.logBeaconOverTCPIP       = false;
-
-    wxsensor.active                 = false;
-    wxsensor.heightCorrection       = 0;
-    wxsensor.temperatureCorrection  = 0.0;
-
-    ota.username                    = "";
-    ota.password                    = "";
-
-    rememberStationTime             = 30;
-
+    
     battery.sendInternalVoltage     = false;
     battery.monitorInternalVoltage  = false;
     battery.internalSleepVoltage    = 2.9;
@@ -378,23 +367,18 @@ void Configuration::init() {
 
     battery.sendVoltageAsTelemetry  = false;
 
-    backupDigiMode                  = false;
+    wxsensor.active                 = false;
+    wxsensor.heightCorrection       = 0;
+    wxsensor.temperatureCorrection  = 0.0;
 
-    rebootMode                      = false;
-    rebootModeTime                  = 0;
+    syslog.active                   = false;
+    syslog.server                   = "lora.link9.net";
+    syslog.port                     = 1514;
+    syslog.logBeaconOverTCPIP       = false;
 
-    personalNote                    = "";
-
-    blacklist                       = "";
-
-    webadmin.active                 = false;
-    webadmin.username               = "admin";
-    webadmin.password               = "";
-
-    ntp.gmtCorrection               = 0.0;
-
-    remoteManagement.managers       = "";
-    remoteManagement.rfOnly         = true;
+    tnc.enableServer                = false;
+    tnc.enableSerial                = false;
+    tnc.acceptOwn                   = false;
 
     mqtt.active                     = false;
     mqtt.server                     = "";
@@ -402,6 +386,25 @@ void Configuration::init() {
     mqtt.username                   = "";
     mqtt.password                   = "";
     mqtt.port                       = 1883;
+
+    ota.username                    = "";
+    ota.password                    = "";
+
+    webadmin.active                 = false;
+    webadmin.username               = "admin";
+    webadmin.password               = "";
+
+    remoteManagement.managers       = "";
+    remoteManagement.rfOnly         = true;
+
+    ntp.gmtCorrection               = 0.0;
+
+    rebootMode                      = false;
+    rebootModeTime                  = 0;
+
+    rememberStationTime             = 30;
+
+    backupDigiMode                  = false;
 
     Serial.println("All is Written!");
 }
