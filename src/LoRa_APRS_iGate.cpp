@@ -67,7 +67,7 @@ ___________________________________________________________________*/
 #endif
 
 
-String              versionDate             = "2025-08-27";
+String              versionDate             = "2025-08-29";
 Configuration       Config;
 WiFiClient          aprsIsClient;
 WiFiClient          mqttClient;

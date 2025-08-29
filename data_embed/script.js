@@ -58,21 +58,6 @@ alwaysOnCheckbox.addEventListener("change", function () {
     timeoutInput.disabled = this.checked;
 });
 
-// timeoutInput.addEventListener("change", function () {
-//     alwaysOnCheckbox.disabled = this.value !== "";
-// });
-
-const logCheckbox               = document.querySelector('input[name="syslog.active"]');
-const serverField               = document.querySelector('input[name="syslog.server"]');
-const portField                 = document.querySelector('input[name="syslog.port"]');
-const logBeaconOverTCPIPField   = document.querySelector('input[name="syslog.logBeaconOverTCPIP"]');
-
-logCheckbox.addEventListener("change", function () {
-    serverField.disabled                = !this.checked;
-    portField.disabled                  = !this.checked;
-    logBeaconOverTCPIPField.disabled    = !this.checked
-});
-
 function loadSettings(settings) {
     currentSettings = settings;
     // General
@@ -184,17 +169,20 @@ function loadSettings(settings) {
     document.getElementById("wxsensor.active").checked                  = settings.wxsensor.active;
     document.getElementById("wxsensor.heightCorrection").value          = settings.wxsensor.heightCorrection;
     document.getElementById("wxsensor.temperatureCorrection").value     = settings.wxsensor.temperatureCorrection.toFixed(1);
+    if (settings.wxsensor.active) {
+        TelemetryHeightCorrection.disabled  = false;
+        TelemetryTempCorrection.disabled    = false;
+    }
     
     // SYSLOG
     document.getElementById("syslog.active").checked                    = settings.syslog.active;
     document.getElementById("syslog.server").value                      = settings.syslog.server;
     document.getElementById("syslog.port").value                        = settings.syslog.port;
     document.getElementById("syslog.logBeaconOverTCPIP").checked        = settings.syslog.logBeaconOverTCPIP;
-
     if (settings.syslog.active) {
-        serverField.disabled                = false;
-        portField.disabled                  = false;
-        logBeaconOverTCPIPField.disabled    = false;
+        SyslogServer.disabled           = false;
+        SyslogPort.disabled             = false;
+        SyslogBeaconOverTCPIP.disabled  = false;
     }
 
     // TNC
@@ -204,9 +192,27 @@ function loadSettings(settings) {
         document.getElementById("tnc.acceptOwn").checked                = settings.tnc.acceptOwn;
     }
 
+    // MQTT
+    document.getElementById("mqtt.active").checked                      = settings.mqtt.active;
+    document.getElementById("mqtt.server").value                        = settings.mqtt.server;
+    document.getElementById("mqtt.topic").value                         = settings.mqtt.topic;
+    document.getElementById("mqtt.username").value                      = settings.mqtt.username;
+    document.getElementById("mqtt.password").value                      = settings.mqtt.password;
+    document.getElementById("mqtt.port").value                          = settings.mqtt.port;
+    if (settings.mqtt.active) {
+        MqttServer.disabled     = false;
+        MqttTopic.disabled      = false;
+        MqttUsername.disabled   = false;
+        MqttPassword.disabled   = false;
+        MqttPort.disabled       = false;
+    }
+
     // Reboot
     document.getElementById("other.rebootMode").checked                 = settings.other.rebootMode;
     document.getElementById("other.rebootModeTime").value               = settings.other.rebootModeTime;
+    if (settings.other.rebootMode) {
+        RebootModeTime.disabled = false;
+    }
 
     // WiFi Auto AP
     document.getElementById("wifi.autoAP.password").value               = settings.wifi.autoAP.password;
@@ -221,23 +227,15 @@ function loadSettings(settings) {
     document.getElementById("webadmin.username").value                  = settings.webadmin.username;
     document.getElementById("webadmin.password").value                  = settings.webadmin.password;
 
-    // NTP
-    document.getElementById("ntp.gmtCorrection").value                  = settings.ntp.gmtCorrection;
-
-    // MQTT
-    document.getElementById("mqtt.active").checked                      = settings.mqtt.active;
-    document.getElementById("mqtt.server").value                        = settings.mqtt.server;
-    document.getElementById("mqtt.topic").value                         = settings.mqtt.topic;
-    document.getElementById("mqtt.username").value                      = settings.mqtt.username;
-    document.getElementById("mqtt.password").value                      = settings.mqtt.password;
-    document.getElementById("mqtt.port").value                          = settings.mqtt.port;
-
-    // Experimental
-    document.getElementById("other.backupDigiMode").checked             = settings.other.backupDigiMode;
-
     // Management over APRS
     document.getElementById("remoteManagement.managers").value          = settings.remoteManagement.managers;
     document.getElementById("remoteManagement.rfOnly").checked          = settings.remoteManagement.rfOnly;
+
+    // NTP
+    document.getElementById("ntp.gmtCorrection").value                  = settings.ntp.gmtCorrection;
+
+    // Experimental
+    document.getElementById("other.backupDigiMode").checked             = settings.other.backupDigiMode;
 
     updateImage();
     refreshSpeedStandard();
@@ -267,8 +265,6 @@ document.getElementById('reboot').addEventListener('click', function (e) {
 
     showToast("Your device will be rebooted in a while");
 });
-
-const wxsensorCheckbox = document.querySelector("input[name='wxsensor.active']");
 
 function updateImage() {
     const value = document.getElementById("beacon.overlay").value + document.getElementById("beacon.symbol").value;
@@ -305,21 +301,7 @@ function toggleFields() {
 
     externalVoltagePinInput.disabled = !sendExternalVoltageCheckbox.checked;
     voltageDividerR1.disabled = !sendExternalVoltageCheckbox.checked;
-    voltageDividerR2.disabled = !sendExternalVoltageCheckbox.checked;
-
-    const WebadminCheckbox = document.querySelector(
-        'input[name="webadmin.active"]'
-    );
-
-    const WebadminUsername = document.querySelector(
-        'input[name="webadmin.username"]'
-    );
-
-    const WebadminPassword = document.querySelector(
-        'input[name="webadmin.password"]'
-    );
-    WebadminUsername.disabled = !WebadminCheckbox.checked;
-    WebadminPassword.disabled = !WebadminCheckbox.checked;
+    voltageDividerR2.disabled = !sendExternalVoltageCheckbox.checked;    
 }
 
 const sendExternalVoltageCheckbox = document.querySelector(
@@ -343,46 +325,55 @@ sendExternalVoltageCheckbox.addEventListener("change", function () {
     voltageDividerR2.disabled = !this.checked;
 });
 
-const WebadminCheckbox = document.querySelector(
-    'input[name="webadmin.active"]'
-);
-
-const WebadminUsername = document.querySelector(
-    'input[name="webadmin.username"]'
-);
-
-const WebadminPassword = document.querySelector(
-    'input[name="webadmin.password"]'
-);
-WebadminCheckbox.addEventListener("change", function () {
-    WebadminUsername.disabled = !this.checked;
-    WebadminPassword.disabled = !this.checked;
+// Telemetry Switches
+const TelemetryCheckbox         = document.querySelector('input[name="wxsensor.active"]');
+const TelemetryHeightCorrection = document.querySelector('input[name="wxsensor.heightCorrection"]');
+const TelemetryTempCorrection   = document.querySelector('input[name="wxsensor.temperatureCorrection"]');
+TelemetryCheckbox.addEventListener("change", function () {
+    TelemetryHeightCorrection.disabled  = !this.checked;
+    TelemetryTempCorrection.disabled    = !this.checked;
 });
 
-const MqttCheckbox = document.querySelector(
-    'input[name="mqtt.active"]'
-);
-const MqttServer = document.querySelector(
-    'input[name="mqtt.server"]'
-);
-const MqttTopic = document.querySelector(
-    'input[name="mqtt.topic"]'
-);
-const MqttUsername = document.querySelector(
-    'input[name="mqtt.username"]'
-);
-const MqttPassword = document.querySelector(
-    'input[name="mqtt.password"]'
-);
-const MqttPort = document.querySelector(
-    'input[name="mqtt.port"]'
-);
+// Syslog Switches
+const SyslogCheckbox            = document.querySelector('input[name="syslog.active"]');
+const SyslogServer              = document.querySelector('input[name="syslog.server"]');
+const SyslogPort                = document.querySelector('input[name="syslog.port"]');
+const SyslogBeaconOverTCPIP     = document.querySelector('input[name="syslog.logBeaconOverTCPIP"]');
+SyslogCheckbox.addEventListener("change", function () {
+    SyslogServer.disabled           = !this.checked;
+    SyslogPort.disabled             = !this.checked;
+    SyslogBeaconOverTCPIP.disabled  = !this.checked
+});
+
+// MQTT Switches
+const MqttCheckbox              = document.querySelector('input[name="mqtt.active"]');
+const MqttServer                = document.querySelector('input[name="mqtt.server"]');
+const MqttTopic                 = document.querySelector('input[name="mqtt.topic"]');
+const MqttUsername              = document.querySelector('input[name="mqtt.username"]');
+const MqttPassword              = document.querySelector('input[name="mqtt.password"]');
+const MqttPort                  = document.querySelector('input[name="mqtt.port"]');
 MqttCheckbox.addEventListener("change", function () {
-    MqttServer.disabled = !this.checked;
-    MqttTopic.disabled = !this.checked;
-    MqttUsername.disabled = !this.checked;
-    MqttPassword.disabled = !this.checked;
-    MqttPort.disabled = !this.checked;
+    MqttServer.disabled         = !this.checked;
+    MqttTopic.disabled          = !this.checked;
+    MqttUsername.disabled       = !this.checked;
+    MqttPassword.disabled       = !this.checked;
+    MqttPort.disabled           = !this.checked;
+});
+
+// Reboot Switches
+const RebootModeCheckbox        = document.querySelector('input[name="other.rebootMode"]');
+const RebootModeTime            = document.querySelector('input[name="other.rebootModeTime"]');
+RebootModeCheckbox.addEventListener("change", function() {
+    RebootModeTime.disabled     = !this.checked;
+});
+
+// Web Admin Switches
+const WebadminCheckbox          = document.querySelector('input[name="webadmin.active"]');
+const WebadminUsername          = document.querySelector('input[name="webadmin.username"]');
+const WebadminPassword          = document.querySelector('input[name="webadmin.password"]');
+WebadminCheckbox.addEventListener("change", function () {
+    WebadminUsername.disabled   = !this.checked;
+    WebadminPassword.disabled   = !this.checked;
 });
 
 document.querySelector(".new button").addEventListener("click", function () {
