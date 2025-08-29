@@ -41,6 +41,7 @@ extern String               sixthLine;
 extern String               seventhLine;
 extern bool                 modemLoggedToAPRSIS;
 extern bool                 backUpDigiMode;
+extern String               versionNumber;
 
 uint32_t    lastRxTime      = millis();
 bool        passcodeValid   = false;
@@ -78,7 +79,9 @@ namespace APRS_IS_Utils {
             aprsAuth += Config.callsign;
             aprsAuth += " pass ";
             aprsAuth += Config.aprs_is.passcode;
-            aprsAuth += " vers CA2RXU_iGate 3.0 filter ";
+            aprsAuth += " vers CA2RXUiGate ";
+            aprsAuth += versionNumber;
+            aprsAuth += " filter ";
             aprsAuth += Config.aprs_is.filter;
             upload(aprsAuth);
         }

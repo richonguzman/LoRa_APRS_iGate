@@ -31,6 +31,7 @@ extern float                            snr;
 extern int                              freqError;
 extern bool                             shouldSleepLowVoltage;
 extern bool                             saveNewDigiEcoModeConfig;
+extern String                           versionNumber;
 
 
 namespace QUERY_Utils {
@@ -42,7 +43,9 @@ namespace QUERY_Utils {
         if (queryQuestion == "?APRS?" || queryQuestion == "H" || queryQuestion == "HELP" || queryQuestion=="?") {
             answer.concat("?APRSV ?APRSP ?APRSL ?APRSSSR ?EM=? ?TX=? "); // ?APRSH ?WHERE callsign
         } else if (queryQuestion == "?APRSV") {
-            answer.concat("CA2RXU_LoRa_iGate 3.0 v");
+            answer.concat("CA2RXU_LoRa_iGate v");
+            answer.concat(versionNumber);
+            answer.concat(" ");
             answer.concat(versionDate);
         } else if (queryQuestion == "?APRSP") {
             answer.concat("iGate QTH: ");

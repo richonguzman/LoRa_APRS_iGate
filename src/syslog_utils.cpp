@@ -25,6 +25,7 @@
 
 extern Configuration    Config;
 extern String           versionDate;
+extern String           versionNumber;
 
 WiFiUDP udpClient;
 
@@ -35,7 +36,9 @@ namespace SYSLOG_Utils {
         if (Config.syslog.active && WiFi.status() == WL_CONNECTED) {
             String syslogPacket = "<165>1 - ";
             syslogPacket.concat(Config.callsign);
-            syslogPacket.concat(" CA2RXU_LoRa_iGate_3.0 - - - "); //RFC5424 The Syslog Protocol
+            syslogPacket.concat(" CA2RXU_LoRa_iGate_");
+            syslogPacket.concat(versionNumber);
+            syslogPacket.concat(" - - - "); //RFC5424 The Syslog Protocol
 
             char signalData[35];
             snprintf(signalData, sizeof(signalData), " / %ddBm / %.2fdB / %dHz", rssi, snr, freqError);
