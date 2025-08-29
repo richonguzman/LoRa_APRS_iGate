@@ -49,14 +49,6 @@ function fetchSettings() {
         });
 }
 
-const alwaysOnCheckbox = document.querySelector(
-    'input[name="display.alwaysOn"]'
-);
-const timeoutInput = document.querySelector('input[name="display.timeout"]');
-
-alwaysOnCheckbox.addEventListener("change", function () {
-    timeoutInput.disabled = this.checked;
-});
 
 function loadSettings(settings) {
     currentSettings = settings;
@@ -112,6 +104,13 @@ function loadSettings(settings) {
     document.getElementById("aprs_is.port").value                       = settings.aprs_is.port;
     document.getElementById("aprs_is.filter").value                     = settings.aprs_is.filter;
     document.getElementById("aprs_is.passcode").value                   = settings.aprs_is.passcode;
+    APRSISCheckbox.checked      = settings.aprs_is.active;
+    APRSISGateMessages.disabled = !APRSISCheckbox.checked;
+    APRSISGateObjects.disabled  = !APRSISCheckbox.checked;
+    APRSISServer.disabled       = !APRSISCheckbox.checked;
+    APRSISPort.disabled         = !APRSISCheckbox.checked;
+    APRSISPasscode.disabled     = !APRSISCheckbox.checked;
+    APRSISFilter.disabled       = !APRSISCheckbox.checked;
 
     // Beacon
     document.getElementById("beacon.latitude").value                    = settings.beacon.latitude;
@@ -123,6 +122,8 @@ function loadSettings(settings) {
 
     document.getElementById("beacon.statusActive").checked              = settings.beacon.statusActive;
     document.getElementById("beacon.statusPacket").value                = settings.beacon.statusPacket;
+    StatusCheckbox.checked  = settings.beacon.statusActive;
+    StatusPacket.disabled   = !StatusCheckbox.checked;
 
     document.getElementById("beacon.gpsActive").checked                 = settings.beacon.gpsActive;
     document.getElementById("beacon.gpsAmbiguity").checked              = settings.beacon.gpsAmbiguity;
@@ -132,7 +133,7 @@ function loadSettings(settings) {
 
     // Digi
     document.getElementById("digi.mode").value                          = settings.digi.mode;
-    document.getElementById("digi.ecoMode").checked                     = settings.digi.ecoMode;
+    document.getElementById("digi.ecoMode").value                       = settings.digi.ecoMode;
 
     // LoRa
     document.getElementById("lora.txFreq").value                        = settings.lora.txFreq;
@@ -148,43 +149,50 @@ function loadSettings(settings) {
     document.getElementById("display.alwaysOn").checked                 = settings.display.alwaysOn;
     document.getElementById("display.turn180").checked                  = settings.display.turn180;
     document.getElementById("display.timeout").value                    = settings.display.timeout;
-
-    if (settings.display.alwaysOn) {
-        timeoutInput.disabled = true;
-    }
+    DisplayAlwaysOnCheckbox.checked = settings.display.alwaysOn;
+    DisplayTimeout.disabled         = DisplayAlwaysOnCheckbox.checked;
 
     // BATTERY
     document.getElementById("battery.sendInternalVoltage").checked      = settings.battery.sendInternalVoltage;
     document.getElementById("battery.monitorInternalVoltage").checked   = settings.battery.monitorInternalVoltage;
     document.getElementById("battery.internalSleepVoltage").value       = settings.battery.internalSleepVoltage.toFixed(1);
+    MonitorInternalVoltageCheckbox.checked  = settings.battery.monitorInternalVoltage;
+    MonitorInternalSleepVoltage.disabled    = !MonitorInternalVoltageCheckbox.checked;
+
     document.getElementById("battery.sendExternalVoltage").checked      = settings.battery.sendExternalVoltage;
     document.getElementById("battery.externalVoltagePin").value         = settings.battery.externalVoltagePin;
     document.getElementById("battery.voltageDividerR1").value           = settings.battery.voltageDividerR1.toFixed(1);
     document.getElementById("battery.voltageDividerR2").value           = settings.battery.voltageDividerR2.toFixed(1);
+    SendExternalVoltageCheckbox.checked     = settings.battery.sendExternalVoltage;
+    ExternalVoltagePin.disabled             = !SendExternalVoltageCheckbox.checked;
+    ExternalVoltageDividerR1.disabled       = !SendExternalVoltageCheckbox.checked;
+    ExternalVoltageDividerR2.disabled       = !SendExternalVoltageCheckbox.checked;
+
     document.getElementById("battery.monitorExternalVoltage").checked   = settings.battery.monitorExternalVoltage;
     document.getElementById("battery.externalSleepVoltage").value       = settings.battery.externalSleepVoltage.toFixed(1);
+    MonitorExternalVoltageCheckbox.checked  = settings.battery.monitorExternalVoltage;
+    MonitorExternalSleepVoltage.disabled    = !MonitorExternalVoltageCheckbox.checked;
+
     document.getElementById("battery.sendVoltageAsTelemetry").checked   = settings.battery.sendVoltageAsTelemetry;
-    
+
     // TELEMETRY WX SENSOR
     document.getElementById("wxsensor.active").checked                  = settings.wxsensor.active;
     document.getElementById("wxsensor.heightCorrection").value          = settings.wxsensor.heightCorrection;
     document.getElementById("wxsensor.temperatureCorrection").value     = settings.wxsensor.temperatureCorrection.toFixed(1);
-    if (settings.wxsensor.active) {
-        TelemetryHeightCorrection.disabled  = false;
-        TelemetryTempCorrection.disabled    = false;
-    }
+    TelemetryCheckbox.checked           = settings.wxsensor.active;
+    TelemetryHeightCorrection.disabled  = !TelemetryCheckbox.checked;
+    TelemetryTempCorrection.disabled    = !TelemetryCheckbox.checked;
     
     // SYSLOG
     document.getElementById("syslog.active").checked                    = settings.syslog.active;
     document.getElementById("syslog.server").value                      = settings.syslog.server;
     document.getElementById("syslog.port").value                        = settings.syslog.port;
     document.getElementById("syslog.logBeaconOverTCPIP").checked        = settings.syslog.logBeaconOverTCPIP;
-    if (settings.syslog.active) {
-        SyslogServer.disabled           = false;
-        SyslogPort.disabled             = false;
-        SyslogBeaconOverTCPIP.disabled  = false;
-    }
-
+    SyslogCheckbox.checked          = settings.syslog.active;
+    SyslogServer.disabled           = !SyslogCheckbox.checked;
+    SyslogPort.disabled             = !SyslogCheckbox.checked;
+    SyslogBeaconOverTCPIP.disabled  = !SyslogCheckbox.checked;
+    
     // TNC
     if (settings.tnc) {
         document.getElementById("tnc.enableServer").checked             = settings.tnc.enableServer;
@@ -199,20 +207,18 @@ function loadSettings(settings) {
     document.getElementById("mqtt.username").value                      = settings.mqtt.username;
     document.getElementById("mqtt.password").value                      = settings.mqtt.password;
     document.getElementById("mqtt.port").value                          = settings.mqtt.port;
-    if (settings.mqtt.active) {
-        MqttServer.disabled     = false;
-        MqttTopic.disabled      = false;
-        MqttUsername.disabled   = false;
-        MqttPassword.disabled   = false;
-        MqttPort.disabled       = false;
-    }
+    MqttCheckbox.checked    = settings.mqtt.active;
+    MqttServer.disabled     = !MqttCheckbox.check;
+    MqttTopic.disabled      = !MqttCheckbox.check;
+    MqttUsername.disabled   = !MqttCheckbox.check;
+    MqttPassword.disabled   = !MqttCheckbox.check;
+    MqttPort.disabled       = !MqttCheckbox.check;
 
     // Reboot
     document.getElementById("other.rebootMode").checked                 = settings.other.rebootMode;
     document.getElementById("other.rebootModeTime").value               = settings.other.rebootModeTime;
-    if (settings.other.rebootMode) {
-        RebootModeTime.disabled = false;
-    }
+    RebootModeCheckbox.checked  = settings.other.rebootMode;
+    RebootModeTime.disabled     = !RebootModeCheckbox.check;
 
     // WiFi Auto AP
     document.getElementById("wifi.autoAP.password").value               = settings.wifi.autoAP.password;
@@ -226,6 +232,9 @@ function loadSettings(settings) {
     document.getElementById("webadmin.active").checked                  = settings.webadmin.active;
     document.getElementById("webadmin.username").value                  = settings.webadmin.username;
     document.getElementById("webadmin.password").value                  = settings.webadmin.password;
+    WebadminCheckbox.checked    = settings.webadmin.active;
+    WebadminUsername.disabled   = !WebadminCheckbox.check;
+    WebadminPassword.disabled   = !WebadminCheckbox.check;
 
     // Management over APRS
     document.getElementById("remoteManagement.managers").value          = settings.remoteManagement.managers;
@@ -239,7 +248,6 @@ function loadSettings(settings) {
 
     updateImage();
     refreshSpeedStandard();
-    toggleFields();
 }
 
 function showToast(message) {
@@ -291,54 +299,73 @@ function updateImage() {
     }
 }
 
-function toggleFields() {
-    const sendExternalVoltageCheckbox = document.querySelector(
-        'input[name="battery.sendExternalVoltage"]'
-    );
-    const externalVoltagePinInput = document.querySelector(
-        'input[name="battery.externalVoltagePin"]'
-    );
 
-    externalVoltagePinInput.disabled = !sendExternalVoltageCheckbox.checked;
-    voltageDividerR1.disabled = !sendExternalVoltageCheckbox.checked;
-    voltageDividerR2.disabled = !sendExternalVoltageCheckbox.checked;    
-}
+// Status Switch
+const StatusCheckbox            = document.querySelector('input[name="beacon.statusActive"]');
+const StatusPacket              = document.querySelector('input[name="beacon.statusPacket"]');
+StatusCheckbox.addEventListener("change", function() {
+    StatusPacket.disabled       = !this.checked;
+});
 
-const sendExternalVoltageCheckbox = document.querySelector(
-    'input[name="battery.sendExternalVoltage"]'
-);
-const externalVoltagePinInput = document.querySelector(
-    'input[name="battery.externalVoltagePin"]'
-);
+// APRS-IS Switches
+const APRSISCheckbox            = document.querySelector('input[name="aprs_is.active"]');
+const APRSISGateMessages        = document.querySelector('input[name="aprs_is.messagesToRF"]');
+const APRSISGateObjects         = document.querySelector('input[name="aprs_is.objectsToRF"]');
+const APRSISServer              = document.querySelector('input[name="aprs_is.server"]');
+const APRSISPort                = document.querySelector('input[name="aprs_is.port"]');
+const APRSISPasscode            = document.querySelector('input[name="aprs_is.passcode"]');
+const APRSISFilter              = document.querySelector('input[name="aprs_is.filter"]');
+APRSISCheckbox.addEventListener("change", function() {
+    APRSISGateMessages.disabled = !this.checked;
+    APRSISGateObjects.disabled  = !this.checked;
+    APRSISServer.disabled       = !this.checked;
+    APRSISPort.disabled         = !this.checked;
+    APRSISPasscode.disabled     = !this.checked;
+    APRSISFilter.disabled       = !this.checked;
+});
 
-const voltageDividerR1 = document.querySelector(
-    'input[name="battery.voltageDividerR1"]'
-);
+// Display Switches
+const DisplayAlwaysOnCheckbox   = document.querySelector('input[name="display.alwaysOn"]');
+const DisplayTimeout            = document.querySelector('input[name="display.timeout"]');
+DisplayAlwaysOnCheckbox.addEventListener("change", function () {
+    DisplayTimeout.disabled     = this.checked;
+});
 
-const voltageDividerR2 = document.querySelector(
-    'input[name="battery.voltageDividerR2"]'
-);
-
-sendExternalVoltageCheckbox.addEventListener("change", function () {
-    externalVoltagePinInput.disabled = !this.checked;
-    voltageDividerR1.disabled = !this.checked;
-    voltageDividerR2.disabled = !this.checked;
+// Battery Switches
+const MonitorInternalVoltageCheckbox        = document.querySelector('input[name="battery.monitorInternalVoltage"]');
+const MonitorInternalSleepVoltage           = document.querySelector('input[name="battery.internalSleepVoltage"]');
+MonitorInternalVoltageCheckbox.addEventListener("change", function () {
+    MonitorInternalSleepVoltage.disabled    = !this.checked;
+});
+const MonitorExternalVoltageCheckbox        = document.querySelector('input[name="battery.monitorExternalVoltage"]');
+const MonitorExternalSleepVoltage           = document.querySelector('input[name="battery.externalSleepVoltage"]');
+MonitorExternalVoltageCheckbox.addEventListener("change", function () {
+    MonitorExternalSleepVoltage.disabled    = !this.checked;
+});
+const SendExternalVoltageCheckbox           = document.querySelector('input[name="battery.sendExternalVoltage"]');
+const ExternalVoltagePin                    = document.querySelector('input[name="battery.externalVoltagePin"]');
+const ExternalVoltageDividerR1              = document.querySelector('input[name="battery.voltageDividerR1"]');
+const ExternalVoltageDividerR2              = document.querySelector('input[name="battery.voltageDividerR2"]');
+SendExternalVoltageCheckbox.addEventListener("change", function () {
+    ExternalVoltagePin.disabled             = !this.checked;
+    ExternalVoltageDividerR1.disabled       = !this.checked;
+    ExternalVoltageDividerR2.disabled       = !this.checked;
 });
 
 // Telemetry Switches
-const TelemetryCheckbox         = document.querySelector('input[name="wxsensor.active"]');
-const TelemetryHeightCorrection = document.querySelector('input[name="wxsensor.heightCorrection"]');
-const TelemetryTempCorrection   = document.querySelector('input[name="wxsensor.temperatureCorrection"]');
+const TelemetryCheckbox                 = document.querySelector('input[name="wxsensor.active"]');
+const TelemetryHeightCorrection         = document.querySelector('input[name="wxsensor.heightCorrection"]');
+const TelemetryTempCorrection           = document.querySelector('input[name="wxsensor.temperatureCorrection"]');
 TelemetryCheckbox.addEventListener("change", function () {
     TelemetryHeightCorrection.disabled  = !this.checked;
     TelemetryTempCorrection.disabled    = !this.checked;
 });
 
 // Syslog Switches
-const SyslogCheckbox            = document.querySelector('input[name="syslog.active"]');
-const SyslogServer              = document.querySelector('input[name="syslog.server"]');
-const SyslogPort                = document.querySelector('input[name="syslog.port"]');
-const SyslogBeaconOverTCPIP     = document.querySelector('input[name="syslog.logBeaconOverTCPIP"]');
+const SyslogCheckbox                = document.querySelector('input[name="syslog.active"]');
+const SyslogServer                  = document.querySelector('input[name="syslog.server"]');
+const SyslogPort                    = document.querySelector('input[name="syslog.port"]');
+const SyslogBeaconOverTCPIP         = document.querySelector('input[name="syslog.logBeaconOverTCPIP"]');
 SyslogCheckbox.addEventListener("change", function () {
     SyslogServer.disabled           = !this.checked;
     SyslogPort.disabled             = !this.checked;
@@ -375,6 +402,7 @@ WebadminCheckbox.addEventListener("change", function () {
     WebadminUsername.disabled   = !this.checked;
     WebadminPassword.disabled   = !this.checked;
 });
+
 
 document.querySelector(".new button").addEventListener("click", function () {
     const networksContainer = document.querySelector(".list-networks");
