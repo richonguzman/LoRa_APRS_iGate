@@ -210,7 +210,7 @@ namespace Utils {
                 }
             #endif
 
-            #ifndef HELTEC_WP
+            #ifndef HELTEC_WP_V1
                 if (Config.battery.sendExternalVoltage || Config.battery.monitorExternalVoltage) {
                     float externalVoltage       = BATTERY_Utils::checkExternalVoltage();
                     if (Config.battery.monitorExternalVoltage && externalVoltage < Config.battery.externalSleepVoltage) {

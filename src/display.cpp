@@ -44,7 +44,9 @@
         #ifdef HAS_EPAPER
             #include <heltec-eink-modules.h>
             #include "Fonts/FreeSansBold9pt7b.h"
-            EInkDisplay_WirelessPaperV1_1 display;
+            #ifdef HELTEC_WP_V1
+                EInkDisplay_WirelessPaperV1_1 display;
+            #endif
             String lastEpaperText;
         #else
             #include <Adafruit_GFX.h>

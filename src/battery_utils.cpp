@@ -147,7 +147,7 @@ namespace BATTERY_Utils {
             #ifdef ADC_CTRL
                 POWER_Utils::adc_ctrl_OFF();
 
-                #ifdef HELTEC_WP
+                #ifdef HELTEC_WP_V1
                 double inputDivider = (1.0 / (10.0 + 10.0)) * 10.0;  // The voltage divider is a 10k + 10k resistor in series
                 #else
                 double inputDivider = (1.0 / (390.0 + 100.0)) * 100.0;  // The voltage divider is a 390k + 100k resistor in series, 100k on the low side.
@@ -216,7 +216,7 @@ namespace BATTERY_Utils {
                 shouldSleepLowVoltage = true;
             }
         #endif
-        #ifndef HELTEC_WP
+        #ifndef HELTEC_WP_V1
             if (Config.battery.monitorExternalVoltage && checkExternalVoltage() < Config.battery.externalSleepVoltage + 0.1) {
                 shouldSleepLowVoltage = true;
             }
