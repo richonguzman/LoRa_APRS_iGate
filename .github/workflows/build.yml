@@ -67,7 +67,7 @@ jobs:
                       chip: esp32s3
                     - name: heltec_ht-ct62
                       chip: esp32c3
-                    - name: heltec_wireless_paper_v1
+                    - name: heltec_wireless_paper
                       chip: esp32s3
                     - name: OE5HWN_MeshCom
                       chip: esp32
