@@ -18,7 +18,9 @@
         "sendViaAPRSIS": false,
         "sendViaRF": false,
         "statusActive": false,
-        "statusPacket": ""
+        "statusPacket": "",
+        "gpsActive": false,
+        "gpsAmbiguity": false
     },
     "aprs_is": {
         "active": false,
