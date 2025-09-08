@@ -29,10 +29,14 @@
         TFT_eSPI tft = TFT_eSPI(); 
         TFT_eSprite sprite  = TFT_eSprite(&tft);
 
-        #ifdef HELTEC_WIRELESS_TRACKER
+        #if defined(HELTEC_WIRELESS_TRACKER)
             #define bigSizeFont     2
             #define smallSizeFont   1
             #define lineSpacing     10
+        #elif defined(TTGO_T8_S2_DIY_LoRa)
+            #define bigSizeFont     2
+            #define smallSizeFont   1
+            #define lineSpacing     17
         #endif
         #if defined(TTGO_T_DECK_GPS) || defined(TTGO_T_DECK_PLUS)
             #define bigSizeFont     5
@@ -84,6 +88,8 @@ void displaySetup() {
             tft.fillScreen(TFT_BLACK);
             #if defined(TTGO_T_DECK_GPS) || defined(TTGO_T_DECK_PLUS)
                 sprite.createSprite(320,240);
+            #elif defined(TTGO_T8_S2_DIY_LoRa)
+                sprite.createSprite(240,135);
             #else
                 sprite.createSprite(160,80);
             #endif
@@ -178,6 +184,9 @@ void displayShow(const String& header, const String& line1, const String& line2,
             #if defined(TTGO_T_DECK_GPS) || defined(TTGO_T_DECK_PLUS)
                 sprite.fillRect(0, 0, 320, 43, redColor);
             #endif
+            #if defined(TTGO_T8_S2_DIY_LoRa)
+                sprite.fillRect(0, 0, 320, 25, redColor);
+            #endif
             sprite.setTextFont(0);
             sprite.setTextSize(bigSizeFont);
             sprite.setTextColor(TFT_WHITE, redColor);
@@ -242,6 +251,9 @@ void displayShow(const String& header, const String& line1, const String& line2,
             #endif
             #if defined(TTGO_T_DECK_GPS) || defined(TTGO_T_DECK_PLUS)
                 sprite.fillRect(0, 0, 320, 43, redColor);
+            #endif
+            #if defined(TTGO_T8_S2_DIY_LoRa)
+                sprite.fillRect(0, 0, 320, 27, redColor);
             #endif
             sprite.setTextFont(0);
             sprite.setTextSize(bigSizeFont);

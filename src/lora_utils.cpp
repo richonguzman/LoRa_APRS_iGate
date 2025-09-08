@@ -37,7 +37,12 @@ bool operationDone   = true;
 bool transmitFlag    = true;
 
 #ifdef HAS_SX1262
-    SX1262 radio = new Module(RADIO_CS_PIN, RADIO_DIO1_PIN, RADIO_RST_PIN, RADIO_BUSY_PIN);
+    #if defined(TTGO_T8_S2_DIY_LoRa) 
+        SPIClass loraSPI(FSPI);
+        SX1262 radio = new Module(RADIO_CS_PIN, RADIO_DIO1_PIN, RADIO_RST_PIN, RADIO_BUSY_PIN, loraSPI); 
+    #else
+        SX1262 radio = new Module(RADIO_CS_PIN, RADIO_DIO1_PIN, RADIO_RST_PIN, RADIO_BUSY_PIN);
+    #endif
 #endif
 #ifdef HAS_SX1268
     #if defined(LIGHTGATEWAY_1_0) || defined(LIGHTGATEWAY_PLUS_1_0)
@@ -68,13 +73,15 @@ namespace LoRa_Utils {
     }
 
     void setup() {
-        #if defined (LIGHTGATEWAY_1_0) || defined(LIGHTGATEWAY_PLUS_1_0)
-            pinMode(RADIO_VCC_PIN,OUTPUT);
-            digitalWrite(RADIO_VCC_PIN,HIGH);
+        #if defined (LIGHTGATEWAY_1_0) || defined(LIGHTGATEWAY_PLUS_1_0) || defined(TTGO_T8_S2_DIY_LoRa)
+            #if defined(RADIO_VCC_PIN)
+                pinMode(RADIO_VCC_PIN,OUTPUT);
+                digitalWrite(RADIO_VCC_PIN,HIGH);
+            #endif
             loraSPI.begin(RADIO_SCLK_PIN, RADIO_MISO_PIN, RADIO_MOSI_PIN, RADIO_CS_PIN);
-        #else
-            SPI.begin(RADIO_SCLK_PIN, RADIO_MISO_PIN, RADIO_MOSI_PIN);
-        #endif
+#else
+        SPI.begin(RADIO_SCLK_PIN, RADIO_MISO_PIN, RADIO_MOSI_PIN);
+#endif
         float freq = (float)Config.loramodule.rxFreq / 1000000;
         #if defined(RADIO_HAS_XTAL)
             radio.XTAL = true;
