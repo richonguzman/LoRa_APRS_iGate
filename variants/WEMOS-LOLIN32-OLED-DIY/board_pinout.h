@@ -30,7 +30,10 @@
     #define RADIO_WAKEUP_PIN        RADIO_BUSY_PIN
     #define GPIO_WAKEUP_PIN         GPIO_SEL_25
 
-    //  Display    
+    //  I2C
+    #define USE_WIRE_WITH_OLED_PINS
+
+    //  Display
     #define HAS_DISPLAY
 
     #undef  OLED_SDA

@@ -34,6 +34,9 @@
     #define RADIO_WAKEUP_PIN        RADIO_DIO1_PIN
     #define GPIO_WAKEUP_PIN         GPIO_SEL_12
 
+    //  I2C
+    #define USE_WIRE_WITH_OLED_PINS
+
     //  Display
     #define HAS_DISPLAY
 

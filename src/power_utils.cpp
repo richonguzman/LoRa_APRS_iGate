@@ -296,18 +296,6 @@ namespace POWER_Utils {
             adc_ctrl_OFF();
         #endif
 
-        #if defined(HELTEC_WIRELESS_TRACKER)
-            Wire.begin(BOARD_I2C_SDA, BOARD_I2C_SCL);
-        #endif
-
-        #if defined(HELTEC_V3) || defined(HELTEC_V3_2) || defined(HELTEC_WS) || defined(LIGHTGATEWAY_1_0) || defined(LIGHTGATEWAY_PLUS_1_0) || defined(TTGO_LORA32_T3S3_V1_2) || defined(HELTEC_V2)
-            Wire.begin(OLED_SDA, OLED_SCL);
-        #endif
-
-        #if defined(HELTEC_V3) || defined(HELTEC_V3_2) || defined(HELTEC_WP_V1) || defined(HELTEC_WSL_V3) || defined(HELTEC_WSL_V3_DISPLAY)
-            Wire1.begin(BOARD_I2C_SDA, BOARD_I2C_SCL);
-        #endif
-
         #if defined(TTGO_T_DECK_GPS) || defined(TTGO_T_DECK_PLUS)
             pinMode(BOARD_POWERON, OUTPUT);
             digitalWrite(BOARD_POWERON, HIGH);
@@ -321,9 +309,20 @@ namespace POWER_Utils {
             digitalWrite(TFT_CS, HIGH);
 
             delay(500);
+        #endif
+
+        #ifdef USE_WIRE_WITH_OLED_PINS
+            Wire.begin(OLED_SDA, OLED_SCL);
+        #endif
+
+        #ifdef USE_WIRE_WITH_BOARD_I2C_PINS
             Wire.begin(BOARD_I2C_SDA, BOARD_I2C_SCL);
         #endif
 
+        #ifdef USE_WIRE1_WITH_BOARD_I2C_PINS
+            Wire1.begin(BOARD_I2C_SDA, BOARD_I2C_SCL);
+        #endif
+        
         delay(1000);
         BATTERY_Utils::setup();
         BATTERY_Utils::startupBatteryHealth();

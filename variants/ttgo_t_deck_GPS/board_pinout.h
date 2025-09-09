@@ -31,6 +31,11 @@
     #define RADIO_WAKEUP_PIN        RADIO_DIO1_PIN
     #define GPIO_WAKEUP_PIN         GPIO_SEL_45
 
+    //  I2C
+    #define USE_WIRE_WITH_BOARD_I2C_PINS
+    #define BOARD_I2C_SDA           18
+    #define BOARD_I2C_SCL           8
+
     //  Display
     #define HAS_DISPLAY
     #define HAS_TFT
@@ -49,8 +54,5 @@
     #define BOARD_POWERON           10
     #define BOARD_SDCARD_CS         39
     #define BOARD_BL_PIN            42
-
-    #define BOARD_I2C_SDA           18
-    #define BOARD_I2C_SCL           8
 
 #endif

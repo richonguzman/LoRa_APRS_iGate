@@ -30,6 +30,11 @@
     #define RADIO_BUSY_PIN          13      // SX1262 BUSY
     #define RADIO_WAKEUP_PIN        RADIO_DIO1_PIN
     #define GPIO_WAKEUP_PIN         GPIO_SEL_14
+
+    //  I2C
+    #define USE_WIRE_WITH_BOARD_I2C_PINS
+    #define BOARD_I2C_SDA           7
+    #define BOARD_I2C_SCL           6
     
     //  Display
     #define HAS_DISPLAY
@@ -40,8 +45,6 @@
     #define BATTERY_PIN             1    
     #define ADC_CTRL                2   // HELTEC Wireless Tracker ADC_CTRL = HIGH powers the voltage divider to read BatteryPin. Only on V05 = V1.1
     #define VEXT_CTRL               3   // To turn on GPS and TFT
-    #define BOARD_I2C_SDA           7
-    #define BOARD_I2C_SCL           6
 
     //  GPS
     #define HAS_GPS
