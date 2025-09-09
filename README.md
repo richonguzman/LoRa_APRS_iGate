@@ -60,6 +60,7 @@ ____________________________________________________
 
 ## Timeline (Versions):
 
+- 2025-09-09 MQTT added (pub+sub), Status defined by Op now and many fixes more.
 - 2025-06-20 Digipeaters now with updated EcoMode (Board Sleeps until packet Rx reducing current consumption to almost 10% at idle).
 - 2025-06-20 New Boards Added: Heltec T114 MeshNode, Faketec V3 as Digipeaters and QRP Labs LightGateway Plus 1.0.
 - 2025-06-19 DateVersion format Change. Licence changed into GNU GPLv3.
