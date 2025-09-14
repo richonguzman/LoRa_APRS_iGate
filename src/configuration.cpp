@@ -29,7 +29,7 @@ bool shouldSleepStop = true;
 void Configuration::writeFile() {
     Serial.println("Saving config...");
 
-    StaticJsonDocument<2560> data;
+    StaticJsonDocument<3584> data;
     File configFile = SPIFFS.open("/igate_conf.json", "w");
 
     if (wifiAPs[0].ssid != "") { // We don't want to save Auto AP empty SSID
@@ -157,7 +157,7 @@ bool Configuration::readFile() {
     File configFile = SPIFFS.open("/igate_conf.json", "r");
 
     if (configFile) {
-        StaticJsonDocument<2560> data;
+        StaticJsonDocument<3584> data;
 
         DeserializationError error = deserializeJson(data, configFile);
         if (error) {
