@@ -117,157 +117,198 @@ namespace WEB_Utils {
     void handleWriteConfiguration(AsyncWebServerRequest *request) {
         Serial.println("Got new config from www");
 
-        int networks = request->getParam("wifi.APs", true)->value().toInt();
+        auto getParamStringSafe = [&](const String& name, const String& defaultValue = "") -> String {
+            if (request->hasParam(name, true)) {
+                return request->getParam(name, true)->value();
+            }
+            return defaultValue;
+        };
+
+        auto getParamIntSafe = [&](const String& name, int defaultValue = 0) -> int {
+            if (request->hasParam(name, true)) {
+                return request->getParam(name, true)->value().toInt();
+            }
+            return defaultValue;
+        };
+
+        auto getParamFloatSafe = [&](const String& name, float defaultValue = 0.0) -> float {
+            if (request->hasParam(name, true)) {
+                return request->getParam(name, true)->value().toFloat();
+            }
+            return defaultValue;
+        };
+
+        auto getParamDoubleSafe = [&](const String& name, double defaultValue = 0.0) -> double {
+            if (request->hasParam(name, true)) {
+                return request->getParam(name, true)->value().toDouble();
+            }
+            return defaultValue;
+        };
+
+        int networks = getParamIntSafe("wifi.APs");
 
         Config.wifiAPs = {};
 
-        for (int i=0; i<networks; i++) {
+        for (int i = 0; i < networks; i++) {
             WiFi_AP wifiap;
-            wifiap.ssid                   = request->getParam("wifi.AP." + String(i) + ".ssid", true)->value();
-            wifiap.password               = request->getParam("wifi.AP." + String(i) + ".password", true)->value();
+            wifiap.ssid                   = getParamStringSafe("wifi.AP." + String(i) + ".ssid");
+            wifiap.password               = getParamStringSafe("wifi.AP." + String(i) + ".password");
 
             Config.wifiAPs.push_back(wifiap);
         }
 
-        Config.callsign                     = request->getParam("callsign", true)->value();
+        Config.callsign                     = getParamStringSafe("callsign", Config.callsign);
         
-        Config.wifiAutoAP.password          = request->getParam("wifi.autoAP.password", true)->value();
-        Config.wifiAutoAP.timeout           = request->getParam("wifi.autoAP.timeout", true)->value().toInt();
+        Config.wifiAutoAP.password          = getParamStringSafe("wifi.autoAP.password", Config.wifiAutoAP.password);
+        Config.wifiAutoAP.timeout           = getParamIntSafe("wifi.autoAP.timeout", Config.wifiAutoAP.timeout);
 
-        
         Config.aprs_is.active               = request->hasParam("aprs_is.active", true);
         if (Config.aprs_is.active) {
             Config.aprs_is.messagesToRF     = request->hasParam("aprs_is.messagesToRF", true);
             Config.aprs_is.objectsToRF      = request->hasParam("aprs_is.objectsToRF", true);
-            Config.aprs_is.server           = request->getParam("aprs_is.server", true)->value();
-            Config.aprs_is.passcode         = request->getParam("aprs_is.passcode", true)->value();
-            Config.aprs_is.port             = request->getParam("aprs_is.port", true)->value().toInt();
-            Config.aprs_is.filter           = request->getParam("aprs_is.filter", true)->value();  
+            Config.aprs_is.server           = getParamStringSafe("aprs_is.server", Config.aprs_is.server);
+            Config.aprs_is.passcode         = getParamStringSafe("aprs_is.passcode", Config.aprs_is.passcode);
+            Config.aprs_is.port             = getParamIntSafe("aprs_is.port", Config.aprs_is.port);
+            Config.aprs_is.filter           = getParamStringSafe("aprs_is.filter", Config.aprs_is.filter);
         }
 
-        Config.beacon.interval              = request->getParam("beacon.interval", true)->value().toInt();
+        Config.beacon.interval              = getParamIntSafe("beacon.interval", Config.beacon.interval);
         Config.beacon.sendViaAPRSIS         = request->hasParam("beacon.sendViaAPRSIS", true);
         Config.beacon.sendViaRF             = request->hasParam("beacon.sendViaRF", true);
-        Config.beacon.latitude              = request->getParam("beacon.latitude", true)->value().toDouble();
-        Config.beacon.longitude             = request->getParam("beacon.longitude", true)->value().toDouble();
-        Config.beacon.comment               = request->getParam("beacon.comment", true)->value();
-        Config.beacon.overlay               = request->getParam("beacon.overlay", true)->value();
-        Config.beacon.symbol                = request->getParam("beacon.symbol", true)->value();
-        Config.beacon.path                  = request->getParam("beacon.path", true)->value();
+        Config.beacon.latitude              = getParamDoubleSafe("beacon.latitude", Config.beacon.latitude);
+        Config.beacon.longitude             = getParamDoubleSafe("beacon.longitude", Config.beacon.longitude);
+        Config.beacon.comment               = getParamStringSafe("beacon.comment", Config.beacon.comment);
+        Config.beacon.overlay               = getParamStringSafe("beacon.overlay", Config.beacon.overlay);
+        Config.beacon.symbol                = getParamStringSafe("beacon.symbol", Config.beacon.symbol);
+        Config.beacon.path                  = getParamStringSafe("beacon.path", Config.beacon.path);
 
         Config.beacon.statusActive          = request->hasParam("beacon.statusActive", true);
         if (Config.beacon.statusActive) {
-            Config.beacon.statusPacket      = request->getParam("beacon.statusPacket", true)->value();
+            Config.beacon.statusPacket      = getParamStringSafe("beacon.statusPacket", Config.beacon.statusPacket);
         }
 
         Config.beacon.gpsActive             = request->hasParam("beacon.gpsActive", true);
         Config.beacon.gpsAmbiguity          = request->hasParam("beacon.gpsAmbiguity", true);
 
-        Config.personalNote                 = request->getParam("personalNote", true)->value();
+        Config.personalNote                 = getParamStringSafe("personalNote", Config.personalNote);
 
-        Config.blacklist                    = request->getParam("blacklist", true)->value();
+        Config.blacklist                    = getParamStringSafe("blacklist", Config.blacklist);
 
-        Config.digi.mode                    = request->getParam("digi.mode", true)->value().toInt();
-        Config.digi.ecoMode                 = request->getParam("digi.ecoMode", true)->value().toInt();;
+        Config.digi.mode                    = getParamIntSafe("digi.mode", Config.digi.mode);
+        Config.digi.ecoMode                 = getParamIntSafe("digi.ecoMode", Config.digi.ecoMode);
 
-        Config.loramodule.txFreq            = request->getParam("lora.txFreq", true)->value().toInt();
-        Config.loramodule.rxFreq            = request->getParam("lora.rxFreq", true)->value().toInt();
-        Config.loramodule.spreadingFactor   = request->getParam("lora.spreadingFactor", true)->value().toInt();
-        Config.loramodule.signalBandwidth   = request->getParam("lora.signalBandwidth", true)->value().toInt();
-        Config.loramodule.codingRate4       = request->getParam("lora.codingRate4", true)->value().toInt();
-        Config.loramodule.power             = request->getParam("lora.power", true)->value().toInt();
+        Config.loramodule.txFreq            = getParamIntSafe("lora.txFreq", Config.loramodule.txFreq);
+        Config.loramodule.rxFreq            = getParamIntSafe("lora.rxFreq", Config.loramodule.rxFreq);
+        Config.loramodule.spreadingFactor   = getParamIntSafe("lora.spreadingFactor", Config.loramodule.spreadingFactor);
+        Config.loramodule.signalBandwidth   = getParamIntSafe("lora.signalBandwidth", Config.loramodule.signalBandwidth);
+        Config.loramodule.codingRate4       = getParamIntSafe("lora.codingRate4", Config.loramodule.codingRate4);
+        Config.loramodule.power             = getParamIntSafe("lora.power", Config.loramodule.power);
         Config.loramodule.txActive          = request->hasParam("lora.txActive", true);
         Config.loramodule.rxActive          = request->hasParam("lora.rxActive", true);
 
 
         Config.display.alwaysOn             = request->hasParam("display.alwaysOn", true);
         if (!Config.display.alwaysOn) {
-            Config.display.timeout          = request->getParam("display.timeout", true)->value().toInt();
+            Config.display.timeout          = getParamIntSafe("display.timeout", Config.display.timeout);
         }
         Config.display.turn180              = request->hasParam("display.turn180", true);
 
 
-        Config.battery.sendInternalVoltage      = request->hasParam("battery.sendInternalVoltage", true);
-        Config.battery.monitorInternalVoltage   = request->hasParam("battery.monitorInternalVoltage", true);
+        Config.battery.sendInternalVoltage          = request->hasParam("battery.sendInternalVoltage", true);
+        Config.battery.monitorInternalVoltage       = request->hasParam("battery.monitorInternalVoltage", true);
         if (Config.battery.monitorInternalVoltage) {
-            Config.battery.internalSleepVoltage     = request->getParam("battery.internalSleepVoltage", true)->value().toFloat();
-        }        
+            Config.battery.internalSleepVoltage     = getParamFloatSafe("battery.internalSleepVoltage", Config.battery.internalSleepVoltage);
+        }
 
-        Config.battery.sendExternalVoltage      = request->hasParam("battery.sendExternalVoltage", true);
+        Config.battery.sendExternalVoltage          = request->hasParam("battery.sendExternalVoltage", true);
         if (Config.battery.sendExternalVoltage) {
-            Config.battery.externalVoltagePin   = request->getParam("battery.externalVoltagePin", true)->value().toInt();
-            Config.battery.voltageDividerR1     = request->getParam("battery.voltageDividerR1", true)->value().toFloat();
-            Config.battery.voltageDividerR2     = request->getParam("battery.voltageDividerR2", true)->value().toFloat();
+            Config.battery.externalVoltagePin       = getParamIntSafe("battery.externalVoltagePin", Config.battery.externalVoltagePin);
+            Config.battery.voltageDividerR1         = getParamFloatSafe("battery.voltageDividerR1", Config.battery.voltageDividerR1);
+            Config.battery.voltageDividerR2         = getParamFloatSafe("battery.voltageDividerR2", Config.battery.voltageDividerR2);
         }
-        Config.battery.monitorExternalVoltage   = request->hasParam("battery.monitorExternalVoltage", true);
+        Config.battery.monitorExternalVoltage       = request->hasParam("battery.monitorExternalVoltage", true);
         if (Config.battery.monitorExternalVoltage) {
-            Config.battery.externalSleepVoltage = request->getParam("battery.externalSleepVoltage", true)->value().toFloat();
+            Config.battery.externalSleepVoltage     = getParamFloatSafe("battery.externalSleepVoltage", Config.battery.externalSleepVoltage);
         }
-        Config.battery.sendVoltageAsTelemetry   = request->hasParam("battery.sendVoltageAsTelemetry", true);
+        Config.battery.sendVoltageAsTelemetry       = request->hasParam("battery.sendVoltageAsTelemetry", true);
 
 
         Config.wxsensor.active                      = request->hasParam("wxsensor.active", true);
         if (Config.wxsensor.active) {
-            Config.wxsensor.heightCorrection        = request->getParam("wxsensor.heightCorrection", true)->value().toInt();
-            Config.wxsensor.temperatureCorrection   = request->getParam("wxsensor.temperatureCorrection", true)->value().toFloat();
+            Config.wxsensor.heightCorrection        = getParamIntSafe("wxsensor.heightCorrection", Config.wxsensor.heightCorrection);
+            Config.wxsensor.temperatureCorrection   = getParamFloatSafe("wxsensor.temperatureCorrection", Config.wxsensor.temperatureCorrection);
             Config.beacon.symbol = "_";
         }
 
 
         Config.syslog.active                    = request->hasParam("syslog.active", true);
         if (Config.syslog.active) {
-            Config.syslog.server                = request->getParam("syslog.server", true)->value();
-            Config.syslog.port                  = request->getParam("syslog.port", true)->value().toInt();
+            Config.syslog.server                = getParamStringSafe("syslog.server", Config.syslog.server);
+            Config.syslog.port                  = getParamIntSafe("syslog.port", Config.syslog.port);
             Config.syslog.logBeaconOverTCPIP    = request->hasParam("syslog.logBeaconOverTCPIP", true);
         }
 
 
-        Config.tnc.enableServer     = request->hasParam("tnc.enableServer", true);
-        Config.tnc.enableSerial     = request->hasParam("tnc.enableSerial", true);
-        Config.tnc.acceptOwn        = request->hasParam("tnc.acceptOwn", true);
+        Config.tnc.enableServer             = request->hasParam("tnc.enableServer", true);
+        Config.tnc.enableSerial             = request->hasParam("tnc.enableSerial", true);
+        Config.tnc.acceptOwn                = request->hasParam("tnc.acceptOwn", true);
 
 
-        Config.mqtt.active          = request->hasParam("mqtt.active", true);
+        Config.mqtt.active                  = request->hasParam("mqtt.active", true);
         if (Config.mqtt.active) {
-            Config.mqtt.server      = request->getParam("mqtt.server", true)->value();
-            Config.mqtt.topic       = request->getParam("mqtt.topic", true)->value();
-            Config.mqtt.username    = request->getParam("mqtt.username", true)->value();
-            Config.mqtt.password    = request->getParam("mqtt.password", true)->value();
-            Config.mqtt.port        = request->getParam("mqtt.port", true)->value().toInt();
+            Config.mqtt.server              = getParamStringSafe("mqtt.server", Config.mqtt.server);
+            Config.mqtt.topic               = getParamStringSafe("mqtt.topic", Config.mqtt.topic);
+            Config.mqtt.username            = getParamStringSafe("mqtt.username", Config.mqtt.username);
+            Config.mqtt.password            = getParamStringSafe("mqtt.password", Config.mqtt.password);
+            Config.mqtt.port                = getParamIntSafe("mqtt.port", Config.mqtt.port);
         }
 
-        
-        Config.rebootMode           = request->hasParam("other.rebootMode", true);
+
+        Config.rebootMode                   = request->hasParam("other.rebootMode", true);
         if (Config.rebootMode) {
-            Config.rebootModeTime   = request->getParam("other.rebootModeTime", true)->value().toInt();
+            Config.rebootModeTime           = getParamIntSafe("other.rebootModeTime", Config.rebootModeTime);
         }
 
-        Config.ota.username         = request->getParam("ota.username", true)->value();
-        Config.ota.password         = request->getParam("ota.password", true)->value();
+        Config.ota.username                 = getParamStringSafe("ota.username", Config.ota.username);
+        Config.ota.password                 = getParamStringSafe("ota.password", Config.ota.password);
 
         Config.webadmin.active              = request->hasParam("webadmin.active", true);
         if (Config.webadmin.active) {
-            Config.webadmin.username        = request->getParam("webadmin.username", true)->value();
-            Config.webadmin.password        = request->getParam("webadmin.password", true)->value();
+            Config.webadmin.username        = getParamStringSafe("webadmin.username", Config.webadmin.username);
+            Config.webadmin.password        = getParamStringSafe("webadmin.password", Config.webadmin.password);
         }
 
-        Config.remoteManagement.managers    = request->getParam("remoteManagement.managers", true)->value();
+        Config.remoteManagement.managers    = getParamStringSafe("remoteManagement.managers", Config.remoteManagement.managers);
         Config.remoteManagement.rfOnly      = request->hasParam("remoteManagement.rfOnly", true);
 
-        Config.ntp.gmtCorrection            = request->getParam("ntp.gmtCorrection", true)->value().toFloat();
+        Config.ntp.gmtCorrection            = getParamFloatSafe("ntp.gmtCorrection", Config.ntp.gmtCorrection);
 
-        Config.rememberStationTime          = request->getParam("other.rememberStationTime", true)->value().toInt();
+        Config.rememberStationTime          = getParamIntSafe("other.rememberStationTime", Config.rememberStationTime);
 
         Config.backupDigiMode               = request->hasParam("other.backupDigiMode", true);
+        
+        Serial.println("Saving configuration...");
+        bool saveSuccess = Config.writeFile();
 
-        Config.writeFile();
-
-        AsyncWebServerResponse *response    = request->beginResponse(302, "text/html", "");
-        response->addHeader("Location", "/");
-        request->send(response);
-        displayToggle(false);
-        delay(200);
-        ESP.restart();
+        if (saveSuccess) {
+            Serial.println("Configuration saved successfully");
+            AsyncWebServerResponse *response = request->beginResponse(302, "text/html", "");
+            response->addHeader("Location", "/?success=1");
+            request->send(response);
+            
+            displayToggle(false);
+            delay(1000); // Dar tiempo al guardado
+            ESP.restart();
+        } else {
+            Serial.println("Error saving configuration!");
+            String errorPage = "<!DOCTYPE html><html><head><title>Error</title></head><body>";
+            errorPage += "<h1>Configuration Error:</h1>";
+            errorPage += "<p>Couldn't save new configuration. Please try again.</p>";
+            errorPage += "<a href='/'>Back</a></body></html>";
+            
+            AsyncWebServerResponse *response = request->beginResponse(500, "text/html", errorPage);
+            request->send(response);
+        }
     }
 
     void handleAction(AsyncWebServerRequest *request) {
