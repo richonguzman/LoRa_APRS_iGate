@@ -115,7 +115,7 @@ namespace WEB_Utils {
     }
 
     void handleWriteConfiguration(AsyncWebServerRequest *request) {
-        Serial.println("Got new config from www");
+        Serial.println("Got new Configuration Data from www");
 
         auto getParamStringSafe = [&](const String& name, const String& defaultValue = "") -> String {
             if (request->hasParam(name, true)) {
@@ -287,7 +287,6 @@ namespace WEB_Utils {
 
         Config.backupDigiMode               = request->hasParam("other.backupDigiMode", true);
         
-        Serial.println("Saving configuration...");
         bool saveSuccess = Config.writeFile();
 
         if (saveSuccess) {
