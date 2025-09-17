@@ -186,7 +186,7 @@ public:
     MQTT                    mqtt;
 
     void init();
-    void writeFile();
+    bool writeFile();
     Configuration();
 
 private:

@@ -26,129 +26,139 @@
 bool shouldSleepStop = true;
 
 
-void Configuration::writeFile() {
+bool Configuration::writeFile() {
     Serial.println("Saving config...");
 
     StaticJsonDocument<3584> data;
     File configFile = SPIFFS.open("/igate_conf.json", "w");
 
-    if (wifiAPs[0].ssid != "") { // We don't want to save Auto AP empty SSID
-        for (int i = 0; i < wifiAPs.size(); i++) {
-            data["wifi"]["AP"][i]["ssid"] = wifiAPs[i].ssid;
-            data["wifi"]["AP"][i]["password"] = wifiAPs[i].password;
-        }
+    if (!configFile) {
+        Serial.println("Error: Could not open config file for writing");
+        return false;
     }
+    try {
 
-    data["wifi"]["autoAP"]["password"]          = wifiAutoAP.password;
-    data["wifi"]["autoAP"]["timeout"]           = wifiAutoAP.timeout;
+        if (wifiAPs[0].ssid != "") { // We don't want to save Auto AP empty SSID
+            for (int i = 0; i < wifiAPs.size(); i++) {
+                data["wifi"]["AP"][i]["ssid"] = wifiAPs[i].ssid;
+                data["wifi"]["AP"][i]["password"] = wifiAPs[i].password;
+            }
+        }
 
-    data["callsign"]                            = callsign;
+        data["wifi"]["autoAP"]["password"]          = wifiAutoAP.password;
+        data["wifi"]["autoAP"]["timeout"]           = wifiAutoAP.timeout;
 
-    data["aprs_is"]["active"]                   = aprs_is.active;
-    data["aprs_is"]["passcode"]                 = aprs_is.passcode;
-    data["aprs_is"]["server"]                   = aprs_is.server;
-    data["aprs_is"]["port"]                     = aprs_is.port;
-    data["aprs_is"]["filter"]                   = aprs_is.filter;
-    data["aprs_is"]["messagesToRF"]             = aprs_is.messagesToRF;
-    data["aprs_is"]["objectsToRF"]              = aprs_is.objectsToRF;
+        data["callsign"]                            = callsign;
 
-    data["beacon"]["comment"]                   = beacon.comment;
-    data["beacon"]["interval"]                  = beacon.interval;
-    data["beacon"]["latitude"]                  = beacon.latitude;
-    data["beacon"]["longitude"]                 = beacon.longitude;
-    data["beacon"]["overlay"]                   = beacon.overlay;
-    data["beacon"]["symbol"]                    = beacon.symbol;
-    data["beacon"]["sendViaAPRSIS"]             = beacon.sendViaAPRSIS;
-    data["beacon"]["sendViaRF"]                 = beacon.sendViaRF;
-    data["beacon"]["path"]                      = beacon.path;
+        data["aprs_is"]["active"]                   = aprs_is.active;
+        data["aprs_is"]["passcode"]                 = aprs_is.passcode;
+        data["aprs_is"]["server"]                   = aprs_is.server;
+        data["aprs_is"]["port"]                     = aprs_is.port;
+        data["aprs_is"]["filter"]                   = aprs_is.filter;
+        data["aprs_is"]["messagesToRF"]             = aprs_is.messagesToRF;
+        data["aprs_is"]["objectsToRF"]              = aprs_is.objectsToRF;
 
-    data["beacon"]["statusActive"]              = beacon.statusActive;
-    data["beacon"]["statusPacket"]              = beacon.statusPacket;
+        data["beacon"]["comment"]                   = beacon.comment;
+        data["beacon"]["interval"]                  = beacon.interval;
+        data["beacon"]["latitude"]                  = beacon.latitude;
+        data["beacon"]["longitude"]                 = beacon.longitude;
+        data["beacon"]["overlay"]                   = beacon.overlay;
+        data["beacon"]["symbol"]                    = beacon.symbol;
+        data["beacon"]["sendViaAPRSIS"]             = beacon.sendViaAPRSIS;
+        data["beacon"]["sendViaRF"]                 = beacon.sendViaRF;
+        data["beacon"]["path"]                      = beacon.path;
 
-    data["beacon"]["gpsActive"]                 = beacon.gpsActive;
-    data["beacon"]["gpsAmbiguity"]              = beacon.gpsAmbiguity;
+        data["beacon"]["statusActive"]              = beacon.statusActive;
+        data["beacon"]["statusPacket"]              = beacon.statusPacket;
 
-    data["personalNote"]                        = personalNote;
+        data["beacon"]["gpsActive"]                 = beacon.gpsActive;
+        data["beacon"]["gpsAmbiguity"]              = beacon.gpsAmbiguity;
 
-    data["blacklist"]                           = blacklist;
+        data["personalNote"]                        = personalNote;
 
-    data["digi"]["mode"]                        = digi.mode;
-    data["digi"]["ecoMode"]                     = digi.ecoMode;
-    #if defined(HAS_A7670)
-        if (digi.ecoMode == 1) data["digi"]["ecoMode"] = 2;
-    #endif
+        data["blacklist"]                           = blacklist;
 
-    data["lora"]["rxFreq"]                      = loramodule.rxFreq;
-    data["lora"]["txFreq"]                      = loramodule.txFreq;
-    data["lora"]["spreadingFactor"]             = loramodule.spreadingFactor;
-    data["lora"]["signalBandwidth"]             = loramodule.signalBandwidth;
-    data["lora"]["codingRate4"]                 = loramodule.codingRate4;
-    data["lora"]["power"]                       = loramodule.power;
-    data["lora"]["txActive"]                    = loramodule.txActive;
-    data["lora"]["rxActive"]                    = loramodule.rxActive;
+        data["digi"]["mode"]                        = digi.mode;
+        data["digi"]["ecoMode"]                     = digi.ecoMode;
+        #if defined(HAS_A7670)
+            if (digi.ecoMode == 1) data["digi"]["ecoMode"] = 2;
+        #endif
 
-    data["display"]["alwaysOn"]                 = display.alwaysOn;
-    data["display"]["timeout"]                  = display.timeout;
-    data["display"]["turn180"]                  = display.turn180;
+        data["lora"]["rxFreq"]                      = loramodule.rxFreq;
+        data["lora"]["txFreq"]                      = loramodule.txFreq;
+        data["lora"]["spreadingFactor"]             = loramodule.spreadingFactor;
+        data["lora"]["signalBandwidth"]             = loramodule.signalBandwidth;
+        data["lora"]["codingRate4"]                 = loramodule.codingRate4;
+        data["lora"]["power"]                       = loramodule.power;
+        data["lora"]["txActive"]                    = loramodule.txActive;
+        data["lora"]["rxActive"]                    = loramodule.rxActive;
 
-    data["battery"]["sendInternalVoltage"]      = battery.sendInternalVoltage;
-    data["battery"]["monitorInternalVoltage"]   = battery.monitorInternalVoltage;
-    data["battery"]["internalSleepVoltage"]     = battery.internalSleepVoltage;
+        data["display"]["alwaysOn"]                 = display.alwaysOn;
+        data["display"]["timeout"]                  = display.timeout;
+        data["display"]["turn180"]                  = display.turn180;
 
-    data["battery"]["sendExternalVoltage"]      = battery.sendExternalVoltage;
-    data["battery"]["externalVoltagePin"]       = battery.externalVoltagePin;
-    data["battery"]["monitorExternalVoltage"]   = battery.monitorExternalVoltage;
-    data["battery"]["externalSleepVoltage"]     = battery.externalSleepVoltage;
-    data["battery"]["voltageDividerR1"]         = battery.voltageDividerR1;
-    data["battery"]["voltageDividerR2"]         = battery.voltageDividerR2;
+        data["battery"]["sendInternalVoltage"]      = battery.sendInternalVoltage;
+        data["battery"]["monitorInternalVoltage"]   = battery.monitorInternalVoltage;
+        data["battery"]["internalSleepVoltage"]     = battery.internalSleepVoltage;
 
-    data["battery"]["sendVoltageAsTelemetry"]   = battery.sendVoltageAsTelemetry;
+        data["battery"]["sendExternalVoltage"]      = battery.sendExternalVoltage;
+        data["battery"]["externalVoltagePin"]       = battery.externalVoltagePin;
+        data["battery"]["monitorExternalVoltage"]   = battery.monitorExternalVoltage;
+        data["battery"]["externalSleepVoltage"]     = battery.externalSleepVoltage;
+        data["battery"]["voltageDividerR1"]         = battery.voltageDividerR1;
+        data["battery"]["voltageDividerR2"]         = battery.voltageDividerR2;
 
-    data["wxsensor"]["active"]                  = wxsensor.active;
-    data["wxsensor"]["heightCorrection"]        = wxsensor.heightCorrection;
-    data["wxsensor"]["temperatureCorrection"]   = wxsensor.temperatureCorrection;
+        data["battery"]["sendVoltageAsTelemetry"]   = battery.sendVoltageAsTelemetry;
 
-    data["syslog"]["active"]                    = syslog.active;
-    data["syslog"]["server"]                    = syslog.server;
-    data["syslog"]["port"]                      = syslog.port;
-    data["syslog"]["logBeaconOverTCPIP"]        = syslog.logBeaconOverTCPIP;
+        data["wxsensor"]["active"]                  = wxsensor.active;
+        data["wxsensor"]["heightCorrection"]        = wxsensor.heightCorrection;
+        data["wxsensor"]["temperatureCorrection"]   = wxsensor.temperatureCorrection;
 
-    data["tnc"]["enableServer"]                 = tnc.enableServer;
-    data["tnc"]["enableSerial"]                 = tnc.enableSerial;
-    data["tnc"]["acceptOwn"]                    = tnc.acceptOwn;
+        data["syslog"]["active"]                    = syslog.active;
+        data["syslog"]["server"]                    = syslog.server;
+        data["syslog"]["port"]                      = syslog.port;
+        data["syslog"]["logBeaconOverTCPIP"]        = syslog.logBeaconOverTCPIP;
 
-    data["mqtt"]["active"]                      = mqtt.active;
-    data["mqtt"]["server"]                      = mqtt.server;
-    data["mqtt"]["topic"]                       = mqtt.topic;
-    data["mqtt"]["username"]                    = mqtt.username;
-    data["mqtt"]["password"]                    = mqtt.password;
-    data["mqtt"]["port"]                        = mqtt.port;
+        data["tnc"]["enableServer"]                 = tnc.enableServer;
+        data["tnc"]["enableSerial"]                 = tnc.enableSerial;
+        data["tnc"]["acceptOwn"]                    = tnc.acceptOwn;
 
-    data["ota"]["username"]                     = ota.username;
-    data["ota"]["password"]                     = ota.password;
+        data["mqtt"]["active"]                      = mqtt.active;
+        data["mqtt"]["server"]                      = mqtt.server;
+        data["mqtt"]["topic"]                       = mqtt.topic;
+        data["mqtt"]["username"]                    = mqtt.username;
+        data["mqtt"]["password"]                    = mqtt.password;
+        data["mqtt"]["port"]                        = mqtt.port;
 
-    data["webadmin"]["active"]                  = webadmin.active;
-    data["webadmin"]["username"]                = webadmin.username;
-    data["webadmin"]["password"]                = webadmin.password;
+        data["ota"]["username"]                     = ota.username;
+        data["ota"]["password"]                     = ota.password;
 
-    data["remoteManagement"]["managers"]        = remoteManagement.managers;
-    data["remoteManagement"]["rfOnly"]          = remoteManagement.rfOnly;
+        data["webadmin"]["active"]                  = webadmin.active;
+        data["webadmin"]["username"]                = webadmin.username;
+        data["webadmin"]["password"]                = webadmin.password;
 
-    data["ntp"]["gmtCorrection"]                = ntp.gmtCorrection;
+        data["remoteManagement"]["managers"]        = remoteManagement.managers;
+        data["remoteManagement"]["rfOnly"]          = remoteManagement.rfOnly;
 
-    data["other"]["rebootMode"]                 = rebootMode;
-    data["other"]["rebootModeTime"]             = rebootModeTime;
+        data["ntp"]["gmtCorrection"]                = ntp.gmtCorrection;
 
-    data["other"]["rememberStationTime"]        = rememberStationTime;
+        data["other"]["rebootMode"]                 = rebootMode;
+        data["other"]["rebootModeTime"]             = rebootModeTime;
 
-    data["other"]["backupDigiMode"]             = backupDigiMode;
+        data["other"]["rememberStationTime"]        = rememberStationTime;
 
-    serializeJson(data, configFile);
+        data["other"]["backupDigiMode"]             = backupDigiMode;
 
-    configFile.close();
+        serializeJson(data, configFile);
+        configFile.close();
 
-    Serial.println("Config saved");
-    delay(200);
+        Serial.println("Config saved");
+        return true;
+    } catch (...) {
+        Serial.println("Error: Exception occurred while saving config");
+        configFile.close();
+        return false;
+    }
 }
 
 bool Configuration::readFile() {
