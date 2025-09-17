@@ -371,7 +371,7 @@ bool Configuration::readFile() {
         if (needsRewrite) {
             Serial.println("Config JSON incomplete, rewriting...");
             writeFile();
-            delay(1000);
+            delay(500);
             ESP.restart();
         } 
         Serial.println("Config read successfuly");
@@ -382,7 +382,7 @@ bool Configuration::readFile() {
     }
 }
     
-void Configuration::init() {
+void Configuration::setDefaultValues() {
 
     WiFi_AP wifiap;
     wifiap.ssid                     = "";
@@ -504,8 +504,9 @@ Configuration::Configuration() {
 
     bool exists = SPIFFS.exists("/igate_conf.json");
     if (!exists) {
-        init();
+        setDefaultValues();
         writeFile();
+        delay(500);
         ESP.restart();
     }
 

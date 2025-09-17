@@ -185,7 +185,7 @@ public:
     REMOTE_MANAGEMENT       remoteManagement;
     MQTT                    mqtt;
 
-    void init();
+    void setDefaultValues();
     bool writeFile();
     Configuration();
 

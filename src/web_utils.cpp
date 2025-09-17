@@ -296,7 +296,7 @@ namespace WEB_Utils {
             request->send(response);
             
             displayToggle(false);
-            delay(1000); // Dar tiempo al guardado
+            delay(500);
             ESP.restart();
         } else {
             Serial.println("Error saving configuration!");
