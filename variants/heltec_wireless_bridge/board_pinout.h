@@ -45,7 +45,7 @@
     #define OLED_RST                -1
 
     //  Aditional Config
-    #define INTERNAL_LED_PIN        2
+    #define INTERNAL_LED_PIN        16
     /*
     Green LED (Lora): PIN 22 / GPIO2
     Yellow LED (Wifi): PIN 23 / GPIO0
