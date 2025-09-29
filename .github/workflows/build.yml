@@ -29,6 +29,8 @@ jobs:
                       chip: esp32s3
                     - name: heltec_wireless_stick_lite_v3_display
                       chip: esp32s3
+                    - name: heltec_wireless_bridge
+                      chip: esp32
                     - name: ESP32_DIY_LoRa
                       chip: esp32
                     - name: ESP32_DIY_LoRa_915
