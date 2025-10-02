@@ -16,17 +16,23 @@
         "symbol": "a",
         "path": "WIDE1-1",
         "sendViaAPRSIS": false,
-        "sendViaRF": false
+        "sendViaRF": false,
+        "statusActive": false,
+        "statusPacket": "",
+        "gpsActive": false,
+        "gpsAmbiguity": false
     },
     "aprs_is": {
         "active": false,
-        "passcode": "XYZVW",
-        "server": "rotate.aprs2.net",
-        "port": 14580,
-        "filter": "m/10",
         "messagesToRF": false,
-        "objectsToRF": false
+        "objectsToRF": false,
+        "server": "rotate.aprs2.net",
+        "passcode": "XYZVW",        
+        "port": 14580,
+        "filter": "m/10"        
     },
+    "personalNote": "",
+    "blacklist": "",
     "digi": {
         "mode": 0,
         "ecoMode": 0
@@ -66,12 +72,21 @@
     "syslog": {
         "active": false,
         "server": "lora.link9.net",
-        "port": 1514
+        "port": 1514,
+        "logBeaconOverTCPIP": false
     },
     "tnc": {
         "enableServer": false,
         "enableSerial": false,
         "acceptOwn": false
+    },
+    "mqtt": {
+        "active": false,
+        "server": "",
+        "topic": "",
+        "username": "",
+        "password": "",
+        "port": 1883
     },
     "ota": {
         "username": "",
@@ -81,19 +96,17 @@
         "username": "admin",
         "password": ""
     },
-    "ntp": {
-        "gmtCorrection": 0.0
-    },
     "remoteManagement": {
         "managers": "",
         "rfOnly": true
-    },        
+    },
+    "ntp": {
+        "gmtCorrection": 0.0
+    },
     "other": {
         "rememberStationTime": 30,
         "backupDigiMode": false,
         "rebootMode": false,
         "rebootModeTime": 6
-    },
-    "personalNote": "",
-    "blacklist": ""
+    }
 }

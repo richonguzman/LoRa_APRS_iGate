@@ -47,6 +47,57 @@ extern Configuration    Config;
 
 namespace POWER_Utils {
 
+    #ifdef VEXT_CTRL
+        void vext_ctrl_ON() {
+            #if defined(HELTEC_WIRELESS_TRACKER) || defined(HELTEC_V3)
+                digitalWrite(VEXT_CTRL, Config.digi.ecoMode == 1 ? LOW : HIGH);
+            #endif
+            #if defined(HELTEC_WP_V1) || defined(HELTEC_WS) || defined(HELTEC_V3_2) || defined(HELTEC_WSL_V3)
+                digitalWrite(VEXT_CTRL, Config.digi.ecoMode == 1 ? HIGH : LOW);
+            #endif
+        }
+
+        void vext_ctrl_OFF() {
+            #if defined(HELTEC_WIRELESS_TRACKER) || defined(HELTEC_V3)
+                digitalWrite(VEXT_CTRL, Config.digi.ecoMode == 1 ? HIGH : LOW);
+            #endif
+            #if defined(HELTEC_WP_V1) || defined(HELTEC_WS) || defined(HELTEC_V3_2) || defined(HELTEC_WSL_V3)
+                digitalWrite(VEXT_CTRL, Config.digi.ecoMode == 1 ? LOW : HIGH);
+            #endif
+        }
+    #endif
+
+
+    #ifdef ADC_CTRL
+        void adc_ctrl_ON() {
+            #if defined(HELTEC_WIRELESS_TRACKER) || defined(HELTEC_V3_2)
+                digitalWrite(ADC_CTRL, HIGH);
+            #endif
+            #if defined(HELTEC_V3) || defined(HELTEC_V2) || defined(HELTEC_WSL_V3) || defined(HELTEC_WP_V1)
+                digitalWrite(ADC_CTRL, LOW);
+            #endif
+        }
+
+        void adc_ctrl_OFF() {
+            #if defined(HELTEC_WIRELESS_TRACKER) || defined(HELTEC_V3_2)
+                digitalWrite(ADC_CTRL, LOW);
+            #endif
+            #if defined(HELTEC_V3) || defined(HELTEC_V2) || defined(HELTEC_WSL_V3) || defined(HELTEC_WP_V1)
+                digitalWrite(ADC_CTRL, HIGH);
+            #endif
+        }
+    #endif
+
+    #if defined(HAS_AXP192) || defined(HAS_AXP2101)
+        void activateMeasurement() {
+            PMU.disableTSPinMeasure();
+            PMU.enableBattDetection();
+            PMU.enableVbusVoltageMeasure();
+            PMU.enableBattVoltageMeasure();
+            PMU.enableSystemVoltageMeasure();
+        }
+    #endif
+
     double getBatteryVoltage() {
         #if defined(HAS_AXP192) || defined(HAS_AXP2101)
             return (PMU.getBattVoltage() / 1000.0);
@@ -61,17 +112,7 @@ namespace POWER_Utils {
         #else
             return false;
         #endif
-    }
-
-    void activateMeasurement() {
-        #if defined(HAS_AXP192) || defined(HAS_AXP2101)
-            PMU.disableTSPinMeasure();
-            PMU.enableBattDetection();
-            PMU.enableVbusVoltageMeasure();
-            PMU.enableBattVoltageMeasure();
-            PMU.enableSystemVoltageMeasure();
-        #endif
-    }
+    }    
 
     void activateGPS() {
         #ifdef HAS_AXP192
@@ -89,7 +130,7 @@ namespace POWER_Utils {
             #endif
         #endif
         #ifdef HELTEC_WIRELESS_TRACKER
-            digitalWrite(VEXT_CTRL, HIGH);
+            adc_ctrl_ON();
         #endif
         //gpsIsActive = true;
     }
@@ -107,7 +148,7 @@ namespace POWER_Utils {
             #endif
         #endif
         #ifdef HELTEC_WIRELESS_TRACKER
-            digitalWrite(VEXT_CTRL, LOW);
+            adc_ctrl_OFF();
         #endif
         //gpsIsActive = false;
     }
@@ -243,12 +284,7 @@ namespace POWER_Utils {
 
         #ifdef VEXT_CTRL
             pinMode(VEXT_CTRL,OUTPUT); // GPS + TFT on HELTEC Wireless_Tracker and only for Oled in HELTEC V3
-            #if defined(HELTEC_WIRELESS_TRACKER) || defined(HELTEC_V3)
-                digitalWrite(VEXT_CTRL, Config.digi.ecoMode == 1 ? LOW : HIGH);
-            #endif
-            #if defined(HELTEC_WP) || defined(HELTEC_WS) || defined(HELTEC_V3_2) || defined(HELTEC_WSL_V3)
-                digitalWrite(VEXT_CTRL, Config.digi.ecoMode == 1 ? HIGH : LOW);
-            #endif
+            vext_ctrl_ON();
         #endif
 
         #ifdef HAS_GPS
@@ -257,24 +293,7 @@ namespace POWER_Utils {
 
         #ifdef ADC_CTRL
             pinMode(ADC_CTRL, OUTPUT);
-            #if defined(HELTEC_WIRELESS_TRACKER) || defined(HELTEC_V3_2)
-                digitalWrite(ADC_CTRL, LOW);
-            #endif
-            #if defined(HELTEC_V3) || defined(HELTEC_V2) || defined(HELTEC_WSL_V3) || defined(HELTEC_WP)
-                digitalWrite(ADC_CTRL, HIGH);
-            #endif
-        #endif
-
-        #if defined(HELTEC_WIRELESS_TRACKER)
-            Wire.begin(BOARD_I2C_SDA, BOARD_I2C_SCL);
-        #endif
-
-        #if defined(HELTEC_V3) || defined(HELTEC_V3_2) || defined(HELTEC_WS) || defined(LIGHTGATEWAY_1_0) || defined(LIGHTGATEWAY_PLUS_1_0) || defined(TTGO_LORA32_T3S3_V1_2) || defined(HELTEC_V2)
-            Wire.begin(OLED_SDA, OLED_SCL);
-        #endif
-
-        #if defined(HELTEC_V3) || defined(HELTEC_V3_2) || defined(HELTEC_WP) || defined(HELTEC_WSL_V3) || defined(HELTEC_WSL_V3_DISPLAY)
-            Wire1.begin(BOARD_I2C_SDA, BOARD_I2C_SCL);
+            adc_ctrl_OFF();
         #endif
 
         #if defined(TTGO_T_DECK_GPS) || defined(TTGO_T_DECK_PLUS)
@@ -290,9 +309,20 @@ namespace POWER_Utils {
             digitalWrite(TFT_CS, HIGH);
 
             delay(500);
+        #endif
+
+        #ifdef USE_WIRE_WITH_OLED_PINS
+            Wire.begin(OLED_SDA, OLED_SCL);
+        #endif
+
+        #ifdef USE_WIRE_WITH_BOARD_I2C_PINS
             Wire.begin(BOARD_I2C_SDA, BOARD_I2C_SCL);
         #endif
 
+        #ifdef USE_WIRE1_WITH_BOARD_I2C_PINS
+            Wire1.begin(BOARD_I2C_SDA, BOARD_I2C_SCL);
+        #endif
+        
         delay(1000);
         BATTERY_Utils::setup();
         BATTERY_Utils::startupBatteryHealth();

@@ -29,9 +29,18 @@
 
 namespace POWER_Utils {
 
+    #ifdef VEXT_CTRL
+        void vext_ctrl_ON();
+        void vext_ctrl_OFF();
+    #endif
+
+    #ifdef ADC_CTRL
+        void adc_ctrl_ON();
+        void adc_ctrl_OFF();
+    #endif
+
     double  getBatteryVoltage();
     bool    isBatteryConnected();
-    void    activateMeasurement();
     void    activateGPS();
     void    deactivateGPS();
     void    activateLoRa();

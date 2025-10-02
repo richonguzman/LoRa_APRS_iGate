@@ -32,9 +32,6 @@ namespace BATTERY_Utils {
     float   checkExternalVoltage();
     void    startupBatteryHealth();
 
-    String  generateEncodedTelemetryBytes(float value, bool firstBytes, byte voltageType);
-    String  generateEncodedTelemetry();
-
 }
 
 #endif

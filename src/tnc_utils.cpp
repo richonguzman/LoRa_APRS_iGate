@@ -17,10 +17,12 @@
  */
 
 #include <WiFi.h>
+#include "ESPmDNS.h"
 #include "configuration.h"
 #include "station_utils.h"
 #include "kiss_protocol.h"
 #include "kiss_utils.h"
+#include "tnc_utils.h"
 #include "utils.h"
 
 
@@ -45,6 +47,17 @@ namespace TNC_Utils {
         if (Config.tnc.enableServer && Config.digi.ecoMode == 0) {
             tncServer.stop();
             tncServer.begin();
+            String host = "igate-" + Config.callsign;
+            if (!MDNS.begin(host.c_str())) {
+                Serial.println("Error Starting mDNS");
+                tncServer.stop();
+                return;
+            }
+            if (!MDNS.addService("tnc", "tcp", TNC_PORT)) {
+                Serial.println("Error: Could not add mDNS service");
+            }
+            Serial.println("TNC server started successfully");
+            Serial.println("mDNS Host: " + host + ".local");
         }
     }
 

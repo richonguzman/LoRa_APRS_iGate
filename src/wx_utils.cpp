@@ -71,6 +71,7 @@ namespace WX_Utils {
                 #endif
                 err = Wire.endTransmission();
             #endif
+            delay(5);
             if (err == 0) {
                 //Serial.println(addr); //this shows any connected board to I2C
                 if (addr == 0x76 || addr == 0x77) { // BME or BMP

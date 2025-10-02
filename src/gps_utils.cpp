@@ -31,7 +31,6 @@
 #endif
 
 extern Configuration    Config;
-extern WiFiClient       espClient;
 extern HardwareSerial   gpsSerial;
 extern TinyGPSPlus      gps;
 String                  distance, iGateBeaconPacket, iGateLoRaBeaconPacket;

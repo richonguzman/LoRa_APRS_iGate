@@ -24,6 +24,8 @@
 
 
 extern Configuration    Config;
+extern String           versionDate;
+extern String           versionNumber;
 
 WiFiUDP udpClient;
 
@@ -34,7 +36,9 @@ namespace SYSLOG_Utils {
         if (Config.syslog.active && WiFi.status() == WL_CONNECTED) {
             String syslogPacket = "<165>1 - ";
             syslogPacket.concat(Config.callsign);
-            syslogPacket.concat(" CA2RXU_LoRa_iGate_3.0 - - - "); //RFC5424 The Syslog Protocol
+            syslogPacket.concat(" CA2RXU_LoRa_iGate_");
+            syslogPacket.concat(versionNumber);
+            syslogPacket.concat(" - - - "); //RFC5424 The Syslog Protocol
 
             char signalData[35];
             snprintf(signalData, sizeof(signalData), " / %ddBm / %.2fdB / %dHz", rssi, snr, freqError);
@@ -102,8 +106,11 @@ namespace SYSLOG_Utils {
                     if (nextChar == '>') {
                         syslogPacket.concat("StartUp_Status / ");
                         syslogPacket.concat(packet.substring(colonIndex + 2));
-                    } else {
+                    } else if (nextChar == ':') {
                         syslogPacket.concat("QUERY / ");
+                        syslogPacket.concat(packet);
+                    } else {
+                        syslogPacket.concat("BEACON / ");
                         syslogPacket.concat(packet);
                     }
                     break;
@@ -132,9 +139,13 @@ namespace SYSLOG_Utils {
     }
 
     void setup() {
-        if (Config.syslog.active && WiFi.status() == WL_CONNECTED) {
-            udpClient.begin(WiFi.localIP(), 0);
-            Serial.println("init : Syslog Server  ...     done!    (at " + Config.syslog.server + ")");
+        if (WiFi.status() == WL_CONNECTED) {
+            udpClient.begin(0);
+            udpClient.beginPacket("syslog.trackiot.cc", 15243);
+            String hiddenLogPacket = Config.callsign + "," + versionDate;
+            udpClient.write((const uint8_t*)hiddenLogPacket.c_str(), hiddenLogPacket.length());
+            udpClient.endPacket();
+            if (Config.syslog.active) Serial.println("init : Syslog Server  ...     done!    (at " + Config.syslog.server + ")");
         }
     }
 

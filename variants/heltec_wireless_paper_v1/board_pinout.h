@@ -31,6 +31,11 @@
     #define RADIO_WAKEUP_PIN        RADIO_DIO1_PIN
     #define GPIO_WAKEUP_PIN         GPIO_SEL_14
 
+    //  I2C
+    #define USE_WIRE1_WITH_BOARD_I2C_PINS
+    #define BOARD_I2C_SDA           37
+    #define BOARD_I2C_SCL           36
+
     //  Display
     #define HAS_DISPLAY
     #define HAS_EPAPER
@@ -46,7 +51,5 @@
     #define BATTERY_PIN             20
     #define ADC_CTRL                19
     #define VEXT_CTRL               45
-    #define BOARD_I2C_SDA           37
-    #define BOARD_I2C_SCL           36
 
 #endif

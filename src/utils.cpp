@@ -18,6 +18,7 @@
 
 #include <TinyGPS++.h>
 #include <WiFi.h>
+#include "telemetry_utils.h"
 #include "configuration.h"
 #include "station_utils.h"
 #include "battery_utils.h"
@@ -34,7 +35,6 @@
 
 
 extern Configuration        Config;
-extern WiFiClient           espClient;
 extern TinyGPSPlus          gps;
 extern String               versionDate;
 extern String               firstLine;
@@ -79,15 +79,15 @@ namespace Utils {
         }
         if (WiFi.status() == WL_CONNECTED && Config.aprs_is.active && Config.beacon.sendViaAPRSIS) {
             delay(1000);
-            status.concat(",qAC:>https://github.com/richonguzman/LoRa_APRS_iGate ");
-            status.concat(versionDate);
+            status.concat(",qAC:>");
+            status.concat(Config.beacon.statusPacket);
             APRS_IS_Utils::upload(status);
             SYSLOG_Utils::log(2, status, 0, 0.0, 0);   // APRSIS TX
             statusAfterBoot = false;
         }
         if (statusAfterBoot && !Config.beacon.sendViaAPRSIS && Config.beacon.sendViaRF) {
-            status.concat(":>https://github.com/richonguzman/LoRa_APRS_iGate ");
-            status.concat(versionDate);
+            status.concat(":>");
+            status.concat(Config.beacon.statusPacket);
             STATION_Utils::addToOutputPacketBuffer(status);
             statusAfterBoot = false;
         }
@@ -133,77 +133,6 @@ namespace Utils {
         fourthLine = buffer;
     }
 
-    void sendInitialTelemetryPackets() {
-        char sender[10];                                                    // 9 characters + null terminator
-        snprintf(sender, sizeof(sender), "%-9s", Config.callsign.c_str());  // Left-align with spaces
-
-        String baseAPRSISTelemetryPacket = Config.callsign;
-        baseAPRSISTelemetryPacket += ">APLRG1,TCPIP,qAC::";
-        baseAPRSISTelemetryPacket += sender;
-        baseAPRSISTelemetryPacket += ":";
-
-        String baseRFTelemetryPacket = Config.callsign;
-        baseRFTelemetryPacket += ">APLRG1";
-        if (Config.beacon.path.indexOf("WIDE") != -1) {
-            baseRFTelemetryPacket += ",";
-            baseRFTelemetryPacket += Config.beacon.path;
-        }
-        baseRFTelemetryPacket += "::";
-        baseRFTelemetryPacket += sender;
-        baseRFTelemetryPacket += ":";
-
-        String telemetryPacket1 = "EQNS.";
-        if (Config.battery.sendInternalVoltage) {
-            telemetryPacket1 += "0,0.01,0";
-        }
-        if (Config.battery.sendExternalVoltage) {
-            telemetryPacket1 += String(Config.battery.sendInternalVoltage ? ",0,0.02,0" : "0,0.02,0");
-        }
-
-        String telemetryPacket2 = "UNIT.";
-        if (Config.battery.sendInternalVoltage) {
-            telemetryPacket2 += "VDC";
-        }
-        if (Config.battery.sendExternalVoltage) {
-            telemetryPacket2 += String(Config.battery.sendInternalVoltage ? ",VDC" : "VDC");
-        }
-
-        String telemetryPacket3 = "PARM.";
-        if (Config.battery.sendInternalVoltage) {
-            telemetryPacket3 += "V_Batt";
-        }
-        if (Config.battery.sendExternalVoltage) {
-            telemetryPacket3 += String(Config.battery.sendInternalVoltage ? ",V_Ext" : "V_Ext");
-        }
-
-        if (Config.beacon.sendViaAPRSIS) {
-            #ifdef HAS_A7670
-                A7670_Utils::uploadToAPRSIS(baseAPRSISTelemetryPacket + telemetryPacket1);
-                delay(300);
-                A7670_Utils::uploadToAPRSIS(baseAPRSISTelemetryPacket + telemetryPacket2);
-                delay(300);
-                A7670_Utils::uploadToAPRSIS(baseAPRSISTelemetryPacket + telemetryPacket3);
-                delay(300);
-            #else
-                APRS_IS_Utils::upload(baseAPRSISTelemetryPacket + telemetryPacket1);
-                delay(300);
-                APRS_IS_Utils::upload(baseAPRSISTelemetryPacket + telemetryPacket2);
-                delay(300);
-                APRS_IS_Utils::upload(baseAPRSISTelemetryPacket + telemetryPacket3);
-                delay(300);
-            #endif
-            delay(300);
-        } else if (Config.beacon.sendViaRF) {
-            LoRa_Utils::sendNewPacket(baseRFTelemetryPacket + telemetryPacket1);
-            delay(3000);
-            LoRa_Utils::sendNewPacket(baseRFTelemetryPacket + telemetryPacket2);
-            delay(3000);
-            LoRa_Utils::sendNewPacket(baseRFTelemetryPacket + telemetryPacket3);
-            delay(3000);
-        }
-        sendStartTelemetry = false;
-    }
-
     void checkBeaconInterval() {
         uint32_t lastTx = millis() - lastBeaconTx;
         if (lastBeaconTx == 0 || lastTx >= Config.beacon.interval * 60 * 1000) {
@@ -225,7 +154,7 @@ namespace Utils {
                 !Config.wxsensor.active && 
                 (Config.battery.sendInternalVoltage || Config.battery.sendExternalVoltage) &&
                 (lastBeaconTx > 0)) {
-                sendInitialTelemetryPackets();
+                TELEMETRY_Utils::sendEquationsUnitsParameters();
             }
 
             STATION_Utils::deleteNotHeard();
@@ -281,7 +210,7 @@ namespace Utils {
                 }
             #endif
 
-            #ifndef HELTEC_WP
+            #ifndef HELTEC_WP_V1
                 if (Config.battery.sendExternalVoltage || Config.battery.monitorExternalVoltage) {
                     float externalVoltage       = BATTERY_Utils::checkExternalVoltage();
                     if (Config.battery.monitorExternalVoltage && externalVoltage < Config.battery.externalSleepVoltage) {
@@ -309,7 +238,7 @@ namespace Utils {
             #endif
 
             if (Config.battery.sendVoltageAsTelemetry && !Config.wxsensor.active && (Config.battery.sendInternalVoltage || Config.battery.sendExternalVoltage)){
-                String encodedTelemetry = BATTERY_Utils::generateEncodedTelemetry();
+                String encodedTelemetry = TELEMETRY_Utils::generateEncodedTelemetry();
                 beaconPacket += encodedTelemetry;
                 secondaryBeaconPacket += encodedTelemetry;
             }
@@ -323,6 +252,7 @@ namespace Utils {
                 #else
                     APRS_IS_Utils::upload(beaconPacket);
                 #endif
+                if (Config.syslog.logBeaconOverTCPIP) SYSLOG_Utils::log(1, "tcp" + beaconPacket, 0, 0.0, 0);   // APRSIS TX
             }
 
             if (Config.beacon.sendViaRF || backUpDigiMode) {
@@ -337,7 +267,7 @@ namespace Utils {
             beaconUpdate = false;
         }
 
-        if (statusAfterBoot) {
+        if (statusAfterBoot && Config.beacon.statusActive && !Config.beacon.statusPacket.isEmpty()) {
             processStatus();
         }
     }

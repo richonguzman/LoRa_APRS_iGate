@@ -253,7 +253,37 @@
                                             name="personalNote"
                                             id="personalNote"
                                             class="form-control"
-                                            placeholder="A Couple of words."
+                                            placeholder="A couple of words"
+                                        />
+                                    </div>
+                                    <div class="col-12 mt-3">
+                                        <div class="form-check form-switch">
+                                            <input
+                                                type="checkbox"
+                                                name="beacon.statusActive"
+                                                id="beacon.statusActive"
+                                                class="form-check-input"
+                                            />
+                                            <label
+                                                for="beacon.statusActive"
+                                                class="form-label"
+                                                >Send Status at each Boot</label
+                                            >
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <label
+                                            for="beacon.statusPacket"
+                                            class="form-label"
+                                            >Status</label
+                                        >
+                                        <input
+                                            type="text"
+                                            name="beacon.statusPacket"
+                                            id="beacon.statusPacket"
+                                            class="form-control"
+                                            placeholder="Custom Status"
+                                            value=""
                                         />
                                     </div>
                                 </div>
@@ -409,8 +439,9 @@
                                             type="text"
                                             name="aprs_is.server"
                                             id="aprs_is.server"
-                                            placeholder="soam.aprs2.net"
+                                            placeholder="rotate.aprs2.net"
                                             class="form-control"
+                                            value="rotate.aprs2.net"
                                         />
                                     </div>
                                     <div class="col-4">
@@ -425,6 +456,7 @@
                                             id="aprs_is.port"
                                             placeholder="14580"
                                             class="form-control"
+                                            value="14580"
                                         />
                                     </div>
                                 </div>
@@ -440,6 +472,7 @@
                                             name="aprs_is.passcode"
                                             id="aprs_is.passcode"
                                             class="form-control"
+                                            value="XYZWV"
                                         />
                                     </div>
                                     <div class="col-4">
@@ -453,6 +486,7 @@
                                             class="form-control"
                                             name="aprs_is.filter"
                                             id="aprs_is.filter"
+                                            value="m/10"
                                         />
                                     </div>
                                 </div>
@@ -837,7 +871,10 @@
                                                 name="lora.signalBandwidth"
                                                 id="lora.signalBandwidth"
                                                 required=""
-                                            >
+                                            >   
+                                                <option value="62500" selected>
+                                                    62.5 kHz
+                                                </option>
                                                 <option value="125000" selected>
                                                     125 kHz
                                                 </option>
@@ -989,6 +1026,8 @@
                                                 name="display.timeout"
                                                 id="display.timeout"
                                                 value="4"
+                                                step="1"
+                                                min="2"
                                                 class="form-control"
                                             />
                                             <span class="input-group-text"
@@ -1350,7 +1389,6 @@
                                             id="syslog.server"
                                             placeholder="lora.link9.net"
                                             class="form-control"
-                                            disabled
                                         />
                                     </div>
                                     <div class="col-6">
@@ -1365,8 +1403,22 @@
                                             id="syslog.port"
                                             placeholder="1514"
                                             class="form-control"
-                                            disabled
                                         />
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="form-check form-switch">
+                                            <input
+                                                type="checkbox"
+                                                name="syslog.logBeaconOverTCPIP"
+                                                id="syslog.logBeaconOverTCPIP"
+                                                class="form-check-input"
+                                            />
+                                            <label
+                                                for="syslog.logBeaconOverTCPIP"
+                                                class="form-label"
+                                                >Log Beacon over TCP/IP</label
+                                            >
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -1451,6 +1503,142 @@
                                                 class="form-label"
                                                 >Accept own frames via KISS</label
                                             >
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+
+                        <div class="row my-5 d-flex align-items-top">
+                            <div class="col-lg-3 col-sm-12">
+                                <h5>
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="20"
+                                        height="20"
+                                        fill="currentColor"
+                                        class="bi bi-database-fill"
+                                        viewBox="0 0 16 16"
+                                    >
+                                        <path
+                                            d="M3.904 1.777C4.978 1.289 6.427 1 8 1s3.022.289 4.096.777C13.125 2.245 14 2.993 14 4s-.875 1.755-1.904 2.223C11.022 6.711 9.573 7 8 7s-3.022-.289-4.096-.777C2.875 5.755 2 5.007 2 4s.875-1.755 1.904-2.223"
+                                        />
+                                        <path
+                                            d="M2 6.161V7c0 1.007.875 1.755 1.904 2.223C4.978 9.71 6.427 10 8 10s3.022-.289 4.096-.777C13.125 8.755 14 8.007 14 7v-.839c-.457.432-1.004.751-1.49.972C11.278 7.693 9.682 8 8 8s-3.278-.307-4.51-.867c-.486-.22-1.033-.54-1.49-.972"
+                                        />
+                                        <path
+                                            d="M2 9.161V10c0 1.007.875 1.755 1.904 2.223C4.978 12.711 6.427 13 8 13s3.022-.289 4.096-.777C13.125 11.755 14 11.007 14 10v-.839c-.457.432-1.004.751-1.49.972-1.232.56-2.828.867-4.51.867s-3.278-.307-4.51-.867c-.486-.22-1.033-.54-1.49-.972"
+                                        />
+                                        <path
+                                            d="M2 12.161V13c0 1.007.875 1.755 1.904 2.223C4.978 15.711 6.427 16 8 16s3.022-.289 4.096-.777C13.125 14.755 14 14.007 14 13v-.839c-.457.432-1.004.751-1.49.972-1.232.56-2.828.867-4.51.867s-3.278-.307-4.51-.867c-.486-.22-1.033-.54-1.49-.972"
+                                        />
+                                    </svg>
+                                    MQTT
+                                </h5>
+                                <small>Set your MQTT server</small>
+                            </div>
+                            <div class="col-lg-9 col-sm-12">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="form-check form-switch">
+                                            <input
+                                                type="checkbox"
+                                                name="mqtt.active"
+                                                id="mqtt.active"
+                                                class="form-check-input"
+                                            />
+                                            <label
+                                                for="mqtt.active"
+                                                class="form-label"
+                                                >Enable</label
+                                            >
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <label
+                                            for="mqtt.server"
+                                            class="form-label"
+                                            >Server</label
+                                        >
+                                        <div class="input-group">
+                                            <input
+                                                type="text"
+                                                name="mqtt.server"
+                                                id="mqtt.server"
+                                                class="form-control"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <label
+                                            for="mqtt.topic"
+                                            class="form-label"
+                                            >Topic</label
+                                        >
+                                        <div class="input-group">
+                                            <input
+                                                type="text"
+                                                name="mqtt.topic"
+                                                id="mqtt.topic"
+                                                class="form-control"
+                                                placeholder="aprs-igate"
+                                            />
+                                        </div>
+                                        <div class="form-text">
+                                            Default is <strong>aprs-igate</strong>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <label
+                                            for="mqtt.username"
+                                            class="form-label"
+                                            >Username</label
+                                        >
+                                        <div class="input-group">
+                                            <input
+                                                type="text"
+                                                name="mqtt.username"
+                                                id="mqtt.username"
+                                                class="form-control"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div class="col-12 mt-3">
+                                        <label
+                                            for="mqtt.password"
+                                            class="form-label"
+                                            >Password</label
+                                        >
+                                        <div class="input-group">
+                                            <input
+                                                type="password"
+                                                name="mqtt.password"
+                                                id="mqtt.password"
+                                                class="form-control"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div class="col-12 mt-3">
+                                        <label
+                                            for="mqtt.port"
+                                            class="form-label"
+                                            >Port</label
+                                        >
+                                        <div class="input-group">
+                                            <input
+                                                type="number"
+                                                name="mqtt.port"
+                                                id="mqtt.port"
+                                                class="form-control"
+                                                placeholder="1883"
+                                                required=""
+                                                step="1"
+                                                min="0"
+                                            />
+                                        </div>
+                                        <div class="form-text">
+                                            Default is <strong>1883</strong>
                                         </div>
                                     </div>
                                 </div>

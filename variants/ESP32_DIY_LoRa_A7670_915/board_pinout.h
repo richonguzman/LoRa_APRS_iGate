@@ -28,6 +28,9 @@
     #define RADIO_RST_PIN           0
     #define RADIO_BUSY_PIN          32
 
+    //  I2C
+    #define USE_WIRE_WITH_OLED_PINS
+
     //  Display    
     #define HAS_DISPLAY
 

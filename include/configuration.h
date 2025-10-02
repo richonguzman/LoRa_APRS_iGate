@@ -49,6 +49,8 @@ public:
     bool    sendViaAPRSIS;
     bool    gpsActive;
     bool    gpsAmbiguity;
+    bool    statusActive;
+    String  statusPacket;
 };
 
 class APRS_IS {
@@ -113,6 +115,7 @@ public:
     bool    active;
     String  server;
     int     port;
+    bool    logBeaconOverTCPIP;
 };
 
 class TNC {
@@ -146,6 +149,16 @@ public:
     bool    rfOnly;
 };
 
+class MQTT {
+public:
+    bool    active;
+    String  server;
+    String  topic;
+    String  username;
+    String  password;
+    int     port;
+};
+
 class Configuration {
 public:
     String                  callsign;
@@ -170,9 +183,10 @@ public:
     WEBADMIN                webadmin;
     NTP                     ntp;    
     REMOTE_MANAGEMENT       remoteManagement;
+    MQTT                    mqtt;
 
-    void init();
-    void writeFile();
+    void setDefaultValues();
+    bool writeFile();
     Configuration();
 
 private:

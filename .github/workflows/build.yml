@@ -29,6 +29,8 @@ jobs:
                       chip: esp32s3
                     - name: heltec_wireless_stick_lite_v3_display
                       chip: esp32s3
+                    - name: heltec_wireless_bridge
+                      chip: esp32
                     - name: ESP32_DIY_LoRa
                       chip: esp32
                     - name: ESP32_DIY_LoRa_915
@@ -67,7 +69,7 @@ jobs:
                       chip: esp32s3
                     - name: heltec_ht-ct62
                       chip: esp32c3
-                    - name: heltec_wireless_paper
+                    - name: heltec_wireless_paper_v1
                       chip: esp32s3
                     - name: OE5HWN_MeshCom
                       chip: esp32

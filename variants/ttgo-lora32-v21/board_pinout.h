@@ -30,6 +30,9 @@
     #define RADIO_WAKEUP_PIN        RADIO_BUSY_PIN
     #define GPIO_WAKEUP_PIN         GPIO_SEL_26
 
+    //  I2C
+    #define USE_WIRE_WITH_OLED_PINS
+
     //  Display
     #define HAS_DISPLAY
 
@@ -43,7 +46,7 @@
 
     //  Aditional Config
     #define INTERNAL_LED_PIN        25      // Green Led
-    #define BATTERY_PIN             35   
-	#define HAS_ADC_CALIBRATION    
+    #define BATTERY_PIN             35
+	#define HAS_ADC_CALIBRATION
 
 #endif
