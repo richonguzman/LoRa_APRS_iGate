@@ -22,9 +22,7 @@ ____________________________________________________
 <br/>
 ____________________________________________________
 
-# SUPPORTED BOARDS
-
-### Buying links --> <a href="https://github.com/richonguzman/LoRa_APRS_iGate/wiki/Supported-Boards-and-Buying-Links" target="_blank">here</a>.
+## SUPPORTED BOARDS (<a href="https://github.com/richonguzman/LoRa_APRS_iGate/wiki/Supported-Boards-and-Buying-Links" target="_blank">Buying links</a>).
 
 (NOTE: all boards with 433-868-915 MHz versions)
 
@@ -54,7 +52,7 @@ ____________________________________________________
 
 <br />
 
-## Timeline (Versions):
+# Timeline (Versions):
 
 - 2025-10-10 Changed Wiki into a pdf manual.
 - 2025-09-26 Heltec Wireless Bridge support added.
