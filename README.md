@@ -13,18 +13,13 @@ ____________________________________________________
 
 [<img src="https://github.com/richonguzman/LoRa_APRS_Tracker/blob/main/images/github-sponsors.png">](https://github.com/sponsors/richonguzman)     [<img src="https://github.com/richonguzman/LoRa_APRS_Tracker/blob/main/images/paypalme.png">](http://paypal.me/richonguzman)
 
-<br />
+<br/>
 
-# WEB FLASHER/INSTALLER is <a href="https://richonguzman.github.io/lora-igate-web-flasher/installer.html" target="_blank">here</a>
-
+ <a href="https://richonguzman.github.io/lora-igate-web-flasher/installer.html" target="_blank">WEB FLASHER/INSTALLER</a>
+<br/>
+<a href="https://github.com/richonguzman/LoRa_APRS_iGate/wiki" target="_blank">WIKI</a> (Installation Guide, FAQ, BME280, TNC and much more)
+<br/>
 ____________________________________________________
-
-# WIKI
-
-### FAQ, BME280, TNC and more --> <a href="https://github.com/richonguzman/LoRa_APRS_iGate/wiki/00.-FAQ-(frequently-asked-questions)" target="_blank">here</a>.
-
-### Installation Guide --> <a href="https://github.com/richonguzman/LoRa_APRS_iGate/wiki/01.-Installation-Guide" target="_blank">here</a>.
-<br />
 
 # SUPPORTED BOARDS
 
@@ -60,6 +55,7 @@ ____________________________________________________
 
 ## Timeline (Versions):
 
+- 2025-10-10 Changed Wiki into a pdf manual.
 - 2025-09-26 Heltec Wireless Bridge support added.
 - 2025-09-09 MQTT added (pub+sub), Status defined by Op now and many fixes more.
 - 2025-06-20 Digipeaters now with updated EcoMode (Board Sleeps until packet Rx reducing current consumption to almost 10% at idle).
