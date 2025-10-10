@@ -14,12 +14,12 @@ ____________________________________________________
 
 # <a href="https://github.com/richonguzman/LoRa_APRS_iGate/docs/LoRa_APRS_iGate_CA2RXU_Firmware_Manual.pdf" target="_blank">LoRa APRS iGate CA2RXU Firmware Manual</a>
 
+____________________________________________________
 
 ## You can support this project to continue to grow:
 
 [<img src="https://github.com/richonguzman/LoRa_APRS_Tracker/blob/main/images/github-sponsors.png">](https://github.com/sponsors/richonguzman)     [<img src="https://github.com/richonguzman/LoRa_APRS_Tracker/blob/main/images/paypalme.png">](http://paypal.me/richonguzman)
 
-<br/>
 ____________________________________________________
 
 ## SUPPORTED BOARDS (<a href="https://github.com/richonguzman/LoRa_APRS_iGate/wiki/Supported-Boards-and-Buying-Links" target="_blank">Buying links</a>).
