@@ -9,14 +9,11 @@ __(This iGate Firmware works with all LoRa Tracker Firmwares (specially this <a 
 
 ____________________________________________________
 
-## <a href="https://richonguzman.github.io/lora-igate-web-flasher/installer.html" target="_blank">WEB FLASHER/INSTALLER</a>
-
-<br/>
+# <a href="https://richonguzman.github.io/lora-igate-web-flasher/installer.html" target="_blank">WEB FLASHER/INSTALLER</a>
 
 
-## <a href="https://github.com/richonguzman/LoRa_APRS_iGate/docs/LoRa_APRS_iGate_CA2RXU_Firmware_Manual.pdf" target="_blank">LoRa APRS iGate CA2RXU Firmware Manual</a>
+# <a href="https://github.com/richonguzman/LoRa_APRS_iGate/docs/LoRa_APRS_iGate_CA2RXU_Firmware_Manual.pdf" target="_blank">LoRa APRS iGate CA2RXU Firmware Manual</a>
 
-<br/>
 
 ## You can support this project to continue to grow:
 
