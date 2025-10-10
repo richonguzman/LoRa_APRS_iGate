@@ -28,6 +28,7 @@ extern  Configuration                   Config;
 extern  uint32_t                        lastBatteryCheck;
 
 bool    shouldSleepLowVoltage           = false;
+bool    INA219Init                      = false;
 
 float   adcReadingTransformation        = (3.3/4095);
 int     adcReadings                     = 20;
@@ -58,6 +59,15 @@ float   voltageDividerTransformation    = 0.0;
     #endif
 
     esp_adc_cal_characteristics_t adc_chars;
+#endif
+
+#if defined(HAS_INA219)
+    #include <Adafruit_INA219.h>
+    #include <Wire.h>
+    #ifndef INA219_ADDR
+        #define INA219_ADDR 0x40
+    #endif
+    Adafruit_INA219 ina219(INA219_ADDR);
 #endif
 
 bool calibrationEnable = false;
@@ -107,6 +117,16 @@ namespace BATTERY_Utils {
                 adcCalibration();
             }
         #endif
+
+        #if defined(HAS_INA219)
+            if (ina219.begin()) {
+                INA219Init = true;
+                Serial.println("Found INA219 on address:" + String(int(INA219_ADDR),HEX));
+            }
+            else {
+                Serial.println("Failed to find INA219");
+            }
+        #endif
     }
 
     float checkInternalVoltage() { 
@@ -126,6 +146,7 @@ namespace BATTERY_Utils {
             for (int i = 0; i < adcReadings; i++) {
                 #if defined(ESP32_DIY_LoRa) || defined(ESP32_DIY_LoRa_915) || defined(ESP32_DIY_1W_LoRa) || defined(ESP32_DIY_1W_LoRa_915)
                     sampleSum = 0;
+                    break;
                 #else
                     #ifdef HAS_ADC_CALIBRATION
                         if (calibrationEnable){
@@ -138,6 +159,7 @@ namespace BATTERY_Utils {
                             sampleSum += analogRead(BATTERY_PIN);
                         #else
                             sampleSum += 0;
+                            break;
                         #endif
                     #endif
                 #endif
@@ -177,6 +199,14 @@ namespace BATTERY_Utils {
     }
 
     float checkExternalVoltage() {
+        #if defined(HAS_INA219)
+            if(INA219Init) {
+                return ina219.getBusVoltage_V();
+            } else {
+                Serial.println("INA219 not Init!");
+                return 0.0f;
+            }
+        #else
         int sample;
         int sampleSum = 0;
         for (int i = 0; i < 100; i++) {
@@ -206,7 +236,7 @@ namespace BATTERY_Utils {
         #endif
         
         return extVoltage; // raw voltage without mapping
-
+        #endif
         // return mapVoltage(voltage, 5.05, 6.32, 4.5, 5.5); // mapped voltage
     }
 
