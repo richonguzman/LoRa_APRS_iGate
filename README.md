@@ -28,21 +28,19 @@ ____________________________________________________
 
 - TTGO Lilygo LoRa32 T3S3 V1.2 and LoRa32 V2.1 (V1.6 is the same).
 
-- TTGO T-Beam V1.0 , V1.1, V1.2 (also variations with SX1262 and SX1268 LoRa Modules).
+- TTGO T-Beam V1.0 , V1.1, V1.2 (also variations with SX1262 and SX1268 LoRa Modules) and Supreme V3.
 
 - T-Deck Plus (and also regular T-Deck with/without GPS).
 
 - HELTEC V2, V3, V3.2, T114, Wireless Stick, Wireless Stick Lite, HT-CT62, Wireless Tracker, Wireless Paper.
 
-- RAK Wireless 4631 + 19007(19003)
+- RAK Wireless 4631 + 19007(or 19003)
 
-- Faketec (NRF52840 + Heltec HTRA62(SX1262))
+- Faketec V3 (NRF52840 + Heltec HTRA62(SX1262))
 
 - QRP Labs LightGateway 1.0 and Plus 1.0.
 
-- Faketec V3 (NRF52840 + Heltec HTRA62 SX1262)
-
-- ESP32 Wroom + SX1278 LoRa Module or Ebyte 400M30S (or 900M30S) 1W LoRa Module for a DIY Versions.
+- ESP32 + SX1278 LoRa Module or Ebyte 400M30S (or 900M30S) 1W LoRa Module for a DIY Versions.
 
 - ESP32C3 + Ebyte 400M30S(or 900M30S) 1W LoRa Module for another DIY version.
 
