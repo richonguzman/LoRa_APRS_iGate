@@ -15,15 +15,17 @@ ____________________________________________________
 
 <br/>
 
- <a href="https://richonguzman.github.io/lora-igate-web-flasher/installer.html" target="_blank">WEB FLASHER/INSTALLER</a>
+# <a href="https://richonguzman.github.io/lora-igate-web-flasher/installer.html" target="_blank">WEB FLASHER/INSTALLER</a>
 <br/>
-<a href="https://github.com/richonguzman/LoRa_APRS_iGate/wiki" target="_blank">WIKI</a> (Installation Guide, FAQ, BME280, TNC and much more)
+<br/>
+# <a href="https://github.com/richonguzman/LoRa_APRS_iGate/wiki" target="_blank">WIKI</a> (Installation Guide, FAQ, BME280, TNC and much more)
+<br/>
 <br/>
 ____________________________________________________
 
 # SUPPORTED BOARDS
 
-### Buying links --> <a href="https://github.com/richonguzman/LoRa_APRS_iGate/wiki/108.-Supported-Boards-and-Buying-Links" target="_blank">here</a>.
+### Buying links --> <a href="https://github.com/richonguzman/LoRa_APRS_iGate/wiki/Supported-Boards-and-Buying-Links" target="_blank">here</a>.
 
 (NOTE: all boards with 433-868-915 MHz versions)
 
