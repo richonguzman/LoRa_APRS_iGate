@@ -241,6 +241,7 @@ function loadSettings(settings) {
     document.getElementById("remoteManagement.rfOnly").checked          = settings.remoteManagement.rfOnly;
 
     // NTP
+    document.getElementById("ntp.server").value                         = settings.ntp.server;
     document.getElementById("ntp.gmtCorrection").value                  = settings.ntp.gmtCorrection;
 
     // Experimental

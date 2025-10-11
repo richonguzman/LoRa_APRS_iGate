@@ -140,6 +140,7 @@ bool Configuration::writeFile() {
         data["remoteManagement"]["managers"]        = remoteManagement.managers;
         data["remoteManagement"]["rfOnly"]          = remoteManagement.rfOnly;
 
+        data["ntp"]["server"]                       = ntp.server;
         data["ntp"]["gmtCorrection"]                = ntp.gmtCorrection;
 
         data["other"]["rebootMode"]                 = rebootMode;
@@ -345,7 +346,9 @@ bool Configuration::readFile() {
         remoteManagement.managers       = data["remoteManagement"]["managers"] | "";
         remoteManagement.rfOnly         = data["remoteManagement"]["rfOnly"] | true;
 
-        if (!data["ntp"].containsKey("gmtCorrection")) needsRewrite = true;
+        if (!data["ntp"].containsKey("server") ||
+            !data["ntp"].containsKey("gmtCorrection")) needsRewrite = true;
+        ntp.server                      = data["ntp"]["server"] | "pool.ntp.org";
         ntp.gmtCorrection               = data["ntp"]["gmtCorrection"] | 0.0;
 
         if (!data["other"].containsKey("rebootMode") ||
@@ -371,7 +374,7 @@ bool Configuration::readFile() {
         if (needsRewrite) {
             Serial.println("Config JSON incomplete, rewriting...");
             writeFile();
-            delay(500);
+            delay(1000);
             ESP.restart();
         } 
         Serial.println("Config read successfuly");
@@ -482,6 +485,7 @@ void Configuration::setDefaultValues() {
     remoteManagement.managers       = "";
     remoteManagement.rfOnly         = true;
 
+    ntp.server                      = "pool.ntp.org";
     ntp.gmtCorrection               = 0.0;
 
     rebootMode                      = false;
@@ -506,7 +510,7 @@ Configuration::Configuration() {
     if (!exists) {
         setDefaultValues();
         writeFile();
-        delay(500);
+        delay(1000);
         ESP.restart();
     }
 

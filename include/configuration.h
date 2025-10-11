@@ -140,6 +140,7 @@ public:
 
 class NTP {
 public:
+    String  server;
     float   gmtCorrection;
 };
 

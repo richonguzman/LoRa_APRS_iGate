@@ -27,7 +27,7 @@
 extern      Configuration  Config;
 
 WiFiUDP     ntpUDP;
-NTPClient   timeClient(ntpUDP, "pool.ntp.org", 0, 15 * 60 * 1000);  // Update interval 15 min
+NTPClient   timeClient(ntpUDP, Config.ntp.server.c_str(), 0, 15 * 60 * 1000);  // Update interval 15 min
 
 
 namespace NTP_Utils {

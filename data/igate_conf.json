@@ -101,6 +101,7 @@
         "rfOnly": true
     },
     "ntp": {
+        "server": "pool.ntp.org",
         "gmtCorrection": 0.0
     },
     "other": {

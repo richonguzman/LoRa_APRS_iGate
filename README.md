@@ -52,6 +52,7 @@ ____________________________________________________
 
 # Timeline (Versions):
 
+- 2025-10-11 User defined NTP server added.
 - 2025-10-10 Changed Wiki into a pdf manual.
 - 2025-09-26 Heltec Wireless Bridge support added.
 - 2025-09-09 MQTT added (pub+sub), Status defined by Op now and many fixes more.
