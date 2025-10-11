@@ -48,6 +48,8 @@ bool Configuration::writeFile() {
         data["wifi"]["autoAP"]["password"]          = wifiAutoAP.password;
         data["wifi"]["autoAP"]["timeout"]           = wifiAutoAP.timeout;
 
+        callsign.trim();
+        callsign.toUpperCase();
         data["callsign"]                            = callsign;
 
         data["aprs_is"]["active"]                   = aprs_is.active;
