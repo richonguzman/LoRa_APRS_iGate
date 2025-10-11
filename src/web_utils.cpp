@@ -261,6 +261,7 @@ namespace WEB_Utils {
             Config.mqtt.username            = getParamStringSafe("mqtt.username", Config.mqtt.username);
             Config.mqtt.password            = getParamStringSafe("mqtt.password", Config.mqtt.password);
             Config.mqtt.port                = getParamIntSafe("mqtt.port", Config.mqtt.port);
+            Config.mqtt.beaconOverMqtt      = request->hasParam("mqtt.beaconOverMqtt", true);
         }
 
 

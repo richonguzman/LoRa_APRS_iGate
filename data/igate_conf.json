@@ -86,7 +86,8 @@
         "topic": "",
         "username": "",
         "password": "",
-        "port": 1883
+        "port": 1883,
+        "beaconOverMqtt": false
     },
     "ota": {
         "username": "",

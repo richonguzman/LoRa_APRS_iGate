@@ -131,6 +131,7 @@ bool Configuration::writeFile() {
         data["mqtt"]["username"]                    = mqtt.username;
         data["mqtt"]["password"]                    = mqtt.password;
         data["mqtt"]["port"]                        = mqtt.port;
+        data["mqtt"]["beaconOverMqtt"]              = mqtt.beaconOverMqtt;
 
         data["ota"]["username"]                     = ota.username;
         data["ota"]["password"]                     = ota.password;
@@ -323,13 +324,15 @@ bool Configuration::readFile() {
             !data["mqtt"].containsKey("topic") ||
             !data["mqtt"].containsKey("username") ||
             !data["mqtt"].containsKey("password") ||
-            !data["mqtt"].containsKey("port")) needsRewrite = true;
+            !data["mqtt"].containsKey("port") ||
+            !data["mqtt"].containsKey("beaconOverMqtt")) needsRewrite = true;
         mqtt.active                     = data["mqtt"]["active"] | false;
         mqtt.server                     = data["mqtt"]["server"] | "";
         mqtt.topic                      = data["mqtt"]["topic"] | "aprs-igate";
         mqtt.username                   = data["mqtt"]["username"] | "";
         mqtt.password                   = data["mqtt"]["password"] | "";
         mqtt.port                       = data["mqtt"]["port"] | 1883;
+        mqtt.beaconOverMqtt             = data["mqtt"]["beaconOverMqtt"] | false;
         
         if (!data["ota"].containsKey("username") ||
             !data["ota"].containsKey("password")) needsRewrite = true;
@@ -476,6 +479,7 @@ void Configuration::setDefaultValues() {
     mqtt.username                   = "";
     mqtt.password                   = "";
     mqtt.port                       = 1883;
+    mqtt.beaconOverMqtt             = false;
 
     ota.username                    = "";
     ota.password                    = "";

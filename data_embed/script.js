@@ -207,12 +207,14 @@ function loadSettings(settings) {
     document.getElementById("mqtt.username").value                      = settings.mqtt.username;
     document.getElementById("mqtt.password").value                      = settings.mqtt.password;
     document.getElementById("mqtt.port").value                          = settings.mqtt.port;
-    MqttCheckbox.checked    = settings.mqtt.active;
-    MqttServer.disabled     = !MqttCheckbox.check;
-    MqttTopic.disabled      = !MqttCheckbox.check;
-    MqttUsername.disabled   = !MqttCheckbox.check;
-    MqttPassword.disabled   = !MqttCheckbox.check;
-    MqttPort.disabled       = !MqttCheckbox.check;
+    document.getElementById("mqtt.beaconOverMqtt").value                = settings.mqtt.beaconOverMqtt;
+    MqttCheckbox.checked        = settings.mqtt.active;
+    MqttServer.disabled         = !MqttCheckbox.check;
+    MqttTopic.disabled          = !MqttCheckbox.check;
+    MqttUsername.disabled       = !MqttCheckbox.check;
+    MqttPassword.disabled       = !MqttCheckbox.check;
+    MqttPort.disabled           = !MqttCheckbox.check;
+    MqttBeaconOverMqtt.disabled = !MqttCheckbox.check;
 
     // Reboot
     document.getElementById("other.rebootMode").checked                 = settings.other.rebootMode;
@@ -380,12 +382,14 @@ const MqttTopic                 = document.querySelector('input[name="mqtt.topic
 const MqttUsername              = document.querySelector('input[name="mqtt.username"]');
 const MqttPassword              = document.querySelector('input[name="mqtt.password"]');
 const MqttPort                  = document.querySelector('input[name="mqtt.port"]');
+const MqttBeaconOverMqtt        = document.querySelector('input[name="mqtt.beaconOverMqtt"]');
 MqttCheckbox.addEventListener("change", function () {
     MqttServer.disabled         = !this.checked;
     MqttTopic.disabled          = !this.checked;
     MqttUsername.disabled       = !this.checked;
     MqttPassword.disabled       = !this.checked;
     MqttPort.disabled           = !this.checked;
+    MqttBeaconOverMqtt.disabled = !this.checked;
 });
 
 // Reboot Switches

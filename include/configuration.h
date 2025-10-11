@@ -158,6 +158,7 @@ public:
     String  username;
     String  password;
     int     port;
+    bool    beaconOverMqtt;
 };
 
 class Configuration {
