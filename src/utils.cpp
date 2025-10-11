@@ -127,7 +127,7 @@ namespace Utils {
         seventhLine = "     listening...";
     }
 
-    void activeStations() {
+    void showActiveStations() {
         char buffer[30]; // Adjust size as needed
         sprintf(buffer, "Stations (%dmin) = %2d", Config.rememberStationTime, lastHeardStations.size());
         fourthLine = buffer;
@@ -159,7 +159,7 @@ namespace Utils {
 
             STATION_Utils::deleteNotHeard();
 
-            activeStations();
+            showActiveStations();
 
             beaconPacket            = iGateBeaconPacket;
             secondaryBeaconPacket   = iGateLoRaBeaconPacket;
@@ -259,7 +259,7 @@ namespace Utils {
                 Utils::println("-- Sending Beacon to RF --");
                 displayShow(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING DIGI BEACON", 0);
                 seventhLine = "     listening...";
-                STATION_Utils::addToOutputPacketBuffer(secondaryBeaconPacket);
+                STATION_Utils::addToOutputPacketBuffer(secondaryBeaconPacket, true);
             }
 
             lastBeaconTx = millis();

@@ -33,13 +33,26 @@ extern bool                     shouldSleepLowVoltage;
 
 uint32_t lastTxTime             = millis();
 std::vector<LastHeardStation>   lastHeardStations;
-std::vector<String>             outputPacketBuffer;
-std::vector<Packet25SegBuffer>  packet25SegBuffer;
 std::vector<String>             blacklist;
 std::vector<String>             managers;
 std::vector<LastHeardStation>   lastHeardObjects;
 
+struct OutputPacketBuffer {
+    String      packet;
+    bool        isBeacon;
+};
+std::vector<OutputPacketBuffer> outputPacketBuffer;
+
+struct Packet25SegBuffer {
+    uint32_t    receivedTime;
+    String      station;
+    String      payload;
+};
+std::vector<Packet25SegBuffer>  packet25SegBuffer;
+
+
 bool saveNewDigiEcoModeConfig   = false;
+bool packetIsBeacon             = false;
 
 
 namespace STATION_Utils {
@@ -138,7 +151,7 @@ namespace STATION_Utils {
             }
         }
         if (!stationHeard) lastHeardStations.emplace_back(LastHeardStation{millis(), station});
-        Utils::activeStations();
+        Utils::showActiveStations();
     }
 
     bool wasHeard(const String& station) {
@@ -171,7 +184,9 @@ namespace STATION_Utils {
         size_t currentIndex = 0;
         while (currentIndex < outputPacketBuffer.size()) {                  // this sends all packets from output buffer
             delay(3000);                                                    // and cleans buffer to avoid sending packets with time offset
-            LoRa_Utils::sendNewPacket(outputPacketBuffer[currentIndex]);    // next time it wakes up
+            if (outputPacketBuffer[currentIndex].isBeacon) packetIsBeacon = true;
+            LoRa_Utils::sendNewPacket(outputPacketBuffer[currentIndex].packet);    // next time it wakes up
+            if (outputPacketBuffer[currentIndex].isBeacon) packetIsBeacon = false;
             currentIndex++;
         }
         outputPacketBuffer.clear();
@@ -190,13 +205,17 @@ namespace STATION_Utils {
         uint32_t lastRx                 = millis() - lastRxTime;
         uint32_t lastTx                 = millis() - lastTxTime;
         if (outputPacketBuffer.size() > 0 && lastTx > timeToWait && lastRx > timeToWait) {
-            LoRa_Utils::sendNewPacket(outputPacketBuffer[0]);
+            if (outputPacketBuffer[0].isBeacon) packetIsBeacon = true;
+            LoRa_Utils::sendNewPacket(outputPacketBuffer[0].packet);
+            if (outputPacketBuffer[0].isBeacon) packetIsBeacon = false;
             outputPacketBuffer.erase(outputPacketBuffer.begin());
             lastTxTime = millis();
         }
         if (shouldSleepLowVoltage) {
             while (outputPacketBuffer.size() > 0) {
-                LoRa_Utils::sendNewPacket(outputPacketBuffer[0]);
+                if (outputPacketBuffer[0].isBeacon) packetIsBeacon = true;
+                LoRa_Utils::sendNewPacket(outputPacketBuffer[0].packet);
+                if (outputPacketBuffer[0].isBeacon) packetIsBeacon = false;
                 outputPacketBuffer.erase(outputPacketBuffer.begin());
                 delay(4000);
             }
@@ -209,8 +228,12 @@ namespace STATION_Utils {
         }
     }
 
-    void addToOutputPacketBuffer(const String& packet) {
-        outputPacketBuffer.push_back(packet);
+    void addToOutputPacketBuffer(const String& packet, bool flag) {
+        OutputPacketBuffer entry;
+        entry.packet    = packet;
+        entry.isBeacon  = flag;
+
+        outputPacketBuffer.push_back(entry);
     }
 
 }

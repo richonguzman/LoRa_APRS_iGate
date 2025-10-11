@@ -134,6 +134,7 @@ function loadSettings(settings) {
     // Digi
     document.getElementById("digi.mode").value                          = settings.digi.mode;
     document.getElementById("digi.ecoMode").value                       = settings.digi.ecoMode;
+    document.getElementById("digi.beaconOnRxFreq").value                = settings.digi.beaconOnRxFreq;
 
     // LoRa
     document.getElementById("lora.txFreq").value                        = settings.lora.txFreq;

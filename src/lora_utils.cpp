@@ -30,6 +30,7 @@
 
 extern Configuration    Config;
 extern uint32_t         lastRxTime;
+extern bool             packetIsBeacon;
 
 extern std::vector<ReceivedPacket> receivedPackets;
 
@@ -143,7 +144,9 @@ namespace LoRa_Utils {
         if (!Config.loramodule.txActive) return;
 
         if (Config.loramodule.txFreq != Config.loramodule.rxFreq) {
-            changeFreqTx();
+            if (!packetIsBeacon || (packetIsBeacon && !Config.digi.beaconOnRxFreq)) {
+                changeFreqTx();
+            }
         }
         
         #ifdef INTERNAL_LED_PIN
@@ -165,7 +168,9 @@ namespace LoRa_Utils {
             if (Config.digi.ecoMode != 1) digitalWrite(INTERNAL_LED_PIN, LOW);      // disabled in Ultra Eco Mode
         #endif
         if (Config.loramodule.txFreq != Config.loramodule.rxFreq) {
-            changeFreqRx();
+            if (!packetIsBeacon || (packetIsBeacon && !Config.digi.beaconOnRxFreq)) {
+                changeFreqRx();
+            }
         }
     }
 

@@ -196,6 +196,7 @@ namespace WEB_Utils {
 
         Config.digi.mode                    = getParamIntSafe("digi.mode", Config.digi.mode);
         Config.digi.ecoMode                 = getParamIntSafe("digi.ecoMode", Config.digi.ecoMode);
+        Config.digi.beaconOnRxFreq          = request->hasParam("digi.beaconOnRxFreq", true);
 
         Config.loramodule.txFreq            = getParamIntSafe("lora.txFreq", Config.loramodule.txFreq);
         Config.loramodule.rxFreq            = getParamIntSafe("lora.rxFreq", Config.loramodule.rxFreq);

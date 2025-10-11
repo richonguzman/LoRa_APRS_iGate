@@ -35,7 +35,8 @@
     "blacklist": "",
     "digi": {
         "mode": 0,
-        "ecoMode": 0
+        "ecoMode": 0,
+        "beaconOnRxFreq": false
     },
     "lora": {
         "txFreq": 433775000,

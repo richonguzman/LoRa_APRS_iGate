@@ -23,12 +23,6 @@
 #include <Arduino.h>
 
 
-struct Packet25SegBuffer {
-    uint32_t    receivedTime;
-    String      station;
-    String      payload;
-};
-
 struct LastHeardStation {
     uint32_t    lastHeardTime;
     String      station;
@@ -47,7 +41,7 @@ namespace STATION_Utils {
     bool check25SegBuffer(const String& station, const String& textMessage);
     void processOutputPacketBufferUltraEcoMode();
     void processOutputPacketBuffer();
-    void addToOutputPacketBuffer(const String& packet);
+    void addToOutputPacketBuffer(const String& packet, bool flag = false);
 
 }
 
