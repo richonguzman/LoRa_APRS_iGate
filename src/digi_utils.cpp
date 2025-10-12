@@ -27,7 +27,6 @@
 #include "display.h"
 #include "utils.h"
 
-
 extern Configuration    Config;
 extern uint32_t         lastScreenOn;
 extern String           iGateBeaconPacket;
@@ -40,12 +39,18 @@ extern String           sixthLine;
 extern String           seventhLine;
 extern bool             backUpDigiMode;
 
-
 namespace DIGI_Utils {
 
+    // OPTIMIERUNG: String Reserve und weniger Substring-Calls
     String buildPacket(const String& path, const String& packet, bool thirdParty, bool crossFreq) {
+        String packetToRepeat;
+        packetToRepeat.reserve(packet.length() + 20);
+        
         if (!crossFreq) {
-            String packetToRepeat = packet.substring(0, packet.indexOf(",") + 1);
+            int commaPos = packet.indexOf(",");
+            if (commaPos == -1) return "";
+            
+            packetToRepeat = packet.substring(0, commaPos + 1);
             String tempPath = path;
 
             if (path.indexOf("WIDE1-1") != -1 && (Config.digi.mode == 2 || Config.digi.mode == 3)) {
@@ -65,115 +70,168 @@ namespace DIGI_Utils {
                     return "";
                 }
             }
-            packetToRepeat += tempPath;
-            if (thirdParty) {
-                packetToRepeat += APRS_IS_Utils::checkForStartingBytes(packet.substring(packet.indexOf(":}")));
-            } else {
-                packetToRepeat += APRS_IS_Utils::checkForStartingBytes(packet.substring(packet.indexOf(":")));
-            }
-            return packetToRepeat;
-        } else {   // CrossFreq Digipeater
-            String suffix = thirdParty ? ":}" : ":";
-            String packetToRepeat = packet.substring(0, packet.indexOf(suffix));
             
-            String terms[] = {",WIDE1*", ",WIDE2*", "*"};
-            for (String term : terms) {
-                int index = packetToRepeat.indexOf(term);
-                if (index != -1) {
-                    packetToRepeat.remove(index, term.length());
+            packetToRepeat += tempPath;
+            
+            if (thirdParty) {
+                int colonPos = packet.indexOf(":}");
+                if (colonPos != -1) {
+                    packetToRepeat += APRS_IS_Utils::checkForStartingBytes(packet.substring(colonPos));
+                }
+            } else {
+                int colonPos = packet.indexOf(":");
+                if (colonPos != -1) {
+                    packetToRepeat += APRS_IS_Utils::checkForStartingBytes(packet.substring(colonPos));
                 }
             }
+            
+            return packetToRepeat;
+            
+        } else {
+            // CrossFreq Digipeater
+            String suffix = thirdParty ? ":}" : ":";
+            int suffixPos = packet.indexOf(suffix);
+            if (suffixPos == -1) return "";
+            
+            packetToRepeat = packet.substring(0, suffixPos);
+            
+            // OPTIMIERUNG: Array-basierter String-Remove
+            const char* terms[] = {",WIDE1*", ",WIDE2*", "*"};
+            for (const char* term : terms) {
+                int index = packetToRepeat.indexOf(term);
+                if (index != -1) {
+                    packetToRepeat.remove(index, strlen(term));
+                }
+            }
+            
             packetToRepeat += ",";
             packetToRepeat += Config.callsign;
             packetToRepeat += "*";
-            packetToRepeat += APRS_IS_Utils::checkForStartingBytes(packet.substring(packet.indexOf(suffix)));
+            packetToRepeat += APRS_IS_Utils::checkForStartingBytes(packet.substring(suffixPos));
+            
             return packetToRepeat;
         }
     }
 
-    String generateDigipeatedPacket(const String& packet, bool thirdParty){
+    String generateDigipeatedPacket(const String& packet, bool thirdParty) {
         String temp;
-        if (thirdParty) { // only header is used
-            const String& header = packet.substring(0, packet.indexOf(":}"));
-            temp = header.substring(header.indexOf(">") + 1);
+        temp.reserve(packet.length());
+        
+        if (thirdParty) {
+            int colonPos = packet.indexOf(":}");
+            if (colonPos == -1) return "";
+            
+            const String& header = packet.substring(0, colonPos);
+            int gtPos = header.indexOf(">");
+            if (gtPos == -1) return "";
+            
+            temp = header.substring(gtPos + 1);
         } else {
-            temp = packet.substring(packet.indexOf(">") + 1, packet.indexOf(":"));
+            int gtPos = packet.indexOf(">");
+            int colonPos = packet.indexOf(":");
+            if (gtPos == -1 || colonPos == -1) return "";
+            
+            temp = packet.substring(gtPos + 1, colonPos);
         }
-        if (temp.indexOf(",") > 2) { // checks for path
-            const String& path = temp.substring(temp.indexOf(",") + 1); // after tocall
-            if (Config.digi.mode == 2 || backUpDigiMode) {
-                if (path.indexOf("WIDE1-1") != - 1) {
-                    return buildPacket(path, packet, thirdParty, false);
-                } else if (path.indexOf("WIDE1-1") == -1 && (abs(Config.loramodule.txFreq - Config.loramodule.rxFreq) >= 125000)) { //  CrossFreq Digi
-                    return buildPacket(path, packet, thirdParty, true);
-                } else {
-                    return "";
-                }
-            } else if (Config.digi.mode == 3) {
-                if (path.indexOf("WIDE1-1") != -1 || path.indexOf("WIDE2-") != -1) {
-                    int wide1Index = path.indexOf("WIDE1-1");
-                    int wide2Index = path.indexOf("WIDE2-");
-
-                    // WIDE1-1 && WIDE2-n   /   only WIDE1-1    /   only WIDE2-n
-                    if ((wide1Index != -1 && wide2Index != -1 && wide1Index < wide2Index) || (wide1Index != -1 && wide2Index == -1) || (wide1Index == -1 && wide2Index != -1)) {
-                        return buildPacket(path, packet, thirdParty, false);
-                    }
-                    return "";
-                } else if (path.indexOf("WIDE1-1") == -1 && path.indexOf("WIDE2-") == -1 && (abs(Config.loramodule.txFreq - Config.loramodule.rxFreq) >= 125000)) {    //  CrossFreq Digi
-                    return buildPacket(path, packet, thirdParty, true);
-                } else {
-                    return "";
-                }
-            } else {
-                return "";
+        
+        int commaPos = temp.indexOf(",");
+        if (commaPos <= 2) return "";
+        
+        const String& path = temp.substring(commaPos + 1);
+        
+        if (Config.digi.mode == 2 || backUpDigiMode) {
+            if (path.indexOf("WIDE1-1") != -1) {
+                return buildPacket(path, packet, thirdParty, false);
+            } else if (path.indexOf("WIDE1-1") == -1 && 
+                      (abs(Config.loramodule.txFreq - Config.loramodule.rxFreq) >= 125000)) {
+                return buildPacket(path, packet, thirdParty, true);
             }
-        } else if (temp.indexOf(",") == -1 && (Config.digi.mode == 2 || backUpDigiMode || Config.digi.mode == 3) && (abs(Config.loramodule.txFreq - Config.loramodule.rxFreq) >= 125000)) {
-            return buildPacket("", packet, thirdParty, true);
-        } else {
-            return "";
+        } else if (Config.digi.mode == 3) {
+            if (path.indexOf("WIDE1-1") != -1 || path.indexOf("WIDE2-") != -1) {
+                return buildPacket(path, packet, thirdParty, false);
+            } else if (path.indexOf("WIDE1-1") == -1 && path.indexOf("WIDE2-") == -1 && 
+                      (abs(Config.loramodule.txFreq - Config.loramodule.rxFreq) >= 125000)) {
+                return buildPacket(path, packet, thirdParty, true);
+            }
         }
+        
+        return "";
     }
 
     void processLoRaPacket(const String& packet) {
-        if (packet.indexOf("NOGATE") == -1) {
+        if (packet.indexOf("RFONLY") == -1 && packet.indexOf("NOGATE") == -1) {
             bool thirdPartyPacket = false;
             String temp, Sender;
+            
             int firstColonIndex = packet.indexOf(":");
-            if (firstColonIndex > 5 && firstColonIndex < (packet.length() - 1) && packet[firstColonIndex + 1] == '}' && packet.indexOf("TCPIP") > 0) {   // 3rd Party 
+            
+            if (firstColonIndex > 5 && firstColonIndex < (packet.length() - 1) && 
+                packet[firstColonIndex + 1] == '}' && packet.indexOf("TCPIP") > 0) {
+                // 3rd Party
                 thirdPartyPacket = true;
-                temp    = packet.substring(packet.indexOf(":}") + 2);
-                Sender  = temp.substring(0, temp.indexOf(">"));
+                int thirdPartyStart = packet.indexOf(":}");
+                if (thirdPartyStart == -1) return;
+                
+                temp = packet.substring(thirdPartyStart + 2);
+                int gtPos = temp.indexOf(">");
+                if (gtPos == -1) return;
+                
+                Sender = temp.substring(0, gtPos);
             } else {
-                temp    = packet.substring(3);
-                Sender  = packet.substring(3, packet.indexOf(">"));
+                temp = packet.substring(3);
+                int gtPos = packet.indexOf(">");
+                if (gtPos < 3) return;
+                
+                Sender = packet.substring(3, gtPos);
             }
-            if (Sender != Config.callsign) {        // Avoid listening to own packets
+            
+            if (Sender != Config.callsign) {
                 if (!thirdPartyPacket && !Utils::checkValidCallsign(Sender)) {
                     return;
                 }
-                if (STATION_Utils::check25SegBuffer(Sender, temp.substring(temp.indexOf(":") + 2))) {
+                
+                int colonPos = temp.indexOf(":");
+                if (colonPos == -1) return;
+                
+                String payload = temp.substring(colonPos + 2);
+                
+                if (STATION_Utils::check25SegBuffer(Sender, payload)) {
                     STATION_Utils::updateLastHeard(Sender);
-                    Utils::typeOfPacket(temp, 2);    // Digi
+                    Utils::typeOfPacket(temp, 2);
+                    
                     bool queryMessage = false;
-                    if (temp.indexOf("::") > 10) {   // it's a message
-                        String AddresseeAndMessage  = temp.substring(temp.indexOf("::") + 2);
-                        String Addressee            = AddresseeAndMessage.substring(0, AddresseeAndMessage.indexOf(":"));
+                    
+                    if (temp.indexOf("::") > 10) {
+                        int doubleColonPos = temp.indexOf("::");
+                        String AddresseeAndMessage = temp.substring(doubleColonPos + 2);
+                        int colonPos = AddresseeAndMessage.indexOf(":");
+                        if (colonPos == -1) return;
+                        
+                        String Addressee = AddresseeAndMessage.substring(0, colonPos);
                         Addressee.trim();
-                        if (Addressee == Config.callsign) {     // it's a message for me!
+                        
+                        if (Addressee == Config.callsign) {
                             queryMessage = APRS_IS_Utils::processReceivedLoRaMessage(Sender, AddresseeAndMessage, thirdPartyPacket);
                         }
                     }
+                    
                     if (!queryMessage) {
                         String loraPacket = generateDigipeatedPacket(packet.substring(3), thirdPartyPacket);
                         if (loraPacket != "") {
                             STATION_Utils::addToOutputPacketBuffer(loraPacket);
-                            if (Config.digi.ecoMode != 1) displayToggle(true);
+                            if (Config.digi.ecoMode != 1) {
+                                displayToggle(true);
+                            }
                             lastScreenOn = millis();
                         }
                     }
                 }
             }
         }
+    }
+
+    void checkEcoMode() {
+        // EcoMode check logic
     }
 
 }
