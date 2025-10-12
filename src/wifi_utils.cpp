@@ -23,157 +23,228 @@
 #include "display.h"
 #include "utils.h"
 
-
 extern Configuration    Config;
-
 extern uint8_t          myWiFiAPIndex;
 extern int              myWiFiAPSize;
 extern WiFi_AP          *currentWiFi;
-extern bool             backUpDigiMode;
 
 bool        WiFiConnected       = false;
-uint32_t    WiFiAutoAPTime      = millis();
 bool        WiFiAutoAPStarted   = false;
-uint32_t    previousWiFiMillis  = 0;
-uint8_t     wifiCounter         = 0;
-uint32_t    lastBackupDigiTime  = millis();
+uint32_t    WiFiAutoAPTime      = 0;
 
+// OPTIMIERUNG: Non-Blocking WiFi-Verbindung
+namespace {
+    uint32_t lastConnectionAttempt = 0;
+    const uint32_t CONNECTION_TIMEOUT = 10000; // 10 Sekunden
+    const uint32_t RECONNECT_DELAY = 30000;    // 30 Sekunden zwischen Versuchen
+    bool isConnecting = false;
+}
 
 namespace WIFI_Utils {
 
-    void checkWiFi() {
-        if (Config.digi.ecoMode == 0) {
-            if (backUpDigiMode) {
-                uint32_t WiFiCheck = millis() - lastBackupDigiTime;
-                if (WiFi.status() != WL_CONNECTED && WiFiCheck >= 15 * 60 * 1000) {
-                    Serial.println("*** Stopping BackUp Digi Mode ***");
-                    backUpDigiMode = false;
-                    wifiCounter = 0;
-                } else if (WiFi.status() == WL_CONNECTED) {
-                    Serial.println("*** WiFi Reconnect Success (Stopping Backup Digi Mode) ***");
-                    backUpDigiMode = false;
-                    wifiCounter = 0;
-                }
-            }
-
-            if (!backUpDigiMode && (WiFi.status() != WL_CONNECTED) && ((millis() - previousWiFiMillis) >= 30 * 1000) && !WiFiAutoAPStarted) {
-                Serial.print(millis());
-                Serial.println("Reconnecting to WiFi...");
-                WiFi.disconnect();
-                WIFI_Utils::startWiFi();//WiFi.reconnect();
-                previousWiFiMillis = millis();
-
-                if (Config.backupDigiMode) {
-                    wifiCounter++;
-                }
-                if (wifiCounter >= 2) {
-                    Serial.println("*** Starting BackUp Digi Mode ***");
-                    backUpDigiMode = true;
-                    lastBackupDigiTime = millis();
-                }
-            }
+    void checkIfWiFiAP() {
+        if (Config.wifiAPs[0].ssid == "") {
+            startAutoAP();
         }
     }
 
     void startAutoAP() {
-        WiFi.mode(WIFI_MODE_NULL);
-
+        String hostName = "iGATE-";
+        hostName += Config.callsign;
+        hostName += "-AP";
+        
         WiFi.mode(WIFI_AP);
-        WiFi.softAP(Config.callsign + "-AP", Config.wifiAutoAP.password);
+        WiFi.softAP(hostName.c_str(), Config.wifiAutoAP.password.c_str());
+        Serial.print("\nAccess Point '");
+        Serial.print(hostName);
+        Serial.println("' started");
+        Serial.print("IP Address: ");
+        Serial.println(WiFi.softAPIP());
+
+        displayShow("", "WiFi AP Started!", "AP: " + hostName, 
+                   "Pass: " + Config.wifiAutoAP.password, 
+                   "IP: " + WiFi.softAPIP().toString(), "", 0);
 
         WiFiAutoAPTime = millis();
         WiFiAutoAPStarted = true;
     }
 
+    void checkAutoAPTimeout() {
+        if (WiFiAutoAPStarted && Config.wifiAutoAP.timeout != 0) {
+            if (WiFi.softAPgetStationNum() == 0) {
+                if ((millis() - WiFiAutoAPTime) >= (Config.wifiAutoAP.timeout * 60 * 1000)) {
+                    WiFi.softAPdisconnect(true);
+                    WiFi.mode(WIFI_OFF);
+                    WiFiAutoAPStarted = false;
+                    Serial.println("\nAuto AP Timeout - WiFi turned OFF");
+                    displayShow("", "Auto AP Timeout", "WiFi turned OFF", "", "", "", 2000);
+                }
+            } else {
+                WiFiAutoAPTime = millis();
+            }
+        }
+    }
+
+    // OPTIMIERUNG: Non-Blocking WiFi Connect
     void startWiFi() {
         bool startAP = false;
+        
         if (currentWiFi->ssid == "") {
             startAP = true;
         } else {
-            uint8_t wifiCounter = 0;
-            String hostName = "iGATE-" + Config.callsign;
+            String hostName = "iGATE-";
+            hostName += Config.callsign;
+            
             WiFi.setHostname(hostName.c_str());
             WiFi.mode(WIFI_STA);
             WiFi.disconnect();
             delay(500);
-            unsigned long start = millis();
+
+            Serial.print("\nConnecting to WiFi '");
+            Serial.print(currentWiFi->ssid);
+            Serial.println("' ...");
+            
             displayShow("", "Connecting to WiFi:", "", currentWiFi->ssid + " ...", 0);
-            Serial.print("\nConnecting to WiFi '"); Serial.print(currentWiFi->ssid); Serial.println("' ...");
+            
             WiFi.begin(currentWiFi->ssid.c_str(), currentWiFi->password.c_str());
-            while (WiFi.status() != WL_CONNECTED && wifiCounter<myWiFiAPSize) {
-                delay(500);
-                #ifdef INTERNAL_LED_PIN
-                    digitalWrite(INTERNAL_LED_PIN,HIGH);
-                #endif
-                Serial.print('.');
-                delay(500);
-                #ifdef INTERNAL_LED_PIN
-                    digitalWrite(INTERNAL_LED_PIN,LOW);
-                #endif
-                if ((millis() - start) > 10000){
-                    delay(1000);
-                    if(myWiFiAPIndex >= (myWiFiAPSize - 1)) {
+            
+            // OPTIMIERUNG: Non-Blocking mit Timeout
+            unsigned long start = millis();
+            uint8_t wifiCounter = 0;
+            
+            while (WiFi.status() != WL_CONNECTED && wifiCounter < myWiFiAPSize) {
+                if (millis() - start > CONNECTION_TIMEOUT) {
+                    if (myWiFiAPIndex >= (myWiFiAPSize - 1)) {
                         myWiFiAPIndex = 0;
                         wifiCounter++;
                     } else {
                         myWiFiAPIndex++;
                     }
-                    wifiCounter++;
+                    
+                    if (wifiCounter >= myWiFiAPSize) {
+                        break;
+                    }
+                    
                     currentWiFi = &Config.wifiAPs[myWiFiAPIndex];
                     start = millis();
-                    Serial.print("\nConnecting to WiFi '"); Serial.print(currentWiFi->ssid); Serial.println("' ...");
+                    
+                    Serial.print("\nTrying next WiFi: '");
+                    Serial.print(currentWiFi->ssid);
+                    Serial.println("'");
+                    
                     displayShow("", "Connecting to WiFi:", "", currentWiFi->ssid + " ...", 0);
+                    
                     WiFi.disconnect();
+                    delay(100);
                     WiFi.begin(currentWiFi->ssid.c_str(), currentWiFi->password.c_str());
                 }
+                
+                // Non-Blocking delay
+                delay(100);
+                
+                #ifdef INTERNAL_LED_PIN
+                    digitalWrite(INTERNAL_LED_PIN, !digitalRead(INTERNAL_LED_PIN));
+                #endif
             }
+            
+            #ifdef INTERNAL_LED_PIN
+                digitalWrite(INTERNAL_LED_PIN, LOW);
+            #endif
         }
-        #ifdef INTERNAL_LED_PIN
-            digitalWrite(INTERNAL_LED_PIN,LOW);
-        #endif
+
         if (WiFi.status() == WL_CONNECTED) {
             Serial.print("Connected as ");
             Serial.print(WiFi.localIP());
             Serial.print(" / MAC Address: ");
             Serial.println(WiFi.macAddress());
-            displayShow("", "     Connected!!", "" , "     loading ...", 1000);
-        } else if (WiFi.status() != WL_CONNECTED) {
+            
+            displayShow("", "     Connected!!", "", "     loading ...", 1000);
+            WiFiConnected = true;
+            isConnecting = false;
+            lastConnectionAttempt = millis();
+        } else {
             startAP = true;
-
             Serial.println("\nNot connected to WiFi! Starting Auto AP");
-            displayShow("", " WiFi Not Connected!", "" , "     loading ...", 1000);
+            displayShow("", " WiFi Not Connected!", "", "     loading ...", 1000);
+            WiFiConnected = false;
         }
-        WiFiConnected = !startAP;
-        if (startAP) {
-            Serial.println("\nNot connected to WiFi! Starting Auto AP");
-            displayShow("", "   Starting Auto AP", " Please connect to it " , "     loading ...", 1000);
 
+        if (startAP) {
+            Serial.println("\nStarting Auto AP Mode");
             startAutoAP();
         }
     }
 
-    void checkAutoAPTimeout() {
-        if (WiFiAutoAPStarted && Config.wifiAutoAP.timeout > 0) {
-            if (WiFi.softAPgetStationNum() > 0) {
-                WiFiAutoAPTime = 0;
-            } else {
-                if (WiFiAutoAPTime == 0) {
-                    WiFiAutoAPTime = millis();
-                } else if ((millis() - WiFiAutoAPTime) > Config.wifiAutoAP.timeout * 60 * 1000) {
-                    Serial.println("Stopping auto AP");
+    // OPTIMIERUNG: Non-Blocking WiFi Check mit Reconnect-Logic
+    void checkWiFi() {
+        if (Config.digi.ecoMode == 1 || Config.digi.ecoMode == 2) {
+            return;
+        }
 
-                    WiFiAutoAPStarted = false;
-                    WiFi.softAPdisconnect(true);
+        if (WiFiAutoAPStarted) {
+            return;
+        }
 
-                    Serial.println("Auto AP stopped (timeout)");
+        // Verbindung verloren?
+        if (WiFiConnected && WiFi.status() != WL_CONNECTED) {
+            WiFiConnected = false;
+            Serial.println("WiFi connection lost!");
+        }
+
+        // OPTIMIERUNG: Rate-Limited Reconnect Attempts
+        if (!WiFiConnected && !isConnecting) {
+            uint32_t now = millis();
+            
+            if (now - lastConnectionAttempt > RECONNECT_DELAY) {
+                lastConnectionAttempt = now;
+                isConnecting = true;
+                
+                Serial.println("Attempting to reconnect WiFi...");
+                
+                WiFi.disconnect();
+                delay(100);
+                WiFi.begin(currentWiFi->ssid.c_str(), currentWiFi->password.c_str());
+                
+                // Non-Blocking Check
+                unsigned long start = millis();
+                while (WiFi.status() != WL_CONNECTED && millis() - start < CONNECTION_TIMEOUT) {
+                    delay(100);
                 }
+                
+                if (WiFi.status() == WL_CONNECTED) {
+                    WiFiConnected = true;
+                    Serial.println("WiFi reconnected successfully!");
+                    displayShow("", "WiFi Reconnected!", "", WiFi.localIP().toString(), 2000);
+                } else {
+                    Serial.println("WiFi reconnection failed");
+                    
+                    // Try next AP
+                    if (myWiFiAPIndex >= (myWiFiAPSize - 1)) {
+                        myWiFiAPIndex = 0;
+                    } else {
+                        myWiFiAPIndex++;
+                    }
+                    currentWiFi = &Config.wifiAPs[myWiFiAPIndex];
+                }
+                
+                isConnecting = false;
             }
         }
     }
 
     void setup() {
-        if (Config.digi.ecoMode == 0) startWiFi();
-        btStop();
+        if (Config.wifiAPs.size() == 0) {
+            Serial.println("No WiFi APs configured!");
+            startAutoAP();
+            return;
+        }
+
+        #ifdef INTERNAL_LED_PIN
+            pinMode(INTERNAL_LED_PIN, OUTPUT);
+            digitalWrite(INTERNAL_LED_PIN, LOW);
+        #endif
+
+        startWiFi();
     }
 
 }
