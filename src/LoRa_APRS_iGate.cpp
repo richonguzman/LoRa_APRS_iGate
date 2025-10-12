@@ -67,7 +67,7 @@ ___________________________________________________________________*/
 #endif
 
 
-String              versionDate             = "2025-10-11";
+String              versionDate             = "2025-10-12";
 String              versionNumber           = "3.1.3";
 Configuration       Config;
 WiFiClient          aprsIsClient;
@@ -97,7 +97,6 @@ bool                modemLoggedToAPRSIS     = false;
 std::vector<ReceivedPacket> receivedPackets;
 
 String firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine;
-//#define STARTUP_DELAY 5 //min
 
 
 void setup() {
@@ -108,12 +107,7 @@ void setup() {
     Utils::validateFreqs();
     GPS_Utils::setup();
     STATION_Utils::loadBlacklistAndManagers();
-
-    #ifdef STARTUP_DELAY    // (TEST) just to wait for WiFi init of Routers
-        displayShow("", "  STARTUP DELAY ...", "", "", 0);
-        delay(STARTUP_DELAY * 60 * 1000);
-    #endif
-
+    Utils::startupDelay();
     SLEEP_Utils::setup();
     WIFI_Utils::setup();
     NTP_Utils::setup();

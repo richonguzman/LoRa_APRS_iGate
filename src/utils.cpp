@@ -436,4 +436,11 @@ namespace Utils {
         return true;
     }
 
+    void startupDelay() {
+        if (Config.startupDelay > 0) {
+            displayShow("", "  STARTUP DELAY ...", "", "", 0);
+            delay(Config.startupDelay * 60 * 1000);
+        }
+    }
+
 }

@@ -95,6 +95,7 @@ function loadSettings(settings) {
         networksContainer.appendChild(networkElement);
         networkCount++;
     });
+    document.getElementById("startupDelay").value                       = settings.startupDelay;
 
     // APRS-IS
     document.getElementById("aprs_is.active").checked                   = settings.aprs_is.active;

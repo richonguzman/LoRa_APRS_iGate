@@ -110,6 +110,7 @@
         "rememberStationTime": 30,
         "backupDigiMode": false,
         "rebootMode": false,
-        "rebootModeTime": 6
+        "rebootModeTime": 6,
+        "startupDelay": 0
     }
 }

@@ -45,6 +45,8 @@ bool Configuration::writeFile() {
             }
         }
 
+        data["other"]["startupDelay"]               = startupDelay;
+
         data["wifi"]["autoAP"]["password"]          = wifiAutoAP.password;
         data["wifi"]["autoAP"]["timeout"]           = wifiAutoAP.timeout;
 
@@ -185,6 +187,9 @@ bool Configuration::readFile() {
 
             wifiAPs.push_back(wifiap);
         }
+
+        if (!data["other"].containsKey("startupDelay")) needsRewrite = true;
+        startupDelay                    = data["other"]["startupDelay"] | 0;
 
         if (!data["wifi"]["autoAP"].containsKey("password") ||
             !data["wifi"]["autoAP"].containsKey("timeout")) needsRewrite = true;
@@ -400,6 +405,8 @@ void Configuration::setDefaultValues() {
     wifiap.password                 = "";
 
     wifiAPs.push_back(wifiap);
+
+    startupDelay                    = 0;
 
     wifiAutoAP.password             = "1234567890";
     wifiAutoAP.timeout              = 10;

@@ -157,6 +157,8 @@ namespace WEB_Utils {
             Config.wifiAPs.push_back(wifiap);
         }
 
+        Config.startupDelay                 = getParamIntSafe("startupDelay", Config.startupDelay);
+
         Config.callsign                     = getParamStringSafe("callsign", Config.callsign);
         
         Config.wifiAutoAP.password          = getParamStringSafe("wifi.autoAP.password", Config.wifiAutoAP.password);

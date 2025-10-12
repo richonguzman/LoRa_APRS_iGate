@@ -169,6 +169,7 @@ public:
     bool                    backupDigiMode;
     bool                    rebootMode;
     int                     rebootModeTime;
+    int                     startupDelay;
     String                  personalNote;
     String                  blacklist;
     std::vector<WiFi_AP>    wifiAPs;
