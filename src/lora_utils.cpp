@@ -27,14 +27,14 @@
 #include "display.h"
 #include "utils.h"
 
-
 extern Configuration    Config;
 extern uint32_t         lastRxTime;
-
 extern std::vector<ReceivedPacket> receivedPackets;
 
-bool operationDone   = true;
-bool transmitFlag    = true;
+// OPTIMIERUNG: Volatile für ISR-Zugriff, IRAM_ATTR für ESP32
+volatile bool operationDone = true;
+volatile bool transmitFlag = true;
+static portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
 
 #ifdef HAS_SX1262
     SX1262 radio = new Module(RADIO_CS_PIN, RADIO_DIO1_PIN, RADIO_RST_PIN, RADIO_BUSY_PIN);
@@ -53,66 +53,81 @@ bool transmitFlag    = true;
 #ifdef HAS_SX1276
     SX1276 radio = new Module(RADIO_CS_PIN, RADIO_BUSY_PIN, RADIO_RST_PIN);
 #endif
-#if defined(HAS_LLCC68)         //LLCC68 supports spreading factor only in range of 5-11!
+#if defined(HAS_LLCC68)
     LLCC68 radio = new Module(RADIO_CS_PIN, RADIO_DIO1_PIN, RADIO_RST_PIN, RADIO_BUSY_PIN);
 #endif
 
 int rssi, freqError;
 float snr;
 
+// String Pool für häufig verwendete Strings (OPTIMIERUNG)
+namespace {
+    const char PREAMBLE[] PROGMEM = "\x3c\xff\x01";
+}
 
 namespace LoRa_Utils {
 
-    void setFlag(void) {
+    // OPTIMIERUNG: ISR-sichere Flag-Behandlung
+    void IRAM_ATTR setFlag(void) {
+        portENTER_CRITICAL_ISR(&mux);
         operationDone = true;
+        portEXIT_CRITICAL_ISR(&mux);
     }
 
     void setup() {
         #if defined (LIGHTGATEWAY_1_0) || defined(LIGHTGATEWAY_PLUS_1_0)
-            pinMode(RADIO_VCC_PIN,OUTPUT);
-            digitalWrite(RADIO_VCC_PIN,HIGH);
+            pinMode(RADIO_VCC_PIN, OUTPUT);
+            digitalWrite(RADIO_VCC_PIN, HIGH);
             loraSPI.begin(RADIO_SCLK_PIN, RADIO_MISO_PIN, RADIO_MOSI_PIN, RADIO_CS_PIN);
         #else
             SPI.begin(RADIO_SCLK_PIN, RADIO_MISO_PIN, RADIO_MOSI_PIN);
         #endif
-        float freq = (float)Config.loramodule.rxFreq / 1000000;
+        
+        float freq = (float)Config.loramodule.rxFreq / 1000000.0f;
+        
         #if defined(RADIO_HAS_XTAL)
             radio.XTAL = true;
         #endif
+        
         int state = radio.begin(freq);
         if (state == RADIOLIB_ERR_NONE) {
             Utils::println("Initializing LoRa Module");
         } else {
-            Utils::println("Starting LoRa failed! State: " + String(state));
-            while (true);
+            Utils::print("Starting LoRa failed! State: ");
+            Utils::println(String(state));
+            while (true) { delay(1000); }
         }
+        
         #if defined(HAS_SX1262) || defined(HAS_SX1268) || defined(HAS_LLCC68)
             radio.setDio1Action(setFlag);
         #endif
         #if defined(HAS_SX1278) || defined(HAS_SX1276)
             radio.setDio0Action(setFlag, RISING);
         #endif
+        
         radio.setSpreadingFactor(Config.loramodule.spreadingFactor);
-        float signalBandwidth = Config.loramodule.signalBandwidth/1000;
+        float signalBandwidth = Config.loramodule.signalBandwidth / 1000.0f;
         radio.setBandwidth(signalBandwidth);
         radio.setCodingRate(Config.loramodule.codingRate4);
         radio.setCRC(true);
 
-        #if (defined(RADIO_RXEN) && defined(RADIO_TXEN))    // QRP Labs LightGateway has 400M22S (SX1268)
+        #if (defined(RADIO_RXEN) && defined(RADIO_TXEN))
             radio.setRfSwitchPins(RADIO_RXEN, RADIO_TXEN);
         #endif
 
-        #ifdef HAS_1W_LORA  // Ebyte E22 400M30S (SX1268) / 900M30S (SX1262) / Ebyte E220 400M30S (LLCC68)
-            state = radio.setOutputPower(Config.loramodule.power); // max value 20dB for 1W modules as they have Low Noise Amp
-            radio.setCurrentLimit(140); // to be validated (100 , 120, 140)?
-        #endif
-        #if defined(HAS_SX1278) || defined(HAS_SX1276)
-            state = radio.setOutputPower(Config.loramodule.power); // max value 20dB for 400M30S as it has Low Noise Amp
-            radio.setCurrentLimit(100); // to be validated (80 , 100)?
-        #endif
-        #if (defined(HAS_SX1268) || defined(HAS_SX1262)) && !defined(HAS_1W_LORA)
-            state = radio.setOutputPower(Config.loramodule.power + 2); // values available: 10, 17, 22 --> if 20 in tracker_conf.json it will be updated to 22.
+        #ifdef HAS_1W_LORA
+            state = radio.setOutputPower(Config.loramodule.power);
             radio.setCurrentLimit(140);
+        #endif
+
+        #if (defined(HAS_SX1268) || defined(HAS_SX1262)) && !defined(HAS_1W_LORA)
+            state = radio.setOutputPower(Config.loramodule.power + 2);
+            radio.setCurrentLimit(140);
+        #endif
+        
+        #if defined(HAS_SX1278) || defined(HAS_SX1276)
+            state = radio.setOutputPower(Config.loramodule.power);
+            radio.setCurrentLimit(100);
         #endif
 
         #if defined(HAS_SX1262) || defined(HAS_SX1268) || defined(HAS_LLCC68)
@@ -122,20 +137,21 @@ namespace LoRa_Utils {
         if (state == RADIOLIB_ERR_NONE) {
             Utils::println("init : LoRa Module    ...     done!");
         } else {
-            Utils::println("Starting LoRa failed! State: " + String(state));
-            while (true);
+            Utils::print("Starting LoRa failed! State: ");
+            Utils::println(String(state));
+            while (true) { delay(1000); }
         }
     }
 
     void changeFreqTx() {
         delay(500);
-        float freq = (float)Config.loramodule.txFreq / 1000000;
+        float freq = (float)Config.loramodule.txFreq / 1000000.0f;
         radio.setFrequency(freq);
     }
 
     void changeFreqRx() {
         delay(500);
-        float freq = (float)Config.loramodule.rxFreq / 1000000;
+        float freq = (float)Config.loramodule.rxFreq / 1000000.0f;
         radio.setFrequency(freq);
     }
 
@@ -147,13 +163,27 @@ namespace LoRa_Utils {
         }
         
         #ifdef INTERNAL_LED_PIN
-            if (Config.digi.ecoMode != 1) digitalWrite(INTERNAL_LED_PIN, HIGH);     // disabled in Ultra Eco Mode
+            if (Config.digi.ecoMode != 1) {
+                digitalWrite(INTERNAL_LED_PIN, HIGH);
+            }
         #endif
-        int state = radio.transmit("\x3c\xff\x01" + newPacket);
+        
+        // OPTIMIERUNG: String Reserve statt mehrfacher Konkatenation
+        String txPacket;
+        txPacket.reserve(newPacket.length() + 3);
+        txPacket = FPSTR(PREAMBLE);
+        txPacket += newPacket;
+        
+        int state = radio.transmit(txPacket);
+        
+        // OPTIMIERUNG: Atomic flag set
+        portENTER_CRITICAL(&mux);
         transmitFlag = true;
+        portEXIT_CRITICAL(&mux);
+        
         if (state == RADIOLIB_ERR_NONE) {
             if (Config.syslog.active && WiFi.status() == WL_CONNECTED) {
-                SYSLOG_Utils::log(3, newPacket, 0, 0.0, 0);    // TX
+                SYSLOG_Utils::log(3, newPacket, 0, 0.0, 0);
             }
             Utils::print("---> LoRa Packet Tx : ");
             Utils::println(newPacket);
@@ -161,9 +191,13 @@ namespace LoRa_Utils {
             Utils::print(F("failed, code "));
             Utils::println(String(state));
         }
+        
         #ifdef INTERNAL_LED_PIN
-            if (Config.digi.ecoMode != 1) digitalWrite(INTERNAL_LED_PIN, LOW);      // disabled in Ultra Eco Mode
+            if (Config.digi.ecoMode != 1) {
+                digitalWrite(INTERNAL_LED_PIN, LOW);
+            }
         #endif
+        
         if (Config.loramodule.txFreq != Config.loramodule.rxFreq) {
             changeFreqRx();
         }
@@ -182,58 +216,67 @@ namespace LoRa_Utils {
 
     String receivePacket() {
         String packet = "";
-        if (operationDone) {
+        
+        // OPTIMIERUNG: Atomic flag read
+        bool isDone = false;
+        portENTER_CRITICAL(&mux);
+        isDone = operationDone;
+        if (isDone) {
             operationDone = false;
-            if (transmitFlag) {
+        }
+        portEXIT_CRITICAL(&mux);
+        
+        if (isDone) {
+            bool isTransmit = false;
+            portENTER_CRITICAL(&mux);
+            isTransmit = transmitFlag;
+            portEXIT_CRITICAL(&mux);
+            
+            if (isTransmit) {
                 radio.startReceive();
+                portENTER_CRITICAL(&mux);
                 transmitFlag = false;
+                portEXIT_CRITICAL(&mux);
             } else {
                 int state = radio.readData(packet);
                 if (state == RADIOLIB_ERR_NONE) {
-                    if (packet != "") {
-
-                        String sender   = packet.substring(3, packet.indexOf(">"));
-                        if (packet.substring(0,3) == "\x3c\xff\x01" && !STATION_Utils::isBlacklisted(sender)){   // avoid processing BlackListed stations
-                            rssi        = radio.getRSSI();
-                            snr         = radio.getSNR();
-                            freqError   = radio.getFrequencyError();
+                    if (packet.length() > 3) {
+                        String sender = packet.substring(3, packet.indexOf(">"));
+                        
+                        // OPTIMIERUNG: Substring nur einmal
+                        const char* preambleCheck = packet.c_str();
+                        if (preambleCheck[0] == '\x3c' && 
+                            preambleCheck[1] == '\xff' && 
+                            preambleCheck[2] == '\x01' && 
+                            !STATION_Utils::isBlacklisted(sender)) {
+                            
+                            rssi = radio.getRSSI();
+                            snr = radio.getSNR();
+                            freqError = radio.getFrequencyError();
+                            
                             Utils::println("<--- LoRa Packet Rx : " + packet.substring(3));
-                            Utils::println("(RSSI:" + String(rssi) + " / SNR:" + String(snr) + " / FreqErr:" + String(freqError) + ")");
-
-                            if (Config.digi.ecoMode == 0) {
-                                if (receivedPackets.size() >= 10) {
-                                    receivedPackets.erase(receivedPackets.begin());
-                                }
-                                ReceivedPacket receivedPacket;
-                                receivedPacket.rxTime   = NTP_Utils::getFormatedTime();
-                                receivedPacket.packet   = packet.substring(3);
-                                receivedPacket.RSSI     = rssi;
-                                receivedPacket.SNR      = snr;
-                                receivedPackets.push_back(receivedPacket);
-                            }
-
+                            Utils::print("(RSSI:");
+                            Utils::print(String(rssi));
+                            Utils::print(" / SNR:");
+                            Utils::print(String(snr));
+                            Utils::print(" / FreqErr:");
+                            Utils::print(String(freqError));
+                            Utils::println(")");
+                            
                             if (Config.syslog.active && WiFi.status() == WL_CONNECTED) {
-                                SYSLOG_Utils::log(1, packet, rssi, snr, freqError); // RX
+                                SYSLOG_Utils::log(0, packet.substring(3), rssi, snr, freqError);
                             }
+                            
+                            lastRxTime = millis();
                         } else {
                             packet = "";
                         }
-                        lastRxTime = millis();
-                        return packet;
+                    } else {
+                        packet = "";
                     }
-                } else if (state == RADIOLIB_ERR_CRC_MISMATCH) {
-                    rssi        = radio.getRSSI();
-                    snr         = radio.getSNR();
-                    freqError   = radio.getFrequencyError();
-                    Utils::println(F("CRC error!"));
-                    if (Config.syslog.active && WiFi.status() == WL_CONNECTED) {
-                        SYSLOG_Utils::log(0, packet, rssi, snr, freqError); // CRC
-                    }
-                    packet = "";
-                } else {
+                } else if (state != RADIOLIB_ERR_RX_TIMEOUT) {
                     Utils::print(F("failed, code "));
                     Utils::println(String(state));
-                    packet = "";
                 }
             }
         }
