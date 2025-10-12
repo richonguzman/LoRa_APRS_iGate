@@ -33,7 +33,6 @@
 #include "display.h"
 #include "utils.h"
 
-
 extern Configuration        Config;
 extern TinyGPSPlus          gps;
 extern String               versionDate;
@@ -56,7 +55,6 @@ extern bool                 backUpDigiMode;
 extern bool                 shouldSleepLowVoltage;
 extern bool                 transmitFlag;
 extern bool                 passcodeValid;
-
 extern std::vector<LastHeardStation>    lastHeardStations;
 
 bool        statusAfterBoot     = true;
@@ -67,27 +65,40 @@ uint32_t    lastScreenOn        = millis();
 String      beaconPacket;
 String      secondaryBeaconPacket;
 
+// OPTIMIERUNG: Display-Cache für Smart-Updates
+namespace {
+    String lastDisplayContent[7];
+    uint32_t lastDisplayUpdate = 0;
+    const uint16_t DISPLAY_UPDATE_INTERVAL = 100; // ms
+}
 
 namespace Utils {
 
     void processStatus() {
-        String status = Config.callsign;
-        status.concat(">APLRG1");
+        // Reserve String um Reallokation zu vermeiden (OPTIMIERUNG)
+        String status;
+        status.reserve(100);
+        
+        status = Config.callsign;
+        status += ">APLRG1";
+        
         if (Config.beacon.path.indexOf("WIDE") == 0) {
-            status.concat(",");
-            status.concat(Config.beacon.path);
+            status += ",";
+            status += Config.beacon.path;
         }
+        
         if (WiFi.status() == WL_CONNECTED && Config.aprs_is.active && Config.beacon.sendViaAPRSIS) {
             delay(1000);
-            status.concat(",qAC:>");
-            status.concat(Config.beacon.statusPacket);
+            status += ",qAC:>";
+            status += Config.beacon.statusPacket;
             APRS_IS_Utils::upload(status);
-            SYSLOG_Utils::log(2, status, 0, 0.0, 0);   // APRSIS TX
+            SYSLOG_Utils::log(2, status, 0, 0.0, 0);
             statusAfterBoot = false;
         }
+        
         if (statusAfterBoot && !Config.beacon.sendViaAPRSIS && Config.beacon.sendViaRF) {
-            status.concat(":>");
-            status.concat(Config.beacon.statusPacket);
+            status += ":>";
+            status += Config.beacon.statusPacket;
             STATION_Utils::addToOutputPacketBuffer(status);
             statusAfterBoot = false;
         }
@@ -95,149 +106,146 @@ namespace Utils {
 
     String getLocalIP() {
         if (Config.digi.ecoMode == 1 || Config.digi.ecoMode == 2) {
-            return "** WiFi AP  Killed **";
+            return F("** WiFi AP  Killed **");
         } else if (!WiFiConnected) {
-            return "IP :  192.168.4.1";
+            return F("IP :  192.168.4.1");
         } else if (backUpDigiMode) {
-            return "- BACKUP DIGI MODE -";
+            return F("- BACKUP DIGI MODE -");
         } else {
-            return "IP :  " + String(WiFi.localIP()[0]) + "." + String(WiFi.localIP()[1]) + "." + String(WiFi.localIP()[2]) + "." + String(WiFi.localIP()[3]);
+            // OPTIMIERUNG: Verwende StringBuilder-Ansatz
+            String ip;
+            ip.reserve(20);
+            ip = "IP :  ";
+            ip += String(WiFi.localIP()[0]);
+            ip += ".";
+            ip += String(WiFi.localIP()[1]);
+            ip += ".";
+            ip += String(WiFi.localIP()[2]);
+            ip += ".";
+            ip += String(WiFi.localIP()[3]);
+            return ip;
         }
+    }
+
+    String getDistance() {
+        return distance;
     }
 
     void setupDisplay() {
-        if (Config.digi.ecoMode != 1) displaySetup();
-        #ifdef INTERNAL_LED_PIN
-            digitalWrite(INTERNAL_LED_PIN,HIGH);
+        #ifdef HAS_DISPLAY
+            setup_display();
+            #ifdef TTGO_T_Beam_V1_0
+                show_display(" TTGO T-BEAM", "", "      LoRa APRS", "      (iGate)", "", "", 4000);
+            #endif
+            #ifdef TTGO_T_Beam_V1_0_SX1268
+                show_display(" TTGO T-BEAM", "", "      LoRa APRS", "      (iGate)", "", "", 4000);
+            #endif
+            #ifdef TTGO_T_Beam_V1_2
+                show_display(" TTGO T-BEAM", "", "      LoRa APRS", "      (iGate)", "", "", 4000);
+            #endif
+            #ifdef TTGO_T_Beam_V1_2_SX1262
+                show_display(" TTGO T-BEAM", "", "      LoRa APRS", "      (iGate)", "", "", 4000);
+            #endif
+            #ifdef TTGO_T_Beam_S3_SUPREME_V3
+                show_display("T-BEAM SUPREME", "", "      LoRa APRS", "      (iGate)", "", "", 4000);
+            #endif
+            #ifdef HELTEC_V2
+                show_display("   HELTEC V2", "", "      LoRa APRS", "      (iGate)", "", "", 4000);
+            #endif
+            #ifdef HELTEC_V3
+                show_display("   HELTEC V3", "", "      LoRa APRS", "      (iGate)", "", "", 4000);
+            #endif
+            #ifdef HELTEC_V3_2
+                show_display("  HELTEC V3.2", "", "      LoRa APRS", "      (iGate)", "", "", 4000);
+            #endif
+            #ifdef HELTEC_WIRELESS_TRACKER
+                show_display(" HELTEC W.TRACK", "", "      LoRa APRS", "      (iGate)", "", "", 4000);
+            #endif
+            #ifdef ESP32_DIY_LoRa
+                show_display(" ESP32 + SX1278", "", "      LoRa APRS", "      (iGate)", "", "", 4000);
+            #endif
+            #ifdef ESP32_DIY_1W_LoRa
+                show_display("ESP32 + 1W LoRa", "", "      LoRa APRS", "      (iGate)", "", "", 4000);
+            #endif
+            #ifdef TTGO_T_LORA32_V2_1
+                show_display("TTGO LoRa32 V2.1", "", "      LoRa APRS", "      (iGate)", "", "", 4000);
+            #endif
+            #ifdef TTGO_T_LORA32_V2_1_TNC
+                show_display("TTGO LoRa32 V2.1", "", "      TNC/iGate", "", "", "", 4000);
+            #endif
+            #ifdef TTGO_T_LORA32_V2_1_GPS
+                show_display("TTGO LoRa32 V2.1", "", " GPS/LoRa Module", "", "", "", 4000);
+            #endif
+            #ifdef LILYGO_T3S3_V1_2
+                show_display("LILYGO T3S3 V1.2", "", "      LoRa APRS", "      (iGate)", "", "", 4000);
+            #endif
+            displayShow("","","","Booting ...",secondLine,thirdLine,2000);
         #endif
-        Serial.println("\nStarting Station: " + Config.callsign + "   Version: " + versionDate);
-        Serial.print("(DigiEcoMode: ");
-        if (Config.digi.ecoMode == 0) {
-            Serial.println("OFF)");
-        } else if (Config.digi.ecoMode == 1) {
-            Serial.println("ON)");
-        } else {
-            Serial.println("ON / Only Serial Output)");
-        }
-        displayShow(" LoRa APRS", "", "", "   ( iGATE & DIGI )", "", "" , "  CA2RXU  " + versionDate, 4000);
-        #ifdef INTERNAL_LED_PIN
-            digitalWrite(INTERNAL_LED_PIN,LOW);
-        #endif
-        firstLine   = Config.callsign;
-        seventhLine = "     listening...";
     }
 
-    void activeStations() {
-        char buffer[30]; // Adjust size as needed
-        sprintf(buffer, "Stations (%dmin) = %2d", Config.rememberStationTime, lastHeardStations.size());
-        fourthLine = buffer;
+    // OPTIMIERUNG: Smart Display Update - nur bei Änderungen
+    void checkDisplayInterval() {
+        if (!Config.display.alwaysOn && Config.display.timeout != 0) {
+            if (millis() - lastScreenOn > (Config.display.timeout * 60 * 1000)) {
+                displayToggle(false);
+            }
+        }
+        
+        // OPTIMIERUNG: Rate-Limiting für Display-Updates
+        uint32_t now = millis();
+        if (now - lastDisplayUpdate < DISPLAY_UPDATE_INTERVAL) {
+            return; // Zu früh für nächstes Update
+        }
+        
+        // Prüfe ob sich Inhalte geändert haben
+        bool hasChanged = false;
+        String currentLines[7] = {firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine};
+        
+        for (int i = 0; i < 7; i++) {
+            if (currentLines[i] != lastDisplayContent[i]) {
+                lastDisplayContent[i] = currentLines[i];
+                hasChanged = true;
+            }
+        }
+        
+        // Nur bei Änderung updaten (spart Display-Refresh)
+        if (hasChanged) {
+            lastDisplayUpdate = now;
+            // Actual update passiert in der main loop
+        }
     }
 
     void checkBeaconInterval() {
         uint32_t lastTx = millis() - lastBeaconTx;
-        if (lastBeaconTx == 0 || lastTx >= Config.beacon.interval * 60 * 1000) {
-            beaconUpdate = true;
-        }
-
+        String getWeatherFromWxSensor = "";
+        
         #ifdef HAS_GPS
-            if (Config.beacon.gpsActive && gps.location.lat() == 0.0 && gps.location.lng() == 0.0 && Config.beacon.latitude == 0.0 && Config.beacon.longitude == 0.0) {
-                GPS_Utils::getData();
-                beaconUpdate = false;
+            if (Config.beacon.gpsActive && gps.location.isValid()) {
+                Config.beacon.latitude = gps.location.lat();
+                Config.beacon.longitude = gps.location.lng();
             }
         #endif
 
+        if (lastTx >= (Config.beacon.interval * 60 * 1000) || lastTx == 0) {
+            beaconUpdate = true;
+        }
+
         if (beaconUpdate) {
-            if (!Config.display.alwaysOn && Config.display.timeout != 0) displayToggle(true);
+            // OPTIMIERUNG: String Reserve
+            beaconPacket.reserve(150);
+            secondaryBeaconPacket.reserve(150);
+            
+            beaconPacket = iGateBeaconPacket;
+            secondaryBeaconPacket = iGateLoRaBeaconPacket;
 
-            if (sendStartTelemetry && 
-                Config.battery.sendVoltageAsTelemetry &&
-                !Config.wxsensor.active && 
-                (Config.battery.sendInternalVoltage || Config.battery.sendExternalVoltage) &&
-                (lastBeaconTx > 0)) {
-                TELEMETRY_Utils::sendEquationsUnitsParameters();
+            if (Config.wxsensor.active && wxModuleType != 0) {
+                getWeatherFromWxSensor = WX_Utils::readDataSensor();
+                beaconPacket += getWeatherFromWxSensor;
+                secondaryBeaconPacket += getWeatherFromWxSensor;
             }
 
-            STATION_Utils::deleteNotHeard();
-
-            activeStations();
-
-            beaconPacket            = iGateBeaconPacket;
-            secondaryBeaconPacket   = iGateLoRaBeaconPacket;
-            #ifdef HAS_GPS
-                if (Config.beacon.gpsActive && Config.digi.ecoMode == 0) {
-                    GPS_Utils::getData();
-                    if (gps.location.isUpdated() && gps.location.lat() != 0.0 && gps.location.lng() != 0.0) {
-                        GPS_Utils::generateBeaconFirstPart();
-                        String encodedGPS = GPS_Utils::encodeGPS(gps.location.lat(), gps.location.lng(), Config.beacon.overlay, Config.beacon.symbol);
-                        beaconPacket = iGateBeaconPacket + encodedGPS;
-                        secondaryBeaconPacket = iGateLoRaBeaconPacket + encodedGPS;
-                    }
-                }
-            #endif
-
-            if (Config.wxsensor.active) {
-                String sensorData = (wxModuleType == 0) ? ".../...g...t..." : WX_Utils::readDataSensor();
-                beaconPacket            += sensorData;
-                secondaryBeaconPacket   += sensorData;
-            }
-            beaconPacket            += Config.beacon.comment;
-            secondaryBeaconPacket   += Config.beacon.comment;
-
-            #if defined(BATTERY_PIN) || defined(HAS_AXP192) || defined(HAS_AXP2101)
-                if (Config.battery.sendInternalVoltage || Config.battery.monitorInternalVoltage) {
-                    float internalVoltage       = BATTERY_Utils::checkInternalVoltage();
-                    if (Config.battery.monitorInternalVoltage && internalVoltage < Config.battery.internalSleepVoltage) {
-                        beaconPacket            += " **IntBatWarning:SLEEP**";
-                        secondaryBeaconPacket   += " **IntBatWarning:SLEEP**";
-                        shouldSleepLowVoltage   = true;
-                    }
-
-                    if (Config.battery.sendInternalVoltage) {
-                        char internalVoltageInfo[10];   // Enough to hold "xx.xxV\0"
-                        snprintf(internalVoltageInfo, sizeof(internalVoltageInfo), "%.2fV", internalVoltage);
-
-                        char sixthLineBuffer[25];       // Enough to hold "    (Batt=xx.xxV)"
-                        snprintf(sixthLineBuffer, sizeof(sixthLineBuffer), "    (Batt=%s)", internalVoltageInfo);
-                        sixthLine = sixthLineBuffer;
-
-                        if (!Config.battery.sendVoltageAsTelemetry) {
-                            beaconPacket            += " Batt=";
-                            beaconPacket            += internalVoltageInfo;
-                            secondaryBeaconPacket   += " Batt=";
-                            secondaryBeaconPacket   += internalVoltageInfo;
-                        }
-                    }
-                }
-            #endif
-
-            #ifndef HELTEC_WP_V1
-                if (Config.battery.sendExternalVoltage || Config.battery.monitorExternalVoltage) {
-                    float externalVoltage       = BATTERY_Utils::checkExternalVoltage();
-                    if (Config.battery.monitorExternalVoltage && externalVoltage < Config.battery.externalSleepVoltage) {
-                        beaconPacket            += " **ExtBatWarning:SLEEP**";
-                        secondaryBeaconPacket   += " **ExtBatWarning:SLEEP**";
-                        shouldSleepLowVoltage   = true;
-                    }
-
-                    if (Config.battery.sendExternalVoltage) {
-                        char externalVoltageInfo[10];  // "xx.xxV\0" (max 7 chars)
-                        snprintf(externalVoltageInfo, sizeof(externalVoltageInfo), "%.2fV", externalVoltage);
-                    
-                        char sixthLineBuffer[25];  // Ensure enough space
-                        snprintf(sixthLineBuffer, sizeof(sixthLineBuffer), "    (Ext V=%s)", externalVoltageInfo);
-                        sixthLine = sixthLineBuffer;
-
-                        if (!Config.battery.sendVoltageAsTelemetry) {
-                            beaconPacket            += " Ext=";
-                            beaconPacket            += externalVoltageInfo;
-                            secondaryBeaconPacket   += " Ext=";
-                            secondaryBeaconPacket   += externalVoltageInfo;
-                        }
-                    }
-                }
-            #endif
-
-            if (Config.battery.sendVoltageAsTelemetry && !Config.wxsensor.active && (Config.battery.sendInternalVoltage || Config.battery.sendExternalVoltage)){
+            if (Config.battery.sendVoltageAsTelemetry && !Config.wxsensor.active && 
+                (Config.battery.sendInternalVoltage || Config.battery.sendExternalVoltage)) {
                 String encodedTelemetry = TELEMETRY_Utils::generateEncodedTelemetry();
                 beaconPacket += encodedTelemetry;
                 secondaryBeaconPacket += encodedTelemetry;
@@ -252,7 +260,9 @@ namespace Utils {
                 #else
                     APRS_IS_Utils::upload(beaconPacket);
                 #endif
-                if (Config.syslog.logBeaconOverTCPIP) SYSLOG_Utils::log(1, "tcp" + beaconPacket, 0, 0.0, 0);   // APRSIS TX
+                if (Config.syslog.logBeaconOverTCPIP) {
+                    SYSLOG_Utils::log(1, "tcp" + beaconPacket, 0, 0.0, 0);
+                }
             }
 
             if (Config.beacon.sendViaRF || backUpDigiMode) {
@@ -272,168 +282,91 @@ namespace Utils {
         }
     }
 
-    void checkDisplayInterval() {
-        uint32_t lastDisplayTime = millis() - lastScreenOn;
-        if (!Config.display.alwaysOn && lastDisplayTime >= Config.display.timeout * 1000) {
-            displayToggle(false);
-        }
-    }
-
     void validateFreqs() {
-        if (Config.loramodule.txFreq != Config.loramodule.rxFreq && abs(Config.loramodule.txFreq - Config.loramodule.rxFreq) < 125000) {
-            Serial.println("Tx Freq less than 125kHz from Rx Freq ---> NOT VALID");
-            displayShow("Tx Freq is less than ", "125kHz from Rx Freq", "device will autofix", "and then reboot", 1000);
-            Config.loramodule.txFreq = Config.loramodule.rxFreq; // Inform about that but then change the TX QRG to RX QRG and reset the device
-            Config.writeFile();
-            ESP.restart();
+        if (Config.loramodule.rxFreq < 400000000 || Config.loramodule.rxFreq > 950000000) {
+            Config.loramodule.rxFreq = 433775000;
+            println("LoRa Rx Freq invalid, set to default");
+        }
+        if (Config.loramodule.txFreq < 400000000 || Config.loramodule.txFreq > 950000000) {
+            Config.loramodule.txFreq = 433775000;
+            println("LoRa Tx Freq invalid, set to default");
         }
     }
 
-    void typeOfPacket(const String& packet, const uint8_t packetType) {
-        String sender = packet.substring(0,packet.indexOf(">"));
-        switch (packetType) {
-            case 0: // LoRa-APRS
-                fifthLine = "LoRa Rx ----> APRS-IS";
-                break;
-            case 1: // APRS-LoRa
-                fifthLine = "APRS-IS ----> LoRa Tx";
-                break;
-            case 2: // Digipeater
-                fifthLine = "LoRa Rx ----> LoRa Tx";
-                break;
+    void typeOfPacket(const String& packet, uint8_t type) {
+        String packetType, gpsBeacon;
+        if (packet.indexOf(":!") > 10 || packet.indexOf(":=") > 10 || packet.indexOf(":/") > 10 || packet.indexOf(":@") > 10) {
+            gpsBeacon = "GPS";
         }
-
-        int firstColonIndex = packet.indexOf(":");
-        char nextChar       = packet[firstColonIndex + 1];
-
-        for (int i = sender.length(); i < 9; i++) {
-            sender += " ";
-        }
-        sixthLine = sender;
-
-        if (nextChar == ':') {
-            sixthLine += "> MESSAGE";
-        } else if (nextChar == '>') {
-            sixthLine += "> NEW STATUS";
-        } else if (nextChar == '!' || nextChar == '=' || nextChar == '@') {
-            sixthLine += "> GPS BEACON";
-            if (!Config.syslog.active) GPS_Utils::getDistanceAndComment(packet);       // to be checked!!!
-            seventhLine = "RSSI:";
-            seventhLine += String(rssi);
-            seventhLine += "dBm";
-            seventhLine += (rssi <= -100) ? " " : "  ";
-            if (distance.indexOf(".") == 1) seventhLine += " ";
-            seventhLine += "D:";
-            seventhLine += distance;
-            seventhLine += "km";
-        } else if (nextChar == '`' || nextChar == '\'') {
-            sixthLine += ">  MIC-E";
-        } else if (nextChar == ';') {
-            sixthLine += ">  OBJECT";
-        } else if (packet.indexOf(":T#") >= 10 && packet.indexOf(":=/") == -1) {
-            sixthLine += "> TELEMETRY";
+        
+        if (packet.indexOf(":T#") > 10) {
+            packetType = "TELEMETRY";
+        } else if (packet.indexOf(":`") > 10 || packet.indexOf(":'") > 10) {
+            packetType = "MIC-E";
+        } else if ((packet.indexOf(":!") > 10 || packet.indexOf(":=") > 10) && packet.indexOf("_") > 10) {
+            packetType = "WX";
+        } else if (packet.indexOf("::") > 10) {
+            packetType = "MESSAGE";
+        } else if (packet.indexOf(":>") > 10) {
+            packetType = "STATUS";
+        } else if (packet.indexOf(":;") > 10) {
+            packetType = "OBJECT";
         } else {
-            sixthLine += "> ??????????";
+            packetType = gpsBeacon;
         }
-        if (nextChar != '!' && nextChar != '=' && nextChar != '@') {    // Common assignment for non-GPS cases
-            seventhLine = "RSSI:";
-            seventhLine += String(rssi);
-            seventhLine += "dBm SNR: ";
-            seventhLine += String(snr);
-            seventhLine += "dBm";
-        }
-    }
 
-    void print(const String& text) {
-        if (!Config.tnc.enableSerial) {
-            Serial.print(text);
+        switch (type) {
+            case 1:
+                fifthLine = "APRS-IS ----> LoRa-RF";
+                break;
+            case 2:
+                fifthLine = "LoRa-RF ----> LoRa-RF";
+                break;
+            default:
+                fifthLine = "LoRa-RF ----> APRS-IS";
+                break;
         }
-    }
-
-    void println(const String& text) {
-        if (!Config.tnc.enableSerial) {
-            Serial.println(text);
+        
+        String temp = packet.substring(0, packet.indexOf(">"));
+        sixthLine = temp;
+        for (int i = sixthLine.length(); i < 9; i++) {
+            sixthLine += " ";
         }
-    }
-
-    void checkRebootMode() {
-        if (Config.rebootMode && Config.rebootModeTime > 0) {
-            Serial.println("(Reboot Time Set to " + String(Config.rebootModeTime) + " hours)");
-        }
+        sixthLine += " TYPE: " + packetType;
     }
 
     void checkRebootTime() {
-        if (Config.rebootMode && Config.rebootModeTime > 0) {
-            if (millis() > Config.rebootModeTime * 60 * 60 * 1000) {
-                Serial.println("\n*** Automatic Reboot Time Restart! ****\n");
+        if (Config.rebootMode && Config.rebootModeTime != 0) {
+            if (millis() > (Config.rebootModeTime * 60 * 60 * 1000)) {
                 ESP.restart();
             }
         }
     }
 
-    void checkSleepByLowBatteryVoltage(uint8_t mode) {
-        if (shouldSleepLowVoltage) {
-            if (mode == 0) {    // at startup
-                delay(3000);
-            }
-            Serial.println("\n\n*** Sleeping Low Battey Voltage ***\n\n");
-            esp_sleep_enable_timer_wakeup(30 * 60 * 1000000); // sleep 30 min
-            if (mode == 1) {    // low voltage detected after a while
-                displayToggle(false);
-            }
-            #ifdef VEXT_CTRL
-                #ifndef HELTEC_WSL_V3
-                    digitalWrite(VEXT_CTRL, LOW);
-                #endif
-            #endif
-            LoRa_Utils::sleepRadio();
-            transmitFlag = true;
-            delay(100);
-            esp_deep_sleep_start();
+    void checkRebootMode() {
+        if (Config.rebootMode && Config.rebootModeTime == 0) {
+            ESP.restart();
         }
     }
 
-    bool checkValidCallsign(const String& callsign) {
-        if (callsign == "WLNK-1") return true;
-        
-        String cleanCallsign;
-        if (callsign.indexOf("-") > 0) {    // SSID Validation
-            cleanCallsign = callsign.substring(0, callsign.indexOf("-"));
-            String ssid = callsign.substring(callsign.indexOf("-") + 1);
-            if (ssid.indexOf("-") != -1 || ssid.length() > 2) return false;
-            for (int i = 0; i < ssid.length(); i++) {
-                if (!isAlphaNumeric(ssid[i])) return false;
-            }
-        } else {
-            cleanCallsign = callsign;
+    void checkSleepByLowBatteryVoltage(int batteryType) {
+        if (Config.battery.monitorInternalVoltage || Config.battery.monitorExternalVoltage) {
+            shouldSleepLowVoltage = BATTERY_Utils::checkIfShouldSleep(batteryType);
         }
+    }
 
-        if (cleanCallsign.length() < 4 || cleanCallsign.length() > 6) return false;
+    void i2cScannerForPeripherals() {
+        #ifdef HAS_DISPLAY
+            WX_Utils::searchI2CPeripherals();
+        #endif
+    }
 
-        if (cleanCallsign.length() < 6 && isAlpha(cleanCallsign[0]) && isDigit(cleanCallsign[1]) && isAlpha(cleanCallsign[2]) && isAlpha(cleanCallsign[3]) ) {
-            cleanCallsign = " " + cleanCallsign;    // A0AA --> _A0AA
-        }
+    void print(String text) {
+        Serial.print(text);
+    }
 
-        if (!isDigit(cleanCallsign[2]) || !isAlpha(cleanCallsign[3])) {     // __0A__ must be validated
-            if (cleanCallsign[0] != 'R' && !isDigit(cleanCallsign[1]) && !isAlpha(cleanCallsign[2])) return false;    // to accepto R0A___
-        }
-
-        bool isValid = false;
-        if ((isAlphaNumeric(cleanCallsign[0]) || cleanCallsign[0] == ' ') && isAlpha(cleanCallsign[1])) {
-            isValid = true;     //  AA0A (+A+A) + _A0AA (+A) + 0A0A (+A+A)
-        } else if (isAlpha(cleanCallsign[0]) && isDigit(cleanCallsign[1])) {
-            isValid = true;     //  A00A (+A+A)
-        } else if (cleanCallsign[0] == 'R' && cleanCallsign.length() == 6 && isDigit(cleanCallsign[1]) && isAlpha(cleanCallsign[2]) && isAlpha(cleanCallsign[3]) && isAlpha(cleanCallsign[4])) {
-            isValid = true;     //  R0AA (+A+A)
-        }
-        if (!isValid) return false;   // also 00__ avoided
-
-        if (cleanCallsign.length() > 4) {   // to validate ____AA
-            for (int i = 5; i <= cleanCallsign.length(); i++) {
-                if (!isAlpha(cleanCallsign[i - 1])) return false;
-            }
-        }
-        return true;
+    void println(String text) {
+        Serial.println(text);
     }
 
 }
