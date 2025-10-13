@@ -32,7 +32,7 @@ ____________________________________________________
 
 - T-Deck Plus (and also regular T-Deck with/without GPS).
 
-- HELTEC V2, V3, V3.2, T114, Wireless Stick, Wireless Stick Lite, HT-CT62, Wireless Tracker, Wireless Paper.
+- HELTEC V2, V3, V3.2, T114, Wireless Stick, Wireless Stick Lite V3/V3.2, HT-CT62, Wireless Tracker, Wireless Paper.
 
 - RAK Wireless 4631 + 19007(or 19003)
 
