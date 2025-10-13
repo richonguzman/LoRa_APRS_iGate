@@ -93,10 +93,10 @@ namespace LoRa_Utils {
         #if defined(HAS_SX1278) || defined(HAS_SX1276)
             radio.setDio0Action(setFlag, RISING);
         #endif
-        radio.setSpreadingFactor(Config.loramodule.spreadingFactor);
-        float signalBandwidth = Config.loramodule.signalBandwidth/1000;
-        radio.setBandwidth(signalBandwidth);
-        radio.setCodingRate(Config.loramodule.codingRate4);
+        radio.setSpreadingFactor(Config.loramodule.rxSpreadingFactor);
+        radio.setCodingRate(Config.loramodule.rxCodingRate4);
+        float signalBandwidth = Config.loramodule.rxSignalBandwidth/1000;
+        radio.setBandwidth(signalBandwidth);        
         radio.setCRC(true);
 
         #if (defined(RADIO_RXEN) && defined(RADIO_TXEN))    // QRP Labs LightGateway has 400M22S (SX1268)
@@ -132,12 +132,18 @@ namespace LoRa_Utils {
         delay(500);
         float freq = (float)Config.loramodule.txFreq / 1000000;
         radio.setFrequency(freq);
+        radio.setSpreadingFactor(Config.loramodule.txSpreadingFactor);
+        radio.setCodingRate(Config.loramodule.txCodingRate4);
+        radio.setBandwidth(Config.loramodule.txSignalBandwidth);
     }
 
     void changeFreqRx() {
         delay(500);
         float freq = (float)Config.loramodule.rxFreq / 1000000;
         radio.setFrequency(freq);
+        radio.setSpreadingFactor(Config.loramodule.rxSpreadingFactor);
+        radio.setCodingRate(Config.loramodule.rxCodingRate4);
+        radio.setBandwidth(Config.loramodule.rxSignalBandwidth);
     }
 
     void sendNewPacket(const String& newPacket) {

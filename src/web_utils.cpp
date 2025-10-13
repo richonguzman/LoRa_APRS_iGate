@@ -200,14 +200,18 @@ namespace WEB_Utils {
         Config.digi.ecoMode                 = getParamIntSafe("digi.ecoMode", Config.digi.ecoMode);
         Config.digi.beaconOnRxFreq          = request->hasParam("digi.beaconOnRxFreq", true);
 
-        Config.loramodule.txFreq            = getParamIntSafe("lora.txFreq", Config.loramodule.txFreq);
-        Config.loramodule.rxFreq            = getParamIntSafe("lora.rxFreq", Config.loramodule.rxFreq);
-        Config.loramodule.spreadingFactor   = getParamIntSafe("lora.spreadingFactor", Config.loramodule.spreadingFactor);
-        Config.loramodule.signalBandwidth   = getParamIntSafe("lora.signalBandwidth", Config.loramodule.signalBandwidth);
-        Config.loramodule.codingRate4       = getParamIntSafe("lora.codingRate4", Config.loramodule.codingRate4);
-        Config.loramodule.power             = getParamIntSafe("lora.power", Config.loramodule.power);
-        Config.loramodule.txActive          = request->hasParam("lora.txActive", true);
+        
         Config.loramodule.rxActive          = request->hasParam("lora.rxActive", true);
+        Config.loramodule.rxFreq            = getParamIntSafe("lora.rxFreq", Config.loramodule.rxFreq);
+        Config.loramodule.rxSpreadingFactor = getParamIntSafe("lora.rxSpreadingFactor", Config.loramodule.rxSpreadingFactor);
+        Config.loramodule.rxCodingRate4     = getParamIntSafe("lora.rxCodingRate4", Config.loramodule.rxCodingRate4);
+        Config.loramodule.rxSignalBandwidth = getParamIntSafe("lora.rxSignalBandwidth", Config.loramodule.rxSignalBandwidth);
+        Config.loramodule.txActive          = request->hasParam("lora.txActive", true);
+        Config.loramodule.txFreq            = getParamIntSafe("lora.txFreq", Config.loramodule.txFreq);
+        Config.loramodule.txSpreadingFactor = getParamIntSafe("lora.txSpreadingFactor", Config.loramodule.txSpreadingFactor);
+        Config.loramodule.txCodingRate4     = getParamIntSafe("lora.txCodingRate4", Config.loramodule.txCodingRate4);
+        Config.loramodule.txSignalBandwidth = getParamIntSafe("lora.txSignalBandwidth", Config.loramodule.txSignalBandwidth);
+        Config.loramodule.power             = getParamIntSafe("lora.power", Config.loramodule.power);
 
 
         Config.display.alwaysOn             = request->hasParam("display.alwaysOn", true);

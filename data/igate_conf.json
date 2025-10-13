@@ -39,14 +39,17 @@
         "beaconOnRxFreq": false
     },
     "lora": {
-        "txFreq": 433775000,
+        "rxActive": true,
         "rxFreq": 433775000,
-        "spreadingFactor": 12,
-        "signalBandwidth": 125000,
-        "codingRate4": 5,
-        "power": 20,
+        "rxSpreadingFactor": 12,
+        "rxCodingRate4": 5,
+        "rxSignalBandwidth": 125000,
         "txActive": false,
-        "rxActive": true
+        "txFreq": 433775000,
+        "txSpreadingFactor": 12,
+        "txCodingRate4": 5,
+        "txSignalBandwidth": 125000,
+        "power": 20
     },
     "display": {
         "alwaysOn": true,

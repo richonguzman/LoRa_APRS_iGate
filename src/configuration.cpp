@@ -89,14 +89,17 @@ bool Configuration::writeFile() {
         #endif
         data["digi"]["beaconOnRxFreq"]              = digi.beaconOnRxFreq;
 
-        data["lora"]["rxFreq"]                      = loramodule.rxFreq;
-        data["lora"]["txFreq"]                      = loramodule.txFreq;
-        data["lora"]["spreadingFactor"]             = loramodule.spreadingFactor;
-        data["lora"]["signalBandwidth"]             = loramodule.signalBandwidth;
-        data["lora"]["codingRate4"]                 = loramodule.codingRate4;
-        data["lora"]["power"]                       = loramodule.power;
-        data["lora"]["txActive"]                    = loramodule.txActive;
         data["lora"]["rxActive"]                    = loramodule.rxActive;
+        data["lora"]["rxFreq"]                      = loramodule.rxFreq;
+        data["lora"]["rxSpreadingFactor"]           = loramodule.rxSpreadingFactor;
+        data["lora"]["rxCodingRate4"]               = loramodule.rxCodingRate4;
+        data["lora"]["rxSignalBandwidth"]           = loramodule.rxSignalBandwidth;
+        data["lora"]["txActive"]                    = loramodule.txActive;      
+        data["lora"]["txFreq"]                      = loramodule.txFreq;
+        data["lora"]["txSpreadingFactor"]           = loramodule.txSpreadingFactor;
+        data["lora"]["txCodingRate4"]               = loramodule.txCodingRate4;
+        data["lora"]["txSignalBandwidth"]           = loramodule.txSignalBandwidth;        
+        data["lora"]["power"]                       = loramodule.power;        
 
         data["display"]["alwaysOn"]                 = display.alwaysOn;
         data["display"]["timeout"]                  = display.timeout;
@@ -259,23 +262,29 @@ bool Configuration::readFile() {
             if (digi.ecoMode == 1) digi.ecoMode = 2;
         #endif
 
-        if (!data["lora"].containsKey("txFreq") ||
+        if (!data["lora"].containsKey("rxActive") ||
             !data["lora"].containsKey("rxFreq") ||
-            !data["lora"].containsKey("spreadingFactor") ||
-            !data["lora"].containsKey("signalBandwidth") ||
-            !data["lora"].containsKey("codingRate4") ||
-            !data["lora"].containsKey("power") ||
+            !data["lora"].containsKey("rxSpreadingFactor") ||
+            !data["lora"].containsKey("rxCodingRate4") ||
+            !data["lora"].containsKey("rxSignalBandwidth") ||
             !data["lora"].containsKey("txActive") ||
-            !data["lora"].containsKey("rxActive")) needsRewrite = true;
-        loramodule.txFreq               = data["lora"]["txFreq"] | 433775000;
+            !data["lora"].containsKey("txFreq") ||
+            !data["lora"].containsKey("txSpreadingFactor") ||
+            !data["lora"].containsKey("txCodingRate4") ||
+            !data["lora"].containsKey("txSignalBandwidth") ||
+            !data["lora"].containsKey("power")) needsRewrite = true;
+        loramodule.rxActive             = data["lora"]["rxActive"] | true;
         loramodule.rxFreq               = data["lora"]["rxFreq"] | 433775000;
-        loramodule.spreadingFactor      = data["lora"]["spreadingFactor"] | 12;
-        loramodule.signalBandwidth      = data["lora"]["signalBandwidth"] | 125000;
-        loramodule.codingRate4          = data["lora"]["codingRate4"] | 5;
-        loramodule.power                = data["lora"]["power"] | 20;
+        loramodule.rxSpreadingFactor    = data["lora"]["rxSpreadingFactor"] | 12;
+        loramodule.rxCodingRate4        = data["lora"]["rxCodingRate4"] | 5;
+        loramodule.rxSignalBandwidth    = data["lora"]["rxSignalBandwidth"] | 125000;        
         loramodule.txActive             = data["lora"]["txActive"] | false;
-        loramodule.rxActive             = data["lora"]["rxActive"] | false;
-
+        loramodule.txFreq               = data["lora"]["txFreq"] | 433775000;
+        loramodule.txSpreadingFactor    = data["lora"]["txSpreadingFactor"] | 12;
+        loramodule.txCodingRate4        = data["lora"]["txCodingRate4"] | 5;
+        loramodule.txSignalBandwidth    = data["lora"]["txSignalBandwidth"] | 125000;
+        loramodule.power                = data["lora"]["power"] | 20;
+        
         if (!data["display"].containsKey("alwaysOn") ||
             !data["display"].containsKey("timeout") ||
             !data["display"].containsKey("turn180")) needsRewrite = true;
@@ -445,14 +454,17 @@ void Configuration::setDefaultValues() {
     digi.ecoMode                    = 0;
     digi.beaconOnRxFreq             = false;
 
-    loramodule.txFreq               = 433775000;
-    loramodule.rxFreq               = 433775000;
-    loramodule.spreadingFactor      = 12;
-    loramodule.signalBandwidth      = 125000;
-    loramodule.codingRate4          = 5;
-    loramodule.power                = 20;
-    loramodule.txActive             = false;
     loramodule.rxActive             = true;
+    loramodule.rxFreq               = 433775000;
+    loramodule.rxSpreadingFactor    = 12;
+    loramodule.rxCodingRate4        = 5;
+    loramodule.rxSignalBandwidth    = 125000;
+    loramodule.txActive             = false;
+    loramodule.txFreq               = 433775000;
+    loramodule.txSpreadingFactor    = 12;
+    loramodule.txCodingRate4        = 5;
+    loramodule.txSignalBandwidth    = 125000;
+    loramodule.power                = 20;
 
     display.alwaysOn                = true;
     display.timeout                 = 4;
