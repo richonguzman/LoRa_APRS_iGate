@@ -255,7 +255,6 @@ function loadSettings(settings) {
     document.getElementById("other.backupDigiMode").checked             = settings.other.backupDigiMode;
 
     updateImage();
-    refreshSpeedStandard();
 }
 
 function showToast(message) {
@@ -461,65 +460,6 @@ document
         updateImage();
     });
 
-const speedStandards = {
-    300: [125, 5, 12],
-    244: [125, 6, 12],
-    209: [125, 7, 12],
-    183: [125, 8, 12],
-    610: [125, 8, 10],
-    1200: [125, 7, 9],
-};
-
-function refreshSpeedStandard() {
-    const bw = Number(document.getElementById("lora.signalBandwidth").value);
-    const cr4 = Number(document.getElementById("lora.codingRate4").value);
-    const sf = Number(document.getElementById("lora.spreadingFactor").value);
-
-    let found = false;
-
-    for (const speed in speedStandards) {
-        const standard = speedStandards[speed];
-
-        if (standard[0] !== bw / 1000) continue;
-        if (standard[1] !== cr4) continue;
-        if (standard[2] !== sf) continue;
-
-        document.getElementById("action.speed").value = speed;
-        found = true;
-
-        break;
-    }
-
-    if (!found) {
-        document.getElementById("action.speed").value = "";
-    }
-}
-
-document
-    .getElementById("lora.signalBandwidth")
-    .addEventListener("focusout", refreshSpeedStandard);
-document
-    .getElementById("lora.codingRate4")
-    .addEventListener("focusout", refreshSpeedStandard);
-document
-    .getElementById("lora.spreadingFactor")
-    .addEventListener("focusout", refreshSpeedStandard);
-
-document.getElementById("action.speed").addEventListener("change", function () {
-    const speed = document.getElementById("action.speed").value;
-
-    if (speed !== "") {
-        const value = speedStandards[Number(speed)];
-
-        const bw = value[0];
-        const cr4 = value[1];
-        const sf = value[2];
-
-        document.getElementById("lora.signalBandwidth").value = bw * 1000;
-        document.getElementById("lora.codingRate4").value = cr4;
-        document.getElementById("lora.spreadingFactor").value = sf;
-    }
-});
 
 const form = document.querySelector("form");
 
