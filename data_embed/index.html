@@ -792,6 +792,21 @@
                                         <div class="form-check form-switch">
                                             <input
                                                 type="checkbox"
+                                                name="lora.rxActive"
+                                                id="lora.rxActive"
+                                                class="form-check-input"
+                                            />
+                                            <label
+                                                for="lora.rxActive"
+                                                class="form-label"
+                                                >Enable LoRa RX</label
+                                            >
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="form-check form-switch">
+                                            <input
+                                                type="checkbox"
                                                 name="lora.txActive"
                                                 id="lora.txActive"
                                                 class="form-check-input"
@@ -804,20 +819,24 @@
                                         </div>
                                     </div>
                                     <div class="col-6">
-                                        <div class="form-check form-switch">
+                                        <label
+                                            for="lora.rxFreq"
+                                            class="form-label">
+                                            Rx Frequency
+                                        </label>
+                                        <div class="input-group">
                                             <input
-                                                type="checkbox"
-                                                name="lora.rxActive"
-                                                id="lora.rxActive"
-                                                class="form-check-input"
+                                                type="text"
+                                                name="lora.rxFreq"
+                                                id="lora.rxFreq"
+                                                placeholder="433775000"
+                                                class="form-control"
                                             />
-                                            <label
-                                                for="lora.rxActive"
-                                                class="form-label"
-                                                >Enable LoRa RX</label
-                                            >
+                                            <span class="input-group-text"
+                                                >Hz
+                                            </span>
                                         </div>
-                                    </div>
+                                    </div>                                    
                                     <div class="col-6">
                                         <label
                                             for="lora.txFreq"
@@ -848,132 +867,119 @@
                                     </div>
                                     <div class="col-6">
                                         <label
-                                            for="lora.rxFreq"
-                                            class="form-label">
-                                            Rx Frequency
-                                        </label>
-                                        <div class="input-group">
-                                            <input
-                                                type="text"
-                                                name="lora.rxFreq"
-                                                id="lora.rxFreq"
-                                                placeholder="433775000"
-                                                class="form-control"
-                                            />
-                                            <span class="input-group-text"
-                                                >Hz
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row mt-4">
-                                    <div class="col-12 mb-4">
-                                        <label
-                                            for="action.speed"
+                                            for="lora.rxSpreadingFactor"
                                             class="form-label"
-                                            >Predefined speeds
+                                            >Rx Spreading Factor
                                         </label>
                                         <select
                                             class="form-select form-select"
-                                            name="action.speed"
-                                            id="action.speed"
-                                        >
-                                            <option value="300">
-                                                BW 125khz CR 4:5 SF 12 (Slow
-                                                Standard, 300bps)
-                                            </option>
-                                            <option value="244">
-                                                BW 125khz CR 4:6 SF 12 (244bps)
-                                            </option>
-                                            <option value="209">
-                                                BW 125khz CR 4:7 SF 12 (209bps)
-                                            </option>
-                                            <option value="183">
-                                                BW 125khz CR 4:8 SF 12 (183bps)
-                                            </option>
-                                            <option value="610">
-                                                BW 125khz CR 4:8 SF 10 (610bps)
-                                            </option>
-                                            <option value="1200">
-                                                BW 125khz CR 4:7 SF 9 (Fast
-                                                Standard, 1200bps)
-                                            </option>
-                                            <option value="">
-                                                User defined
-                                            </option>
-                                        </select>
-                                    </div>
-                                    <div class="col-5">
-                                        <label
-                                            for="lora.signalBandwidth"
-                                            class="form-label"
-                                            >Bandwidth
-                                        </label>
-                                        <div class="input-group">
-                                            <select
-                                                class="form-select form-select"
-                                                name="lora.signalBandwidth"
-                                                id="lora.signalBandwidth"
-                                                required=""
-                                            >   
-                                                <option value="62500" selected>
-                                                    62.5 kHz
-                                                </option>
-                                                <option value="125000" selected>
-                                                    125 kHz
-                                                </option>
-                                                <option value="250000">
-                                                    250 kHz
-                                                </option>
-                                                <option value="500000">
-                                                    500 kHz
-                                                </option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-7">
-                                        <label
-                                            for="lora.spreadingFactor"
-                                            class="form-label"
-                                            >Spreading Factor
-                                        </label>
-                                        <select
-                                            class="form-select form-select"
-                                            name="lora.spreadingFactor"
-                                            id="lora.spreadingFactor"
+                                            name="lora.rxSpreadingFactor"
+                                            id="lora.rxSpreadingFactor"
                                             required=""
                                         >
-                                            <option value="7">
-                                                SF7 - Lowest battery usage
-                                            </option>
+                                            <option value="7">SF7 - Lowest battery usage</option>
                                             <option value="8">SF8</option>
                                             <option value="9">SF9</option>
                                             <option value="10">SF10</option>
                                             <option value="11">SF11</option>
-                                            <option value="12" selected>
-                                                SF12 - Highest sensitivity
-                                            </option>
+                                            <option value="12" selected>SF12 - Highest sensitivity</option>
                                         </select>
                                     </div>
-                                </div>
-                                <div class="row mt-3">
                                     <div class="col-6">
                                         <label
-                                            for="lora.codingRate4"
-                                            class="form-label">
-                                            Coding Rate
+                                            for="lora.txSpreadingFactor"
+                                            class="form-label"
+                                            >Tx Spreading Factor
                                         </label>
                                         <select
                                             class="form-select form-select"
-                                            name="lora.codingRate4"
-                                            id="lora.codingRate4"
+                                            name="lora.txSpreadingFactor"
+                                            id="lora.txSpreadingFactor"
                                             required=""
                                         >
-                                            <option value="5">5</option>
+                                            <option value="7">SF7 - Lowest battery usage</option>
+                                            <option value="8">SF8</option>
+                                            <option value="9">SF9</option>
+                                            <option value="10">SF10</option>
+                                            <option value="11">SF11</option>
+                                            <option value="12" selected>SF12 - Highest sensitivity</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-6">
+                                        <label
+                                            for="lora.rxCodingRate4"
+                                            class="form-label">
+                                            Rx Coding Rate
+                                        </label>
+                                        <select
+                                            class="form-select form-select"
+                                            name="lora.rxCodingRate4"
+                                            id="lora.rxCodingRate4"
+                                            required=""
+                                        >
+                                            <option value="5" selected>5</option>
                                             <option value="6">6</option>
                                             <option value="7">7</option>
                                             <option value="8">8</option>
                                         </select>
+                                    </div>
+                                    <div class="col-6">
+                                        <label
+                                            for="lora.txCodingRate4"
+                                            class="form-label">
+                                            Tx Coding Rate
+                                        </label>
+                                        <select
+                                            class="form-select form-select"
+                                            name="lora.txCodingRate4"
+                                            id="lora.txCodingRate4"
+                                            required=""
+                                        >
+                                            <option value="5" selected>5</option>
+                                            <option value="6">6</option>
+                                            <option value="7">7</option>
+                                            <option value="8">8</option>
+                                        </select>
+                                    </div>                                    
+                                    <div class="col-6">
+                                        <label
+                                            for="lora.rxSignalBandwidth"
+                                            class="form-label"
+                                            >Rx Signal Bandwidth
+                                        </label>
+                                        <div class="input-group">
+                                            <select
+                                                class="form-select form-select"
+                                                name="lora.rxSignalBandwidth"
+                                                id="lora.rxSignalBandwidth"
+                                                required=""
+                                            >   
+                                                <option value="62500">62.5 kHz</option>
+                                                <option value="125000" selected>125 kHz</option>
+                                                <option value="250000">250 kHz</option>
+                                                <option value="500000">500 kHz</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <label
+                                            for="lora.txSignalBandwidth"
+                                            class="form-label"
+                                            >Tx Signal Bandwidth
+                                        </label>
+                                        <div class="input-group">
+                                            <select
+                                                class="form-select form-select"
+                                                name="lora.txSignalBandwidth"
+                                                id="lora.txSignalBandwidth"
+                                                required=""
+                                            >   
+                                                <option value="62500">62.5 kHz</option>
+                                                <option value="125000" selected>125 kHz</option>
+                                                <option value="250000">250 kHz</option>
+                                                <option value="500000">500 kHz</option>
+                                            </select>
+                                        </div>
                                     </div>
                                     <div class="col-6">
                                         <label
@@ -997,7 +1003,7 @@
                                                 >dBm</span
                                             >
                                         </div>
-                                    </div>
+                                    </div>                                    
                                 </div>
                             </div>
                         </div>

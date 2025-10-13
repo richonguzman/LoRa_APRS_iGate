@@ -138,13 +138,16 @@ function loadSettings(settings) {
     document.getElementById("digi.beaconOnRxFreq").value                = settings.digi.beaconOnRxFreq;
 
     // LoRa
-    document.getElementById("lora.txFreq").value                        = settings.lora.txFreq;
-    document.getElementById("lora.rxFreq").value                        = settings.lora.rxFreq;
-    document.getElementById("lora.txActive").checked                    = settings.lora.txActive;
     document.getElementById("lora.rxActive").checked                    = settings.lora.rxActive;
-    document.getElementById("lora.spreadingFactor").value               = settings.lora.spreadingFactor;
-    document.getElementById("lora.signalBandwidth").value               = settings.lora.signalBandwidth;
-    document.getElementById("lora.codingRate4").value                   = settings.lora.codingRate4;
+    document.getElementById("lora.rxFreq").value                        = settings.lora.rxFreq;
+    document.getElementById("lora.rxSpreadingFactor").value             = settings.lora.rxSpreadingFactor;
+    document.getElementById("lora.rxCodingRate4").value                 = settings.lora.rxCodingRate4;
+    document.getElementById("lora.rxSignalBandwidth").value             = settings.lora.rxSignalBandwidth;
+    document.getElementById("lora.txActive").checked                    = settings.lora.txActive;
+    document.getElementById("lora.txFreq").value                        = settings.lora.txFreq;
+    document.getElementById("lora.txSpreadingFactor").value             = settings.lora.txSpreadingFactor;
+    document.getElementById("lora.txCodingRate4").value                 = settings.lora.txCodingRate4;
+    document.getElementById("lora.txSignalBandwidth").value             = settings.lora.txSignalBandwidth;    
     document.getElementById("lora.power").value                         = settings.lora.power;
 
     // Display
