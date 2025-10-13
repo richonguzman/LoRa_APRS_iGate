@@ -344,23 +344,27 @@
                                         </button>
                                     </div>
                                 </div>
-                                <div class="col-4">
+                                <div class="col-6">
                                     <label
                                         for="startupDelay"
                                         class="form-label"
-                                        >Startup Delay in minutes <small>(To Allow Router/Modem to start WiFiAP before connection)</small></label
+                                        >Startup Delay<small>(To Allow Router/Modem to start WiFiAP before connection)</small></label
                                     >
-                                    <input
-                                        type="number"
-                                        name="startupDelay"
-                                        id="startupDelay"
-                                        placeholder="0"
-                                        class="form-control"
-                                        value="0"
-                                        step="1"
-                                        min="0"
-                                        max="5"
-                                    />
+                                    <div class="input-group">
+                                        <input
+                                            type="number"
+                                            name="startupDelay"
+                                            id="startupDelay"
+                                            placeholder="0"
+                                            class="form-control"
+                                            step="1"
+                                            min="0"
+                                            max="5"
+                                        />
+                                        <span class="input-group-text"
+                                            >minutes</span
+                                        >
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -735,19 +739,26 @@
                                         </select>
                                     </div>
                                     <div class="col-12 mt-3">
-                                        <div class="form-check form-switch">
-                                            <input
-                                                type="checkbox"
-                                                name="digi.beaconOnRxFreq"
-                                                id="digi.beaconOnRxFreq"
-                                                class="form-check-input"
-                                            />
-                                            <label
-                                                for="digi.beaconOnRxFreq"
-                                                class="form-label"
-                                                >Which Frequency to send Beacon: <small>(Disable: Tx Freq / Enable: Rx Freq)</small>
-                                            </label>
-                                        </div>
+                                        <label
+                                            for="digi.beaconOnRxFreq"
+                                            class="form-label"
+                                            >Digipeater Beacon Frequency
+                                            <small
+                                                >(If Rx Freq different from Tx Freq).</small
+                                            ></label
+                                        >
+                                        <select
+                                            class="form-select form-select"
+                                            name="digi.beaconOnRxFreq"
+                                            id="digi.beaconOnRxFreq"
+                                        >
+                                            <option value="false">
+                                                Beacon on Tx Freq
+                                            </option>
+                                            <option value="true">
+                                                Beacon on Rx Freq
+                                            </option>
+                                        </select>
                                     </div>
                                 </div>
                             </div>
