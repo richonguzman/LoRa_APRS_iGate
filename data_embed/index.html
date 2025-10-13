@@ -344,7 +344,7 @@
                                         </button>
                                     </div>
                                 </div>
-                                <div class="col-6">
+                                <div class="col-6 mt-3">
                                     <label
                                         for="startupDelay"
                                         class="form-label"
@@ -572,7 +572,7 @@
                                     </div>
                                 </div>
                                 <div class="row mt-4">
-                                    <div class="col-12">
+                                    <div class="col-6">
                                         <label
                                             for="beacon.interval"
                                             class="form-label"
@@ -648,7 +648,7 @@
                                 </h5>
                                 <small>Add Callsigns with space between them to Blacklist them (* wild card allowed)</small>
                             </div>
-                            <div class="col-9 mt-2">
+                            <div class="col-9">
                                 <div class="row">
                                     <div class="col-12">
                                         <label
@@ -689,7 +689,7 @@
                                 </h5>
                                 <small>Define the Digipeater mode</small>
                             </div>
-                            <div class="col-9 mt-2">
+                            <div class="col-9">
                                 <div class="row">
                                     <div class="col-12">
                                         <label
@@ -728,13 +728,13 @@
                                             id="digi.ecoMode"
                                         >
                                             <option value="0">
-                                                OFF (Normal Mode - WiFiAP enabled)
+                                                OFF (Normal Mode - WiFiAP and Serial Output enabled)
                                             </option>
                                             <option value="1">
                                                 Ultra Eco Mode (Sleep till Packet Rx (WiFiAP/WebUI & Display disabled))
                                             </option>
                                             <option value="2">
-                                                OFF (Normal Mode - WiFiAP disabled)
+                                                OFF (Normal Mode - WiFiAP disabled but Serial Output still enabled)
                                             </option>
                                         </select>
                                     </div>
@@ -818,7 +818,7 @@
                                             >
                                         </div>
                                     </div>
-                                    <div class="col-6">
+                                    <div class="col-6 mt-1">
                                         <label
                                             for="lora.rxFreq"
                                             class="form-label">
@@ -837,7 +837,7 @@
                                             </span>
                                         </div>
                                     </div>                                    
-                                    <div class="col-6">
+                                    <div class="col-6 mt-1">
                                         <label
                                             for="lora.txFreq"
                                             class="form-label"
@@ -865,7 +865,7 @@
                                             </span>
                                         </div>
                                     </div>
-                                    <div class="col-6">
+                                    <div class="col-6 mt-3">
                                         <label
                                             for="lora.rxSpreadingFactor"
                                             class="form-label"
@@ -885,7 +885,7 @@
                                             <option value="12" selected>SF12 - Highest sensitivity</option>
                                         </select>
                                     </div>
-                                    <div class="col-6">
+                                    <div class="col-6 mt-3">
                                         <label
                                             for="lora.txSpreadingFactor"
                                             class="form-label"
@@ -905,7 +905,7 @@
                                             <option value="12" selected>SF12 - Highest sensitivity</option>
                                         </select>
                                     </div>
-                                    <div class="col-6">
+                                    <div class="col-6 mt-3">
                                         <label
                                             for="lora.rxCodingRate4"
                                             class="form-label">
@@ -923,7 +923,7 @@
                                             <option value="8">8</option>
                                         </select>
                                     </div>
-                                    <div class="col-6">
+                                    <div class="col-6 mt-3">
                                         <label
                                             for="lora.txCodingRate4"
                                             class="form-label">
@@ -941,7 +941,7 @@
                                             <option value="8">8</option>
                                         </select>
                                     </div>                                    
-                                    <div class="col-6">
+                                    <div class="col-6 mt-3">
                                         <label
                                             for="lora.rxSignalBandwidth"
                                             class="form-label"
@@ -961,7 +961,7 @@
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="col-6">
+                                    <div class="col-6 mt-3">
                                         <label
                                             for="lora.txSignalBandwidth"
                                             class="form-label"
@@ -981,7 +981,7 @@
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="col-6">
+                                    <div class="col-6 mt-3">
                                         <label
                                             for="lora.power"
                                             class="form-label">
@@ -1063,7 +1063,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="row mt-2">
+                                <div class="row mt-1">
                                     <div class="col-6">
                                         <label
                                             for="display.timeout"
@@ -1142,8 +1142,8 @@
                                     Calculate voltage divider accordingly.
                                 </small>
                             </div>
-                            <div class="col-9 mt-2">
-                                <div class="row mt-2">
+                            <div class="col-9">
+                                <div class="row">
                                     <div class="col-6">
                                         <div class="form-check form-switch">
                                             <input
@@ -1172,7 +1172,7 @@
                                                 >(Send Voltage As Telemetry)</label   
                                             >
                                         </div>
-                                        <div class="form-check form-switch mt-3">
+                                        <div class="form-check form-switch">
                                             <input
                                                 type="checkbox"
                                                 name="battery.monitorInternalVoltage"
@@ -1324,7 +1324,7 @@
                                 </h5>
                                 <small>Define Wx telemetry</small>
                             </div>
-                            <div class="col-9 mt-2">
+                            <div class="col-9">
                                 <div class="row">
                                     <div class="col-12">
                                         <div class="form-check form-switch">
@@ -1345,7 +1345,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="row mt-3">
+                                <div class="row mt-2">
                                     <div class="col-6">
                                         <label for="wxsensor.heightCorrection" class="form-label"
                                             >Height Correction (Above Sea-Level)</label
@@ -1413,18 +1413,37 @@
                                 >
                             </div>
                             <div class="col-lg-9 col-sm-12">
-                                <div class="form-check form-switch">
-                                    <input
-                                        type="checkbox"
-                                        name="syslog.active"
-                                        id="syslog.active"
-                                        class="form-check-input"
-                                    />
-                                    <label
-                                        for="syslog.active"
-                                        class="form-label"
-                                        >Enable syslog</label
-                                    >
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="form-check form-switch">
+                                            <input
+                                                type="checkbox"
+                                                name="syslog.active"
+                                                id="syslog.active"
+                                                class="form-check-input"
+                                            />
+                                            <label
+                                                for="syslog.active"
+                                                class="form-label"
+                                                >Enable syslog</label
+                                            >
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="form-check form-switch">
+                                            <input
+                                                type="checkbox"
+                                                name="syslog.logBeaconOverTCPIP"
+                                                id="syslog.logBeaconOverTCPIP"
+                                                class="form-check-input"
+                                            />
+                                            <label
+                                                for="syslog.logBeaconOverTCPIP"
+                                                class="form-label"
+                                                >Log Beacon over TCP/IP</label
+                                            >
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="row mt-3">
                                     <div class="col-6">
@@ -1455,21 +1474,7 @@
                                             class="form-control"
                                         />
                                     </div>
-                                    <div class="col-6">
-                                        <div class="form-check form-switch">
-                                            <input
-                                                type="checkbox"
-                                                name="syslog.logBeaconOverTCPIP"
-                                                id="syslog.logBeaconOverTCPIP"
-                                                class="form-check-input"
-                                            />
-                                            <label
-                                                for="syslog.logBeaconOverTCPIP"
-                                                class="form-label"
-                                                >Log Beacon over TCP/IP</label
-                                            >
-                                        </div>
-                                    </div>
+                                    
                                 </div>
                             </div>
                         </div>
@@ -1590,7 +1595,7 @@
                             </div>
                             <div class="col-lg-9 col-sm-12">
                                 <div class="row">
-                                    <div class="col-12">
+                                    <div class="col-6">
                                         <div class="form-check form-switch">
                                             <input
                                                 type="checkbox"
@@ -1605,7 +1610,24 @@
                                             >
                                         </div>
                                     </div>
-                                    <div class="col-12">
+                                    <div class="col-6">
+                                        <div class="form-check form-switch">
+                                            <input
+                                                type="checkbox"
+                                                name="mqtt.beaconOverMqtt"
+                                                id="mqtt.beaconOverMqtt"
+                                                class="form-check-input"
+                                            />
+                                            <label
+                                                for="mqtt.beaconOverMqtt"
+                                                class="form-label"
+                                                >Send (also) iGate Beacon</label
+                                            >
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row mt-3">
+                                    <div class="col-6">
                                         <label
                                             for="mqtt.server"
                                             class="form-label"
@@ -1620,11 +1642,11 @@
                                             />
                                         </div>
                                     </div>
-                                    <div class="col-12">
+                                    <div class="col-6">
                                         <label
                                             for="mqtt.topic"
                                             class="form-label"
-                                            >Topic</label
+                                            >Topic <small>(Default is <strong>aprs-igate</strong>)</small></label
                                         >
                                         <div class="input-group">
                                             <input
@@ -1635,11 +1657,10 @@
                                                 placeholder="aprs-igate"
                                             />
                                         </div>
-                                        <div class="form-text">
-                                            Default is <strong>aprs-igate</strong>
-                                        </div>
                                     </div>
-                                    <div class="col-12">
+                                </div>
+                                <div class="row mt-3">
+                                    <div class="col-6">
                                         <label
                                             for="mqtt.username"
                                             class="form-label"
@@ -1654,7 +1675,7 @@
                                             />
                                         </div>
                                     </div>
-                                    <div class="col-12 mt-3">
+                                    <div class="col-6">
                                         <label
                                             for="mqtt.password"
                                             class="form-label"
@@ -1669,11 +1690,13 @@
                                             />
                                         </div>
                                     </div>
-                                    <div class="col-12 mt-3">
+                                </div>
+                                <div class="row mt-3">                                    
+                                    <div class="col-6">
                                         <label
                                             for="mqtt.port"
                                             class="form-label"
-                                            >Port</label
+                                            >Port <small>(Default is <strong>1883</strong>)</small></label
                                         >
                                         <div class="input-group">
                                             <input
@@ -1686,24 +1709,6 @@
                                                 step="1"
                                                 min="0"
                                             />
-                                        </div>
-                                        <div class="form-text">
-                                            Default is <strong>1883</strong>
-                                        </div>
-                                    </div>
-                                    <div class="col-12 mt-3">
-                                        <div class="form-check form-switch">
-                                            <input
-                                                type="checkbox"
-                                                name="mqtt.beaconOverMqtt"
-                                                id="mqtt.beaconOverMqtt"
-                                                class="form-check-input"
-                                            />
-                                            <label
-                                                for="mqtt.beaconOverMqtt"
-                                                class="form-label"
-                                                >Send iGate Beacon to MQTT</label
-                                            >
                                         </div>
                                     </div>
                                 </div>
@@ -1732,9 +1737,9 @@
                                     Reboot Time
                                 </h5>
                             </div>
-                            <div class="col-9 mt-2">
+                            <div class="col-9">
                                 <div class="row">
-                                    <div class="col-12">
+                                    <div class="col-6">
                                         <div class="form-check form-switch">
                                             <input
                                                 type="checkbox"
@@ -1749,8 +1754,6 @@
                                             >
                                         </div>
                                     </div>
-                                </div>
-                                <div class="row mt-3">
                                     <div class="col-6">
                                         <label
                                             for="other.rebootModeTime"
@@ -1805,49 +1808,55 @@
                                     WiFi Auto AP
                                 </h5>
                                 <small
-                                    >Add your password and WiFi AP timeout to
-                                    auto access point. Auto AP will start if
-                                    there is no WiFi connection. Timeout will
-                                    count from startup or last client
-                                    disconnected.</small
+                                    >WiFi AP will start if there is no WiFi
+                                    connection available. Timeout will count from 
+                                    startup or last client disconnected.</small
                                 >
                             </div>
-                            <div class="col-lg-9 col-sm-12">
-                                <div class="col-12">
-                                    <label
-                                        for="wifi.autoAP.password"
-                                        class="form-label"
-                                        >Password</label
-                                    >
-                                    <input
-                                        type="password"
-                                        name="wifi.autoAP.password"
-                                        id="wifi.autoAP.password"
-                                        class="form-control"
-                                        placeholder="1234567890"
-                                        required=""
-                                    />
-                                </div>
-                                <div class="col-12 mt-3">
-                                    <label
-                                        for="wifi.autoAP.timeout"
-                                        class="form-label"
-                                        >WiFi AP timeout to search again for available WiFi's
-                                        <small>(in minutes)</small></label
-                                    >
-                                    <input
-                                        type="number"
-                                        name="wifi.autoAP.timeout"
-                                        id="wifi.autoAP.timeout"
-                                        class="form-control"
-                                        placeholder="10"
-                                        required=""
-                                        step="1"
-                                        min="0"
-                                    />
-                                    <div class="form-text">
-                                        Set to <strong>0</strong> if you don't
-                                        want WiFi AP to stop.
+                            <div class="col-9">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <label
+                                            for="wifi.autoAP.password"
+                                            class="form-label"
+                                            >Password</label
+                                        >
+                                        <div class="input-group">
+                                            <input
+                                                type="password"
+                                                name="wifi.autoAP.password"
+                                                id="wifi.autoAP.password"
+                                                class="form-control"
+                                                placeholder="1234567890"
+                                                required=""
+                                            />
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <label
+                                            for="wifi.autoAP.timeout"
+                                            class="form-label"
+                                            >WiFiAP timeout (to search again)</label
+                                        >
+                                        <div class="input-group">
+                                            <input
+                                                type="number"
+                                                name="wifi.autoAP.timeout"
+                                                id="wifi.autoAP.timeout"
+                                                class="form-control"
+                                                placeholder="10"
+                                                required=""
+                                                step="1"
+                                                min="0"
+                                            />
+                                            <span class="input-group-text"
+                                                >minutes</span
+                                            >
+                                            <div class="form-text">
+                                                Set to <strong>0</strong> if you don't
+                                                want WiFi AP to stop.
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -1878,27 +1887,29 @@
                                 >
                             </div>
                             <div class="col-lg-9 col-sm-12">
-                                <div class="col-12">
-                                    <label for="ota.username" class="form-label"
-                                        >Username</label
-                                    >
-                                    <input
-                                        type="text"
-                                        name="ota.username"
-                                        id="ota.username"
-                                        class="form-control"
-                                    />
-                                </div>
-                                <div class="col-12 mt-3">
-                                    <label for="ota.password" class="form-label"
-                                        >Password</label
-                                    >
-                                    <input
-                                        type="password"
-                                        name="ota.password"
-                                        id="ota.password"
-                                        class="form-control"
-                                    />
+                                <div class="row">
+                                    <div class="col-6">
+                                        <label for="ota.username" class="form-label"
+                                            >Username</label
+                                        >
+                                        <input
+                                            type="text"
+                                            name="ota.username"
+                                            id="ota.username"
+                                            class="form-control"
+                                        />
+                                    </div>
+                                    <div class="col-6">
+                                        <label for="ota.password" class="form-label"
+                                            >Password</label
+                                        >
+                                        <input
+                                            type="password"
+                                            name="ota.password"
+                                            id="ota.password"
+                                            class="form-control"
+                                        />
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1928,46 +1939,46 @@
                                 >
                             </div>
                             <div class="col-lg-9 col-sm-12">
-                                <div class="row">
-                                    <div class="col-12">
-                                        <div class="form-check form-switch">
-                                            <input
-                                                type="checkbox"
-                                                name="webadmin.active"
-                                                id="webadmin.active"
-                                                class="form-check-input"
-                                            />
-                                            <label
-                                                for="webadmin.active"
-                                                class="form-label"
-                                                >Web interface authentication</label
-                                            >
-                                        </div>
+                                <div class="col-6">
+                                    <div class="form-check form-switch">
+                                        <input
+                                            type="checkbox"
+                                            name="webadmin.active"
+                                            id="webadmin.active"
+                                            class="form-check-input"
+                                        />
+                                        <label
+                                            for="webadmin.active"
+                                            class="form-label"
+                                            >Web interface authentication</label
+                                        >
                                     </div>
                                 </div>
-                                <div class="col-12">
-                                    <label for="webadmin.username" class="form-label"
-                                        >Username</label
-                                    >
-                                    <input
-                                        type="text"
-                                        name="webadmin.username"
-                                        id="webadmin.username"
-                                        class="form-control"
-                                        value="admin"
-                                        required=""
-                                    />
-                                </div>
-                                <div class="col-12 mt-3">
-                                    <label for="webadmin.password" class="form-label"
-                                        >Password</label
-                                    >
-                                    <input
-                                        type="password"
-                                        name="webadmin.password"
-                                        id="webadmin.password"
-                                        class="form-control"
-                                    />
+                                <div class="row">
+                                    <div class="col-6">
+                                        <label for="webadmin.username" class="form-label"
+                                            >Username</label
+                                        >
+                                        <input
+                                            type="text"
+                                            name="webadmin.username"
+                                            id="webadmin.username"
+                                            class="form-control"
+                                            value="admin"
+                                            required=""
+                                        />
+                                    </div>
+                                    <div class="col-6">
+                                        <label for="webadmin.password" class="form-label"
+                                            >Password</label
+                                        >
+                                        <input
+                                            type="password"
+                                            name="webadmin.password"
+                                            id="webadmin.password"
+                                            class="form-control"
+                                        />
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -2011,21 +2022,19 @@
                                         />
                                     </div>
                                 </div>
-                                <div class="row">
-                                    <div class="col-12">
-                                        <div class="form-check form-switch">
-                                            <input
-                                                type="checkbox"
-                                                name="remoteManagement.rfOnly"
-                                                id="remoteManagement.rfOnly"
-                                                class="form-check-input"
-                                            />
-                                            <label
-                                                for="remoteManagement.rfOnly"
-                                                class="form-label"
-                                                >Managers commands only via RF (not APRS-IS)</label
-                                            >
-                                        </div>
+                                <div class="col-12 mt-3">
+                                    <div class="form-check form-switch">
+                                        <input
+                                            type="checkbox"
+                                            name="remoteManagement.rfOnly"
+                                            id="remoteManagement.rfOnly"
+                                            class="form-check-input"
+                                        />
+                                        <label
+                                            for="remoteManagement.rfOnly"
+                                            class="form-label"
+                                            >Managers commands only via RF (not APRS-IS)</label
+                                        >
                                     </div>
                                 </div>
                             </div>
@@ -2055,41 +2064,43 @@
                                 </small>
                             </div>
                             <div class="col-lg-9 col-sm-12">
-                                <div class="col-12">
-                                    <label
-                                        for="ntp.server"
-                                        class="form-label"
-                                        >NTP Server hostname</label
-                                    >
-                                    <div class="input-group">
-                                        <input
-                                            type="text"
-                                            name="ntp.server"
-                                            id="ntp.server"
-                                            class="form-control"
-                                        />
-                                    </div>
-                                </div>
-                                <div class="col-12">
-                                    <label
-                                        for="ntp.gmtCorrection"
-                                        class="form-label"
-                                        >GMT Time Correction for accurate Local Time</label
-                                    >
-                                    <div class="input-group">
-                                        <input
-                                            type="number"
-                                            name="ntp.gmtCorrection"
-                                            id="ntp.gmtCorrection"
-                                            placeholder="0"
-                                            class="form-control"
-                                            step="0.25"
-                                            min="-23.75"
-                                            max="23.75"
-                                        />
-                                        <span class="input-group-text"
-                                            >hours</span
+                                <div class="row">
+                                    <div class="col-6">
+                                        <label
+                                            for="ntp.server"
+                                            class="form-label"
+                                            >NTP Server hostname</label
                                         >
+                                        <div class="input-group">
+                                            <input
+                                                type="text"
+                                                name="ntp.server"
+                                                id="ntp.server"
+                                                class="form-control"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <label
+                                            for="ntp.gmtCorrection"
+                                            class="form-label"
+                                            >GMT Time Correction Offset</label
+                                        >
+                                        <div class="input-group">
+                                            <input
+                                                type="number"
+                                                name="ntp.gmtCorrection"
+                                                id="ntp.gmtCorrection"
+                                                placeholder="0"
+                                                class="form-control"
+                                                step="0.25"
+                                                min="-23.75"
+                                                max="23.75"
+                                            />
+                                            <span class="input-group-text"
+                                                >hours</span
+                                            >
+                                        </div>
                                     </div>
                                 </div>
                             </div>

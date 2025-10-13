@@ -33,7 +33,7 @@
                 ╚═╝ ╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚══════╝
 
 
-                       Ricardo Guzman - CA2RXU 
+                       Ricardo Guzman - CA2RXU
            https://github.com/richonguzman/LoRa_APRS_iGate
              (donations : http://paypal.me/richonguzman)
 ___________________________________________________________________*/
@@ -67,7 +67,7 @@ ___________________________________________________________________*/
 #endif
 
 
-String              versionDate             = "2025-10-12";
+String              versionDate             = "2025-10-13";
 String              versionNumber           = "3.1.3";
 Configuration       Config;
 WiFiClient          aprsIsClient;

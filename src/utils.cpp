@@ -88,7 +88,7 @@ namespace Utils {
         if (statusAfterBoot && !Config.beacon.sendViaAPRSIS && Config.beacon.sendViaRF) {
             status.concat(":>");
             status.concat(Config.beacon.statusPacket);
-            STATION_Utils::addToOutputPacketBuffer(status);
+            STATION_Utils::addToOutputPacketBuffer(status, true);   // treated also as beacon on Tx Freq
             statusAfterBoot = false;
         }
     }
