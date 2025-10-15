@@ -569,28 +569,25 @@
                                     </div>
                                 </div>
                                 <div class="row mt-3">
-                                    <div class="col-6 d-grid gap-2">
-                                        <button class="btn btn-primary" id="send-beacon">Send beacon now</button>
+                                    <div class="col-6">
+                                        <button class="btn btn-primary form-control h-100" id="send-beacon">Send beacon now</button>
                                     </div>
                                     <div class="col-6">
                                         <label
-                                            for="digi.beaconOnRxFreq"
-                                            class="form-label"
-                                            >Digipeater Beacon Frequency
-                                            <small
-                                                >(If Rx Freq different from Tx Freq).</small
-                                            ></label
-                                        >
+                                            for="beacon.beaconFreq"
+                                            class="form-label">
+                                            <small>(Select LoRa Beacon Frequency)</small>
+                                        </label>
                                         <select
                                             class="form-select form-select"
-                                            name="digi.beaconOnRxFreq"
-                                            id="digi.beaconOnRxFreq"
+                                            name="beacon.beaconFreq"
+                                            id="beacon.beaconFreq"
                                         >
-                                            <option value="false">
-                                                Beacon on Tx Freq
-                                            </option>
-                                            <option value="true">
+                                            <option value="0">
                                                 Beacon on Rx Freq
+                                            </option>
+                                            <option value="1">
+                                                Beacon on Tx Freq
                                             </option>
                                         </select>
                                     </div>

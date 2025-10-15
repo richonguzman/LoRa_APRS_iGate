@@ -129,7 +129,7 @@ namespace LoRa_Utils {
     }
 
     void changeFreqTx() {
-        delay(500);
+        delay(300);
         float freq = (float)Config.loramodule.txFreq / 1000000;
         radio.setFrequency(freq);
         radio.setSpreadingFactor(Config.loramodule.txSpreadingFactor);
@@ -138,7 +138,7 @@ namespace LoRa_Utils {
     }
 
     void changeFreqRx() {
-        delay(500);
+        delay(300);
         float freq = (float)Config.loramodule.rxFreq / 1000000;
         radio.setFrequency(freq);
         radio.setSpreadingFactor(Config.loramodule.rxSpreadingFactor);
@@ -150,7 +150,7 @@ namespace LoRa_Utils {
         if (!Config.loramodule.txActive) return;
 
         if (Config.loramodule.txFreq != Config.loramodule.rxFreq) {
-            if (!packetIsBeacon || (packetIsBeacon && !Config.beacon.beaconOnRxFreq)) {
+            if (!packetIsBeacon || (packetIsBeacon && Config.beacon.beaconFreq == 1)) {
                 changeFreqTx();
             }
         }
@@ -174,7 +174,7 @@ namespace LoRa_Utils {
             if (Config.digi.ecoMode != 1) digitalWrite(INTERNAL_LED_PIN, LOW);      // disabled in Ultra Eco Mode
         #endif
         if (Config.loramodule.txFreq != Config.loramodule.rxFreq) {
-            if (!packetIsBeacon || (packetIsBeacon && !Config.beacon.beaconOnRxFreq)) {
+            if (!packetIsBeacon || (packetIsBeacon && Config.beacon.beaconFreq == 1)) {
                 changeFreqRx();
             }
         }

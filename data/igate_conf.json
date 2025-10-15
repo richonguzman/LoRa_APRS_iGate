@@ -17,7 +17,7 @@
         "path": "WIDE1-1",
         "sendViaAPRSIS": false,
         "sendViaRF": false,
-        "beaconOnRxFreq": false,
+        "beaconFreq": 1,
         "statusActive": false,
         "statusPacket": "",
         "gpsActive": false,

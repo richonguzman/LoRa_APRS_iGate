@@ -47,7 +47,7 @@ public:
     String  path;    
     bool    sendViaAPRSIS;
     bool    sendViaRF;
-    bool    beaconOnRxFreq;
+    int     beaconFreq;
     bool    statusActive;
     String  statusPacket;
     bool    gpsActive;

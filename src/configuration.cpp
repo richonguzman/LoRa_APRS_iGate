@@ -72,7 +72,7 @@ bool Configuration::writeFile() {
 
         data["beacon"]["sendViaAPRSIS"]             = beacon.sendViaAPRSIS;
         data["beacon"]["sendViaRF"]                 = beacon.sendViaRF;
-        data["beacon"]["beaconOnRxFreq"]            = beacon.beaconOnRxFreq;
+        data["beacon"]["beaconFreq"]                = beacon.beaconFreq;
 
         data["beacon"]["statusActive"]              = beacon.statusActive;
         data["beacon"]["statusPacket"]              = beacon.statusPacket;
@@ -227,7 +227,7 @@ bool Configuration::readFile() {
             !data["beacon"].containsKey("path") ||
             !data["beacon"].containsKey("sendViaAPRSIS") ||
             !data["beacon"].containsKey("sendViaRF") ||
-            !data["beacon"].containsKey("beaconOnRxFreq") ||
+            !data["beacon"].containsKey("beaconFreq") ||
             !data["beacon"].containsKey("statusActive") ||
             !data["beacon"].containsKey("statusPacket") ||
             !data["beacon"].containsKey("gpsActive") ||
@@ -241,7 +241,7 @@ bool Configuration::readFile() {
         beacon.path                     = data["beacon"]["path"] | "WIDE1-1";
         beacon.sendViaAPRSIS            = data["beacon"]["sendViaAPRSIS"] | false;
         beacon.sendViaRF                = data["beacon"]["sendViaRF"] | false;
-        beacon.beaconOnRxFreq           = data["beacon"]["beaconOnRxFreq"] | false;
+        beacon.beaconFreq               = data["beacon"]["beaconFreq"] | 1;
         beacon.statusActive             = data["beacon"]["statusActive"] | false;
         beacon.statusPacket             = data["beacon"]["statusPacket"] | "";
         beacon.gpsActive                = data["beacon"]["gpsActive"] | false;
@@ -440,7 +440,7 @@ void Configuration::setDefaultValues() {
 
     beacon.sendViaAPRSIS            = true;
     beacon.sendViaRF                = false;
-    beacon.beaconOnRxFreq           = false;
+    beacon.beaconFreq               = 1;
     
     beacon.statusActive             = false;
     beacon.statusPacket             = "";    

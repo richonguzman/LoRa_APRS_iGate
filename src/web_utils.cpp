@@ -177,7 +177,7 @@ namespace WEB_Utils {
         Config.beacon.interval              = getParamIntSafe("beacon.interval", Config.beacon.interval);
         Config.beacon.sendViaAPRSIS         = request->hasParam("beacon.sendViaAPRSIS", true);
         Config.beacon.sendViaRF             = request->hasParam("beacon.sendViaRF", true);
-        Config.beacon.beaconOnRxFreq        = request->hasParam("beacon.beaconOnRxFreq", true);
+        Config.beacon.beaconFreq            = getParamIntSafe("beacon.beaconFreq", Config.beacon.beaconFreq);
         Config.beacon.latitude              = getParamDoubleSafe("beacon.latitude", Config.beacon.latitude);
         Config.beacon.longitude             = getParamDoubleSafe("beacon.longitude", Config.beacon.longitude);
         Config.beacon.comment               = getParamStringSafe("beacon.comment", Config.beacon.comment);

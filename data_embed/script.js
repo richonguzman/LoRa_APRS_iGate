@@ -119,8 +119,11 @@ function loadSettings(settings) {
     document.getElementById("beacon.interval").value                    = settings.beacon.interval;
     document.getElementById("other.rememberStationTime").value          = settings.other.rememberStationTime;   
     document.getElementById("beacon.sendViaAPRSIS").checked             = settings.beacon.sendViaAPRSIS;
+
     document.getElementById("beacon.sendViaRF").checked                 = settings.beacon.sendViaRF;
-    document.getElementById("beacon.beaconOnRxFreq").value              = settings.beacon.beaconOnRxFreq;
+    document.getElementById("beacon.beaconFreq").value                  = settings.beacon.beaconFreq;
+    BeaconingViaRFCheckbox.checked  = settings.beacon.sendViaRF;
+    BeaconingFrequency.disabled     = !BeaconingViaRFCheckbox.checked;
 
     document.getElementById("beacon.statusActive").checked              = settings.beacon.statusActive;
     document.getElementById("beacon.statusPacket").value                = settings.beacon.statusPacket;
@@ -306,6 +309,12 @@ function updateImage() {
     }
 }
 
+// Beaconing Switches
+const BeaconingViaRFCheckbox    = document.querySelector('input[name="beacon.sendViaRF"]');
+const BeaconingFrequency        = document.querySelector('select[name="beacon.beaconFreq"]');
+BeaconingViaRFCheckbox.addEventListener("change", function() {
+    BeaconingFrequency.disabled = !this.checked;
+});
 
 // Status Switch
 const StatusCheckbox            = document.querySelector('input[name="beacon.statusActive"]');
