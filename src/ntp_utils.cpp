@@ -27,7 +27,7 @@
 extern      Configuration  Config;
 
 WiFiUDP     ntpUDP;
-NTPClient   timeClient(ntpUDP, Config.ntp.server.c_str(), 0, 15 * 60 * 1000);  // Update interval 15 min
+NTPClient*  timeClient;
 
 
 namespace NTP_Utils {
@@ -35,17 +35,17 @@ namespace NTP_Utils {
     void setup() {
         if (WiFi.status() == WL_CONNECTED && Config.digi.ecoMode == 0 && Config.callsign != "NOCALL-10") {
             int gmt = Config.ntp.gmtCorrection * 3600;
-            timeClient.setTimeOffset(gmt);
-            timeClient.begin();
+            timeClient = new NTPClient(ntpUDP, Config.ntp.server.c_str(), gmt, 15 * 60 * 1000); // Update interval 15 min
+            timeClient->begin();
         }
     }
 
     void update() {
-        if (WiFi.status() == WL_CONNECTED && Config.digi.ecoMode == 0 && Config.callsign != "NOCALL-10") timeClient.update();
+        if (WiFi.status() == WL_CONNECTED && Config.digi.ecoMode == 0 && Config.callsign != "NOCALL-10") timeClient->update();
     }
 
     String getFormatedTime() {
-        if (Config.digi.ecoMode == 0) return timeClient.getFormattedTime();
+        if (Config.digi.ecoMode == 0) return timeClient->getFormattedTime();
         return "DigiEcoMode Active";
     }
 
