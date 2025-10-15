@@ -51,9 +51,10 @@ ____________________________________________________
 <br />
 
 # Timeline (Versions):
+- 2025-10-15 APRS Bridge for TNC added.
 - 2025-10-13 Rx and Tx Frequencies are now with fully configurable.
 - 2025-10-13 Startup Delay to allow the Router/Modem to start WiFiAP before connecting.
-- 2025-10-12 Choose to send Beacon on Rx or Tx frequency in Digipeater Mode.
+- 2025-10-12 Choose to send Beacon on Rx or Tx frequency.
 - 2025-10-11 User defined NTP server and send beacon over MQTT added.
 - 2025-10-10 Converted the Wiki into a PDF manual.
 - 2025-09-26 Heltec Wireless Bridge support added.
