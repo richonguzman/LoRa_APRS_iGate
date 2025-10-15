@@ -192,9 +192,9 @@ void loop() {
                 DIGI_Utils::processLoRaPacket(packet); // Send received packet to Digi
             }
 
-            if (Config.tnc.enableServer) TNC_Utils::sendToClients(packet);  // Send received packet to TNC KISS
-            if (Config.tnc.enableSerial) TNC_Utils::sendToSerial(packet);   // Send received packet to Serial KISS
-            if (Config.mqtt.active) MQTT_Utils::sendToMqtt(packet);         // Send received packet to MQTT
+            if (Config.tnc.enableServer) TNC_Utils::sendToClients(packet, true);    // Send received packet to TNC KISS
+            if (Config.tnc.enableSerial) TNC_Utils::sendToSerial(packet, true);     // Send received packet to Serial KISS
+            if (Config.mqtt.active) MQTT_Utils::sendToMqtt(packet);                 // Send received packet to MQTT
         }
 
         if (Config.aprs_is.active) APRS_IS_Utils::listenAPRSIS();           // listen received packet from APRSIS

@@ -135,8 +135,8 @@ namespace TNC_Utils {
         }
     }
 
-    void sendToClients(const String& packet) {
-        String cleanPacket = packet.substring(3);
+    void sendToClients(const String& packet, bool stripBytes) {
+        String cleanPacket = stripBytes ? packet.substring(3): packet;
 
         const String kissEncoded = encodeKISS(cleanPacket);
 
@@ -156,8 +156,8 @@ namespace TNC_Utils {
         Utils::println(cleanPacket);
     }
 
-    void sendToSerial(const String& packet) {
-        String cleanPacket = packet.substring(3);
+    void sendToSerial(const String& packet, bool stripBytes) {
+        String cleanPacket = stripBytes ? packet.substring(3): packet;
         Serial.print(encodeKISS(cleanPacket));
         Serial.flush();
     }
