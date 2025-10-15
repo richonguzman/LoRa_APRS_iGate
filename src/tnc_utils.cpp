@@ -21,12 +21,15 @@
 #include "configuration.h"
 #include "station_utils.h"
 #include "kiss_protocol.h"
+#include "aprs_is_utils.h"
 #include "kiss_utils.h"
 #include "tnc_utils.h"
 #include "utils.h"
 
 
-extern Configuration        Config;
+extern Configuration    Config;
+extern WiFiClient       aprsIsClient;
+extern bool             passcodeValid;
 
 #define MAX_CLIENTS 4
 #define INPUT_BUFFER_SIZE (2 + MAX_CLIENTS)
@@ -94,7 +97,8 @@ namespace TNC_Utils {
                 String sender = frame.substring(0,frame.indexOf(">"));
 
                 if (Config.tnc.acceptOwn || sender != Config.callsign) {
-                    STATION_Utils::addToOutputPacketBuffer(frame);
+                    if (Config.loramodule.txActive) STATION_Utils::addToOutputPacketBuffer(frame);
+                    if (Config.tnc.aprsBridgeActive && Config.aprs_is.active && passcodeValid && aprsIsClient.connected()) APRS_IS_Utils::upload(frame);
                 } else {
                     Utils::println("Ignored own frame from KISS");
                 }

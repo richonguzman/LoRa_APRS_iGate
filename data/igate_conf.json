@@ -82,7 +82,8 @@
     "tnc": {
         "enableServer": false,
         "enableSerial": false,
-        "acceptOwn": false
+        "acceptOwn": false,
+        "aprsBrigdeActive": false
     },
     "mqtt": {
         "active": false,

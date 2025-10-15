@@ -131,6 +131,7 @@ bool Configuration::writeFile() {
         data["tnc"]["enableServer"]                 = tnc.enableServer;
         data["tnc"]["enableSerial"]                 = tnc.enableSerial;
         data["tnc"]["acceptOwn"]                    = tnc.acceptOwn;
+        data["tnc"]["aprsBridgeActive"]             = tnc.aprsBridgeActive;
 
         data["mqtt"]["active"]                      = mqtt.active;
         data["mqtt"]["server"]                      = mqtt.server;
@@ -331,10 +332,12 @@ bool Configuration::readFile() {
 
         if (!data["tnc"].containsKey("enableServer") ||
             !data["tnc"].containsKey("enableSerial") ||
-            !data["tnc"].containsKey("acceptOwn")) needsRewrite = true;
+            !data["tnc"].containsKey("acceptOwn") ||
+            !data["tnc"].containsKey("aprsBridgeActive")) needsRewrite = true;
         tnc.enableServer                = data["tnc"]["enableServer"] | false;
         tnc.enableSerial                = data["tnc"]["enableSerial"] | false;
         tnc.acceptOwn                   = data["tnc"]["acceptOwn"] | false;
+        tnc.aprsBridgeActive            = data["tnc"]["aprsBridgeActive"] | false;
 
         if (!data["mqtt"].containsKey("active") ||
             !data["mqtt"].containsKey("server") ||
@@ -496,6 +499,7 @@ void Configuration::setDefaultValues() {
     tnc.enableServer                = false;
     tnc.enableSerial                = false;
     tnc.acceptOwn                   = false;
+    tnc.aprsBridgeActive            = false;
 
     mqtt.active                     = false;
     mqtt.server                     = "";

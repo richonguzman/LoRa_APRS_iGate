@@ -206,6 +206,7 @@ function loadSettings(settings) {
         document.getElementById("tnc.enableServer").checked             = settings.tnc.enableServer;
         document.getElementById("tnc.enableSerial").checked             = settings.tnc.enableSerial;
         document.getElementById("tnc.acceptOwn").checked                = settings.tnc.acceptOwn;
+        document.getElementById("tnc.aprsBridgeActive").checked         = settings.tnc.aprsBridgeActive;
     }
 
     // MQTT

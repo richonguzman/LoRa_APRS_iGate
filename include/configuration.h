@@ -127,6 +127,7 @@ public:
     bool    enableServer;
     bool    enableSerial;
     bool    acceptOwn;
+    bool    aprsBridgeActive;
 };
 
 class OTA {

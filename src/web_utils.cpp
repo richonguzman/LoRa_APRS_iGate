@@ -259,6 +259,7 @@ namespace WEB_Utils {
         Config.tnc.enableServer             = request->hasParam("tnc.enableServer", true);
         Config.tnc.enableSerial             = request->hasParam("tnc.enableSerial", true);
         Config.tnc.acceptOwn                = request->hasParam("tnc.acceptOwn", true);
+        Config.tnc.aprsBridgeActive         = request->hasParam("tnc.aprsBridgeActive", true);
 
 
         Config.mqtt.active                  = request->hasParam("mqtt.active", true);

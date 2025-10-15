@@ -1511,25 +1511,7 @@
                             </div>
                             <div class="col-lg-9 col-sm-12">
                                 <div class="row">
-                                    <div class="col-12">
-                                        <div class="form-check form-switch">
-                                            <div class="form-text">
-                                                Server will be available at port <strong>8001</strong>
-                                            </div>
-                                            <input
-                                                type="checkbox"
-                                                name="tnc.enableServer"
-                                                id="tnc.enableServer"
-                                                class="form-check-input"
-                                            />
-                                            <label
-                                                for="tnc.enableServer"
-                                                class="form-label"
-                                                >Enable TNC server</label
-                                            >
-                                        </div>
-                                    </div>
-                                    <div class="col-12">
+                                    <div class="col-6">
                                         <div class="form-check form-switch">
                                             <input
                                                 type="checkbox"
@@ -1544,7 +1526,24 @@
                                             >
                                         </div>
                                     </div>
-                                    <div class="col-12">
+                                    <div class="col-6">
+                                        <div class="form-check form-switch">
+                                            <input
+                                                type="checkbox"
+                                                name="tnc.enableServer"
+                                                id="tnc.enableServer"
+                                                class="form-check-input"
+                                            />
+                                            <label
+                                                for="tnc.enableServer"
+                                                class="form-label"
+                                                >Enable TNC server <small><strong>(Port 8001)</strong></small></label
+                                            >
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row mt-2">                                    
+                                    <div class="col-6">
                                         <div class="form-check form-switch">
                                             <input
                                                 type="checkbox"
@@ -1556,6 +1555,21 @@
                                                 for="tnc.acceptOwn"
                                                 class="form-label"
                                                 >Accept own frames via KISS</label
+                                            >
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="form-check form-switch">
+                                            <input
+                                                type="checkbox"
+                                                name="tnc.aprsBridgeActive"
+                                                id="tnc.aprsBridgeActive"
+                                                class="form-check-input"
+                                            />
+                                            <label
+                                                for="tnc.aprsBridgeActive"
+                                                class="form-label"
+                                                >Enable APRS Bridge</label
                                             >
                                         </div>
                                     </div>
