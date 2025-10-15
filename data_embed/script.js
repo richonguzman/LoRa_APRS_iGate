@@ -120,6 +120,7 @@ function loadSettings(settings) {
     document.getElementById("other.rememberStationTime").value          = settings.other.rememberStationTime;   
     document.getElementById("beacon.sendViaAPRSIS").checked             = settings.beacon.sendViaAPRSIS;
     document.getElementById("beacon.sendViaRF").checked                 = settings.beacon.sendViaRF;
+    document.getElementById("beacon.beaconOnRxFreq").value              = settings.beacon.beaconOnRxFreq;
 
     document.getElementById("beacon.statusActive").checked              = settings.beacon.statusActive;
     document.getElementById("beacon.statusPacket").value                = settings.beacon.statusPacket;
@@ -135,7 +136,6 @@ function loadSettings(settings) {
     // Digi
     document.getElementById("digi.mode").value                          = settings.digi.mode;
     document.getElementById("digi.ecoMode").value                       = settings.digi.ecoMode;
-    document.getElementById("digi.beaconOnRxFreq").value                = settings.digi.beaconOnRxFreq;
 
     // LoRa
     document.getElementById("lora.rxActive").checked                    = settings.lora.rxActive;

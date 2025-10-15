@@ -567,11 +567,35 @@
                                             </label>
                                         </div>
                                     </div>
+                                </div>
+                                <div class="row mt-3">
                                     <div class="col-6 d-grid gap-2">
                                         <button class="btn btn-primary" id="send-beacon">Send beacon now</button>
                                     </div>
+                                    <div class="col-6">
+                                        <label
+                                            for="digi.beaconOnRxFreq"
+                                            class="form-label"
+                                            >Digipeater Beacon Frequency
+                                            <small
+                                                >(If Rx Freq different from Tx Freq).</small
+                                            ></label
+                                        >
+                                        <select
+                                            class="form-select form-select"
+                                            name="digi.beaconOnRxFreq"
+                                            id="digi.beaconOnRxFreq"
+                                        >
+                                            <option value="false">
+                                                Beacon on Tx Freq
+                                            </option>
+                                            <option value="true">
+                                                Beacon on Rx Freq
+                                            </option>
+                                        </select>
+                                    </div>
                                 </div>
-                                <div class="row mt-4">
+                                <div class="row mt-3">
                                     <div class="col-6">
                                         <label
                                             for="beacon.interval"
@@ -735,28 +759,6 @@
                                             </option>
                                             <option value="2">
                                                 OFF (Normal Mode - WiFiAP disabled but Serial Output still enabled)
-                                            </option>
-                                        </select>
-                                    </div>
-                                    <div class="col-12 mt-3">
-                                        <label
-                                            for="digi.beaconOnRxFreq"
-                                            class="form-label"
-                                            >Digipeater Beacon Frequency
-                                            <small
-                                                >(If Rx Freq different from Tx Freq).</small
-                                            ></label
-                                        >
-                                        <select
-                                            class="form-select form-select"
-                                            name="digi.beaconOnRxFreq"
-                                            id="digi.beaconOnRxFreq"
-                                        >
-                                            <option value="false">
-                                                Beacon on Tx Freq
-                                            </option>
-                                            <option value="true">
-                                                Beacon on Rx Freq
                                             </option>
                                         </select>
                                     </div>

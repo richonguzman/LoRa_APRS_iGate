@@ -284,6 +284,7 @@ namespace Utils {
             Serial.println("Tx Freq less than 125kHz from Rx Freq ---> NOT VALID");
             displayShow("Tx Freq is less than ", "125kHz from Rx Freq", "device will autofix", "and then reboot", 1000);
             Config.loramodule.txFreq = Config.loramodule.rxFreq; // Inform about that but then change the TX QRG to RX QRG and reset the device
+            Config.beacon.beaconOnRxFreq = false;
             Config.writeFile();
             ESP.restart();
         }

@@ -45,12 +45,13 @@ public:
     String  overlay;
     String  symbol;
     String  path;    
-    bool    sendViaRF;
     bool    sendViaAPRSIS;
-    bool    gpsActive;
-    bool    gpsAmbiguity;
+    bool    sendViaRF;
+    bool    beaconOnRxFreq;
     bool    statusActive;
     String  statusPacket;
+    bool    gpsActive;
+    bool    gpsAmbiguity;    
 };
 
 class APRS_IS {
@@ -67,8 +68,7 @@ public:
 class DIGI {
 public:
     int     mode;
-    int     ecoMode;        // 0 = Not Active | 1 = Ultra EcoMode | 2 = Not Active (WiFi OFF, Serial ON)
-    bool    beaconOnRxFreq;
+    int     ecoMode;        // 0 = Not Active | 1 = Ultra EcoMode | 2 = Not Active (WiFi OFF, Serial ON)  
 };
 
 class LoraModule {

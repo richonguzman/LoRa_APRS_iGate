@@ -68,9 +68,11 @@ bool Configuration::writeFile() {
         data["beacon"]["longitude"]                 = beacon.longitude;
         data["beacon"]["overlay"]                   = beacon.overlay;
         data["beacon"]["symbol"]                    = beacon.symbol;
+        data["beacon"]["path"]                      = beacon.path;
+
         data["beacon"]["sendViaAPRSIS"]             = beacon.sendViaAPRSIS;
         data["beacon"]["sendViaRF"]                 = beacon.sendViaRF;
-        data["beacon"]["path"]                      = beacon.path;
+        data["beacon"]["beaconOnRxFreq"]            = beacon.beaconOnRxFreq;
 
         data["beacon"]["statusActive"]              = beacon.statusActive;
         data["beacon"]["statusPacket"]              = beacon.statusPacket;
@@ -87,7 +89,6 @@ bool Configuration::writeFile() {
         #if defined(HAS_A7670)
             if (digi.ecoMode == 1) data["digi"]["ecoMode"] = 2;
         #endif
-        data["digi"]["beaconOnRxFreq"]              = digi.beaconOnRxFreq;
 
         data["lora"]["rxActive"]                    = loramodule.rxActive;
         data["lora"]["rxFreq"]                      = loramodule.rxFreq;
@@ -226,6 +227,7 @@ bool Configuration::readFile() {
             !data["beacon"].containsKey("path") ||
             !data["beacon"].containsKey("sendViaAPRSIS") ||
             !data["beacon"].containsKey("sendViaRF") ||
+            !data["beacon"].containsKey("beaconOnRxFreq") ||
             !data["beacon"].containsKey("statusActive") ||
             !data["beacon"].containsKey("statusPacket") ||
             !data["beacon"].containsKey("gpsActive") ||
@@ -239,6 +241,7 @@ bool Configuration::readFile() {
         beacon.path                     = data["beacon"]["path"] | "WIDE1-1";
         beacon.sendViaAPRSIS            = data["beacon"]["sendViaAPRSIS"] | false;
         beacon.sendViaRF                = data["beacon"]["sendViaRF"] | false;
+        beacon.beaconOnRxFreq           = data["beacon"]["beaconOnRxFreq"] | false;
         beacon.statusActive             = data["beacon"]["statusActive"] | false;
         beacon.statusPacket             = data["beacon"]["statusPacket"] | "";
         beacon.gpsActive                = data["beacon"]["gpsActive"] | false;
@@ -251,13 +254,10 @@ bool Configuration::readFile() {
         blacklist                       = data["blacklist"] | "station callsign";
 
         if (!data["digi"].containsKey("mode") ||
-            !data["digi"].containsKey("ecoMode") ||
-            !data["digi"].containsKey("beaconOnRxFreq")) needsRewrite = true;
+            !data["digi"].containsKey("ecoMode")) needsRewrite = true;
         digi.mode                       = data["digi"]["mode"] | 0;
         digi.ecoMode                    = data["digi"]["ecoMode"] | 0;
         if (digi.ecoMode == 1) shouldSleepStop = false;
-        digi.beaconOnRxFreq             = data["digi"]["beaconOnRxFreq"] | false;
-
         #if defined(HAS_A7670)
             if (digi.ecoMode == 1) digi.ecoMode = 2;
         #endif
@@ -436,10 +436,12 @@ void Configuration::setDefaultValues() {
     beacon.interval                 = 15;
     beacon.overlay                  = "L";
     beacon.symbol                   = "a";
-    beacon.sendViaAPRSIS            = true;
-    beacon.sendViaRF                = false;
     beacon.path                     = "WIDE1-1";
 
+    beacon.sendViaAPRSIS            = true;
+    beacon.sendViaRF                = false;
+    beacon.beaconOnRxFreq           = false;
+    
     beacon.statusActive             = false;
     beacon.statusPacket             = "";    
 
@@ -452,7 +454,6 @@ void Configuration::setDefaultValues() {
 
     digi.mode                       = 0;
     digi.ecoMode                    = 0;
-    digi.beaconOnRxFreq             = false;
 
     loramodule.rxActive             = true;
     loramodule.rxFreq               = 433775000;

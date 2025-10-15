@@ -17,6 +17,7 @@
         "path": "WIDE1-1",
         "sendViaAPRSIS": false,
         "sendViaRF": false,
+        "beaconOnRxFreq": false,
         "statusActive": false,
         "statusPacket": "",
         "gpsActive": false,
@@ -35,8 +36,7 @@
     "blacklist": "",
     "digi": {
         "mode": 0,
-        "ecoMode": 0,
-        "beaconOnRxFreq": false
+        "ecoMode": 0
     },
     "lora": {
         "rxActive": true,

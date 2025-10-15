@@ -177,6 +177,7 @@ namespace WEB_Utils {
         Config.beacon.interval              = getParamIntSafe("beacon.interval", Config.beacon.interval);
         Config.beacon.sendViaAPRSIS         = request->hasParam("beacon.sendViaAPRSIS", true);
         Config.beacon.sendViaRF             = request->hasParam("beacon.sendViaRF", true);
+        Config.beacon.beaconOnRxFreq        = request->hasParam("beacon.beaconOnRxFreq", true);
         Config.beacon.latitude              = getParamDoubleSafe("beacon.latitude", Config.beacon.latitude);
         Config.beacon.longitude             = getParamDoubleSafe("beacon.longitude", Config.beacon.longitude);
         Config.beacon.comment               = getParamStringSafe("beacon.comment", Config.beacon.comment);
@@ -198,9 +199,8 @@ namespace WEB_Utils {
 
         Config.digi.mode                    = getParamIntSafe("digi.mode", Config.digi.mode);
         Config.digi.ecoMode                 = getParamIntSafe("digi.ecoMode", Config.digi.ecoMode);
-        Config.digi.beaconOnRxFreq          = request->hasParam("digi.beaconOnRxFreq", true);
-
         
+
         Config.loramodule.rxActive          = request->hasParam("lora.rxActive", true);
         Config.loramodule.rxFreq            = getParamIntSafe("lora.rxFreq", Config.loramodule.rxFreq);
         Config.loramodule.rxSpreadingFactor = getParamIntSafe("lora.rxSpreadingFactor", Config.loramodule.rxSpreadingFactor);

@@ -150,7 +150,7 @@ namespace LoRa_Utils {
         if (!Config.loramodule.txActive) return;
 
         if (Config.loramodule.txFreq != Config.loramodule.rxFreq) {
-            if (!packetIsBeacon || (packetIsBeacon && !Config.digi.beaconOnRxFreq)) {
+            if (!packetIsBeacon || (packetIsBeacon && !Config.beacon.beaconOnRxFreq)) {
                 changeFreqTx();
             }
         }
@@ -174,7 +174,7 @@ namespace LoRa_Utils {
             if (Config.digi.ecoMode != 1) digitalWrite(INTERNAL_LED_PIN, LOW);      // disabled in Ultra Eco Mode
         #endif
         if (Config.loramodule.txFreq != Config.loramodule.rxFreq) {
-            if (!packetIsBeacon || (packetIsBeacon && !Config.digi.beaconOnRxFreq)) {
+            if (!packetIsBeacon || (packetIsBeacon && !Config.beacon.beaconOnRxFreq)) {
                 changeFreqRx();
             }
         }
