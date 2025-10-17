@@ -45,9 +45,13 @@ bool Configuration::writeFile() {
             }
         }
 
+        data["other"]["startupDelay"]               = startupDelay;
+
         data["wifi"]["autoAP"]["password"]          = wifiAutoAP.password;
         data["wifi"]["autoAP"]["timeout"]           = wifiAutoAP.timeout;
 
+        callsign.trim();
+        callsign.toUpperCase();
         data["callsign"]                            = callsign;
 
         data["aprs_is"]["active"]                   = aprs_is.active;
@@ -64,9 +68,11 @@ bool Configuration::writeFile() {
         data["beacon"]["longitude"]                 = beacon.longitude;
         data["beacon"]["overlay"]                   = beacon.overlay;
         data["beacon"]["symbol"]                    = beacon.symbol;
+        data["beacon"]["path"]                      = beacon.path;
+
         data["beacon"]["sendViaAPRSIS"]             = beacon.sendViaAPRSIS;
         data["beacon"]["sendViaRF"]                 = beacon.sendViaRF;
-        data["beacon"]["path"]                      = beacon.path;
+        data["beacon"]["beaconFreq"]                = beacon.beaconFreq;
 
         data["beacon"]["statusActive"]              = beacon.statusActive;
         data["beacon"]["statusPacket"]              = beacon.statusPacket;
@@ -84,14 +90,17 @@ bool Configuration::writeFile() {
             if (digi.ecoMode == 1) data["digi"]["ecoMode"] = 2;
         #endif
 
-        data["lora"]["rxFreq"]                      = loramodule.rxFreq;
-        data["lora"]["txFreq"]                      = loramodule.txFreq;
-        data["lora"]["spreadingFactor"]             = loramodule.spreadingFactor;
-        data["lora"]["signalBandwidth"]             = loramodule.signalBandwidth;
-        data["lora"]["codingRate4"]                 = loramodule.codingRate4;
-        data["lora"]["power"]                       = loramodule.power;
-        data["lora"]["txActive"]                    = loramodule.txActive;
         data["lora"]["rxActive"]                    = loramodule.rxActive;
+        data["lora"]["rxFreq"]                      = loramodule.rxFreq;
+        data["lora"]["rxSpreadingFactor"]           = loramodule.rxSpreadingFactor;
+        data["lora"]["rxCodingRate4"]               = loramodule.rxCodingRate4;
+        data["lora"]["rxSignalBandwidth"]           = loramodule.rxSignalBandwidth;
+        data["lora"]["txActive"]                    = loramodule.txActive;      
+        data["lora"]["txFreq"]                      = loramodule.txFreq;
+        data["lora"]["txSpreadingFactor"]           = loramodule.txSpreadingFactor;
+        data["lora"]["txCodingRate4"]               = loramodule.txCodingRate4;
+        data["lora"]["txSignalBandwidth"]           = loramodule.txSignalBandwidth;        
+        data["lora"]["power"]                       = loramodule.power;        
 
         data["display"]["alwaysOn"]                 = display.alwaysOn;
         data["display"]["timeout"]                  = display.timeout;
@@ -122,6 +131,7 @@ bool Configuration::writeFile() {
         data["tnc"]["enableServer"]                 = tnc.enableServer;
         data["tnc"]["enableSerial"]                 = tnc.enableSerial;
         data["tnc"]["acceptOwn"]                    = tnc.acceptOwn;
+        data["tnc"]["aprsBridgeActive"]             = tnc.aprsBridgeActive;
 
         data["mqtt"]["active"]                      = mqtt.active;
         data["mqtt"]["server"]                      = mqtt.server;
@@ -129,6 +139,7 @@ bool Configuration::writeFile() {
         data["mqtt"]["username"]                    = mqtt.username;
         data["mqtt"]["password"]                    = mqtt.password;
         data["mqtt"]["port"]                        = mqtt.port;
+        data["mqtt"]["beaconOverMqtt"]              = mqtt.beaconOverMqtt;
 
         data["ota"]["username"]                     = ota.username;
         data["ota"]["password"]                     = ota.password;
@@ -140,6 +151,7 @@ bool Configuration::writeFile() {
         data["remoteManagement"]["managers"]        = remoteManagement.managers;
         data["remoteManagement"]["rfOnly"]          = remoteManagement.rfOnly;
 
+        data["ntp"]["server"]                       = ntp.server;
         data["ntp"]["gmtCorrection"]                = ntp.gmtCorrection;
 
         data["other"]["rebootMode"]                 = rebootMode;
@@ -181,6 +193,9 @@ bool Configuration::readFile() {
             wifiAPs.push_back(wifiap);
         }
 
+        if (!data["other"].containsKey("startupDelay")) needsRewrite = true;
+        startupDelay                    = data["other"]["startupDelay"] | 0;
+
         if (!data["wifi"]["autoAP"].containsKey("password") ||
             !data["wifi"]["autoAP"].containsKey("timeout")) needsRewrite = true;
         wifiAutoAP.password             = data["wifi"]["autoAP"]["password"] | "1234567890";
@@ -213,6 +228,7 @@ bool Configuration::readFile() {
             !data["beacon"].containsKey("path") ||
             !data["beacon"].containsKey("sendViaAPRSIS") ||
             !data["beacon"].containsKey("sendViaRF") ||
+            !data["beacon"].containsKey("beaconFreq") ||
             !data["beacon"].containsKey("statusActive") ||
             !data["beacon"].containsKey("statusPacket") ||
             !data["beacon"].containsKey("gpsActive") ||
@@ -226,6 +242,7 @@ bool Configuration::readFile() {
         beacon.path                     = data["beacon"]["path"] | "WIDE1-1";
         beacon.sendViaAPRSIS            = data["beacon"]["sendViaAPRSIS"] | false;
         beacon.sendViaRF                = data["beacon"]["sendViaRF"] | false;
+        beacon.beaconFreq               = data["beacon"]["beaconFreq"] | 1;
         beacon.statusActive             = data["beacon"]["statusActive"] | false;
         beacon.statusPacket             = data["beacon"]["statusPacket"] | "";
         beacon.gpsActive                = data["beacon"]["gpsActive"] | false;
@@ -242,28 +259,33 @@ bool Configuration::readFile() {
         digi.mode                       = data["digi"]["mode"] | 0;
         digi.ecoMode                    = data["digi"]["ecoMode"] | 0;
         if (digi.ecoMode == 1) shouldSleepStop = false;
-
         #if defined(HAS_A7670)
             if (digi.ecoMode == 1) digi.ecoMode = 2;
         #endif
 
-        if (!data["lora"].containsKey("txFreq") ||
+        if (!data["lora"].containsKey("rxActive") ||
             !data["lora"].containsKey("rxFreq") ||
-            !data["lora"].containsKey("spreadingFactor") ||
-            !data["lora"].containsKey("signalBandwidth") ||
-            !data["lora"].containsKey("codingRate4") ||
-            !data["lora"].containsKey("power") ||
+            !data["lora"].containsKey("rxSpreadingFactor") ||
+            !data["lora"].containsKey("rxCodingRate4") ||
+            !data["lora"].containsKey("rxSignalBandwidth") ||
             !data["lora"].containsKey("txActive") ||
-            !data["lora"].containsKey("rxActive")) needsRewrite = true;
-        loramodule.txFreq               = data["lora"]["txFreq"] | 433775000;
+            !data["lora"].containsKey("txFreq") ||
+            !data["lora"].containsKey("txSpreadingFactor") ||
+            !data["lora"].containsKey("txCodingRate4") ||
+            !data["lora"].containsKey("txSignalBandwidth") ||
+            !data["lora"].containsKey("power")) needsRewrite = true;
+        loramodule.rxActive             = data["lora"]["rxActive"] | true;
         loramodule.rxFreq               = data["lora"]["rxFreq"] | 433775000;
-        loramodule.spreadingFactor      = data["lora"]["spreadingFactor"] | 12;
-        loramodule.signalBandwidth      = data["lora"]["signalBandwidth"] | 125000;
-        loramodule.codingRate4          = data["lora"]["codingRate4"] | 5;
-        loramodule.power                = data["lora"]["power"] | 20;
+        loramodule.rxSpreadingFactor    = data["lora"]["rxSpreadingFactor"] | 12;
+        loramodule.rxCodingRate4        = data["lora"]["rxCodingRate4"] | 5;
+        loramodule.rxSignalBandwidth    = data["lora"]["rxSignalBandwidth"] | 125000;        
         loramodule.txActive             = data["lora"]["txActive"] | false;
-        loramodule.rxActive             = data["lora"]["rxActive"] | false;
-
+        loramodule.txFreq               = data["lora"]["txFreq"] | 433775000;
+        loramodule.txSpreadingFactor    = data["lora"]["txSpreadingFactor"] | 12;
+        loramodule.txCodingRate4        = data["lora"]["txCodingRate4"] | 5;
+        loramodule.txSignalBandwidth    = data["lora"]["txSignalBandwidth"] | 125000;
+        loramodule.power                = data["lora"]["power"] | 20;
+        
         if (!data["display"].containsKey("alwaysOn") ||
             !data["display"].containsKey("timeout") ||
             !data["display"].containsKey("turn180")) needsRewrite = true;
@@ -310,23 +332,27 @@ bool Configuration::readFile() {
 
         if (!data["tnc"].containsKey("enableServer") ||
             !data["tnc"].containsKey("enableSerial") ||
-            !data["tnc"].containsKey("acceptOwn")) needsRewrite = true;
+            !data["tnc"].containsKey("acceptOwn") ||
+            !data["tnc"].containsKey("aprsBridgeActive")) needsRewrite = true;
         tnc.enableServer                = data["tnc"]["enableServer"] | false;
         tnc.enableSerial                = data["tnc"]["enableSerial"] | false;
         tnc.acceptOwn                   = data["tnc"]["acceptOwn"] | false;
+        tnc.aprsBridgeActive            = data["tnc"]["aprsBridgeActive"] | false;
 
         if (!data["mqtt"].containsKey("active") ||
             !data["mqtt"].containsKey("server") ||
             !data["mqtt"].containsKey("topic") ||
             !data["mqtt"].containsKey("username") ||
             !data["mqtt"].containsKey("password") ||
-            !data["mqtt"].containsKey("port")) needsRewrite = true;
+            !data["mqtt"].containsKey("port") ||
+            !data["mqtt"].containsKey("beaconOverMqtt")) needsRewrite = true;
         mqtt.active                     = data["mqtt"]["active"] | false;
         mqtt.server                     = data["mqtt"]["server"] | "";
         mqtt.topic                      = data["mqtt"]["topic"] | "aprs-igate";
         mqtt.username                   = data["mqtt"]["username"] | "";
         mqtt.password                   = data["mqtt"]["password"] | "";
         mqtt.port                       = data["mqtt"]["port"] | 1883;
+        mqtt.beaconOverMqtt             = data["mqtt"]["beaconOverMqtt"] | false;
         
         if (!data["ota"].containsKey("username") ||
             !data["ota"].containsKey("password")) needsRewrite = true;
@@ -345,7 +371,9 @@ bool Configuration::readFile() {
         remoteManagement.managers       = data["remoteManagement"]["managers"] | "";
         remoteManagement.rfOnly         = data["remoteManagement"]["rfOnly"] | true;
 
-        if (!data["ntp"].containsKey("gmtCorrection")) needsRewrite = true;
+        if (!data["ntp"].containsKey("server") ||
+            !data["ntp"].containsKey("gmtCorrection")) needsRewrite = true;
+        ntp.server                      = data["ntp"]["server"] | "pool.ntp.org";
         ntp.gmtCorrection               = data["ntp"]["gmtCorrection"] | 0.0;
 
         if (!data["other"].containsKey("rebootMode") ||
@@ -371,7 +399,7 @@ bool Configuration::readFile() {
         if (needsRewrite) {
             Serial.println("Config JSON incomplete, rewriting...");
             writeFile();
-            delay(500);
+            delay(1000);
             ESP.restart();
         } 
         Serial.println("Config read successfuly");
@@ -389,6 +417,8 @@ void Configuration::setDefaultValues() {
     wifiap.password                 = "";
 
     wifiAPs.push_back(wifiap);
+
+    startupDelay                    = 0;
 
     wifiAutoAP.password             = "1234567890";
     wifiAutoAP.timeout              = 10;
@@ -409,10 +439,12 @@ void Configuration::setDefaultValues() {
     beacon.interval                 = 15;
     beacon.overlay                  = "L";
     beacon.symbol                   = "a";
-    beacon.sendViaAPRSIS            = true;
-    beacon.sendViaRF                = false;
     beacon.path                     = "WIDE1-1";
 
+    beacon.sendViaAPRSIS            = true;
+    beacon.sendViaRF                = false;
+    beacon.beaconFreq               = 1;
+    
     beacon.statusActive             = false;
     beacon.statusPacket             = "";    
 
@@ -426,14 +458,17 @@ void Configuration::setDefaultValues() {
     digi.mode                       = 0;
     digi.ecoMode                    = 0;
 
-    loramodule.txFreq               = 433775000;
-    loramodule.rxFreq               = 433775000;
-    loramodule.spreadingFactor      = 12;
-    loramodule.signalBandwidth      = 125000;
-    loramodule.codingRate4          = 5;
-    loramodule.power                = 20;
-    loramodule.txActive             = false;
     loramodule.rxActive             = true;
+    loramodule.rxFreq               = 433775000;
+    loramodule.rxSpreadingFactor    = 12;
+    loramodule.rxCodingRate4        = 5;
+    loramodule.rxSignalBandwidth    = 125000;
+    loramodule.txActive             = false;
+    loramodule.txFreq               = 433775000;
+    loramodule.txSpreadingFactor    = 12;
+    loramodule.txCodingRate4        = 5;
+    loramodule.txSignalBandwidth    = 125000;
+    loramodule.power                = 20;
 
     display.alwaysOn                = true;
     display.timeout                 = 4;
@@ -464,6 +499,7 @@ void Configuration::setDefaultValues() {
     tnc.enableServer                = false;
     tnc.enableSerial                = false;
     tnc.acceptOwn                   = false;
+    tnc.aprsBridgeActive            = false;
 
     mqtt.active                     = false;
     mqtt.server                     = "";
@@ -471,6 +507,7 @@ void Configuration::setDefaultValues() {
     mqtt.username                   = "";
     mqtt.password                   = "";
     mqtt.port                       = 1883;
+    mqtt.beaconOverMqtt             = false;
 
     ota.username                    = "";
     ota.password                    = "";
@@ -482,6 +519,7 @@ void Configuration::setDefaultValues() {
     remoteManagement.managers       = "";
     remoteManagement.rfOnly         = true;
 
+    ntp.server                      = "pool.ntp.org";
     ntp.gmtCorrection               = 0.0;
 
     rebootMode                      = false;
@@ -506,7 +544,7 @@ Configuration::Configuration() {
     if (!exists) {
         setDefaultValues();
         writeFile();
-        delay(500);
+        delay(1000);
         ESP.restart();
     }
 

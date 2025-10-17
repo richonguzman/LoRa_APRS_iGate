@@ -17,6 +17,7 @@
         "path": "WIDE1-1",
         "sendViaAPRSIS": false,
         "sendViaRF": false,
+        "beaconFreq": 1,
         "statusActive": false,
         "statusPacket": "",
         "gpsActive": false,
@@ -38,14 +39,17 @@
         "ecoMode": 0
     },
     "lora": {
-        "txFreq": 433775000,
+        "rxActive": true,
         "rxFreq": 433775000,
-        "spreadingFactor": 12,
-        "signalBandwidth": 125000,
-        "codingRate4": 5,
-        "power": 20,
+        "rxSpreadingFactor": 12,
+        "rxCodingRate4": 5,
+        "rxSignalBandwidth": 125000,
         "txActive": false,
-        "rxActive": true
+        "txFreq": 433775000,
+        "txSpreadingFactor": 12,
+        "txCodingRate4": 5,
+        "txSignalBandwidth": 125000,
+        "power": 20
     },
     "display": {
         "alwaysOn": true,
@@ -78,7 +82,8 @@
     "tnc": {
         "enableServer": false,
         "enableSerial": false,
-        "acceptOwn": false
+        "acceptOwn": false,
+        "aprsBrigdeActive": false
     },
     "mqtt": {
         "active": false,
@@ -86,7 +91,8 @@
         "topic": "",
         "username": "",
         "password": "",
-        "port": 1883
+        "port": 1883,
+        "beaconOverMqtt": false
     },
     "ota": {
         "username": "",
@@ -101,12 +107,14 @@
         "rfOnly": true
     },
     "ntp": {
+        "server": "pool.ntp.org",
         "gmtCorrection": 0.0
     },
     "other": {
         "rememberStationTime": 30,
         "backupDigiMode": false,
         "rebootMode": false,
-        "rebootModeTime": 6
+        "rebootModeTime": 6,
+        "startupDelay": 0
     }
 }

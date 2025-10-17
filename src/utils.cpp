@@ -88,7 +88,7 @@ namespace Utils {
         if (statusAfterBoot && !Config.beacon.sendViaAPRSIS && Config.beacon.sendViaRF) {
             status.concat(":>");
             status.concat(Config.beacon.statusPacket);
-            STATION_Utils::addToOutputPacketBuffer(status);
+            STATION_Utils::addToOutputPacketBuffer(status, true);   // treated also as beacon on Tx Freq
             statusAfterBoot = false;
         }
     }
@@ -127,7 +127,7 @@ namespace Utils {
         seventhLine = "     listening...";
     }
 
-    void activeStations() {
+    void showActiveStations() {
         char buffer[30]; // Adjust size as needed
         sprintf(buffer, "Stations (%dmin) = %2d", Config.rememberStationTime, lastHeardStations.size());
         fourthLine = buffer;
@@ -159,7 +159,7 @@ namespace Utils {
 
             STATION_Utils::deleteNotHeard();
 
-            activeStations();
+            showActiveStations();
 
             beaconPacket            = iGateBeaconPacket;
             secondaryBeaconPacket   = iGateLoRaBeaconPacket;
@@ -259,7 +259,7 @@ namespace Utils {
                 Utils::println("-- Sending Beacon to RF --");
                 displayShow(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING DIGI BEACON", 0);
                 seventhLine = "     listening...";
-                STATION_Utils::addToOutputPacketBuffer(secondaryBeaconPacket);
+                STATION_Utils::addToOutputPacketBuffer(secondaryBeaconPacket, true);
             }
 
             lastBeaconTx = millis();
@@ -284,6 +284,7 @@ namespace Utils {
             Serial.println("Tx Freq less than 125kHz from Rx Freq ---> NOT VALID");
             displayShow("Tx Freq is less than ", "125kHz from Rx Freq", "device will autofix", "and then reboot", 1000);
             Config.loramodule.txFreq = Config.loramodule.rxFreq; // Inform about that but then change the TX QRG to RX QRG and reset the device
+            Config.beacon.beaconFreq = 1;   // return to LoRa Tx Beacon Freq
             Config.writeFile();
             ESP.restart();
         }
@@ -434,6 +435,13 @@ namespace Utils {
             }
         }
         return true;
+    }
+
+    void startupDelay() {
+        if (Config.startupDelay > 0) {
+            displayShow("", "  STARTUP DELAY ...", "", "", 0);
+            delay(Config.startupDelay * 60 * 1000);
+        }
     }
 
 }

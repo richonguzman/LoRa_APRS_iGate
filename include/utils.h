@@ -35,7 +35,7 @@ namespace Utils {
     void    processStatus();
     String  getLocalIP();
     void    setupDisplay();
-    void    activeStations();
+    void    showActiveStations();
     void    checkBeaconInterval();
     void    checkDisplayInterval();
     void    validateFreqs();
@@ -46,6 +46,7 @@ namespace Utils {
     void    checkRebootTime();
     void    checkSleepByLowBatteryVoltage(uint8_t mode);
     bool    checkValidCallsign(const String& callsign);
+    void    startupDelay();
 
 }
 

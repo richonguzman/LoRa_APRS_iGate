@@ -33,7 +33,7 @@
                 ╚═╝ ╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚══════╝
 
 
-                       Ricardo Guzman - CA2RXU 
+                       Ricardo Guzman - CA2RXU
            https://github.com/richonguzman/LoRa_APRS_iGate
              (donations : http://paypal.me/richonguzman)
 ___________________________________________________________________*/
@@ -67,8 +67,8 @@ ___________________________________________________________________*/
 #endif
 
 
-String              versionDate             = "2025-09-26";
-String              versionNumber           = "3.1.2.1";
+String              versionDate             = "2025-10-15";
+String              versionNumber           = "3.1.4";
 Configuration       Config;
 WiFiClient          aprsIsClient;
 WiFiClient          mqttClient;
@@ -97,7 +97,6 @@ bool                modemLoggedToAPRSIS     = false;
 std::vector<ReceivedPacket> receivedPackets;
 
 String firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine;
-//#define STARTUP_DELAY 5 //min
 
 
 void setup() {
@@ -108,12 +107,7 @@ void setup() {
     Utils::validateFreqs();
     GPS_Utils::setup();
     STATION_Utils::loadBlacklistAndManagers();
-
-    #ifdef STARTUP_DELAY    // (TEST) just to wait for WiFi init of Routers
-        displayShow("", "  STARTUP DELAY ...", "", "", 0);
-        delay(STARTUP_DELAY * 60 * 1000);
-    #endif
-
+    Utils::startupDelay();
     SLEEP_Utils::setup();
     WIFI_Utils::setup();
     NTP_Utils::setup();
@@ -198,9 +192,9 @@ void loop() {
                 DIGI_Utils::processLoRaPacket(packet); // Send received packet to Digi
             }
 
-            if (Config.tnc.enableServer) TNC_Utils::sendToClients(packet);  // Send received packet to TNC KISS
-            if (Config.tnc.enableSerial) TNC_Utils::sendToSerial(packet);   // Send received packet to Serial KISS
-            if (Config.mqtt.active) MQTT_Utils::sendToMqtt(packet);         // Send received packet to MQTT
+            if (Config.tnc.enableServer) TNC_Utils::sendToClients(packet, true);    // Send received packet to TNC KISS
+            if (Config.tnc.enableSerial) TNC_Utils::sendToSerial(packet, true);     // Send received packet to Serial KISS
+            if (Config.mqtt.active) MQTT_Utils::sendToMqtt(packet);                 // Send received packet to MQTT
         }
 
         if (Config.aprs_is.active) APRS_IS_Utils::listenAPRSIS();           // listen received packet from APRSIS

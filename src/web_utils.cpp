@@ -157,6 +157,8 @@ namespace WEB_Utils {
             Config.wifiAPs.push_back(wifiap);
         }
 
+        Config.startupDelay                 = getParamIntSafe("startupDelay", Config.startupDelay);
+
         Config.callsign                     = getParamStringSafe("callsign", Config.callsign);
         
         Config.wifiAutoAP.password          = getParamStringSafe("wifi.autoAP.password", Config.wifiAutoAP.password);
@@ -175,6 +177,7 @@ namespace WEB_Utils {
         Config.beacon.interval              = getParamIntSafe("beacon.interval", Config.beacon.interval);
         Config.beacon.sendViaAPRSIS         = request->hasParam("beacon.sendViaAPRSIS", true);
         Config.beacon.sendViaRF             = request->hasParam("beacon.sendViaRF", true);
+        Config.beacon.beaconFreq            = getParamIntSafe("beacon.beaconFreq", Config.beacon.beaconFreq);
         Config.beacon.latitude              = getParamDoubleSafe("beacon.latitude", Config.beacon.latitude);
         Config.beacon.longitude             = getParamDoubleSafe("beacon.longitude", Config.beacon.longitude);
         Config.beacon.comment               = getParamStringSafe("beacon.comment", Config.beacon.comment);
@@ -196,15 +199,19 @@ namespace WEB_Utils {
 
         Config.digi.mode                    = getParamIntSafe("digi.mode", Config.digi.mode);
         Config.digi.ecoMode                 = getParamIntSafe("digi.ecoMode", Config.digi.ecoMode);
+        
 
-        Config.loramodule.txFreq            = getParamIntSafe("lora.txFreq", Config.loramodule.txFreq);
-        Config.loramodule.rxFreq            = getParamIntSafe("lora.rxFreq", Config.loramodule.rxFreq);
-        Config.loramodule.spreadingFactor   = getParamIntSafe("lora.spreadingFactor", Config.loramodule.spreadingFactor);
-        Config.loramodule.signalBandwidth   = getParamIntSafe("lora.signalBandwidth", Config.loramodule.signalBandwidth);
-        Config.loramodule.codingRate4       = getParamIntSafe("lora.codingRate4", Config.loramodule.codingRate4);
-        Config.loramodule.power             = getParamIntSafe("lora.power", Config.loramodule.power);
-        Config.loramodule.txActive          = request->hasParam("lora.txActive", true);
         Config.loramodule.rxActive          = request->hasParam("lora.rxActive", true);
+        Config.loramodule.rxFreq            = getParamIntSafe("lora.rxFreq", Config.loramodule.rxFreq);
+        Config.loramodule.rxSpreadingFactor = getParamIntSafe("lora.rxSpreadingFactor", Config.loramodule.rxSpreadingFactor);
+        Config.loramodule.rxCodingRate4     = getParamIntSafe("lora.rxCodingRate4", Config.loramodule.rxCodingRate4);
+        Config.loramodule.rxSignalBandwidth = getParamIntSafe("lora.rxSignalBandwidth", Config.loramodule.rxSignalBandwidth);
+        Config.loramodule.txActive          = request->hasParam("lora.txActive", true);
+        Config.loramodule.txFreq            = getParamIntSafe("lora.txFreq", Config.loramodule.txFreq);
+        Config.loramodule.txSpreadingFactor = getParamIntSafe("lora.txSpreadingFactor", Config.loramodule.txSpreadingFactor);
+        Config.loramodule.txCodingRate4     = getParamIntSafe("lora.txCodingRate4", Config.loramodule.txCodingRate4);
+        Config.loramodule.txSignalBandwidth = getParamIntSafe("lora.txSignalBandwidth", Config.loramodule.txSignalBandwidth);
+        Config.loramodule.power             = getParamIntSafe("lora.power", Config.loramodule.power);
 
 
         Config.display.alwaysOn             = request->hasParam("display.alwaysOn", true);
@@ -252,6 +259,7 @@ namespace WEB_Utils {
         Config.tnc.enableServer             = request->hasParam("tnc.enableServer", true);
         Config.tnc.enableSerial             = request->hasParam("tnc.enableSerial", true);
         Config.tnc.acceptOwn                = request->hasParam("tnc.acceptOwn", true);
+        Config.tnc.aprsBridgeActive         = request->hasParam("tnc.aprsBridgeActive", true);
 
 
         Config.mqtt.active                  = request->hasParam("mqtt.active", true);
@@ -261,6 +269,7 @@ namespace WEB_Utils {
             Config.mqtt.username            = getParamStringSafe("mqtt.username", Config.mqtt.username);
             Config.mqtt.password            = getParamStringSafe("mqtt.password", Config.mqtt.password);
             Config.mqtt.port                = getParamIntSafe("mqtt.port", Config.mqtt.port);
+            Config.mqtt.beaconOverMqtt      = request->hasParam("mqtt.beaconOverMqtt", true);
         }
 
 
@@ -281,6 +290,7 @@ namespace WEB_Utils {
         Config.remoteManagement.managers    = getParamStringSafe("remoteManagement.managers", Config.remoteManagement.managers);
         Config.remoteManagement.rfOnly      = request->hasParam("remoteManagement.rfOnly", true);
 
+        Config.ntp.server                   = getParamStringSafe("ntp.server", Config.ntp.server);
         Config.ntp.gmtCorrection            = getParamFloatSafe("ntp.gmtCorrection", Config.ntp.gmtCorrection);
 
         Config.rememberStationTime          = getParamIntSafe("other.rememberStationTime", Config.rememberStationTime);

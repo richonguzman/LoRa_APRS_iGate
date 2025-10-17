@@ -95,6 +95,7 @@ function loadSettings(settings) {
         networksContainer.appendChild(networkElement);
         networkCount++;
     });
+    document.getElementById("startupDelay").value                       = settings.startupDelay;
 
     // APRS-IS
     document.getElementById("aprs_is.active").checked                   = settings.aprs_is.active;
@@ -118,7 +119,11 @@ function loadSettings(settings) {
     document.getElementById("beacon.interval").value                    = settings.beacon.interval;
     document.getElementById("other.rememberStationTime").value          = settings.other.rememberStationTime;   
     document.getElementById("beacon.sendViaAPRSIS").checked             = settings.beacon.sendViaAPRSIS;
+
     document.getElementById("beacon.sendViaRF").checked                 = settings.beacon.sendViaRF;
+    document.getElementById("beacon.beaconFreq").value                  = settings.beacon.beaconFreq;
+    BeaconingViaRFCheckbox.checked  = settings.beacon.sendViaRF;
+    BeaconingFrequency.disabled     = !BeaconingViaRFCheckbox.checked;
 
     document.getElementById("beacon.statusActive").checked              = settings.beacon.statusActive;
     document.getElementById("beacon.statusPacket").value                = settings.beacon.statusPacket;
@@ -136,13 +141,16 @@ function loadSettings(settings) {
     document.getElementById("digi.ecoMode").value                       = settings.digi.ecoMode;
 
     // LoRa
-    document.getElementById("lora.txFreq").value                        = settings.lora.txFreq;
-    document.getElementById("lora.rxFreq").value                        = settings.lora.rxFreq;
-    document.getElementById("lora.txActive").checked                    = settings.lora.txActive;
     document.getElementById("lora.rxActive").checked                    = settings.lora.rxActive;
-    document.getElementById("lora.spreadingFactor").value               = settings.lora.spreadingFactor;
-    document.getElementById("lora.signalBandwidth").value               = settings.lora.signalBandwidth;
-    document.getElementById("lora.codingRate4").value                   = settings.lora.codingRate4;
+    document.getElementById("lora.rxFreq").value                        = settings.lora.rxFreq;
+    document.getElementById("lora.rxSpreadingFactor").value             = settings.lora.rxSpreadingFactor;
+    document.getElementById("lora.rxCodingRate4").value                 = settings.lora.rxCodingRate4;
+    document.getElementById("lora.rxSignalBandwidth").value             = settings.lora.rxSignalBandwidth;
+    document.getElementById("lora.txActive").checked                    = settings.lora.txActive;
+    document.getElementById("lora.txFreq").value                        = settings.lora.txFreq;
+    document.getElementById("lora.txSpreadingFactor").value             = settings.lora.txSpreadingFactor;
+    document.getElementById("lora.txCodingRate4").value                 = settings.lora.txCodingRate4;
+    document.getElementById("lora.txSignalBandwidth").value             = settings.lora.txSignalBandwidth;    
     document.getElementById("lora.power").value                         = settings.lora.power;
 
     // Display
@@ -198,6 +206,7 @@ function loadSettings(settings) {
         document.getElementById("tnc.enableServer").checked             = settings.tnc.enableServer;
         document.getElementById("tnc.enableSerial").checked             = settings.tnc.enableSerial;
         document.getElementById("tnc.acceptOwn").checked                = settings.tnc.acceptOwn;
+        document.getElementById("tnc.aprsBridgeActive").checked         = settings.tnc.aprsBridgeActive;
     }
 
     // MQTT
@@ -207,12 +216,14 @@ function loadSettings(settings) {
     document.getElementById("mqtt.username").value                      = settings.mqtt.username;
     document.getElementById("mqtt.password").value                      = settings.mqtt.password;
     document.getElementById("mqtt.port").value                          = settings.mqtt.port;
-    MqttCheckbox.checked    = settings.mqtt.active;
-    MqttServer.disabled     = !MqttCheckbox.check;
-    MqttTopic.disabled      = !MqttCheckbox.check;
-    MqttUsername.disabled   = !MqttCheckbox.check;
-    MqttPassword.disabled   = !MqttCheckbox.check;
-    MqttPort.disabled       = !MqttCheckbox.check;
+    document.getElementById("mqtt.beaconOverMqtt").value                = settings.mqtt.beaconOverMqtt;
+    MqttCheckbox.checked        = settings.mqtt.active;
+    MqttServer.disabled         = !MqttCheckbox.check;
+    MqttTopic.disabled          = !MqttCheckbox.check;
+    MqttUsername.disabled       = !MqttCheckbox.check;
+    MqttPassword.disabled       = !MqttCheckbox.check;
+    MqttPort.disabled           = !MqttCheckbox.check;
+    MqttBeaconOverMqtt.disabled = !MqttCheckbox.check;
 
     // Reboot
     document.getElementById("other.rebootMode").checked                 = settings.other.rebootMode;
@@ -241,13 +252,13 @@ function loadSettings(settings) {
     document.getElementById("remoteManagement.rfOnly").checked          = settings.remoteManagement.rfOnly;
 
     // NTP
+    document.getElementById("ntp.server").value                         = settings.ntp.server;
     document.getElementById("ntp.gmtCorrection").value                  = settings.ntp.gmtCorrection;
 
     // Experimental
     document.getElementById("other.backupDigiMode").checked             = settings.other.backupDigiMode;
 
     updateImage();
-    refreshSpeedStandard();
 }
 
 function showToast(message) {
@@ -299,6 +310,12 @@ function updateImage() {
     }
 }
 
+// Beaconing Switches
+const BeaconingViaRFCheckbox    = document.querySelector('input[name="beacon.sendViaRF"]');
+const BeaconingFrequency        = document.querySelector('select[name="beacon.beaconFreq"]');
+BeaconingViaRFCheckbox.addEventListener("change", function() {
+    BeaconingFrequency.disabled = !this.checked;
+});
 
 // Status Switch
 const StatusCheckbox            = document.querySelector('input[name="beacon.statusActive"]');
@@ -379,12 +396,14 @@ const MqttTopic                 = document.querySelector('input[name="mqtt.topic
 const MqttUsername              = document.querySelector('input[name="mqtt.username"]');
 const MqttPassword              = document.querySelector('input[name="mqtt.password"]');
 const MqttPort                  = document.querySelector('input[name="mqtt.port"]');
+const MqttBeaconOverMqtt        = document.querySelector('input[name="mqtt.beaconOverMqtt"]');
 MqttCheckbox.addEventListener("change", function () {
     MqttServer.disabled         = !this.checked;
     MqttTopic.disabled          = !this.checked;
     MqttUsername.disabled       = !this.checked;
     MqttPassword.disabled       = !this.checked;
     MqttPort.disabled           = !this.checked;
+    MqttBeaconOverMqtt.disabled = !this.checked;
 });
 
 // Reboot Switches
@@ -451,65 +470,6 @@ document
         updateImage();
     });
 
-const speedStandards = {
-    300: [125, 5, 12],
-    244: [125, 6, 12],
-    209: [125, 7, 12],
-    183: [125, 8, 12],
-    610: [125, 8, 10],
-    1200: [125, 7, 9],
-};
-
-function refreshSpeedStandard() {
-    const bw = Number(document.getElementById("lora.signalBandwidth").value);
-    const cr4 = Number(document.getElementById("lora.codingRate4").value);
-    const sf = Number(document.getElementById("lora.spreadingFactor").value);
-
-    let found = false;
-
-    for (const speed in speedStandards) {
-        const standard = speedStandards[speed];
-
-        if (standard[0] !== bw / 1000) continue;
-        if (standard[1] !== cr4) continue;
-        if (standard[2] !== sf) continue;
-
-        document.getElementById("action.speed").value = speed;
-        found = true;
-
-        break;
-    }
-
-    if (!found) {
-        document.getElementById("action.speed").value = "";
-    }
-}
-
-document
-    .getElementById("lora.signalBandwidth")
-    .addEventListener("focusout", refreshSpeedStandard);
-document
-    .getElementById("lora.codingRate4")
-    .addEventListener("focusout", refreshSpeedStandard);
-document
-    .getElementById("lora.spreadingFactor")
-    .addEventListener("focusout", refreshSpeedStandard);
-
-document.getElementById("action.speed").addEventListener("change", function () {
-    const speed = document.getElementById("action.speed").value;
-
-    if (speed !== "") {
-        const value = speedStandards[Number(speed)];
-
-        const bw = value[0];
-        const cr4 = value[1];
-        const sf = value[2];
-
-        document.getElementById("lora.signalBandwidth").value = bw * 1000;
-        document.getElementById("lora.codingRate4").value = cr4;
-        document.getElementById("lora.spreadingFactor").value = sf;
-    }
-});
 
 const form = document.querySelector("form");
 

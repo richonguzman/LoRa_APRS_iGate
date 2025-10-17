@@ -27,8 +27,8 @@ namespace TNC_Utils {
     void setup();
     void loop();
 
-    void sendToClients(const String& packet);
-    void sendToSerial(const String& packet);
+    void sendToClients(const String& packet, bool stripBytes = false);
+    void sendToSerial(const String& packet, bool stripBytes = false);
 
 }
 

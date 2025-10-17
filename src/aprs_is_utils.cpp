@@ -25,6 +25,7 @@
 #include "query_utils.h"
 #include "A7670_utils.h"
 #include "digi_utils.h"
+#include "tnc_utils.h"
 #include "display.h"
 #include "utils.h"
 
@@ -366,6 +367,10 @@ namespace APRS_IS_Utils {
                 } else {
                     Serial.println(" ---> Rejected (Time): No Tx");
                 }
+            }
+            if (Config.tnc.aprsBridgeActive) {
+                if (Config.tnc.enableServer) TNC_Utils::sendToClients(packet);  // Send received packet to TNC KISS
+                if (Config.tnc.enableSerial) TNC_Utils::sendToSerial(packet);   // Send received packet to Serial KISS
             }
         }
     }

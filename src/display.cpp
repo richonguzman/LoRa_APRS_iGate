@@ -96,6 +96,7 @@ void displaySetup() {
             #ifdef HAS_EPAPER
                 display.landscape();
                 display.printCenter("LoRa APRS iGate Initialising...");
+                if (Config.display.turn180) display.setRotation(2);
                 display.update();
             #else
                 #ifdef OLED_DISPLAY_HAS_RST_PIN
