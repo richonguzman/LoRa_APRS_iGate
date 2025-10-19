@@ -529,7 +529,7 @@ void Configuration::setDefaultValues() {
 
     backupDigiMode                  = false;
 
-    Serial.println("All is Written!");
+    Serial.println("New Data Created... All is Written!");
 }
 
 Configuration::Configuration() {
