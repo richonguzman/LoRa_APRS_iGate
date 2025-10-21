@@ -216,7 +216,7 @@ function loadSettings(settings) {
     document.getElementById("mqtt.username").value                      = settings.mqtt.username;
     document.getElementById("mqtt.password").value                      = settings.mqtt.password;
     document.getElementById("mqtt.port").value                          = settings.mqtt.port;
-    document.getElementById("mqtt.beaconOverMqtt").value                = settings.mqtt.beaconOverMqtt;
+    document.getElementById("mqtt.beaconOverMqtt").checked              = settings.mqtt.beaconOverMqtt;
     MqttCheckbox.checked        = settings.mqtt.active;
     MqttServer.disabled         = !MqttCheckbox.check;
     MqttTopic.disabled          = !MqttCheckbox.check;
