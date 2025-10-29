@@ -2,7 +2,7 @@
 
 This firmware is for using ESP32 based boards with LoRa Modules and GPS to live in the APRS world.
 
-![Screenshot](https://github.com/richonguzman/LoRa_APRS_iGate/blob/main/images/iGateOledScreen.jpeg)
+![Screenshot](https://github.com/richonguzman/LoRa_APRS_iGate/main/images/iGateOledScreen.jpeg)
 
 __(This iGate Firmware works with all LoRa Tracker Firmwares (specially this <a href="https://github.com/richonguzman/LoRa_APRS_Tracker" target="_blank">LoRa APRS Tracker Firmware</a>))__
 <br />
@@ -12,13 +12,13 @@ ____________________________________________________
 # <a href="https://richonguzman.github.io/lora-igate-web-flasher/installer.html" target="_blank">WEB FLASHER/INSTALLER</a>
 
 
-# <a href="https://github.com/richonguzman/LoRa_APRS_iGate/blob/main/manual/LoRa_APRS_iGate_CA2RXU_Firmware_Manual.pdf" target="_blank">LoRa APRS iGate CA2RXU Firmware Manual</a>
+# <a href="https://drive.google.com/file/d/1-jafzOWis_qOaNUl4WGVcFKjh_uCJtB6/view?usp=share_link" target="_blank">LoRa APRS iGate CA2RXU Firmware Manual</a>
 
 ____________________________________________________
 
 ## You can support this project to continue to grow:
 
-[<img src="https://github.com/richonguzman/LoRa_APRS_Tracker/blob/main/images/github-sponsors.png">](https://github.com/sponsors/richonguzman)     [<img src="https://github.com/richonguzman/LoRa_APRS_Tracker/blob/main/images/paypalme.png">](http://paypal.me/richonguzman)
+[<img src="https://github.com/richonguzman/LoRa_APRS_Tracker/main/images/github-sponsors.png">](https://github.com/sponsors/richonguzman)     [<img src="https://github.com/richonguzman/LoRa_APRS_Tracker/main/images/paypalme.png">](http://paypal.me/richonguzman)
 
 ____________________________________________________
 
