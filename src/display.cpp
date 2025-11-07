@@ -107,7 +107,7 @@ void displaySetup() {
                 #endif
 
                 #if defined(TTGO_T_Beam_S3_SUPREME_V3)
-                    if (!display.begin(0x3c, false)) {
+                    if (display.begin(0x3c, false)) {
                         displayFound = true;
                         if (Config.display.turn180) display.setRotation(2);
                         display.clearDisplay();
