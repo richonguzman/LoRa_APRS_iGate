@@ -42,36 +42,21 @@ uint32_t    lastBackupDigiTime  = millis();
 namespace WIFI_Utils {
 
     void checkWiFi() {
-        if (Config.digi.ecoMode == 0) {
-            if (backUpDigiMode) {
-                uint32_t WiFiCheck = millis() - lastBackupDigiTime;
-                if (WiFi.status() != WL_CONNECTED && WiFiCheck >= 15 * 60 * 1000) {
-                    Serial.println("*** Stopping BackUp Digi Mode ***");
-                    backUpDigiMode = false;
-                    wifiCounter = 0;
-                } else if (WiFi.status() == WL_CONNECTED) {
-                    Serial.println("*** WiFi Reconnect Success (Stopping Backup Digi Mode) ***");
-                    backUpDigiMode = false;
-                    wifiCounter = 0;
-                }
-            }
+            if ((Config.digi.ecoMode == 0) && !backUpDigiMode && (WiFi.status() != WL_CONNECTED) && ((millis() - previousWiFiMillis) >= 30 * 1000) && !WiFiAutoAPStarted) {
+            Serial.print(millis());
+            Serial.println("Reconnecting to WiFi...");
+            WiFi.disconnect();
+            WIFI_Utils::startWiFi();//WiFi.reconnect();
+            previousWiFiMillis = millis();
 
-            if (!backUpDigiMode && (WiFi.status() != WL_CONNECTED) && ((millis() - previousWiFiMillis) >= 30 * 1000) && !WiFiAutoAPStarted) {
-                Serial.print(millis());
-                Serial.println("Reconnecting to WiFi...");
-                WiFi.disconnect();
-                WIFI_Utils::startWiFi();//WiFi.reconnect();
-                previousWiFiMillis = millis();
-
-                if (Config.backupDigiMode) {
-                    wifiCounter++;
-                }
-                if (wifiCounter >= 2) {
-                    Serial.println("*** Starting BackUp Digi Mode ***");
-                    backUpDigiMode = true;
-                    lastBackupDigiTime = millis();
-                }
+            if (Config.backupDigiMode) {
+                wifiCounter++;
             }
+            if (wifiCounter >= 2) {
+                Serial.println("*** Starting BackUp Digi Mode ***");
+                backUpDigiMode = true;
+                lastBackupDigiTime = millis();
+            }                    
         }
     }
 
