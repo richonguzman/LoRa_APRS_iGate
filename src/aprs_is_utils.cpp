@@ -61,7 +61,7 @@ namespace APRS_IS_Utils {
     void connect() {
         Serial.print("Connecting to APRS-IS ...     ");
         uint8_t count = 0;
-        while (!aprsIsClient.connect(Config.aprs_is.server.c_str(), Config.aprs_is.port) && count < 20) {
+        while (!aprsIsClient.connect(Config.aprs_is.server.c_str(), Config.aprs_is.port) && count < 5) {
             Serial.println("Didn't connect with server...");
             delay(1000);
             aprsIsClient.stop();
@@ -71,8 +71,12 @@ namespace APRS_IS_Utils {
             count++;
             Serial.println("Try: " + String(count));
         }
-        if (count == 20) {
+        if (count == 5) {
             Serial.println("Tried: " + String(count) + " FAILED!");
+            if (!backUpDigiMode) {
+                        Serial.println("*** Starting BackUp Digi Mode ***");
+                        backUpDigiMode= true;
+                    }
         } else {
             Serial.println("Connected!\n(Server: " + String(Config.aprs_is.server) + " / Port: " + String(Config.aprs_is.port) + ")");
             // String filter = "t/m/" + Config.callsign + "/" + (String)Config.aprs_is.reportingDistance;
@@ -116,6 +120,10 @@ namespace APRS_IS_Utils {
             #else
                 if (aprsIsClient.connected()) {
                     aprsisState = "OK";
+                    if (backUpDigiMode == true) {
+                        Serial.println("*** APRS-IS Reconnect Success (Stopping Backup Digi Mode) ***");
+                        backUpDigiMode = false;
+                    }
                 } else {
                     aprsisState = "--";
                 }
@@ -393,8 +401,10 @@ namespace APRS_IS_Utils {
     void firstConnection() {
         if (Config.aprs_is.active && (WiFi.status() == WL_CONNECTED) && !aprsIsClient.connected()) {
             connect();
-            while (!passcodeValid) {
-                listenAPRSIS();
+            if (!backUpDigiMode) {
+                while (!passcodeValid) {
+                    listenAPRSIS();
+                }
             }
         }
     }
