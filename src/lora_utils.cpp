@@ -204,7 +204,7 @@ namespace LoRa_Utils {
                     if (packet != "") {
 
                         String sender   = packet.substring(3, packet.indexOf(">"));
-                        if (packet.substring(0,3) == "\x3c\xff\x01" && !STATION_Utils::isBlacklisted(sender)){   // avoid processing BlackListed stations
+                        if (packet.substring(0,3) == "\x3c\xff\x01" && !STATION_Utils::isBlacklisted(sender)) {     // avoid processing BlackListed stations
                             rssi        = radio.getRSSI();
                             snr         = radio.getSNR();
                             freqError   = radio.getFrequencyError();
