@@ -189,18 +189,10 @@
                                             name="action.symbol"
                                             id="action.symbol"
                                         >
-                                            <option value="L#">
-                                                Green star with L
-                                            </option>
-                                            <option value="L_">
-                                                Blue circle with L
-                                            </option>
-                                            <option value="L&">
-                                                Black diamond with L
-                                            </option>
-                                            <option value="La">
-                                                Red diamond with L
-                                            </option>
+                                            <option value="L#">Green star with L</option>
+                                            <option value="L_">Blue circle with L</option>
+                                            <option value="L&">Black diamond with L</option>
+                                            <option value="La" selected>Red diamond with L</option>
                                         </select>
                                     </div>
                                     <div
@@ -583,12 +575,8 @@
                                             name="beacon.beaconFreq"
                                             id="beacon.beaconFreq"
                                         >
-                                            <option value="0">
-                                                Beacon on Rx Freq
-                                            </option>
-                                            <option value="1">
-                                                Beacon on Tx Freq
-                                            </option>
+                                            <option value="0">Beacon on Rx Freq</option>
+                                            <option value="1">Beacon on Tx Freq</option>
                                         </select>
                                     </div>
                                 </div>
@@ -617,6 +605,23 @@
                                     </div>
                                 </div>
                                 <div class="col-12 mt-3">
+                                    <label
+                                        for="beacon.ambiguityLevel"
+                                        class="form-label"
+                                        >APRS Position Ambiguity</label
+                                    >
+                                    <select
+                                        class="form-select form-select"
+                                        name="beacon.ambiguityLevel"
+                                        id="beacon.ambiguityLevel"
+                                    >
+                                        <option value="0" selected>No Ambiguity</option>
+                                        <option value="1">~110 m forced Ambiguity</option>
+                                        <option value="2">~1.1 km forced Ambiguity</option>
+                                        <option value="3">~11 km forced Ambiguity</option>
+                                    </select>
+                                </div>
+                                <div class="col-12 mt-3">
                                     <div class="form-check form-switch">
                                         <input
                                             type="checkbox"
@@ -628,21 +633,6 @@
                                             for="beacon.gpsActive"
                                             class="form-label"
                                             >Send Real-GPS Beacon <small>(Only for Boards with GPS Modules)</small>
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="col-12">
-                                    <div class="form-check form-switch">
-                                        <input
-                                            type="checkbox"
-                                            name="beacon.gpsAmbiguity"
-                                            id="beacon.gpsAmbiguity"
-                                            class="form-check-input"
-                                        />
-                                        <label
-                                            for="beacon.gpsAmbiguity"
-                                            class="form-label"
-                                            >Send Real-GPS Beacon with Ambiguity <small>(~ 1 Km of Random Error)</small>
                                         </label>
                                     </div>
                                 </div>
@@ -723,15 +713,9 @@
                                             name="digi.mode"
                                             id="digi.mode"
                                         >
-                                            <option value="0">
-                                                OFF
-                                            </option>
-                                            <option value="2">
-                                                WIDE1 (fill-in) Digi
-                                            </option>
-                                            <option value="3">
-                                                WIDE2 (+WIDE1) Digi
-                                            </option>
+                                            <option value="0" selected>OFF</option>
+                                            <option value="2">WIDE1 (fill-in) Digi</option>
+                                            <option value="3">WIDE2 (+WIDE1) Digi</option>
                                         </select>
                                     </div>
                                     <div class="col-12 mt-3">
@@ -748,15 +732,9 @@
                                             name="digi.ecoMode"
                                             id="digi.ecoMode"
                                         >
-                                            <option value="0">
-                                                OFF (Normal Mode - WiFiAP and Serial Output enabled)
-                                            </option>
-                                            <option value="1">
-                                                Ultra Eco Mode (Sleep till Packet Rx (WiFiAP/WebUI & Display disabled))
-                                            </option>
-                                            <option value="2">
-                                                OFF (Normal Mode - WiFiAP disabled but Serial Output still enabled)
-                                            </option>
+                                            <option value="0" selected>OFF (Normal Mode - WiFiAP and Serial Output enabled)</option>
+                                            <option value="1">Ultra Eco Mode (Sleep till Packet Rx (WiFiAP/WebUI & Display disabled))</option>
+                                            <option value="2">OFF (Normal Mode - WiFiAP disabled but Serial Output still enabled)</option>
                                         </select>
                                     </div>
                                 </div>

@@ -131,7 +131,7 @@ function loadSettings(settings) {
     StatusPacket.disabled   = !StatusCheckbox.checked;
 
     document.getElementById("beacon.gpsActive").checked                 = settings.beacon.gpsActive;
-    document.getElementById("beacon.gpsAmbiguity").checked              = settings.beacon.gpsAmbiguity;
+    document.getElementById("beacon.ambiguityLevel").value              = settings.beacon.ambiguityLevel;
 
     // Black List
     document.getElementById("blacklist").value                          = settings.blacklist;

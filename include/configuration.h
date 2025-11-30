@@ -51,7 +51,7 @@ public:
     bool    statusActive;
     String  statusPacket;
     bool    gpsActive;
-    bool    gpsAmbiguity;    
+    int     ambiguityLevel;
 };
 
 class APRS_IS {

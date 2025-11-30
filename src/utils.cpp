@@ -16,6 +16,7 @@
  * along with LoRa APRS iGate. If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <APRSPacketLib.h>
 #include <TinyGPS++.h>
 #include <WiFi.h>
 #include "telemetry_utils.h"
@@ -71,12 +72,8 @@ String      secondaryBeaconPacket;
 namespace Utils {
 
     void processStatus() {
-        String status = Config.callsign;
-        status.concat(">APLRG1");
-        if (Config.beacon.path.indexOf("WIDE") == 0) {
-            status.concat(",");
-            status.concat(Config.beacon.path);
-        }
+        String status = APRSPacketLib::generateBasePacket(Config.callsign, "APLRG1", Config.beacon.path);
+
         if (WiFi.status() == WL_CONNECTED && Config.aprs_is.active && Config.beacon.sendViaAPRSIS) {
             delay(1000);
             status.concat(",qAC:>");
@@ -161,18 +158,27 @@ namespace Utils {
 
             showActiveStations();
 
-            beaconPacket            = iGateBeaconPacket;
-            secondaryBeaconPacket   = iGateLoRaBeaconPacket;
             #ifdef HAS_GPS
                 if (Config.beacon.gpsActive && Config.digi.ecoMode == 0) {
                     GPS_Utils::getData();
                     if (gps.location.isUpdated() && gps.location.lat() != 0.0 && gps.location.lng() != 0.0) {
-                        GPS_Utils::generateBeaconFirstPart();
-                        String encodedGPS = GPS_Utils::encodeGPS(gps.location.lat(), gps.location.lng(), Config.beacon.overlay, Config.beacon.symbol);
-                        beaconPacket = iGateBeaconPacket + encodedGPS;
-                        secondaryBeaconPacket = iGateLoRaBeaconPacket + encodedGPS;
+                        String basePacket   = APRSPacketLib::generateBasePacket(Config.callsign, "APLRG1", Config.beacon.path);
+                        String encodedGPS   = APRSPacketLib::encodeGPSIntoBase91(gps.location.lat(),gps.location.lng(), 0, 0, Config.beacon.symbol, true, 0, true, Config.beacon.ambiguityLevel);
+
+                        beaconPacket    = basePacket;
+                        beaconPacket    += ",qAC:!";
+                        beaconPacket    += Config.beacon.overlay;
+                        beaconPacket    += encodedGPS;
+
+                        secondaryBeaconPacket   = basePacket;
+                        secondaryBeaconPacket   += ":=";
+                        secondaryBeaconPacket   += Config.beacon.overlay;
+                        secondaryBeaconPacket   += encodedGPS;
                     }
                 }
+            #else
+                beaconPacket            = iGateBeaconPacket;
+                secondaryBeaconPacket   = iGateLoRaBeaconPacket;
             #endif
 
             if (Config.wxsensor.active) {

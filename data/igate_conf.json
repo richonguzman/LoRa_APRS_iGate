@@ -21,7 +21,7 @@
         "statusActive": false,
         "statusPacket": "",
         "gpsActive": false,
-        "gpsAmbiguity": false
+        "ambiguityLevel": 0
     },
     "aprs_is": {
         "active": false,

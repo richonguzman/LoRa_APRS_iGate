@@ -191,7 +191,7 @@ namespace WEB_Utils {
         }
 
         Config.beacon.gpsActive             = request->hasParam("beacon.gpsActive", true);
-        Config.beacon.gpsAmbiguity          = request->hasParam("beacon.gpsAmbiguity", true);
+        Config.beacon.ambiguityLevel        = getParamIntSafe("beacon.ambiguityLevel", Config.beacon.ambiguityLevel);
 
         Config.personalNote                 = getParamStringSafe("personalNote", Config.personalNote);
 

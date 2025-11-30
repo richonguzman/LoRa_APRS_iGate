@@ -78,7 +78,7 @@ bool Configuration::writeFile() {
         data["beacon"]["statusPacket"]              = beacon.statusPacket;
 
         data["beacon"]["gpsActive"]                 = beacon.gpsActive;
-        data["beacon"]["gpsAmbiguity"]              = beacon.gpsAmbiguity;
+        data["beacon"]["ambiguityLevel"]            = beacon.ambiguityLevel;
 
         data["personalNote"]                        = personalNote;
 
@@ -232,7 +232,7 @@ bool Configuration::readFile() {
             !data["beacon"].containsKey("statusActive") ||
             !data["beacon"].containsKey("statusPacket") ||
             !data["beacon"].containsKey("gpsActive") ||
-            !data["beacon"].containsKey("gpsAmbiguity")) needsRewrite = true;
+            !data["beacon"].containsKey("ambiguityLevel")) needsRewrite = true;
         beacon.latitude                 = data["beacon"]["latitude"] | 0.0;
         beacon.longitude                = data["beacon"]["longitude"] | 0.0;
         beacon.comment                  = data["beacon"]["comment"] | "LoRa APRS";
@@ -246,7 +246,7 @@ bool Configuration::readFile() {
         beacon.statusActive             = data["beacon"]["statusActive"] | false;
         beacon.statusPacket             = data["beacon"]["statusPacket"] | "";
         beacon.gpsActive                = data["beacon"]["gpsActive"] | false;
-        beacon.gpsAmbiguity             = data["beacon"]["gpsAmbiguity"] | false;
+        beacon.ambiguityLevel           = data["beacon"]["ambiguityLevel"] | 0;
 
         if (!data.containsKey("personalNote")) needsRewrite = true;
         personalNote    	            = data["personalNote"] | "personal note here";
@@ -449,7 +449,7 @@ void Configuration::setDefaultValues() {
     beacon.statusPacket             = "";    
 
     beacon.gpsActive                = false;
-    beacon.gpsAmbiguity             = false;
+    beacon.ambiguityLevel           = 0;
 
     personalNote                    = "";   
 

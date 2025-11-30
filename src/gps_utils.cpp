@@ -16,6 +16,7 @@
  * along with LoRa APRS iGate. If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <APRSPacketLib.h>
 #include <TinyGPS++.h>
 #include <WiFi.h>
 #include "configuration.h"
@@ -42,70 +43,6 @@ namespace GPS_Utils {
         return iGateLoRaBeaconPacket;
     }
 
-    char *ax25_base91enc(char *s, uint8_t n, uint32_t v) {
-        for(s += n, *s = '\0'; n; n--) {
-            *(--s) = v % 91 + 33;
-            v /= 91;
-        }
-        return(s);
-    }
-
-    float roundToTwoDecimals(float degrees) {
-        return round(degrees * 100) / 100;
-    }
-
-    String encodeGPS(float latitude, float longitude, const String& overlay, const String& symbol) {
-        String encodedData = overlay;
-        uint32_t aprs_lat, aprs_lon;
-
-        float processedLatitude     = latitude;
-        float processedLongitude    = longitude;
-        if (Config.beacon.gpsActive && Config.beacon.gpsAmbiguity) {
-            processedLatitude       = roundToTwoDecimals(latitude);
-            processedLongitude      = roundToTwoDecimals(longitude);
-        }
-
-        aprs_lat = 900000000 - processedLatitude * 10000000;
-        aprs_lat = aprs_lat / 26 - aprs_lat / 2710 + aprs_lat / 15384615;
-        aprs_lon = 900000000 + processedLongitude * 10000000 / 2;
-        aprs_lon = aprs_lon / 26 - aprs_lon / 2710 + aprs_lon / 15384615;
-
-        String Ns, Ew, helper;
-        if(processedLatitude < 0) { Ns = "S"; } else { Ns = "N"; }
-        if(processedLatitude < 0) { processedLatitude = -processedLatitude; }
-
-        if(processedLongitude < 0) { Ew = "W"; } else { Ew = "E"; }
-        if(processedLongitude < 0) { processedLongitude = -processedLongitude; }
-
-        char helper_base91[] = {"0000\0"};
-        int i;
-        ax25_base91enc(helper_base91, 4, aprs_lat);
-        for (i = 0; i < 4; i++) {
-            encodedData += helper_base91[i];
-        }
-        ax25_base91enc(helper_base91, 4, aprs_lon);
-        for (i = 0; i < 4; i++) {
-            encodedData += helper_base91[i];
-        }
-        encodedData += symbol;
-        encodedData += "  ";
-        encodedData += "\x47";
-        return encodedData;
-    }
-
-    void generateBeaconFirstPart() {
-        String beaconPacket = Config.callsign;
-        beaconPacket += ">APLRG1";
-        if (Config.beacon.path.indexOf("WIDE") == 0) {
-            beaconPacket += ",";
-            beaconPacket += Config.beacon.path;
-        }
-        iGateBeaconPacket       = beaconPacket;
-        iGateBeaconPacket       += ",qAC:!";
-        iGateLoRaBeaconPacket   = beaconPacket;
-        iGateLoRaBeaconPacket   += ":!";
-    }
-
     void generateBeacons() {
         if (Config.callsign.indexOf("NOCALL-10") != 0 && !Utils::checkValidCallsign(Config.callsign)) {
             displayShow("***** ERROR ******", "CALLSIGN = NOT VALID!", "", "Only Rx Mode Active", 3000);
@@ -116,9 +53,17 @@ namespace GPS_Utils {
             Config.digi.mode            = 0;
             Config.backupDigiMode       = false;
         }
-        generateBeaconFirstPart();
-        String encodedGPS       = encodeGPS(Config.beacon.latitude, Config.beacon.longitude, Config.beacon.overlay, Config.beacon.symbol);
+        String beaconPacket     = APRSPacketLib::generateBasePacket(Config.callsign, "APLRG1", Config.beacon.path);
+        String encodedGPS       = APRSPacketLib::encodeGPSIntoBase91(Config.beacon.latitude, Config.beacon.longitude, 0, 0, Config.beacon.symbol, true, 0, true, Config.beacon.ambiguityLevel);
+        
+        iGateBeaconPacket       = beaconPacket;
+        iGateBeaconPacket       += ",qAC:!";
+        iGateBeaconPacket       += Config.beacon.overlay;
         iGateBeaconPacket       += encodedGPS;
+
+        iGateLoRaBeaconPacket   = beaconPacket;
+        iGateLoRaBeaconPacket   += ":=";
+        iGateLoRaBeaconPacket   += Config.beacon.overlay;
         iGateLoRaBeaconPacket   += encodedGPS;
     }
 
@@ -126,47 +71,40 @@ namespace GPS_Utils {
         return TinyGPSPlus::distanceBetween(Config.beacon.latitude,Config.beacon.longitude, latitude, longitude) / 1000.0;
     }
 
+    String buildDistanceAndComment(float latitude, float longitude, const String& comment) {
+        distance = String(calculateDistanceTo(latitude, longitude),1);
+
+        String distanceAndComment = String(latitude,5);
+        distanceAndComment += "N / ";
+        distanceAndComment += String(longitude,5);
+        distanceAndComment += "E / ";
+        distanceAndComment += distance;
+        distanceAndComment += "km";
+
+        if (comment != "") {
+            distanceAndComment += " / ";
+            distanceAndComment += comment;
+        }
+        return distanceAndComment;
+
+    }
+
     String decodeEncodedGPS(const String& packet) {
         int indexOfExclamation  = packet.indexOf(":!");
         int indexOfEqual        = packet.indexOf(":=");
 
         const uint8_t OFFSET = 3;     // Offset for encoded data in the packet
-        String GPSPacket;
+        String infoGPS;
         if (indexOfExclamation > 10) {
-            GPSPacket = packet.substring(indexOfExclamation + OFFSET);
+            infoGPS = packet.substring(indexOfExclamation + OFFSET);
         } else if (indexOfEqual > 10) {
-            GPSPacket = packet.substring(indexOfEqual + OFFSET);
+            infoGPS = packet.substring(indexOfEqual + OFFSET);
         }
 
-        String encodedLatitude = GPSPacket.substring(0,4);
-        int Y1 = encodedLatitude[0] - 33;
-        int Y2 = encodedLatitude[1] - 33;
-        int Y3 = encodedLatitude[2] - 33;
-        int Y4 = encodedLatitude[3] - 33;
-        float decodedLatitude = 90.0 - (((Y1 * pow(91,3)) + (Y2 * pow(91,2)) + (Y3 * 91) + Y4) / 380926.0);
+        float decodedLatitude   = APRSPacketLib::decodeBase91EncodedLatitude(infoGPS.substring(0,4));
+        float decodedLongitude  = APRSPacketLib::decodeBase91EncodedLongitude(infoGPS.substring(4,8));
 
-        String encodedLongitude = GPSPacket.substring(4,8);
-        int X1 = encodedLongitude[0] - 33;
-        int X2 = encodedLongitude[1] - 33;
-        int X3 = encodedLongitude[2] - 33;
-        int X4 = encodedLongitude[3] - 33;
-        float decodedLongitude = -180.0 + (((X1 * pow(91,3)) + (X2 * pow(91,2)) + (X3 * 91) + X4) / 190463.0);
-
-        distance = String(calculateDistanceTo(decodedLatitude, decodedLongitude),1);
-
-        String decodedGPS = String(decodedLatitude,5);
-        decodedGPS += "N / ";
-        decodedGPS += String(decodedLongitude,5);
-        decodedGPS += "E / ";
-        decodedGPS += distance;
-        decodedGPS += "km";
-
-        String comment = GPSPacket.substring(12);
-        if (comment != "") {
-            decodedGPS += " / ";
-            decodedGPS += comment;
-        }
-        return decodedGPS;
+        return buildDistanceAndComment(decodedLatitude, decodedLongitude, infoGPS.substring(12));
     }
 
     String getReceivedGPS(const String& packet) {
@@ -195,21 +133,7 @@ namespace GPS_Utils {
         convertedLongitude += Longitude.substring(Longitude.indexOf(".") + 1, Longitude.indexOf(".") + 3).toFloat() / (60*100);
         if (Longitude.endsWith("W")) convertedLongitude = -convertedLongitude;  // Handle Western Hemisphere
         
-        distance = String(calculateDistanceTo(convertedLatitude, convertedLongitude),1);
-
-        String decodedGPS = String(convertedLatitude,5);
-        decodedGPS += "N / ";
-        decodedGPS += String(convertedLongitude,5);
-        decodedGPS += "E / ";
-        decodedGPS += distance;
-        decodedGPS += "km";
-
-        String comment = infoGPS.substring(19);  
-        if (comment != "") {
-            decodedGPS += " / ";
-            decodedGPS += comment;
-        }
-        return decodedGPS;
+        return buildDistanceAndComment(convertedLatitude, convertedLongitude, infoGPS.substring(19));
     }
 
     String getDistanceAndComment(const String& packet) {
