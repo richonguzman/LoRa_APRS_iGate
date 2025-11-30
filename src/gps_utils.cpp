@@ -54,7 +54,7 @@ namespace GPS_Utils {
             Config.backupDigiMode       = false;
         }
         String beaconPacket     = APRSPacketLib::generateBasePacket(Config.callsign, "APLRG1", Config.beacon.path);
-        String encodedGPS       = APRSPacketLib::encodeGPSIntoBase91(Config.beacon.latitude, Config.beacon.longitude, 0, 0, Config.beacon.symbol, true, 0, true, Config.beacon.ambiguityLevel);
+        String encodedGPS       = APRSPacketLib::encodeGPSIntoBase91(Config.beacon.latitude, Config.beacon.longitude, 0, 0, Config.beacon.symbol, false, 0, true, Config.beacon.ambiguityLevel);
         
         iGateBeaconPacket       = beaconPacket;
         iGateBeaconPacket       += ",qAC:!";

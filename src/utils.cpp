@@ -163,7 +163,7 @@ namespace Utils {
                     GPS_Utils::getData();
                     if (gps.location.isUpdated() && gps.location.lat() != 0.0 && gps.location.lng() != 0.0) {
                         String basePacket   = APRSPacketLib::generateBasePacket(Config.callsign, "APLRG1", Config.beacon.path);
-                        String encodedGPS   = APRSPacketLib::encodeGPSIntoBase91(gps.location.lat(),gps.location.lng(), 0, 0, Config.beacon.symbol, true, 0, true, Config.beacon.ambiguityLevel);
+                        String encodedGPS   = APRSPacketLib::encodeGPSIntoBase91(gps.location.lat(),gps.location.lng(), 0, 0, Config.beacon.symbol, false, 0, true, Config.beacon.ambiguityLevel);
 
                         beaconPacket    = basePacket;
                         beaconPacket    += ",qAC:!";
