@@ -145,7 +145,6 @@
                                             id="beacon.comment"
                                             class="form-control"
                                             placeholder="LoRa APRS"
-                                            required=""
                                         />
                                     </div>
                                     <div class="col-12 mt-3">
@@ -603,23 +602,23 @@
                                             </span>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="col-12 mt-3">
-                                    <label
-                                        for="beacon.ambiguityLevel"
-                                        class="form-label"
-                                        >APRS Position Ambiguity</label
-                                    >
-                                    <select
-                                        class="form-select form-select"
-                                        name="beacon.ambiguityLevel"
-                                        id="beacon.ambiguityLevel"
-                                    >
-                                        <option value="0" selected>No Ambiguity</option>
-                                        <option value="1">~110 m forced Ambiguity</option>
-                                        <option value="2">~1.1 km forced Ambiguity</option>
-                                        <option value="3">~11 km forced Ambiguity</option>
-                                    </select>
+                                    <div class="col-6">
+                                        <label
+                                            for="beacon.ambiguityLevel"
+                                            class="form-label"
+                                            >APRS Position Ambiguity</label
+                                        >
+                                        <select
+                                            class="form-select form-select"
+                                            name="beacon.ambiguityLevel"
+                                            id="beacon.ambiguityLevel"
+                                        >
+                                            <option value="0" selected>No Ambiguity</option>
+                                            <option value="1">~110 m forced Ambiguity</option>
+                                            <option value="2">~1.1 km forced Ambiguity</option>
+                                            <option value="3">~11 km forced Ambiguity</option>
+                                        </select>
+                                    </div>
                                 </div>
                                 <div class="col-12 mt-3">
                                     <div class="form-check form-switch">
