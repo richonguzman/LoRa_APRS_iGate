@@ -111,11 +111,12 @@ bool Configuration::writeFile() {
         data["battery"]["internalSleepVoltage"]     = battery.internalSleepVoltage;
 
         data["battery"]["sendExternalVoltage"]      = battery.sendExternalVoltage;
-        data["battery"]["externalVoltagePin"]       = battery.externalVoltagePin;
         data["battery"]["monitorExternalVoltage"]   = battery.monitorExternalVoltage;
         data["battery"]["externalSleepVoltage"]     = battery.externalSleepVoltage;
+        data["battery"]["externalI2CSensor"]        = battery.externalI2CSensor;
         data["battery"]["voltageDividerR1"]         = battery.voltageDividerR1;
         data["battery"]["voltageDividerR2"]         = battery.voltageDividerR2;
+        data["battery"]["externalVoltagePin"]       = battery.externalVoltagePin;
 
         data["battery"]["sendVoltageAsTelemetry"]   = battery.sendVoltageAsTelemetry;
 
@@ -297,21 +298,23 @@ bool Configuration::readFile() {
             !data["battery"].containsKey("monitorInternalVoltage") ||
             !data["battery"].containsKey("internalSleepVoltage") ||
             !data["battery"].containsKey("sendExternalVoltage") ||
-            !data["battery"].containsKey("externalVoltagePin") ||
             !data["battery"].containsKey("monitorExternalVoltage") ||
             !data["battery"].containsKey("externalSleepVoltage") ||
+            !data["battery"].containsKey("externalI2CSensor") ||
             !data["battery"].containsKey("voltageDividerR1") ||
             !data["battery"].containsKey("voltageDividerR2") ||
+            !data["battery"].containsKey("externalVoltagePin") ||
             !data["battery"].containsKey("sendVoltageAsTelemetry")) needsRewrite = true;
         battery.sendInternalVoltage     = data["battery"]["sendInternalVoltage"] | false;
         battery.monitorInternalVoltage  = data["battery"]["monitorInternalVoltage"] | false;
         battery.internalSleepVoltage    = data["battery"]["internalSleepVoltage"] | 2.9;
         battery.sendExternalVoltage     = data["battery"]["sendExternalVoltage"] | false;
-        battery.externalVoltagePin      = data["battery"]["externalVoltagePin"] | 34;
         battery.monitorExternalVoltage  = data["battery"]["monitorExternalVoltage"] | false;
         battery.externalSleepVoltage    = data["battery"]["externalSleepVoltage"] | 10.9;
+        battery.externalI2CSensor       = data["battery"]["externalI2CSensor"] | 0;
         battery.voltageDividerR1        = data["battery"]["voltageDividerR1"] | 100.0;
         battery.voltageDividerR2        = data["battery"]["voltageDividerR2"] | 27.0;
+        battery.externalVoltagePin      = data["battery"]["externalVoltagePin"] | 34;
         battery.sendVoltageAsTelemetry  = data["battery"]["sendVoltageAsTelemetry"] | false;
 
         if (!data["wxsensor"].containsKey("active") ||
@@ -479,11 +482,12 @@ void Configuration::setDefaultValues() {
     battery.internalSleepVoltage    = 2.9;
 
     battery.sendExternalVoltage     = false;
-    battery.externalVoltagePin      = 34;
     battery.monitorExternalVoltage  = false;
     battery.externalSleepVoltage    = 10.9;
+    battery.externalI2CSensor       = 0;
     battery.voltageDividerR1        = 100.0;
     battery.voltageDividerR2        = 27.0;
+    battery.externalVoltagePin      = 34;
 
     battery.sendVoltageAsTelemetry  = false;
 

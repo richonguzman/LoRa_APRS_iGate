@@ -102,6 +102,7 @@ public:
     int     externalVoltagePin;
     bool    monitorExternalVoltage;
     float   externalSleepVoltage;
+    int     externalI2CSensor;
     float   voltageDividerR1;
     float   voltageDividerR2;
     bool    sendVoltageAsTelemetry;
