@@ -61,11 +61,12 @@
         "monitorInternalVoltage": false,
         "internalSleepVoltage": 2.9,
         "sendExternalVoltage": false,
-        "externalVoltagePin": 34,
         "monitorExternalVoltage": false,
         "externalSleepVoltage": 10.9,
+        "useExternalI2CSensor": false,
         "voltageDividerR1": 100.0,
         "voltageDividerR2": 27.0,
+        "externalVoltagePin": 34,
         "sendVoltageAsTelemetry": false
 	},
     "wxsensor": {

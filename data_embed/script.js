@@ -168,13 +168,16 @@ function loadSettings(settings) {
     MonitorInternalSleepVoltage.disabled    = !MonitorInternalVoltageCheckbox.checked;
 
     document.getElementById("battery.sendExternalVoltage").checked      = settings.battery.sendExternalVoltage;
+    document.getElementById("battery.useExternalI2CSensor").checked     = settings.battery.useExternalI2CSensor;
     document.getElementById("battery.externalVoltagePin").value         = settings.battery.externalVoltagePin;
     document.getElementById("battery.voltageDividerR1").value           = settings.battery.voltageDividerR1.toFixed(1);
     document.getElementById("battery.voltageDividerR2").value           = settings.battery.voltageDividerR2.toFixed(1);
     SendExternalVoltageCheckbox.checked     = settings.battery.sendExternalVoltage;
-    ExternalVoltagePin.disabled             = !SendExternalVoltageCheckbox.checked;
-    ExternalVoltageDividerR1.disabled       = !SendExternalVoltageCheckbox.checked;
-    ExternalVoltageDividerR2.disabled       = !SendExternalVoltageCheckbox.checked;
+    UseExternalI2CSensorCheckbox.disabled   = !SendExternalVoltageCheckbox.checked;
+    ExternalVoltagePin.disabled             = !SendExternalVoltageCheckbox.checked || UseExternalI2CSensorCheckbox.checked;
+    ExternalVoltageDividerR1.disabled       = !SendExternalVoltageCheckbox.checked || UseExternalI2CSensorCheckbox.checked;
+    ExternalVoltageDividerR2.disabled       = !SendExternalVoltageCheckbox.checked || UseExternalI2CSensorCheckbox.checked;
+
 
     document.getElementById("battery.monitorExternalVoltage").checked   = settings.battery.monitorExternalVoltage;
     document.getElementById("battery.externalSleepVoltage").value       = settings.battery.externalSleepVoltage.toFixed(1);
@@ -218,12 +221,12 @@ function loadSettings(settings) {
     document.getElementById("mqtt.port").value                          = settings.mqtt.port;
     document.getElementById("mqtt.beaconOverMqtt").checked              = settings.mqtt.beaconOverMqtt;
     MqttCheckbox.checked        = settings.mqtt.active;
-    MqttServer.disabled         = !MqttCheckbox.check;
-    MqttTopic.disabled          = !MqttCheckbox.check;
-    MqttUsername.disabled       = !MqttCheckbox.check;
-    MqttPassword.disabled       = !MqttCheckbox.check;
-    MqttPort.disabled           = !MqttCheckbox.check;
-    MqttBeaconOverMqtt.disabled = !MqttCheckbox.check;
+    MqttServer.disabled         = !MqttCheckbox.checked;
+    MqttTopic.disabled          = !MqttCheckbox.checked;
+    MqttUsername.disabled       = !MqttCheckbox.checked;
+    MqttPassword.disabled       = !MqttCheckbox.checked;
+    MqttPort.disabled           = !MqttCheckbox.checked;
+    MqttBeaconOverMqtt.disabled = !MqttCheckbox.checked;
 
     // Reboot
     document.getElementById("other.rebootMode").checked                 = settings.other.rebootMode;
@@ -360,13 +363,21 @@ MonitorExternalVoltageCheckbox.addEventListener("change", function () {
     MonitorExternalSleepVoltage.disabled    = !this.checked;
 });
 const SendExternalVoltageCheckbox           = document.querySelector('input[name="battery.sendExternalVoltage"]');
+const UseExternalI2CSensorCheckbox          = document.querySelector('input[name="battery.useExternalI2CSensor"]');
 const ExternalVoltagePin                    = document.querySelector('input[name="battery.externalVoltagePin"]');
 const ExternalVoltageDividerR1              = document.querySelector('input[name="battery.voltageDividerR1"]');
 const ExternalVoltageDividerR2              = document.querySelector('input[name="battery.voltageDividerR2"]');
 SendExternalVoltageCheckbox.addEventListener("change", function () {
-    ExternalVoltagePin.disabled             = !this.checked;
-    ExternalVoltageDividerR1.disabled       = !this.checked;
-    ExternalVoltageDividerR2.disabled       = !this.checked;
+    UseExternalI2CSensorCheckbox.disabled   = !this.checked;
+    ExternalVoltagePin.disabled             = !this.checked || UseExternalI2CSensorCheckbox.checked;
+    ExternalVoltageDividerR1.disabled       = !this.checked || UseExternalI2CSensorCheckbox.checked;
+    ExternalVoltageDividerR2.disabled       = !this.checked || UseExternalI2CSensorCheckbox.checked;
+});
+
+UseExternalI2CSensorCheckbox.addEventListener("change", function () {
+    ExternalVoltagePin.disabled             = this.checked;
+    ExternalVoltageDividerR1.disabled       = this.checked;
+    ExternalVoltageDividerR2.disabled       = this.checked;
 });
 
 // Telemetry Switches

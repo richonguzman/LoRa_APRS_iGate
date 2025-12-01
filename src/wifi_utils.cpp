@@ -132,7 +132,7 @@ namespace WIFI_Utils {
             digitalWrite(INTERNAL_LED_PIN,LOW);
         #endif
         if (WiFi.status() == WL_CONNECTED) {
-            Serial.print("Connected as ");
+            Serial.print("\nConnected as ");
             Serial.print(WiFi.localIP());
             Serial.print(" / MAC Address: ");
             Serial.println(WiFi.macAddress());

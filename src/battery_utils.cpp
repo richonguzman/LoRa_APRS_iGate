@@ -37,9 +37,8 @@ float   multiplyCorrection              = 0.035;
 
 float   voltageDividerTransformation    = 0.0;
 
-//bool    externalI2CSensorFound          = false;
 uint8_t externalI2CSensorAddress        = 0x00;
-int     externalI2CSensorType           = 0; // 0 = None | 1 = INA219 | 2 = INA226 | 3 = INA3221
+int     externalI2CSensorType           = 0; // 0 = None | 1 = INA219
 
 Adafruit_INA219     ina219;
 

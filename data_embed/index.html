@@ -1196,7 +1196,20 @@
                                                 >Send External Voltage</label
                                             >
                                         </div>
-                                        <div class="form-check form-switch mt-5">
+                                        <div class="form-check form-switch">
+                                            <input
+                                                type="checkbox"
+                                                name="battery.useExternalI2CSensor"
+                                                id="battery.useExternalI2CSensor"
+                                                class="form-check-input"
+                                            />
+                                            <label
+                                                for="battery.useExternalI2CSensor"
+                                                class="form-label"
+                                                >Use External I2C Voltage Sensor</label
+                                            >
+                                        </div>
+                                        <div class="form-check form-switch">
                                             <input
                                                 type="checkbox"
                                                 name="battery.monitorExternalVoltage"
@@ -2009,6 +2022,7 @@
                                             name="remoteManagement.managers"
                                             id="remoteManagement.managers"
                                             class="form-control"
+                                            oninput="this.value = this.value.toUpperCase();"
                                         />
                                     </div>
                                 </div>
