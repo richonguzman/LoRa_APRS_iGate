@@ -51,6 +51,7 @@ ____________________________________________________
 <br />
 
 # Timeline (Versions):
+- 2025-12-01 APRSPacketLib updates, AHT20 sensor added.
 - 2025-10-15 APRS Bridge for TNC added.
 - 2025-10-13 Rx and Tx Frequencies are now with fully configurable.
 - 2025-10-13 Startup Delay to allow the Router/Modem to start WiFiAP before connecting.
