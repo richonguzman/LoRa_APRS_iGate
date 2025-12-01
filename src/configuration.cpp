@@ -113,7 +113,7 @@ bool Configuration::writeFile() {
         data["battery"]["sendExternalVoltage"]      = battery.sendExternalVoltage;
         data["battery"]["monitorExternalVoltage"]   = battery.monitorExternalVoltage;
         data["battery"]["externalSleepVoltage"]     = battery.externalSleepVoltage;
-        data["battery"]["externalI2CSensor"]        = battery.externalI2CSensor;
+        data["battery"]["useExternalI2CSensor"]     = battery.useExternalI2CSensor;
         data["battery"]["voltageDividerR1"]         = battery.voltageDividerR1;
         data["battery"]["voltageDividerR2"]         = battery.voltageDividerR2;
         data["battery"]["externalVoltagePin"]       = battery.externalVoltagePin;
@@ -300,7 +300,7 @@ bool Configuration::readFile() {
             !data["battery"].containsKey("sendExternalVoltage") ||
             !data["battery"].containsKey("monitorExternalVoltage") ||
             !data["battery"].containsKey("externalSleepVoltage") ||
-            !data["battery"].containsKey("externalI2CSensor") ||
+            !data["battery"].containsKey("useExternalI2CSensor") ||
             !data["battery"].containsKey("voltageDividerR1") ||
             !data["battery"].containsKey("voltageDividerR2") ||
             !data["battery"].containsKey("externalVoltagePin") ||
@@ -311,7 +311,7 @@ bool Configuration::readFile() {
         battery.sendExternalVoltage     = data["battery"]["sendExternalVoltage"] | false;
         battery.monitorExternalVoltage  = data["battery"]["monitorExternalVoltage"] | false;
         battery.externalSleepVoltage    = data["battery"]["externalSleepVoltage"] | 10.9;
-        battery.externalI2CSensor       = data["battery"]["externalI2CSensor"] | 0;
+        battery.useExternalI2CSensor    = data["battery"]["useExternalI2CSensor"] | false;
         battery.voltageDividerR1        = data["battery"]["voltageDividerR1"] | 100.0;
         battery.voltageDividerR2        = data["battery"]["voltageDividerR2"] | 27.0;
         battery.externalVoltagePin      = data["battery"]["externalVoltagePin"] | 34;
@@ -484,7 +484,7 @@ void Configuration::setDefaultValues() {
     battery.sendExternalVoltage     = false;
     battery.monitorExternalVoltage  = false;
     battery.externalSleepVoltage    = 10.9;
-    battery.externalI2CSensor       = 0;
+    battery.useExternalI2CSensor    = false;
     battery.voltageDividerR1        = 100.0;
     battery.voltageDividerR2        = 27.0;
     battery.externalVoltagePin      = 34;

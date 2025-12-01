@@ -16,7 +16,7 @@
  * along with LoRa APRS iGate. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <Arduino.h>
+#include <Adafruit_INA219.h>
 #include "battery_utils.h"
 #include "configuration.h"
 #include "board_pinout.h"
@@ -37,6 +37,11 @@ float   multiplyCorrection              = 0.035;
 
 float   voltageDividerTransformation    = 0.0;
 
+//bool    externalI2CSensorFound          = false;
+uint8_t externalI2CSensorAddress        = 0x00;
+int     externalI2CSensorType           = 0; // 0 = None | 1 = INA219 | 2 = INA226 | 3 = INA3221
+
+Adafruit_INA219     ina219;
 
 
 #ifdef HAS_ADC_CALIBRATION
@@ -98,6 +103,30 @@ namespace BATTERY_Utils {
         #endif
     }
 
+    void getI2CVoltageSensorAddress() {
+        uint8_t err, addr;
+        for(addr = 1; addr < 0x7F; addr++) {
+            #if defined(HELTEC_V3) || defined(HELTEC_V3_2) || defined(HELTEC_WSL_V3) || defined(HELTEC_WSL_V3_DISPLAY)
+                Wire1.beginTransmission(addr);
+                err = Wire1.endTransmission();
+            #else
+                Wire.beginTransmission(addr);
+                err = Wire.endTransmission();
+            #endif
+            delay(5);
+            if (err == 0) {
+                if (addr == 0x40) { // INA219
+                    externalI2CSensorAddress = addr;
+                }
+            }
+        }
+    }
+
+    bool detectINA219(uint8_t addr) {
+        ina219 = Adafruit_INA219(addr);
+        return ina219.begin();
+    }
+
     void setup() {
         if ((Config.battery.sendExternalVoltage || Config.battery.monitorExternalVoltage) && Config.battery.voltageDividerR2 != 0) voltageDividerTransformation = (Config.battery.voltageDividerR1 + Config.battery.voltageDividerR2) / Config.battery.voltageDividerR2;
 
@@ -107,6 +136,14 @@ namespace BATTERY_Utils {
                 adcCalibration();
             }
         #endif
+
+        getI2CVoltageSensorAddress();
+        if (externalI2CSensorAddress != 0x00) {
+            if (detectINA219(externalI2CSensorAddress)) {
+                Serial.println("INA219 sensor found");
+                externalI2CSensorType = 1;  // INA219
+            }
+        }
     }
 
     float checkInternalVoltage() { 
@@ -177,37 +214,49 @@ namespace BATTERY_Utils {
     }
 
     float checkExternalVoltage() {
-        int sample;
-        int sampleSum = 0;
-        for (int i = 0; i < 100; i++) {
-            #ifdef HAS_ADC_CALIBRATION
-                if (calibrationEnable){
-                    sample = adc1_get_raw(ExternalVoltage_ADC_Channel);
-                } else {
+        if (externalI2CSensorType == 0) {
+            int sample;
+            int sampleSum = 0;
+            for (int i = 0; i < 100; i++) {
+                #ifdef HAS_ADC_CALIBRATION
+                    if (calibrationEnable){
+                        sample = adc1_get_raw(ExternalVoltage_ADC_Channel);
+                    } else {
+                        sample = analogRead(Config.battery.externalVoltagePin);
+                    }
+                #else
                     sample = analogRead(Config.battery.externalVoltagePin);
+                #endif
+                sampleSum += sample;
+                delayMicroseconds(50);
+            }
+
+            float extVoltage;
+            #ifdef HAS_ADC_CALIBRATION
+                if (calibrationEnable) {
+                    extVoltage = esp_adc_cal_raw_to_voltage(sampleSum / 100.0, &adc_chars) * voltageDividerTransformation; // in mV
+                    extVoltage /= 1000.0;
+                } else {
+                    extVoltage = ((((sampleSum/100.0)* adcReadingTransformation) + readingCorrection) * voltageDividerTransformation) - multiplyCorrection;
                 }
             #else
-                sample = analogRead(Config.battery.externalVoltagePin);
+                extVoltage = ((((sampleSum/100.0)* adcReadingTransformation) + readingCorrection) * voltageDividerTransformation) - multiplyCorrection;
             #endif
-            sampleSum += sample;
-            delayMicroseconds(50);
-        }
+            
+            return extVoltage; // raw voltage without mapping
 
-        float extVoltage;
-        #ifdef HAS_ADC_CALIBRATION
-            if (calibrationEnable){
-                extVoltage = esp_adc_cal_raw_to_voltage(sampleSum / 100, &adc_chars) * voltageDividerTransformation; // in mV
-                extVoltage /= 1000;
-            } else {
-                extVoltage = ((((sampleSum/100)* adcReadingTransformation) + readingCorrection) * voltageDividerTransformation) - multiplyCorrection;
+            // return mapVoltage(voltage, 5.05, 6.32, 4.5, 5.5); // mapped voltage
+        } else if (externalI2CSensorType == 1) { // INA219
+            int sampleSum = 0;
+            for (int i = 0; i < 100; i++) {
+                sampleSum += ina219.getBusVoltage_V() * 1000.0;
+                delayMicroseconds(50);
             }
-        #else
-            extVoltage = ((((sampleSum/100)* adcReadingTransformation) + readingCorrection) * voltageDividerTransformation) - multiplyCorrection;
-        #endif
-        
-        return extVoltage; // raw voltage without mapping
-
-        // return mapVoltage(voltage, 5.05, 6.32, 4.5, 5.5); // mapped voltage
+            float extVoltage = sampleSum/100.0;
+            return extVoltage/1000.0;
+        } else {
+            return 0.0;
+        }
     }
 
     void startupBatteryHealth() {

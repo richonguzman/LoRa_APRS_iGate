@@ -229,6 +229,9 @@ namespace WEB_Utils {
 
         Config.battery.sendExternalVoltage          = request->hasParam("battery.sendExternalVoltage", true);
         if (Config.battery.sendExternalVoltage) {
+            Config.battery.useExternalI2CSensor     = request->hasParam("battery.useExternalI2CSensor", true);
+        }
+        if (Config.battery.sendExternalVoltage) {
             Config.battery.externalVoltagePin       = getParamIntSafe("battery.externalVoltagePin", Config.battery.externalVoltagePin);
             Config.battery.voltageDividerR1         = getParamFloatSafe("battery.voltageDividerR1", Config.battery.voltageDividerR1);
             Config.battery.voltageDividerR2         = getParamFloatSafe("battery.voltageDividerR2", Config.battery.voltageDividerR2);
