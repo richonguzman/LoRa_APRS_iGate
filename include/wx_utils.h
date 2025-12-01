@@ -20,6 +20,7 @@
 #define WX_UTILS_H_
 
 #include <Adafruit_Sensor.h>
+#include <Adafruit_AHTX0.h> 
 #include <Adafruit_BME280.h>
 #include <Adafruit_BMP280.h>
 #include <Adafruit_BME680.h>
