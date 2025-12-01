@@ -270,21 +270,25 @@ namespace WX_Utils {
                 newPress    = 0;
                 break;
             case 5: // SHTC3
-                #ifdef LIGHTGATEWAY_PLUS_1_0
-                    sensors_event_t humidity, temp;
-                    shtc3.getEvent(&humidity, &temp);
-                    newTemp     = temp.temperature;
-                    newHum      = humidity.relative_humidity;
-                    newPress    = 0;
-                #endif
+                {
+                    #ifdef LIGHTGATEWAY_PLUS_1_0
+                        sensors_event_t humidity, temp;
+                        shtc3.getEvent(&humidity, &temp);
+                        newTemp     = temp.temperature;
+                        newHum      = humidity.relative_humidity;
+                        newPress    = 0;
+                    #endif
+                }
                 break;
             case 6: // BMP280 + AHT20
-                bmp280.takeForcedMeasurement();
-                newTemp     = bmp280.readTemperature();
-                newPress    = (bmp280.readPressure() / 100.0F);
-                sensors_event_t humidity, temp;
-                aht20.getEvent(&humidity, &temp);
-                newHum      = humidity.relative_humidity;
+                {
+                    bmp280.takeForcedMeasurement();
+                    newTemp     = bmp280.readTemperature();
+                    newPress    = (bmp280.readPressure() / 100.0F);
+                    sensors_event_t humidity, temp;
+                    aht20.getEvent(&humidity, &temp);
+                    newHum      = humidity.relative_humidity;
+                }
                 break;
         }
 
