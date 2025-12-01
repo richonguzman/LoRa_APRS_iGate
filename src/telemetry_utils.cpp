@@ -122,7 +122,7 @@ namespace TELEMETRY_Utils {
         telemetryCounter++;
         if (telemetryCounter == 1000) telemetryCounter = 0;
         if (Config.battery.sendInternalVoltage) telemetry += generateEncodedTelemetryBytes(BATTERY_Utils::checkInternalVoltage(), false, 0);
-        if (Config.battery.sendExternalVoltage) telemetry += generateEncodedTelemetryBytes(BATTERY_Utils::checkExternalVoltage(), false, 1);
+        if (Config.battery.sendExternalVoltage) telemetry += generateEncodedTelemetryBytes(BATTERY_Utils::checkExternalVoltage(), false, Config.battery.useExternalI2CSensor ? 0 : 1);
         telemetry += "|";
         return telemetry;
     }
