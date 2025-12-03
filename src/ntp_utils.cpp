@@ -45,7 +45,7 @@ namespace NTP_Utils {
     }
 
     String getFormatedTime() {
-        if (Config.digi.ecoMode == 0) return timeClient->getFormattedTime();
+        if (WiFi.status() == WL_CONNECTED && Config.digi.ecoMode == 0) return timeClient->getFormattedTime();
         return "DigiEcoMode Active";
     }
 
