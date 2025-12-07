@@ -12,7 +12,7 @@ ____________________________________________________
 # <a href="https://richonguzman.github.io/lora-igate-web-flasher/installer.html" target="_blank">WEB FLASHER/INSTALLER</a>
 
 
-# <a href="https://drive.google.com/file/d/1-jafzOWis_qOaNUl4WGVcFKjh_uCJtB6/view?usp=share_link" target="_blank">LoRa APRS iGate CA2RXU Firmware Manual</a>
+# <a href="https://drive.google.com/file/d/1Hff_Szd7ks8RC7_RiV6POxPJlclbO05M/view?usp=sharing" target="_blank">LoRa APRS iGate CA2RXU Firmware Manual</a>
 
 ____________________________________________________
 
