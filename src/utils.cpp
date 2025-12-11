@@ -158,6 +158,8 @@ namespace Utils {
 
             showActiveStations();
 
+            beaconPacket            = iGateBeaconPacket;
+            secondaryBeaconPacket   = iGateLoRaBeaconPacket;
             #ifdef HAS_GPS
                 if (Config.beacon.gpsActive && Config.digi.ecoMode == 0) {
                     GPS_Utils::getData();
@@ -176,9 +178,6 @@ namespace Utils {
                         secondaryBeaconPacket   += encodedGPS;
                     }
                 }
-            #else
-                beaconPacket            = iGateBeaconPacket;
-                secondaryBeaconPacket   = iGateLoRaBeaconPacket;
             #endif
 
             if (Config.wxsensor.active) {
