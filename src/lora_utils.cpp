@@ -138,7 +138,7 @@ namespace LoRa_Utils {
         #if defined(HAS_TCXO) && !defined(HAS_1W_LORA)
             radio.setDio2AsRfSwitch();
         #endif
-        #ifdef HAS_TCXO            
+        #ifdef HAS_TCXO
             radio.setTCXO(1.8);
         #endif
 
