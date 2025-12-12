@@ -135,6 +135,13 @@ namespace LoRa_Utils {
             radio.setRxBoostedGainMode(true);
         #endif
 
+        #if defined(HAS_TCXO) && !defined(HAS_1W_LORA)
+            radio.setDio2AsRfSwitch();
+        #endif
+        #ifdef HAS_TCXO            
+            radio.setTCXO(1.8);
+        #endif
+
         if (state == RADIOLIB_ERR_NONE) {
             Utils::println("init : LoRa Module    ...     done!");
         } else {
