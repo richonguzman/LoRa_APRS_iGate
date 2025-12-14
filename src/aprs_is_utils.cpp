@@ -16,6 +16,7 @@
  * along with LoRa APRS iGate. If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <APRSPacketLib.h> 
 #include <WiFi.h>
 #include "configuration.h"
 #include "aprs_is_utils.h"
@@ -236,12 +237,7 @@ namespace APRS_IS_Utils {
     String buildPacketToTx(const String& aprsisPacket, uint8_t packetType) {
         String packet = aprsisPacket;
         packet.trim();
-        String outputPacket = Config.callsign;
-        outputPacket += ">APLRG1";
-        if (Config.beacon.path != "") {
-            outputPacket += ",";
-            outputPacket += Config.beacon.path;
-        }
+        String outputPacket = APRSPacketLib::generateBasePacket(Config.callsign, "APLRG1", Config.beacon.path);
         outputPacket += ":}";
         outputPacket += packet.substring(0, packet.indexOf(",")); // Callsign>Tocall
         outputPacket.concat(",TCPIP,");

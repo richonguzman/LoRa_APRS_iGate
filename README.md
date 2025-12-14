@@ -12,7 +12,7 @@ ____________________________________________________
 # <a href="https://richonguzman.github.io/lora-igate-web-flasher/installer.html" target="_blank">WEB FLASHER/INSTALLER</a>
 
 
-# <a href="https://drive.google.com/file/d/1-jafzOWis_qOaNUl4WGVcFKjh_uCJtB6/view?usp=share_link" target="_blank">LoRa APRS iGate CA2RXU Firmware Manual</a>
+# <a href="https://drive.google.com/file/d/1Hff_Szd7ks8RC7_RiV6POxPJlclbO05M/view?usp=sharing" target="_blank">LoRa APRS iGate CA2RXU Firmware Manual</a>
 
 ____________________________________________________
 
@@ -51,6 +51,7 @@ ____________________________________________________
 <br />
 
 # Timeline (Versions):
+- 2025-12-01 APRSPacketLib updates, AHT20 sensor added, INA219 support added.
 - 2025-10-15 APRS Bridge for TNC added.
 - 2025-10-13 Rx and Tx Frequencies are now with fully configurable.
 - 2025-10-13 Startup Delay to allow the Router/Modem to start WiFiAP before connecting.

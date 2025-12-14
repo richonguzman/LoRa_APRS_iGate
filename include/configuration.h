@@ -51,7 +51,7 @@ public:
     bool    statusActive;
     String  statusPacket;
     bool    gpsActive;
-    bool    gpsAmbiguity;    
+    int     ambiguityLevel;
 };
 
 class APRS_IS {
@@ -102,6 +102,7 @@ public:
     int     externalVoltagePin;
     bool    monitorExternalVoltage;
     float   externalSleepVoltage;
+    bool    useExternalI2CSensor;
     float   voltageDividerR1;
     float   voltageDividerR2;
     bool    sendVoltageAsTelemetry;

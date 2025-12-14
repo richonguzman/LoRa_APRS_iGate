@@ -57,7 +57,7 @@ bool packetIsBeacon             = false;
 
 namespace STATION_Utils {
 
-    std::vector<String> loadCallSignList(const String& list) {
+    std::vector<String> loadCallsignList(const String& list) {
         std::vector<String> loadedList;
 
         String callsigns = list;
@@ -77,12 +77,12 @@ namespace STATION_Utils {
     }
 
     void loadBlacklistAndManagers() {
-        blacklist   = loadCallSignList(Config.blacklist);
-        managers    = loadCallSignList(Config.remoteManagement.managers);
+        blacklist   = loadCallsignList(Config.blacklist);
+        managers    = loadCallsignList(Config.remoteManagement.managers);
     }
 
     bool checkCallsignList(const std::vector<String>& list, const String& callsign) {
-        for (int i = 0; i < list.size(); i++) {
+        for (size_t i = 0; i < list.size(); i++) {
             int wildcardIndex = list[i].indexOf("*");
             if (wildcardIndex >= 0) {
                 String wildcard = list[i].substring(0, wildcardIndex);
