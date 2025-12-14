@@ -126,7 +126,7 @@ namespace WX_Utils {
                             }
                         }
                     }
-                } else if (wxModuleAddress == 0x40) {
+                } else if (wxModuleAddress == 0x40 && Config.battery.useExternalI2CSensor == false) {
                     if(si7021.begin()) {
                         Serial.println("Si7021 sensor found");
                         wxModuleType    = 4;
