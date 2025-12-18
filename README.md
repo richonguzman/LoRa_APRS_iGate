@@ -51,6 +51,7 @@ ____________________________________________________
 <br />
 
 # Timeline (Versions):
+- 2025-12-18 TCXO and packet decoding updates.
 - 2025-12-01 APRSPacketLib updates, AHT20 sensor added, INA219 support added.
 - 2025-10-15 APRS Bridge for TNC added.
 - 2025-10-13 Rx and Tx Frequencies are now with fully configurable.
