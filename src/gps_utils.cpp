@@ -153,7 +153,7 @@ namespace GPS_Utils {
 
             if (encodedBytePosition != 0) {
                 char currentChar = packet[encodedBytePosition];
-                if (currentChar == 'G' || currentChar == 'Q' || currentChar == '[' || currentChar == 'H' || currentChar == 'X') {
+                if (currentChar == 'G' || currentChar == 'Q' || currentChar == '[' || currentChar == 'H' || currentChar == 'X' || currentChar == '3') {
                     return decodeEncodedGPS(packet);    // If valid encoded data position is found, decode it
                 } else {
                     return getReceivedGPS(packet);
