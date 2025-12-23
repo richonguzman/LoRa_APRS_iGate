@@ -47,9 +47,9 @@
             #ifdef HELTEC_WP_V1
                 EInkDisplay_WirelessPaperV1_1 display;
             #endif
-            /*#ifdef HELTEC_WP_V1_2
+            #ifdef HELTEC_WP_V1_2
                 EInkDisplay_WirelessPaperV1_2 display;
-            #endif*/
+            #endif
             #ifdef HELTEC_VM_E290
                 EInkDisplay_VisionMasterE290 display;
             #endif
@@ -100,17 +100,14 @@ void displaySetup() {
             #ifdef HAS_EPAPER
                 display.landscape();
                 display.printCenter("LoRa APRS iGate Initialising...");
-                if (Config.display.turn180) 
-                    #ifdef HELTEC_VM_E290 
+                if (Config.display.turn180) {
+                    #if defined(HELTEC_VM_E290) || defined(HELTEC_WP_V1)
                         display.setRotation(3);
-                    #else
-                        #ifdef HELTEC_WP_V1_2
-                            display.setRotation(1);
-                        #else
-                            display.setRotation(3)
-                        #endif
                     #endif
-
+                    #if defined(HELTEC_WP_V1_2)
+                        display.setRotation(1);
+                    #endif
+                }
                 display.update();
             #else
                 #ifdef OLED_DISPLAY_HAS_RST_PIN
