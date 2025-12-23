@@ -49,7 +49,7 @@ namespace POWER_Utils {
 
     #ifdef VEXT_CTRL
         void vext_ctrl_ON() {
-            #if defined(HELTEC_WIRELESS_TRACKER) || defined(HELTEC_V3)
+            #if defined(HELTEC_WIRELESS_TRACKER) || defined(HELTEC_V3) || defined(HELTEC_VM_E290)
                 digitalWrite(VEXT_CTRL, Config.digi.ecoMode == 1 ? LOW : HIGH);
             #endif
             #if defined(HELTEC_WP_V1) || defined(HELTEC_WS) || defined(HELTEC_V3_2) || defined(HELTEC_WSL_V3)
@@ -58,7 +58,7 @@ namespace POWER_Utils {
         }
 
         void vext_ctrl_OFF() {
-            #if defined(HELTEC_WIRELESS_TRACKER) || defined(HELTEC_V3)
+            #if defined(HELTEC_WIRELESS_TRACKER) || defined(HELTEC_V3) || defined(HELTEC_VM_E290)
                 digitalWrite(VEXT_CTRL, Config.digi.ecoMode == 1 ? HIGH : LOW);
             #endif
             #if defined(HELTEC_WP_V1) || defined(HELTEC_WS) || defined(HELTEC_V3_2) || defined(HELTEC_WSL_V3)
@@ -70,7 +70,7 @@ namespace POWER_Utils {
 
     #ifdef ADC_CTRL
         void adc_ctrl_ON() {
-            #if defined(HELTEC_WIRELESS_TRACKER) || defined(HELTEC_V3_2)
+            #if defined(HELTEC_WIRELESS_TRACKER) || defined(HELTEC_V3_2) || defined(HELTEC_VM_E290)
                 digitalWrite(ADC_CTRL, HIGH);
             #endif
             #if defined(HELTEC_V3) || defined(HELTEC_V2) || defined(HELTEC_WSL_V3) || defined(HELTEC_WP_V1)
@@ -79,7 +79,7 @@ namespace POWER_Utils {
         }
 
         void adc_ctrl_OFF() {
-            #if defined(HELTEC_WIRELESS_TRACKER) || defined(HELTEC_V3_2)
+            #if defined(HELTEC_WIRELESS_TRACKER) || defined(HELTEC_V3_2) || defined(HELTEC_VM_E290)
                 digitalWrite(ADC_CTRL, LOW);
             #endif
             #if defined(HELTEC_V3) || defined(HELTEC_V2) || defined(HELTEC_WSL_V3) || defined(HELTEC_WP_V1)
