@@ -57,7 +57,7 @@ namespace GPS_Utils {
         String encodedGPS       = APRSPacketLib::encodeGPSIntoBase91(Config.beacon.latitude, Config.beacon.longitude, 0, 0, Config.beacon.symbol, false, 0, true, Config.beacon.ambiguityLevel);
         
         iGateBeaconPacket       = beaconPacket;
-        iGateBeaconPacket       += ",qAC:!";
+        iGateBeaconPacket       += ",qAC:=";
         iGateBeaconPacket       += Config.beacon.overlay;
         iGateBeaconPacket       += encodedGPS;
 
@@ -132,7 +132,7 @@ namespace GPS_Utils {
         convertedLongitude += Longitude.substring(3,5).toFloat() / 60;          // Next 2 digits (Minutes)
         convertedLongitude += Longitude.substring(Longitude.indexOf(".") + 1, Longitude.indexOf(".") + 3).toFloat() / (60*100);
         if (Longitude.endsWith("W")) convertedLongitude = -convertedLongitude;  // Handle Western Hemisphere
-        
+
         return buildDistanceAndComment(convertedLatitude, convertedLongitude, infoGPS.substring(19));
     }
 
@@ -159,15 +159,14 @@ namespace GPS_Utils {
         int encondedByteIndex   = baseIndex + encondedByteOffset;
         int packetLength        = packet.length();
 
-        if (latitudeIndex >= packetLength || longitudeIndex >= packetLength || encondedByteIndex >= packetLength) return " _ / _ / _ ";
-
-        char latChar = packet[latitudeIndex];
-        char lngChar = packet[longitudeIndex];
-        if ((latChar == 'N' || latChar == 'S') && (lngChar == 'E' || lngChar == 'W')) return getReceivedGPS(packet);
-        
-        char byteChar = packet[encondedByteIndex];
-        if (byteChar == 'G' || byteChar == 'Q' || byteChar == '[' || byteChar == 'H' || byteChar == 'X' || byteChar == '3') return decodeEncodedGPS(packet);
-
+        if (latitudeIndex < packetLength && longitudeIndex < packetLength) {
+            char latChar = packet[latitudeIndex];
+            char lngChar = packet[longitudeIndex];
+            if ((latChar == 'N' || latChar == 'S') && (lngChar == 'E' || lngChar == 'W')) return getReceivedGPS(packet);
+        } else if (encondedByteIndex < packetLength) {
+            char byteChar = packet[encondedByteIndex];
+            if (byteChar == 'G' || byteChar == 'Q' || byteChar == '[' || byteChar == 'H' || byteChar == 'X' || byteChar == '3') return decodeEncodedGPS(packet);
+        }
         return " _ / _ / _ ";
     }
 
