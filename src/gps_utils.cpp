@@ -142,7 +142,7 @@ namespace GPS_Utils {
 
         const uint8_t nonEncondedLatitudeOffset     = 9;    // "N" / "S"
         const uint8_t nonEncondedLongitudeOffset    = 19;   // "E" / "W"
-        const uint8_t encondedByteOffset            = 14;
+        const uint8_t encodedByteOffset             = 14;
         
         int indexOfExclamation  = packet.indexOf(":!");
         int indexOfEqual        = packet.indexOf(":=");
@@ -156,15 +156,16 @@ namespace GPS_Utils {
 
         int latitudeIndex       = baseIndex + nonEncondedLatitudeOffset;
         int longitudeIndex      = baseIndex + nonEncondedLongitudeOffset;
-        int encondedByteIndex   = baseIndex + encondedByteOffset;
+        int encodedByteIndex    = baseIndex + encodedByteOffset;
         int packetLength        = packet.length();
 
         if (latitudeIndex < packetLength && longitudeIndex < packetLength) {
             char latChar = packet[latitudeIndex];
             char lngChar = packet[longitudeIndex];
             if ((latChar == 'N' || latChar == 'S') && (lngChar == 'E' || lngChar == 'W')) return getReceivedGPS(packet);
-        } else if (encondedByteIndex < packetLength) {
-            char byteChar = packet[encondedByteIndex];
+        }
+        if (encodedByteIndex < packetLength) {
+            char byteChar = packet[encodedByteIndex];
             if (byteChar == 'G' || byteChar == 'Q' || byteChar == '[' || byteChar == 'H' || byteChar == 'X' || byteChar == '3') return decodeEncodedGPS(packet);
         }
         return " _ / _ / _ ";
