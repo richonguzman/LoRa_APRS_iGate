@@ -34,13 +34,23 @@
 
     //  I2C
     #define USE_WIRE1_WITH_BOARD_I2C_PINS
-    #define BOARD_I2C_SDA           41
-    #define BOARD_I2C_SCL           42
+    #define BOARD_I2C_SDA           39
+    #define BOARD_I2C_SCL           38
+
+    //  Display
+    #define HAS_DISPLAY
+    #define HAS_EPAPER
+    #define EPAPER_BUSY             6
+    #define EPAPER_RST              5
+    #define EPAPER_DC               4
+    #define EPAPER_CS               3
+    #define EPAPER_SCL              2
+    #define EPAPER_SDA              1
 
     //  Aditional Config
-    #define INTERNAL_LED_PIN        35
-    #define BATTERY_PIN             1
-    #define VEXT_CTRL               36
-    #define ADC_CTRL                37
+    #define INTERNAL_LED_PIN        45
+    #define BATTERY_PIN             7
+    #define ADC_CTRL                46
+    #define VEXT_CTRL               18
 
 #endif

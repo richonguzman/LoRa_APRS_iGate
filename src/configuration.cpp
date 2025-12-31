@@ -290,7 +290,11 @@ bool Configuration::readFile() {
         if (!data["display"].containsKey("alwaysOn") ||
             !data["display"].containsKey("timeout") ||
             !data["display"].containsKey("turn180")) needsRewrite = true;
-        display.alwaysOn                = data["display"]["alwaysOn"] | true;
+        #ifdef HAS_EPAPER
+            display.alwaysOn            = true;
+        #else
+            display.alwaysOn            = data["display"]["alwaysOn"] | true;
+        #endif
         display.timeout                 = data["display"]["timeout"] | 4;
         display.turn180                 = data["display"]["turn180"] | false;
 

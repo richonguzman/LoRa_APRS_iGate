@@ -57,7 +57,7 @@ namespace GPS_Utils {
         String encodedGPS       = APRSPacketLib::encodeGPSIntoBase91(Config.beacon.latitude, Config.beacon.longitude, 0, 0, Config.beacon.symbol, false, 0, true, Config.beacon.ambiguityLevel);
         
         iGateBeaconPacket       = beaconPacket;
-        iGateBeaconPacket       += ",qAC:!";
+        iGateBeaconPacket       += ",qAC:=";
         iGateBeaconPacket       += Config.beacon.overlay;
         iGateBeaconPacket       += encodedGPS;
 
@@ -132,36 +132,43 @@ namespace GPS_Utils {
         convertedLongitude += Longitude.substring(3,5).toFloat() / 60;          // Next 2 digits (Minutes)
         convertedLongitude += Longitude.substring(Longitude.indexOf(".") + 1, Longitude.indexOf(".") + 3).toFloat() / (60*100);
         if (Longitude.endsWith("W")) convertedLongitude = -convertedLongitude;  // Handle Western Hemisphere
-        
+
         return buildDistanceAndComment(convertedLatitude, convertedLongitude, infoGPS.substring(19));
     }
 
     String getDistanceAndComment(const String& packet) {
         int indexOfAt = packet.indexOf(":@");
-        if (indexOfAt > 10) {
-            return getReceivedGPS(packet);
-        } else {
-            const uint8_t ENCODED_BYTE_OFFSET = 14;     // Offset for encoded data in the packet
-            int indexOfExclamation  = packet.indexOf(":!");
-            int indexOfEqual        = packet.indexOf(":=");
-            uint8_t encodedBytePosition = 0;
-            if (indexOfExclamation > 10) {              // Determine the position where encoded data starts
-                encodedBytePosition = indexOfExclamation + ENCODED_BYTE_OFFSET;
-            } else if (indexOfEqual > 10) {
-                encodedBytePosition = indexOfEqual + ENCODED_BYTE_OFFSET;
-            }
+        if (indexOfAt > 10) return getReceivedGPS(packet);
 
-            if (encodedBytePosition != 0) {
-                char currentChar = packet[encodedBytePosition];
-                if (currentChar == 'G' || currentChar == 'Q' || currentChar == '[' || currentChar == 'H' || currentChar == 'X') {
-                    return decodeEncodedGPS(packet);    // If valid encoded data position is found, decode it
-                } else {
-                    return getReceivedGPS(packet);
-                }
-            } else {
-                return " _ / _ / _ ";
-            }
+        const uint8_t nonEncondedLatitudeOffset     = 9;    // "N" / "S"
+        const uint8_t nonEncondedLongitudeOffset    = 19;   // "E" / "W"
+        const uint8_t encodedByteOffset             = 14;
+        
+        int indexOfExclamation  = packet.indexOf(":!");
+        int indexOfEqual        = packet.indexOf(":=");
+        int baseIndex           = - 1;
+        if (indexOfExclamation > 10) {
+            baseIndex = indexOfExclamation;
+        } else if (indexOfEqual > 10) {
+            baseIndex = indexOfEqual;
         }
+        if (baseIndex == -1) return " _ / _ / _ ";
+
+        int latitudeIndex       = baseIndex + nonEncondedLatitudeOffset;
+        int longitudeIndex      = baseIndex + nonEncondedLongitudeOffset;
+        int encodedByteIndex    = baseIndex + encodedByteOffset;
+        int packetLength        = packet.length();
+
+        if (latitudeIndex < packetLength && longitudeIndex < packetLength) {
+            char latChar = packet[latitudeIndex];
+            char lngChar = packet[longitudeIndex];
+            if ((latChar == 'N' || latChar == 'S') && (lngChar == 'E' || lngChar == 'W')) return getReceivedGPS(packet);
+        }
+        if (encodedByteIndex < packetLength) {
+            char byteChar = packet[encodedByteIndex];
+            if (byteChar == 'G' || byteChar == 'Q' || byteChar == '[' || byteChar == 'H' || byteChar == 'X' || byteChar == '3') return decodeEncodedGPS(packet);
+        }
+        return " _ / _ / _ ";
     }
 
     void setup() {

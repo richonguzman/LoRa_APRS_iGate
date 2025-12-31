@@ -278,8 +278,9 @@ namespace APRS_IS_Utils {
         if (!passcodeValid && packet.indexOf(Config.callsign) != -1) {
             if (packet.indexOf("unverified") != -1 ) {
                 Serial.println("\n****APRS PASSCODE NOT VALID****\n");
-                displayShow(firstLine, "", "    APRS PASSCODE", "    NOT VALID !!!", "", "", "", 0);
-                while (1) {};
+                displayShow(firstLine, "", "    APRS PASSCODE", "    NOT VALID !!!", "", "", "", 3000);
+                aprsIsClient.stop();
+                Config.aprs_is.active = false;
             } else if (packet.indexOf("verified") != -1 ) {
                 passcodeValid = true;
             }

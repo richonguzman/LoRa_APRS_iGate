@@ -98,7 +98,7 @@ namespace WIFI_Utils {
             delay(500);
             unsigned long start = millis();
             displayShow("", "Connecting to WiFi:", "", currentWiFi->ssid + " ...", 0);
-            Serial.print("\nConnecting to WiFi '"); Serial.print(currentWiFi->ssid); Serial.println("' ...");
+            Serial.print("\nConnecting to WiFi '"); Serial.print(currentWiFi->ssid); Serial.print("' ");
             WiFi.begin(currentWiFi->ssid.c_str(), currentWiFi->password.c_str());
             while (WiFi.status() != WL_CONNECTED && wifiCounter<myWiFiAPSize) {
                 delay(500);

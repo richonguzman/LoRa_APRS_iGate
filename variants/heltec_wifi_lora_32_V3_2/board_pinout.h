@@ -21,6 +21,7 @@
 
     //  LoRa Radio
     #define HAS_SX1262
+    #define HAS_TCXO
     #define RADIO_SCLK_PIN          9
     #define RADIO_MISO_PIN          11
     #define RADIO_MOSI_PIN          10
