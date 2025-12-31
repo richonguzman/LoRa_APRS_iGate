@@ -58,4 +58,9 @@
     #define ETH_RST_PIN                      -1
     #define ETH_ADDR                         1
 
+     //  GPS
+    #define HAS_GPS
+    #define GPS_RX                  42
+    #define GPS_TX                  39
+
 #endif
