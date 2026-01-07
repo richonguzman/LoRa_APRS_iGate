@@ -92,15 +92,31 @@ bool Configuration::writeFile() {
 
         data["lora"]["rxActive"]                    = loramodule.rxActive;
         data["lora"]["rxFreq"]                      = loramodule.rxFreq;
-        data["lora"]["rxSpreadingFactor"]           = loramodule.rxSpreadingFactor;
         data["lora"]["rxCodingRate4"]               = loramodule.rxCodingRate4;
         data["lora"]["rxSignalBandwidth"]           = loramodule.rxSignalBandwidth;
         data["lora"]["txActive"]                    = loramodule.txActive;      
         data["lora"]["txFreq"]                      = loramodule.txFreq;
-        data["lora"]["txSpreadingFactor"]           = loramodule.txSpreadingFactor;
         data["lora"]["txCodingRate4"]               = loramodule.txCodingRate4;
         data["lora"]["txSignalBandwidth"]           = loramodule.txSignalBandwidth;        
-        data["lora"]["power"]                       = loramodule.power;        
+        data["lora"]["power"]                       = loramodule.power;       
+        
+        int rxSpreadingFactor = loramodule.rxSpreadingFactor;
+        int txSpreadingFactor = loramodule.txSpreadingFactor;
+        #if defined(HAS_SX1276) || defined(HAS_SX1278)
+            const int minSF = 6, maxSF = 12;
+        #endif
+        #if defined(HAS_SX1262) || defined(HAS_SX1268)
+            const int minSF = 5, maxSF = 12;
+        #endif
+        #if defined(HAS_LLCC68)
+            const int minSF = 5, maxSF = 11;
+        #endif
+
+        rxSpreadingFactor = (rxSpreadingFactor < minSF) ? minSF : (rxSpreadingFactor > maxSF) ? maxSF : rxSpreadingFactor;
+        txSpreadingFactor = (txSpreadingFactor < minSF) ? minSF : (txSpreadingFactor > maxSF) ? maxSF : txSpreadingFactor;
+
+        data["lora"]["rxSpreadingFactor"]           = rxSpreadingFactor;
+        data["lora"]["txSpreadingFactor"]           = txSpreadingFactor;
 
         data["display"]["alwaysOn"]                 = display.alwaysOn;
         data["display"]["timeout"]                  = display.timeout;
