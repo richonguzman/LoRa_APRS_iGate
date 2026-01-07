@@ -44,18 +44,30 @@ namespace GPS_Utils {
     }
 
     void generateBeacons() {
-        if (Config.callsign.indexOf("NOCALL-10") != 0 && !Utils::checkValidCallsign(Config.callsign)) {
-            displayShow("***** ERROR ******", "CALLSIGN = NOT VALID!", "", "Only Rx Mode Active", 3000);
-            Config.loramodule.txActive  = false;
-            Config.aprs_is.messagesToRF = false;
-            Config.aprs_is.objectsToRF  = false;
+        String beaconPacket = APRSPacketLib::generateBasePacket(Config.callsign, "APLRG1", Config.beacon.path);
+        String encodedGPS   = APRSPacketLib::encodeGPSIntoBase91(Config.beacon.latitude, Config.beacon.longitude, 0, 0, Config.beacon.symbol, false, 0, true, Config.beacon.ambiguityLevel);
+
+        if (Config.callsign.indexOf("NOCALL-10") != 0) {
+            if (!Utils::checkValidCallsign(Config.callsign)) {
+                displayShow("***** ERROR ******", "CALLSIGN = NOT VALID!", "", "Only Rx Mode Active", 3000);
+                Config.loramodule.txActive  = false;
+                Config.aprs_is.messagesToRF = false;
+                Config.aprs_is.objectsToRF  = false;
+                Config.beacon.sendViaRF     = false;
+                Config.digi.mode            = 0;
+                Config.backupDigiMode       = false;
+            } else if (Utils::checkValidCallsign(Config.callsign) && Config.tacticalCallsign != "") {
+                beaconPacket = APRSPacketLib::generateBasePacket(Config.tacticalCallsign, "APLRG1", Config.beacon.path);
+                Config.beacon.comment       = Config.callsign + " " + Config.beacon.comment;
+                Config.aprs_is.active       = false;
+                Config.beacon.sendViaAPRSIS = false;
+                Config.backupDigiMode       = false;
+            }
+        } else {
+            Config.beacon.sendViaAPRSIS = false;
             Config.beacon.sendViaRF     = false;
-            Config.digi.mode            = 0;
-            Config.backupDigiMode       = false;
         }
-        String beaconPacket     = APRSPacketLib::generateBasePacket(Config.callsign, "APLRG1", Config.beacon.path);
-        String encodedGPS       = APRSPacketLib::encodeGPSIntoBase91(Config.beacon.latitude, Config.beacon.longitude, 0, 0, Config.beacon.symbol, false, 0, true, Config.beacon.ambiguityLevel);
-        
+
         iGateBeaconPacket       = beaconPacket;
         iGateBeaconPacket       += ",qAC:=";
         iGateBeaconPacket       += Config.beacon.overlay;

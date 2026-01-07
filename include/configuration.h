@@ -170,6 +170,7 @@ public:
 class Configuration {
 public:
     String                  callsign;
+    String                  tacticalCallsign;
     int                     rememberStationTime;
     bool                    backupDigiMode;
     bool                    rebootMode;
