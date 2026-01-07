@@ -49,7 +49,7 @@ namespace DIGI_Utils {
             String tempPath = path;
 
             if (path.indexOf("WIDE1-1") != -1 && (Config.digi.mode == 2 || Config.digi.mode == 3)) {
-                tempPath.replace("WIDE1-1", Config.callsign + "*");
+                tempPath.replace("WIDE1-1", (Config.tacticalCallsign == "" ? Config.callsign : Config.tacticalCallsign) + "*");
             } else if (path.indexOf("WIDE2-") != -1 && Config.digi.mode == 3) {
                 if (path.indexOf(",WIDE1*") != -1) {
                     tempPath.remove(path.indexOf(",WIDE1*"), 7);
@@ -58,9 +58,9 @@ namespace DIGI_Utils {
                     tempPath.remove(path.indexOf("*"), 1);
                 }
                 if (path.indexOf("WIDE2-1") != -1) {
-                    tempPath.replace("WIDE2-1", Config.callsign + "*");
+                    tempPath.replace("WIDE2-1", (Config.tacticalCallsign == "" ? Config.callsign : Config.tacticalCallsign) + "*");
                 } else if (path.indexOf("WIDE2-2") != -1) {
-                    tempPath.replace("WIDE2-2", Config.callsign + "*,WIDE2-1");
+                    tempPath.replace("WIDE2-2", (Config.tacticalCallsign == "" ? Config.callsign : Config.tacticalCallsign) + "*,WIDE2-1");
                 } else {
                     return "";
                 }
@@ -84,7 +84,7 @@ namespace DIGI_Utils {
                 }
             }
             packetToRepeat += ",";
-            packetToRepeat += Config.callsign;
+            packetToRepeat += (Config.tacticalCallsign == "" ? Config.callsign : Config.tacticalCallsign);
             packetToRepeat += "*";
             packetToRepeat += APRS_IS_Utils::checkForStartingBytes(packet.substring(packet.indexOf(suffix)));
             return packetToRepeat;
@@ -147,7 +147,7 @@ namespace DIGI_Utils {
                 temp    = packet.substring(3);
                 Sender  = packet.substring(3, packet.indexOf(">"));
             }
-            if (Sender != Config.callsign) {        // Avoid listening to own packets
+            if (Sender != (Config.tacticalCallsign == "" ? Config.callsign : Config.tacticalCallsign)) {    // Avoid listening to own packets
                 if (!thirdPartyPacket && !Utils::checkValidCallsign(Sender)) {
                     return;
                 }
@@ -159,7 +159,7 @@ namespace DIGI_Utils {
                         String AddresseeAndMessage  = temp.substring(temp.indexOf("::") + 2);
                         String Addressee            = AddresseeAndMessage.substring(0, AddresseeAndMessage.indexOf(":"));
                         Addressee.trim();
-                        if (Addressee == Config.callsign) {     // it's a message for me!
+                        if (Addressee == (Config.tacticalCallsign == "" ? Config.callsign : Config.tacticalCallsign)) {     // it's a message for me!
                             queryMessage = APRS_IS_Utils::processReceivedLoRaMessage(Sender, AddresseeAndMessage, thirdPartyPacket);
                         }
                     }
