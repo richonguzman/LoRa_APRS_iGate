@@ -54,6 +54,7 @@ function loadSettings(settings) {
     currentSettings = settings;
     // General
     document.getElementById("callsign").value                           = settings.callsign;
+    document.getElementById("tacticalCallsign").value                   = settings.tacticalCallsign;
     document.getElementById("beacon.comment").value                     = settings.beacon.comment;
     document.getElementById("beacon.path").value                        = settings.beacon.path;
     document.getElementById("beacon.symbol").value                      = settings.beacon.symbol;

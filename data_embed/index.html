@@ -119,7 +119,7 @@
                             </div>
                             <div class="col-lg-9 col-sm-12">
                                 <div class="row">
-                                    <div class="col-12">
+                                    <div class="col-6">
                                         <label for="callsign" class="form-label"
                                             >Callsign - SSID</label
                                         >
@@ -130,6 +130,19 @@
                                             class="form-control"
                                             placeholder="N0CALL-10"
                                             required=""
+                                            oninput="this.value = this.value.toUpperCase();"
+                                        />
+                                    </div>
+                                    <div class="col-6">
+                                        <label for="tacticalCallsign" class="form-label"
+                                            >Tactical Callsign</label
+                                        >
+                                        <input
+                                            type="text"
+                                            name="tacticalCallsign"
+                                            id="tacticalCallsign"
+                                            class="form-control"
+                                            placeholder=""
                                             oninput="this.value = this.value.toUpperCase();"
                                         />
                                     </div>

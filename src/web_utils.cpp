@@ -160,6 +160,7 @@ namespace WEB_Utils {
         Config.startupDelay                 = getParamIntSafe("startupDelay", Config.startupDelay);
 
         Config.callsign                     = getParamStringSafe("callsign", Config.callsign);
+        Config.tacticalCallsign             = getParamStringSafe("tacticalCallsign", Config.tacticalCallsign);
         
         Config.wifiAutoAP.password          = getParamStringSafe("wifi.autoAP.password", Config.wifiAutoAP.password);
         Config.wifiAutoAP.timeout           = getParamIntSafe("wifi.autoAP.timeout", Config.wifiAutoAP.timeout);
