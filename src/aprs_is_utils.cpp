@@ -274,6 +274,29 @@ namespace APRS_IS_Utils {
         return outputPacket;
     }
 
+    void processAckMessage(const String& sender, const String& message) {
+        String ackPacket = Config.callsign;
+        ackPacket += ">APLRG1,TCPIP,qAC::";
+
+        String senderCallsign = sender;
+        for (int i = sender.length(); i < 9; i++) {
+            senderCallsign += ' ';
+        }
+        ackPacket += senderCallsign;
+        ackPacket += ":";
+
+        String ackMessage = "ack";
+        ackMessage += message.substring(message.indexOf("{") + 1);
+        ackMessage.trim();
+        ackPacket += ackMessage;
+
+        #ifdef HAS_A7670
+            A7670_Utils::uploadToAPRSIS(ackPacket);
+        #else
+            upload(ackPacket);
+        #endif
+    }
+
     void processAPRSISPacket(const String& packet) {
         if (!passcodeValid && packet.indexOf(Config.callsign) != -1) {
             if (packet.indexOf("unverified") != -1 ) {
@@ -294,38 +317,19 @@ namespace APRS_IS_Utils {
                 if (Addressee == Config.callsign) {                 // its for me!
                     String receivedMessage;
                     if (AddresseeAndMessage.indexOf("{") > 0) {     // ack?
-                        String ackMessage = "ack";
-                        ackMessage += AddresseeAndMessage.substring(AddresseeAndMessage.indexOf("{") + 1);
-                        ackMessage.trim();
-                        delay(4000);
-                        for (int i = Sender.length(); i < 9; i++) {
-                            Sender += ' ';
-                        }
-
-                        String ackPacket = Config.callsign;
-                        ackPacket += ">APLRG1,TCPIP,qAC::";
-                        ackPacket += Sender;
-                        ackPacket += ":";
-                        ackPacket += ackMessage;
-                        #ifdef HAS_A7670
-                            A7670_Utils::uploadToAPRSIS(ackPacket);
-                        #else
-                            upload(ackPacket);
-                        #endif
+                        processAckMessage(Sender, AddresseeAndMessage);
                         receivedMessage = AddresseeAndMessage.substring(AddresseeAndMessage.indexOf(":") + 1, AddresseeAndMessage.indexOf("{"));
                     } else {
                         receivedMessage = AddresseeAndMessage.substring(AddresseeAndMessage.indexOf(":") + 1);
                     }
                     if (receivedMessage.indexOf("?") == 0) {
                         Utils::println("Rx Query (APRS-IS)  : " + packet);
-                        Sender.trim();
                         String queryAnswer = QUERY_Utils::process(receivedMessage, Sender, true, false);
                         //Serial.println("---> QUERY Answer : " + queryAnswer.substring(0,queryAnswer.indexOf("\n")));
                         if (!Config.display.alwaysOn && Config.display.timeout != 0) {
                             displayToggle(true);
                         }
                         lastScreenOn = millis();
-                        delay(500);
                         #ifdef HAS_A7670
                             A7670_Utils::uploadToAPRSIS(queryAnswer);
                         #else

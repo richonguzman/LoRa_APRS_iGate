@@ -151,7 +151,6 @@ namespace LoRa_Utils {
     }
 
     void changeFreqTx() {
-        delay(300);
         float freq = (float)Config.loramodule.txFreq / 1000000;
         radio.setFrequency(freq);
         radio.setSpreadingFactor(Config.loramodule.txSpreadingFactor);
@@ -160,7 +159,6 @@ namespace LoRa_Utils {
     }
 
     void changeFreqRx() {
-        delay(300);
         float freq = (float)Config.loramodule.rxFreq / 1000000;
         radio.setFrequency(freq);
         radio.setSpreadingFactor(Config.loramodule.rxSpreadingFactor);
