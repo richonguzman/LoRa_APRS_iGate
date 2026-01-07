@@ -120,7 +120,11 @@ namespace Utils {
         #ifdef INTERNAL_LED_PIN
             digitalWrite(INTERNAL_LED_PIN,LOW);
         #endif
-        firstLine   = Config.callsign;
+        if (Config.tacticalCallsign != "") {
+            firstLine = Config.tacticalCallsign;
+        } else {
+            firstLine = Config.callsign;
+        }
         seventhLine = "     listening...";
     }
 
