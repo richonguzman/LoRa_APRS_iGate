@@ -148,7 +148,7 @@ namespace DIGI_Utils {
                 Sender  = packet.substring(3, packet.indexOf(">"));
             }
             if (Sender != (Config.tacticalCallsign == "" ? Config.callsign : Config.tacticalCallsign)) {    // Avoid listening to own packets
-                if (!thirdPartyPacket && !Utils::checkValidCallsign(Sender)) {
+                if (!thirdPartyPacket && Config.tacticalCallsign == "" && !Utils::checkValidCallsign(Sender)) {
                     return;
                 }
                 if (STATION_Utils::check25SegBuffer(Sender, temp.substring(temp.indexOf(":") + 2))) {

@@ -58,7 +58,7 @@ namespace GPS_Utils {
                 Config.backupDigiMode       = false;
             } else if (Utils::checkValidCallsign(Config.callsign) && Config.tacticalCallsign != "") {
                 beaconPacket = APRSPacketLib::generateBasePacket(Config.tacticalCallsign, "APLRG1", Config.beacon.path);
-                Config.beacon.comment       = Config.callsign + " " + Config.beacon.comment;
+                Config.beacon.comment       = Config.beacon.comment + " from " + Config.callsign;
                 Config.aprs_is.active       = false;
                 Config.beacon.sendViaAPRSIS = false;
                 Config.backupDigiMode       = false;
