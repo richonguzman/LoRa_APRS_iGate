@@ -34,6 +34,7 @@
 extern Configuration    Config;
 extern HardwareSerial   gpsSerial;
 extern TinyGPSPlus      gps;
+extern bool             callsignIsValid;
 String                  distance, iGateBeaconPacket, iGateLoRaBeaconPacket;
 
 
@@ -48,7 +49,7 @@ namespace GPS_Utils {
         String encodedGPS   = APRSPacketLib::encodeGPSIntoBase91(Config.beacon.latitude, Config.beacon.longitude, 0, 0, Config.beacon.symbol, false, 0, true, Config.beacon.ambiguityLevel);
 
         if (Config.callsign.indexOf("NOCALL-10") != 0) {
-            if (!Utils::checkValidCallsign(Config.callsign)) {
+            if (!callsignIsValid) {
                 displayShow("***** ERROR ******", "CALLSIGN = NOT VALID!", "", "Only Rx Mode Active", 3000);
                 Config.loramodule.txActive  = false;
                 Config.aprs_is.messagesToRF = false;
@@ -56,9 +57,8 @@ namespace GPS_Utils {
                 Config.beacon.sendViaRF     = false;
                 Config.digi.mode            = 0;
                 Config.backupDigiMode       = false;
-            } else if (Utils::checkValidCallsign(Config.callsign) && Config.tacticalCallsign != "") {
+            } else if (callsignIsValid && Config.tacticalCallsign != "") {
                 beaconPacket = APRSPacketLib::generateBasePacket(Config.tacticalCallsign, "APLRG1", Config.beacon.path);
-                Config.beacon.comment       = Config.beacon.comment + " de " + Config.callsign;
                 Config.aprs_is.active       = false;
                 Config.beacon.sendViaAPRSIS = false;
                 Config.backupDigiMode       = false;

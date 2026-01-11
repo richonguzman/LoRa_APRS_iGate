@@ -65,6 +65,7 @@ bool        sendStartTelemetry  = true;
 bool        beaconUpdate        = false;
 uint32_t    lastBeaconTx        = 0;
 uint32_t    lastScreenOn        = millis();
+bool        callsignIsValid     = false;
 String      beaconPacket;
 String      secondaryBeaconPacket;
 
@@ -191,6 +192,12 @@ namespace Utils {
             }
             beaconPacket            += Config.beacon.comment;
             secondaryBeaconPacket   += Config.beacon.comment;
+            if (callsignIsValid && Config.tacticalCallsign != "") {
+                beaconPacket            += " de ";
+                beaconPacket            += Config.callsign;
+                secondaryBeaconPacket   += " de ";
+                secondaryBeaconPacket   += Config.callsign;
+            }
 
             #if defined(BATTERY_PIN) || defined(HAS_AXP192) || defined(HAS_AXP2101)
                 if (Config.battery.sendInternalVoltage || Config.battery.monitorInternalVoltage) {

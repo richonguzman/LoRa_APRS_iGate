@@ -20,6 +20,7 @@
 #include "battery_utils.h"
 #include "board_pinout.h"
 #include "power_utils.h"
+#include "utils.h"
 
 #if defined(HAS_AXP192) || defined(HAS_AXP2101)
     #ifdef TTGO_T_Beam_S3_SUPREME_V3
@@ -43,6 +44,7 @@
 #endif
 
 extern Configuration    Config;
+extern bool             callsignIsValid;
 
 
 namespace POWER_Utils {
@@ -326,6 +328,7 @@ namespace POWER_Utils {
         delay(1000);
         BATTERY_Utils::setup();
         BATTERY_Utils::startupBatteryHealth();
+        callsignIsValid = Utils::checkValidCallsign(Config.callsign);
         setCpuFrequencyMhz(80);
     }
 
