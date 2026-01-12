@@ -18,14 +18,14 @@
 
 #include <NTPClient.h>
 #include <WiFiUdp.h>
-#include <WiFi.h>
 #include "configuration.h"
+#include "network_manager.h"
 #include "ntp_utils.h"
 #include "time.h"
 
 
 extern      Configuration  Config;
-
+extern      NetworkManager *networkManager;
 WiFiUDP     ntpUDP;
 NTPClient*  timeClient;
 
@@ -33,7 +33,7 @@ NTPClient*  timeClient;
 namespace NTP_Utils {
 
     void setup() {
-        if (WiFi.status() == WL_CONNECTED && Config.digi.ecoMode == 0 && Config.callsign != "NOCALL-10") {
+        if (networkManager->isConnected() && Config.digi.ecoMode == 0 && Config.callsign != "NOCALL-10") {
             int gmt = Config.ntp.gmtCorrection * 3600;
             timeClient = new NTPClient(ntpUDP, Config.ntp.server.c_str(), gmt, 15 * 60 * 1000); // Update interval 15 min
             timeClient->begin();
@@ -41,11 +41,11 @@ namespace NTP_Utils {
     }
 
     void update() {
-        if (WiFi.status() == WL_CONNECTED && Config.digi.ecoMode == 0 && Config.callsign != "NOCALL-10") timeClient->update();
+        if (networkManager->isConnected() && Config.digi.ecoMode == 0 && Config.callsign != "NOCALL-10") timeClient->update();
     }
 
     String getFormatedTime() {
-        if (WiFi.status() == WL_CONNECTED && Config.digi.ecoMode == 0) return timeClient->getFormattedTime();
+        if (networkManager->isConnected() && Config.digi.ecoMode == 0) return timeClient->getFormattedTime();
         return "DigiEcoMode Active";
     }
 
