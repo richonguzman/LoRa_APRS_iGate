@@ -183,7 +183,7 @@ void loop() {
 
         Utils::checkDisplayInterval();
         Utils::checkBeaconInterval();
-        
+
         APRS_IS_Utils::checkStatus(); // Need that to update display, maybe split this and send APRSIS status to display func?
 
         String packet = "";
