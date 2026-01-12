@@ -17,8 +17,8 @@
  */
 
 #include <RadioLib.h>
-#include <WiFi.h>
 #include "configuration.h"
+#include "network_manager.h"
 #include "aprs_is_utils.h"
 #include "station_utils.h"
 #include "board_pinout.h"
@@ -29,6 +29,7 @@
 
 
 extern Configuration    Config;
+extern NetworkManager   *networkManager;
 extern uint32_t         lastRxTime;
 extern bool             packetIsBeacon;
 
@@ -183,7 +184,7 @@ namespace LoRa_Utils {
         int state = radio.transmit("\x3c\xff\x01" + newPacket);
         transmitFlag = true;
         if (state == RADIOLIB_ERR_NONE) {
-            if (Config.syslog.active && WiFi.status() == WL_CONNECTED) {
+            if (Config.syslog.active && networkManager->isConnected()) {
                 SYSLOG_Utils::log(3, newPacket, 0, 0.0, 0);    // TX
             }
             Utils::print("---> LoRa Packet Tx : ");
@@ -245,7 +246,7 @@ namespace LoRa_Utils {
                                 receivedPackets.push_back(receivedPacket);
                             }
 
-                            if (Config.syslog.active && WiFi.status() == WL_CONNECTED) {
+                            if (Config.syslog.active && networkManager->isConnected()) {
                                 SYSLOG_Utils::log(1, packet, rssi, snr, freqError); // RX
                             }
                         } else {
@@ -259,7 +260,7 @@ namespace LoRa_Utils {
                     snr         = radio.getSNR();
                     freqError   = radio.getFrequencyError();
                     Utils::println(F("CRC error!"));
-                    if (Config.syslog.active && WiFi.status() == WL_CONNECTED) {
+                    if (Config.syslog.active && networkManager->isConnected()) {
                         SYSLOG_Utils::log(0, packet, rssi, snr, freqError); // CRC
                     }
                     packet = "";
