@@ -34,7 +34,6 @@ extern WiFi_AP          *currentWiFi;
 extern bool             backupDigiMode;
 extern uint32_t         lastServerCheck;
 
-bool        WiFiConnected       = false;
 uint32_t    WiFiAutoAPTime      = millis();
 uint8_t     wifiCounter         = 0;
 uint32_t    lastBackupDigiTime  = millis();
@@ -126,9 +125,6 @@ namespace WIFI_Utils {
 
             startAutoAP();
         }
-
-        //TODO: Use network manager whenever this variable is used
-        WiFiConnected = networkManager->isWiFiConnected();
     }
 
     void checkAutoAPTimeout() {
