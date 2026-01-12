@@ -94,10 +94,19 @@ bool NetworkManager::connectWiFi(String ssid, String psk) {
     Serial.println("Attempting to connect to WiFi: " + ssid);
     WiFi.begin(ssid.c_str(), psk.c_str());
 
+    Serial.print("Connecting ");
+
     int attempts = 0;
-    while (!isWiFiConnected() && attempts < 20) {
+    while (!isWiFiConnected() && attempts < 10) {
         delay(500);
-        Serial.print(".");
+        #ifdef INTERNAL_LED_PIN
+            digitalWrite(INTERNAL_LED_PIN,HIGH);
+        #endif
+        Serial.print('.');
+        delay(500);
+        #ifdef INTERNAL_LED_PIN
+            digitalWrite(INTERNAL_LED_PIN,LOW);
+        #endif
         attempts++;
     }
     Serial.println();

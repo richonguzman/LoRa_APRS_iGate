@@ -18,6 +18,7 @@
 
 #include <WiFi.h>
 #include "configuration.h"
+#include "network_manager.h"
 #include "board_pinout.h"
 #include "wifi_utils.h"
 #include "display.h"
@@ -25,6 +26,7 @@
 
 
 extern Configuration    Config;
+extern NetworkManager   *networkManager;
 
 extern uint8_t          myWiFiAPIndex;
 extern int              myWiFiAPSize;
@@ -33,7 +35,6 @@ extern bool             backUpDigiMode;
 
 bool        WiFiConnected       = false;
 uint32_t    WiFiAutoAPTime      = millis();
-bool        WiFiAutoAPStarted   = false;
 uint32_t    previousWiFiMillis  = 0;
 uint8_t     wifiCounter         = 0;
 uint32_t    lastBackupDigiTime  = millis();
@@ -45,21 +46,20 @@ namespace WIFI_Utils {
         if (Config.digi.ecoMode == 0) {
             if (backUpDigiMode) {
                 uint32_t WiFiCheck = millis() - lastBackupDigiTime;
-                if (WiFi.status() != WL_CONNECTED && WiFiCheck >= 15 * 60 * 1000) {
+                if (!networkManager->isWiFiConnected() && WiFiCheck >= 15 * 60 * 1000) {
                     Serial.println("*** Stopping BackUp Digi Mode ***");
                     backUpDigiMode = false;
                     wifiCounter = 0;
-                } else if (WiFi.status() == WL_CONNECTED) {
+                } else if (networkManager->isWiFiConnected()) {
                     Serial.println("*** WiFi Reconnect Success (Stopping Backup Digi Mode) ***");
                     backUpDigiMode = false;
                     wifiCounter = 0;
                 }
             }
 
-            if (!backUpDigiMode && (WiFi.status() != WL_CONNECTED) && ((millis() - previousWiFiMillis) >= 30 * 1000) && !WiFiAutoAPStarted) {
+            if (!backUpDigiMode && (!networkManager->isWiFiConnected()) && ((millis() - previousWiFiMillis) >= 30 * 1000) && !networkManager->isWifiAPActive()) {
                 Serial.print(millis());
                 Serial.println("Reconnecting to WiFi...");
-                WiFi.disconnect();
                 WIFI_Utils::startWiFi();
                 previousWiFiMillis = millis();
 
@@ -76,84 +76,57 @@ namespace WIFI_Utils {
     }
 
     void startAutoAP() {
-        WiFi.mode(WIFI_MODE_NULL);
+        displayShow("", "   Starting Auto AP", " Please connect to it " , "     loading ...", 1000);
 
-        WiFi.mode(WIFI_AP);
-        WiFi.softAP(Config.callsign + "-AP", Config.wifiAutoAP.password);
-
+        networkManager->setupAP(Config.callsign + "-AP", Config.wifiAutoAP.password);
         WiFiAutoAPTime = millis();
-        WiFiAutoAPStarted = true;
     }
 
     void startWiFi() {
-        bool startAP = false;
-        if (currentWiFi->ssid == "") {
-            startAP = true;
-        } else {
-            uint8_t wifiCounter = 0;
-            String hostName = "iGATE-" + Config.callsign;
-            WiFi.setHostname(hostName.c_str());
-            WiFi.mode(WIFI_STA);
-            WiFi.disconnect();
-            delay(500);
-            unsigned long start = millis();
-            displayShow("", "Connecting to WiFi:", "", currentWiFi->ssid + " ...", 0);
-            Serial.print("\nConnecting to WiFi '"); Serial.print(currentWiFi->ssid); Serial.print("' ");
-            WiFi.begin(currentWiFi->ssid.c_str(), currentWiFi->password.c_str());
-            while (WiFi.status() != WL_CONNECTED && wifiCounter<myWiFiAPSize) {
-                delay(500);
-                #ifdef INTERNAL_LED_PIN
-                    digitalWrite(INTERNAL_LED_PIN,HIGH);
-                #endif
-                Serial.print('.');
-                delay(500);
-                #ifdef INTERNAL_LED_PIN
-                    digitalWrite(INTERNAL_LED_PIN,LOW);
-                #endif
-                if ((millis() - start) > 10000){
-                    delay(1000);
-                    if(myWiFiAPIndex >= (myWiFiAPSize - 1)) {
-                        myWiFiAPIndex = 0;
-                        wifiCounter++;
-                    } else {
-                        myWiFiAPIndex++;
-                    }
-                    wifiCounter++;
-                    currentWiFi = &Config.wifiAPs[myWiFiAPIndex];
-                    start = millis();
-                    Serial.print("\nConnecting to WiFi '"); Serial.print(currentWiFi->ssid); Serial.println("' ...");
-                    displayShow("", "Connecting to WiFi:", "", currentWiFi->ssid + " ...", 0);
-                    WiFi.disconnect();
-                    WiFi.begin(currentWiFi->ssid.c_str(), currentWiFi->password.c_str());
-                }
-            }
+        if (currentWiFi->ssid.isEmpty()) {
+            Serial.println("WiFi SSID not set! Starting Auto AP");
+            startAutoAP();
+            return;
         }
+
+        String hostName = "iGATE-" + Config.callsign;
+        WiFi.setHostname(hostName.c_str());
+
+        // TODO: Create generic multi-SSID support in Network Manager
+        while (!networkManager->isWiFiConnected()) {
+            displayShow("", "Connecting to WiFi:", "", currentWiFi->ssid + " ...", 0);
+            networkManager->disconnectWiFi();
+            networkManager->connectWiFi(currentWiFi->ssid, currentWiFi->password);
+
+            if(myWiFiAPIndex >= (myWiFiAPSize - 1)) {
+                break;
+            }
+
+            myWiFiAPIndex++;
+            currentWiFi = &Config.wifiAPs[myWiFiAPIndex];
+        }
+
         #ifdef INTERNAL_LED_PIN
             digitalWrite(INTERNAL_LED_PIN,LOW);
         #endif
-        if (WiFi.status() == WL_CONNECTED) {
+        if (networkManager->isWiFiConnected()) {
             Serial.print("\nConnected as ");
-            Serial.print(WiFi.localIP());
+            Serial.print(networkManager->getWiFiIP());
             Serial.print(" / MAC Address: ");
-            Serial.println(WiFi.macAddress());
+            Serial.println(networkManager->getWiFimacAddress());
             displayShow("", "     Connected!!", "" , "     loading ...", 1000);
-        } else if (WiFi.status() != WL_CONNECTED) {
-            startAP = true;
-
+        } else {
             Serial.println("\nNot connected to WiFi! Starting Auto AP");
             displayShow("", " WiFi Not Connected!", "" , "     loading ...", 1000);
-        }
-        WiFiConnected = !startAP;
-        if (startAP) {
-            Serial.println("\nNot connected to WiFi! Starting Auto AP");
-            displayShow("", "   Starting Auto AP", " Please connect to it " , "     loading ...", 1000);
-
             startAutoAP();
         }
+
+        //TODO: Use network manager whenever this variable is used
+        WiFiConnected = networkManager->isWiFiConnected();
     }
 
     void checkAutoAPTimeout() {
-        if (WiFiAutoAPStarted && Config.wifiAutoAP.timeout > 0) {
+        if (networkManager->isWifiAPActive() && Config.wifiAutoAP.timeout > 0) {
             if (WiFi.softAPgetStationNum() > 0) {
                 WiFiAutoAPTime = 0;
             } else {
@@ -162,8 +135,7 @@ namespace WIFI_Utils {
                 } else if ((millis() - WiFiAutoAPTime) > Config.wifiAutoAP.timeout * 60 * 1000) {
                     Serial.println("Stopping auto AP");
 
-                    WiFiAutoAPStarted = false;
-                    WiFi.softAPdisconnect(true);
+                    networkManager->disableAP();
 
                     Serial.println("Auto AP stopped (timeout)");
                 }
