@@ -41,7 +41,7 @@ ___________________________________________________________________*/
 #include <ElegantOTA.h>
 #include <TinyGPS++.h>
 #include <Arduino.h>
-#include <WiFi.h>
+#include <WiFiClient.h>
 #include <vector>
 #include "configuration.h"
 #include "network_manager.h"
