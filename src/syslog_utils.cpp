@@ -17,13 +17,14 @@
  */
 
 #include <WiFiUdp.h>
-#include <WiFi.h>
 #include "configuration.h"
+#include "network_manager.h"
 #include "syslog_utils.h"
 #include "gps_utils.h"
 
 
 extern Configuration    Config;
+extern NetworkManager   *networkManager;
 extern String           versionDate;
 extern String           versionNumber;
 
@@ -33,7 +34,7 @@ WiFiUDP udpClient;
 namespace SYSLOG_Utils {
 
     void log(const uint8_t type, const String& packet, const int rssi, const float snr, const int freqError) {
-        if (Config.syslog.active && WiFi.status() == WL_CONNECTED) {
+        if (Config.syslog.active && networkManager->isConnected()) {
             String syslogPacket = "<165>1 - ";
             syslogPacket.concat(Config.callsign);
             syslogPacket.concat(" CA2RXU_LoRa_iGate_");
@@ -140,7 +141,7 @@ namespace SYSLOG_Utils {
     }
 
     void setup() {
-        if (WiFi.status() == WL_CONNECTED) {
+        if (networkManager->isConnected()) {
             udpClient.begin(0);
             if (Config.syslog.active) Serial.println("init : Syslog Server  ...     done!    (at " + Config.syslog.server + ")");
         }
