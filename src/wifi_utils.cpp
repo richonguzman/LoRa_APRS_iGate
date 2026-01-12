@@ -33,7 +33,6 @@ extern int              myWiFiAPSize;
 extern WiFi_AP          *currentWiFi;
 extern bool             backUpDigiMode;
 
-bool        WiFiConnected       = false;
 uint32_t    WiFiAutoAPTime      = millis();
 uint32_t    previousWiFiMillis  = 0;
 uint8_t     wifiCounter         = 0;
@@ -120,9 +119,6 @@ namespace WIFI_Utils {
             displayShow("", " WiFi Not Connected!", "" , "     loading ...", 1000);
             startAutoAP();
         }
-
-        //TODO: Use network manager whenever this variable is used
-        WiFiConnected = networkManager->isWiFiConnected();
     }
 
     void checkAutoAPTimeout() {
