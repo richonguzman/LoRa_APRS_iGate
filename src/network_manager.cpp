@@ -25,21 +25,19 @@ void NetworkManager::loop() {
 // WiFi methods
 
 void NetworkManager::_processAPTimeout() {
-    if (!_wifiAPmode || _apTimeout == 0 || !_wifiSTAmode) {
+    if (!_wifiAPmode || _apTimeout == 0) {
+        return;
+    }
+
+    // If any station is connected, reset the timer
+    if (WiFi.softAPgetStationNum() > 0) {
+        _apStartup = millis();
         return;
     }
 
     if (millis() - _apStartup > _apTimeout) {
-        // Time expired, switch to client mode if successfully connected
-        if (isWiFiConnected()) {
-            Serial.println("AP timeout reached. Switching to client mode only.");
-            disableAP();
-        }
-        else {
-            // Not connected as a client, keep AP running
-            Serial.println("AP timeout reached but WiFi client still not connected. Keeping AP mode active.");
-            _apStartup = millis(); // Reset timer
-        }
+        Serial.println("AP timeout reached. Disabling AP mode.");
+        disableAP();
     }
 }
 

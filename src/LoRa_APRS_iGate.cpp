@@ -106,6 +106,7 @@ void setup() {
     Serial.begin(115200);
     networkManager = new NetworkManager();
     networkManager->setup();
+    networkManager->setAPTimeout(Config.wifiAutoAP.timeout * 60 * 1000); // Convert minutes to milliseconds
     POWER_Utils::setup();
     Utils::setupDisplay();
     LoRa_Utils::setup();
@@ -137,7 +138,6 @@ void loop() {
         Utils::checkSleepByLowBatteryVoltage(1);
         SLEEP_Utils::startSleeping();
     } else {
-        WIFI_Utils::checkAutoAPTimeout();
         networkManager->loop();
 
         if (isUpdatingOTA) {
