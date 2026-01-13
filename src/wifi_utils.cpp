@@ -33,7 +33,6 @@ extern int              myWiFiAPSize;
 extern WiFi_AP          *currentWiFi;
 extern bool             backUpDigiMode;
 
-uint32_t    WiFiAutoAPTime      = millis();
 uint32_t    previousWiFiMillis  = 0;
 uint8_t     wifiCounter         = 0;
 uint32_t    lastBackupDigiTime  = millis();
@@ -76,9 +75,7 @@ namespace WIFI_Utils {
 
     void startAutoAP() {
         displayShow("", "   Starting Auto AP", " Please connect to it " , "     loading ...", 1000);
-
         networkManager->setupAP(Config.callsign + "-AP", Config.wifiAutoAP.password);
-        WiFiAutoAPTime = millis();
     }
 
     void startWiFi() {
@@ -118,24 +115,6 @@ namespace WIFI_Utils {
             Serial.println("\nNot connected to WiFi! Starting Auto AP");
             displayShow("", " WiFi Not Connected!", "" , "     loading ...", 1000);
             startAutoAP();
-        }
-    }
-
-    void checkAutoAPTimeout() {
-        if (networkManager->isWifiAPActive() && Config.wifiAutoAP.timeout > 0) {
-            if (WiFi.softAPgetStationNum() > 0) {
-                WiFiAutoAPTime = 0;
-            } else {
-                if (WiFiAutoAPTime == 0) {
-                    WiFiAutoAPTime = millis();
-                } else if ((millis() - WiFiAutoAPTime) > Config.wifiAutoAP.timeout * 60 * 1000) {
-                    Serial.println("Stopping auto AP");
-
-                    networkManager->disableAP();
-
-                    Serial.println("Auto AP stopped (timeout)");
-                }
-            }
         }
     }
 
