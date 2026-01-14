@@ -13,7 +13,8 @@ private:
     unsigned long _apStartup = 0;
     unsigned long _apTimeout = 0;
 
-    String _generateAPSSID();
+    String _hostName = "";
+
     void _processAPTimeout();
 
 public:
@@ -26,6 +27,8 @@ public:
     // Initialize network module
     bool setup();
     void loop();
+
+    void setHostName(const String& hostName);
 
     // WiFi methods
     bool setupAP(String apName, String apPsk = "");
