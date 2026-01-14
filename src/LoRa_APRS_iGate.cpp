@@ -107,6 +107,7 @@ void setup() {
     networkManager = new NetworkManager();
     networkManager->setup();
     networkManager->setAPTimeout(Config.wifiAutoAP.timeout * 60 * 1000); // Convert minutes to milliseconds
+    networkManager->setHostName("iGATE-" + Config.callsign);
     POWER_Utils::setup();
     Utils::setupDisplay();
     LoRa_Utils::setup();
