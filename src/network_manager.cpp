@@ -8,21 +8,7 @@ NetworkManager::NetworkManager() { }
 // Destructor
 NetworkManager::~NetworkManager() { }
 
-// Initialize
-bool NetworkManager::setup() {
-    Serial.println("Initializing Networking...");
-    return true;
-}
-
-
-void NetworkManager::loop() {
-    if (_wifiAPmode) {
-        _processAPTimeout();
-    }
-}
-
-
-// WiFi methods
+// Private methods
 
 void NetworkManager::_processAPTimeout() {
     if (!_wifiAPmode || _apTimeout == 0) {
@@ -40,6 +26,24 @@ void NetworkManager::_processAPTimeout() {
         disableAP();
     }
 }
+
+// Initialize
+bool NetworkManager::setup() {
+    Serial.println("Initializing Networking...");
+    return true;
+}
+
+void NetworkManager::loop() {
+    if (_wifiAPmode) {
+        _processAPTimeout();
+    }
+}
+
+void NetworkManager::setHostName(const String& hostName) {
+    _hostName = hostName;
+}
+
+// WiFi methods
 
 bool NetworkManager::setupAP(String apName, String apPsk) {
     _wifiAPmode = true;
@@ -86,6 +90,10 @@ void NetworkManager::setAPTimeout(unsigned long timeout) {
 
 bool NetworkManager::connectWiFi(String ssid, String psk) {
     _wifiSTAmode = true;
+
+    if (!_hostName.isEmpty()) {
+        WiFi.setHostname(_hostName.c_str());
+    }
 
     WiFi.mode(_wifiAPmode ? WIFI_AP_STA : WIFI_STA);
 
