@@ -79,9 +79,44 @@ void NetworkManager::_processAPTimeout() {
     }
 }
 
+void NetworkManager::_onNetworkEvent(arduino_event_id_t event, arduino_event_info_t /*info*/) {
+    switch (event) {
+        case ARDUINO_EVENT_ETH_START:
+            Serial.println("ETH Started");
+            if (!_hostName.isEmpty()) {
+                Serial.println("ETH Setting Hostname: " + _hostName);
+                ETH.setHostname(_hostName.c_str());
+            }
+        break;
+        case ARDUINO_EVENT_ETH_CONNECTED:
+            Serial.println("ETH Connected");
+            break;
+        case ARDUINO_EVENT_ETH_GOT_IP:
+            Serial.println("ETH Got IP");
+            _ethernetConnected = true;
+            break;
+        case ARDUINO_EVENT_ETH_DISCONNECTED:
+            Serial.println("ETH Disconnected");
+            _ethernetConnected = false;
+            break;
+        case ARDUINO_EVENT_ETH_STOP:
+            Serial.println("ETH Stopped");
+            _ethernetConnected = false;
+            break;
+        default:
+            break;
+    }
+}
+
 // Initialize
 bool NetworkManager::setup() {
     Serial.println("Initializing Networking...");
+
+    WiFi.onEvent(
+        [this](arduino_event_id_t event, arduino_event_info_t info) {
+            _onNetworkEvent(event, info);
+        });
+
     return true;
 }
 
@@ -219,6 +254,55 @@ String NetworkManager::getWiFimacAddress(void) const {
     return WiFi.macAddress();
 }
 
+// Ethernet methods
+bool NetworkManager::ethernetConnect(eth_phy_type_t type, uint8_t phy_addr, uint8_t mdc, uint8_t mdio, int power, eth_clock_mode_t clock_mode, bool use_mac_from_efuse) {
+    _ethernetMode = true;
+    Serial.println("Setting up Ethernet...");
+
+    #if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
+        // SDK 5.x (Arduino SDK 3.x)
+        #pragma message("Compiling ETH init: SDK 5.x (Arduino core 3.x)")
+        return ETH.begin(type, phy_addr, mdc, mdio, power, clock_mode, use_mac_from_efuse);
+    #else
+        // SDK 4.x (Arduino SDK 2.x)
+        #pragma message("Compiling ETH init: SDK 4.x (Arduino core 2.x)")
+        return ETH.begin(phy_addr, power, mdc, mdio, type, clock_mode, use_mac_from_efuse);
+    #endif
+}
+
+bool NetworkManager::setEthernetIP(const String& staticIP, const String& gateway, const String& subnet, const String& dns1, const String& dns2) {
+    if (staticIP.isEmpty()) {
+        return false;
+    }
+
+    IPAddress ip, gw, sn, d1, d2;
+    if (!ip.fromString(staticIP) || !gw.fromString(gateway) || !sn.fromString(subnet)) {
+        Serial.println("Invalid static IP configuration");
+        return false;
+    }
+
+    if (!dns1.isEmpty() && d1.fromString(dns1)) {
+        if (!dns2.isEmpty() && d2.fromString(dns2)) {
+            ETH.config(ip, gw, sn, d1, d2);
+        } else {
+            ETH.config(ip, gw, sn, d1);
+        }
+    } else {
+        ETH.config(ip, gw, sn);
+    }
+
+    Serial.println("Ethernet static IP: " + staticIP);
+    return true;
+}
+
+IPAddress NetworkManager::getEthernetIP() const {
+    return ETH.localIP();
+}
+
+String NetworkManager::getEthernetMACAddress() const {
+    return ETH.macAddress();
+}
+
 // Check if network is available
 bool NetworkManager::isConnected() const {
     return isWiFiConnected() || isEthernetConnected() || isModemConnected();
@@ -235,8 +319,7 @@ bool NetworkManager::isWifiAPActive() const {
 
 // Check if Ethernet is connected
 bool NetworkManager::isEthernetConnected() const {
-    // Implement Ethernet connection check logic here
-    return false;
+    return _ethernetMode && _ethernetConnected && ETH.linkUp();
 }
 
 // Check if Modem is connected

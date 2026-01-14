@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <SPI.h>
 #include <WiFi.h>
+#include <ETH.h>
 #include <vector>
 
 /**
@@ -17,6 +18,8 @@ private:
 
     bool _wifiAPmode = false;
     bool _wifiSTAmode = false;
+    bool _ethernetMode = false;
+    bool _ethernetConnected = false;
     unsigned long _apStartup = 0;
     unsigned long _apTimeout = 0;
 
@@ -26,6 +29,7 @@ private:
     int _findWiFiNetworkIndex(const String& ssid) const;
     bool _connectWiFi(const WiFiNetwork& network);
     void _processAPTimeout();
+    void _onNetworkEvent(arduino_event_id_t event, arduino_event_info_t /*info*/);
 
 public:
     // Constructor
@@ -56,6 +60,13 @@ public:
     wifi_mode_t getWiFiMode() const;
     uint8_t* getWiFimacAddress(uint8_t* mac);
     String getWiFimacAddress(void) const;
+
+    // Ethernet methods
+    bool ethernetConnect(eth_phy_type_t type, uint8_t phy_addr, uint8_t mdc, uint8_t mdio, int power, eth_clock_mode_t clock_mode, bool use_mac_from_efuse = false);
+    bool setEthernetIP(const String& staticIP, const String& gateway, const String& subnet, const String& dns1, const String& dns2);
+    bool ethernetDisconnect();
+    IPAddress getEthernetIP() const;
+    String getEthernetMACAddress() const;
 
     // Check if any network is available
     bool isConnected() const;
