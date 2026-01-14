@@ -85,9 +85,6 @@ namespace WIFI_Utils {
             return;
         }
 
-        String hostName = "iGATE-" + Config.callsign;
-        WiFi.setHostname(hostName.c_str());
-
         // TODO: Create generic multi-SSID support in Network Manager
         while (!networkManager->isWiFiConnected()) {
             displayShow("", "Connecting to WiFi:", "", currentWiFi->ssid + " ...", 0);
