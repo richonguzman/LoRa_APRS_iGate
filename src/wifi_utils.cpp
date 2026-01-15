@@ -28,9 +28,6 @@
 extern Configuration    Config;
 extern NetworkManager   *networkManager;
 
-extern uint8_t          myWiFiAPIndex;
-extern int              myWiFiAPSize;
-extern WiFi_AP          *currentWiFi;
 extern bool             backUpDigiMode;
 
 uint32_t    previousWiFiMillis  = 0;
@@ -79,25 +76,27 @@ namespace WIFI_Utils {
     }
 
     void startWiFi() {
-        if (currentWiFi->ssid.isEmpty()) {
+        bool hasNetworks = false;
+
+        networkManager->clearWiFiNetworks();
+        for (size_t i = 0; i < Config.wifiAPs.size(); i++) {
+            const WiFi_AP& wifiAP = Config.wifiAPs[i];
+            if (wifiAP.ssid.isEmpty()) {
+                continue;
+            }
+
+            hasNetworks = true;
+            networkManager->addWiFiNetwork(wifiAP.ssid, wifiAP.password);
+        }
+
+        if (!hasNetworks) {
             Serial.println("WiFi SSID not set! Starting Auto AP");
             startAutoAP();
             return;
         }
 
-        // TODO: Create generic multi-SSID support in Network Manager
-        while (!networkManager->isWiFiConnected()) {
-            displayShow("", "Connecting to WiFi:", "", currentWiFi->ssid + " ...", 0);
-            networkManager->disconnectWiFi();
-            networkManager->connectWiFi(currentWiFi->ssid, currentWiFi->password);
-
-            if(myWiFiAPIndex >= (myWiFiAPSize - 1)) {
-                break;
-            }
-
-            myWiFiAPIndex++;
-            currentWiFi = &Config.wifiAPs[myWiFiAPIndex];
-        }
+        displayShow("", "Connecting to WiFi:", "", "     loading ...", 0);
+        networkManager->connectWiFi();
 
         #ifdef INTERNAL_LED_PIN
             digitalWrite(INTERNAL_LED_PIN,LOW);
