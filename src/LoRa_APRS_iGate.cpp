@@ -82,10 +82,6 @@ WiFiClient          mqttClient;
 
 NetworkManager      *networkManager;
 
-uint8_t             myWiFiAPIndex           = 0;
-int                 myWiFiAPSize            = Config.wifiAPs.size();
-WiFi_AP             *currentWiFi            = &Config.wifiAPs[myWiFiAPIndex];
-
 bool                isUpdatingOTA           = false;
 uint32_t            lastBatteryCheck        = 0;
 
