@@ -17,8 +17,9 @@
  */
 
 #include <APRSPacketLib.h> 
-#include <WiFi.h>
+#include <WiFiClient.h>
 #include "configuration.h"
+#include "network_manager.h"
 #include "aprs_is_utils.h"
 #include "station_utils.h"
 #include "board_pinout.h"
@@ -32,6 +33,7 @@
 
 
 extern Configuration        Config;
+extern NetworkManager       *networkManager;
 extern WiFiClient           aprsIsClient;
 extern uint32_t             lastScreenOn;
 extern String               firstLine;
@@ -91,7 +93,7 @@ namespace APRS_IS_Utils {
 
     void checkStatus() {
         String wifiState, aprsisState;
-        if (WiFi.status() == WL_CONNECTED) {
+        if (networkManager->isWiFiConnected()) {
             wifiState = "OK";
         } else {
             if (backUpDigiMode || Config.digi.ecoMode == 1 || Config.digi.ecoMode == 2) {
@@ -388,7 +390,7 @@ namespace APRS_IS_Utils {
     }
 
     void firstConnection() {
-        if (Config.aprs_is.active && (WiFi.status() == WL_CONNECTED) && !aprsIsClient.connected()) {
+        if (Config.aprs_is.active && networkManager->isConnected() && !aprsIsClient.connected()) {
             connect();
             while (!passcodeValid) {
                 listenAPRSIS();

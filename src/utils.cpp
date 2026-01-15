@@ -18,9 +18,9 @@
 
 #include <APRSPacketLib.h>
 #include <TinyGPS++.h>
-#include <WiFi.h>
 #include "telemetry_utils.h"
 #include "configuration.h"
+#include "network_manager.h"
 #include "station_utils.h"
 #include "battery_utils.h"
 #include "aprs_is_utils.h"
@@ -36,6 +36,7 @@
 
 
 extern Configuration        Config;
+extern NetworkManager       *networkManager;
 extern TinyGPSPlus          gps;
 extern String               versionDate;
 extern String               firstLine;
@@ -51,7 +52,6 @@ extern int                  rssi;
 extern float                snr;
 extern int                  freqError;
 extern String               distance;
-extern bool                 WiFiConnected;
 extern int                  wxModuleType;
 extern bool                 backUpDigiMode;
 extern bool                 shouldSleepLowVoltage;
@@ -74,7 +74,7 @@ namespace Utils {
     void processStatus() {
         String status = APRSPacketLib::generateBasePacket(Config.callsign, "APLRG1", Config.beacon.path);
 
-        if (WiFi.status() == WL_CONNECTED && Config.aprs_is.active && Config.beacon.sendViaAPRSIS) {
+        if (networkManager->isConnected() && Config.aprs_is.active && Config.beacon.sendViaAPRSIS) {
             delay(1000);
             status.concat(",qAC:>");
             status.concat(Config.beacon.statusPacket);
@@ -93,12 +93,12 @@ namespace Utils {
     String getLocalIP() {
         if (Config.digi.ecoMode == 1 || Config.digi.ecoMode == 2) {
             return "** WiFi AP  Killed **";
-        } else if (!WiFiConnected) {
-            return "IP :  192.168.4.1";
+        } else if (!networkManager->isWiFiConnected() && networkManager->isWifiAPActive()) {
+            return "IP :  " + String(networkManager->getWiFiAPIP());
         } else if (backUpDigiMode) {
             return "- BACKUP DIGI MODE -";
         } else {
-            return "IP :  " + String(WiFi.localIP()[0]) + "." + String(WiFi.localIP()[1]) + "." + String(WiFi.localIP()[2]) + "." + String(WiFi.localIP()[3]);
+            return "IP :  " + String(networkManager->getWiFiIP());
         }
     }
 
