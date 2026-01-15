@@ -10,6 +10,58 @@ NetworkManager::~NetworkManager() { }
 
 // Private methods
 
+int NetworkManager::_findWiFiNetworkIndex(const String& ssid) const {
+    for (size_t i = 0; i < _wifiNetworks.size(); i++) {
+        if (_wifiNetworks[i].ssid == ssid) {
+            return static_cast<int>(i);
+        }
+    }
+    return -1;
+}
+
+bool NetworkManager::_connectWiFi(const WiFiNetwork& network) {
+    if (network.ssid.isEmpty()) {
+        return false;
+    }
+
+    _wifiSTAmode = true;
+
+    if (!_hostName.isEmpty()) {
+        WiFi.setHostname(_hostName.c_str());
+    }
+
+    WiFi.mode(_wifiAPmode ? WIFI_AP_STA : WIFI_STA);
+
+    Serial.println("[NM] Attempting to connect to WiFi: " + network.ssid);
+    WiFi.begin(network.ssid.c_str(), network.psk.c_str());
+
+    Serial.print("[NM] Connecting ");
+
+    int attempts = 0;
+    while (!isWiFiConnected() && attempts < 10) {
+        delay(500);
+        #ifdef INTERNAL_LED_PIN
+            digitalWrite(INTERNAL_LED_PIN,HIGH);
+        #endif
+        Serial.print('.');
+        delay(500);
+        #ifdef INTERNAL_LED_PIN
+            digitalWrite(INTERNAL_LED_PIN,LOW);
+        #endif
+        attempts++;
+    }
+    Serial.println();
+
+    if (isWiFiConnected()) {
+        Serial.println("[NM] WiFi connected! IP: " + WiFi.localIP().toString());
+        return true;
+    }
+
+    Serial.println("[NM] Failed to connect to WiFi after " + String(attempts) + " attempts. SSID: " +
+                    network.ssid);
+    return false;
+}
+
 void NetworkManager::_processAPTimeout() {
     if (!_wifiAPmode || _apTimeout == 0) {
         return;
@@ -88,44 +140,47 @@ void NetworkManager::setAPTimeout(unsigned long timeout) {
     _apTimeout = timeout;
 }
 
-bool NetworkManager::connectWiFi(String ssid, String psk) {
-    _wifiSTAmode = true;
-
-    if (!_hostName.isEmpty()) {
-        WiFi.setHostname(_hostName.c_str());
+void NetworkManager::addWiFiNetwork(const String& ssid, const String& psk) {
+    if (ssid.isEmpty()) {
+        return;
     }
 
-    WiFi.mode(_wifiAPmode ? WIFI_AP_STA : WIFI_STA);
-
-    Serial.println("Attempting to connect to WiFi: " + ssid);
-    WiFi.begin(ssid.c_str(), psk.c_str());
-
-    Serial.print("Connecting ");
-
-    int attempts = 0;
-    while (!isWiFiConnected() && attempts < 10) {
-        delay(500);
-        #ifdef INTERNAL_LED_PIN
-            digitalWrite(INTERNAL_LED_PIN,HIGH);
-        #endif
-        Serial.print('.');
-        delay(500);
-        #ifdef INTERNAL_LED_PIN
-            digitalWrite(INTERNAL_LED_PIN,LOW);
-        #endif
-        attempts++;
+    int index = _findWiFiNetworkIndex(ssid);
+    if (index >= 0) {
+        Serial.println("[NM] Updating WiFi network: " + ssid);
+        _wifiNetworks[static_cast<size_t>(index)].psk = psk;
+        return;
     }
-    Serial.println();
 
-    if (isWiFiConnected()) {
-        Serial.println("WiFi connected! IP: " + WiFi.localIP().toString());
-        return true;
-    }
-    else {
-        Serial.println("Failed to connect to WiFi after " + String(attempts) + " attempts. SSID: " +
-                            ssid);
+    Serial.println("[NM] Adding WiFi network: " + ssid);
+    WiFiNetwork network;
+    network.ssid = ssid;
+    network.psk = psk;
+    _wifiNetworks.push_back(network);
+}
+
+void NetworkManager::clearWiFiNetworks() {
+    _wifiNetworks.clear();
+}
+
+bool NetworkManager::connectWiFi() {
+    if (_wifiNetworks.empty()) {
         return false;
     }
+
+    for (size_t i = 0; i < _wifiNetworks.size(); i++) {
+        disconnectWiFi();
+        if (_connectWiFi(_wifiNetworks[i])) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool NetworkManager::connectWiFi(const String& ssid, const String& psk) {
+    addWiFiNetwork(ssid, psk);
+    return connectWiFi();
 }
 
 bool NetworkManager::disconnectWiFi() {

@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <SPI.h>
 #include <WiFi.h>
+#include <vector>
 
 /**
  * Class for managing network connections
@@ -8,13 +9,22 @@
 class NetworkManager
 {
 private:
+    class WiFiNetwork {
+    public:
+        String ssid;
+        String psk;
+    };
+
     bool _wifiAPmode = false;
     bool _wifiSTAmode = false;
     unsigned long _apStartup = 0;
     unsigned long _apTimeout = 0;
 
     String _hostName = "";
+    std::vector<WiFiNetwork> _wifiNetworks;
 
+    int _findWiFiNetworkIndex(const String& ssid) const;
+    bool _connectWiFi(const WiFiNetwork& network);
     void _processAPTimeout();
 
 public:
@@ -34,7 +44,10 @@ public:
     bool setupAP(String apName, String apPsk = "");
     bool disableAP();
     void setAPTimeout(unsigned long timeout);
-    bool connectWiFi(String ssid, String psk);
+    void addWiFiNetwork(const String& ssid, const String& psk = "");
+    void clearWiFiNetworks();
+    bool connectWiFi();
+    bool connectWiFi(const String& ssid, const String& psk = "");
     bool disconnectWiFi();
     String getWiFiSSID() const;
     String getWiFiAPSSID() const;
