@@ -41,7 +41,7 @@ namespace QUERY_Utils {
         String queryQuestion = query;
         queryQuestion.toUpperCase();
         if (queryQuestion == "?APRS?" || queryQuestion == "H" || queryQuestion == "HELP" || queryQuestion=="?") {
-            answer.concat("?APRSV ?APRSP ?APRSL ?APRSSSR ?EM=? ?TX=? "); // ?APRSH ?WHERE callsign
+            answer.concat("?APRSV ?APRSP ?APRSL ?APRSSR ?EM=? ?TX=? "); // ?APRSH ?WHERE callsign
         } else if (queryQuestion == "?APRSV") {
             answer.concat("CA2RXU_LoRa_iGate v");
             answer.concat(versionNumber);
