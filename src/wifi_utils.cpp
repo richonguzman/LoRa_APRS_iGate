@@ -35,35 +35,45 @@ extern bool             backUpDigiMode;
 bool        WiFiConnected       = false;
 uint32_t    WiFiAutoAPTime      = millis();
 bool        WiFiAutoAPStarted   = false;
-uint32_t    previousWiFiMillis  = 0;
 uint8_t     wifiCounter         = 0;
 uint32_t    lastBackupDigiTime  = millis();
+uint32_t    lastWiFiCheck       = 0;
+uint32_t    lastInternetCheck   = 0;
 
 
 namespace WIFI_Utils {
 
     bool checkInternetConnection() {
         HTTPClient http;
-        http.begin("http://connectivitycheck.gstatic.com/generate_204");    // Google Connectivity Detection Endpoint
-        http.setTimeout(2000);
+        String serverUrl = Config.aprs_is.server;
+        if (!serverUrl.startsWith("http://") && !serverUrl.startsWith("https://")) {
+            serverUrl = "http://" + serverUrl;
+        }
+        serverUrl += ":";
+        serverUrl += String(Config.aprs_is.port);
+        http.begin(serverUrl);
+        //http.begin("http://connectivitycheck.gstatic.com/generate_204");    // Google Connectivity Detection Endpoint
+        http.setTimeout(3000);
         http.setConnectTimeout(2000);
         
         int httpCode = http.GET();
         http.end();
-        
-        if (httpCode == 204 || httpCode == HTTP_CODE_OK) {
+        return (httpCode > 0 && httpCode < 400); // Accepting any 'OK' response
+
+        /*if (httpCode == 204 || httpCode == HTTP_CODE_OK) {
             return true;
         } else {
             Serial.printf("Internet: FAIL (Code: %d)\n", httpCode);
             return false;
-        }
+        }*/
     }
 
     void checkWiFi() {
         if (Config.digi.ecoMode != 0) return;
+        uint32_t currentTime = millis();
 
         if (backUpDigiMode) {
-            if (WiFi.status() != WL_CONNECTED && ((millis() - lastBackupDigiTime) >= 15 * 60 * 1000)) {
+            if (WiFi.status() != WL_CONNECTED && ((currentTime - lastBackupDigiTime) >= 15 * 60 * 1000)) {
                 Serial.println("*** Stopping BackUp Digi Mode ***");
                 backUpDigiMode = false;
                 wifiCounter = 0;
@@ -74,15 +84,17 @@ namespace WIFI_Utils {
             }
         }
 
-        if (!backUpDigiMode && ((millis() - previousWiFiMillis) >= 60 * 1000) && !WiFiAutoAPStarted) {
-            previousWiFiMillis = millis();
+        if (!backUpDigiMode && ((currentTime - lastWiFiCheck) >= 60 * 1000) && !WiFiAutoAPStarted) {
+            lastWiFiCheck = currentTime;
             if (WiFi.status() == WL_CONNECTED) {
-                if (Config.backupDigiMode) {
+                if (Config.backupDigiMode && (currentTime - lastInternetCheck > 5 * 60 * 1000)) {
+                    lastInternetCheck = currentTime;
                     bool internetOK = checkInternetConnection();
                     if (!internetOK && Config.backupDigiMode) {
                         Serial.println("*** Internet LOST → Backup Digi Mode ***");
                         backUpDigiMode = true;
                         WiFi.disconnect();
+                        lastBackupDigiTime = currentTime;
                     }
                 }                
             } else {
@@ -94,7 +106,7 @@ namespace WIFI_Utils {
                 if (wifiCounter >= 2) {
                     Serial.println("*** Starting BackUp Digi Mode ***");
                     backUpDigiMode = true;
-                    lastBackupDigiTime = millis();
+                    lastBackupDigiTime = currentTime;
                 }
             }
         }
@@ -125,19 +137,19 @@ namespace WIFI_Utils {
             displayShow("", "Connecting to WiFi:", "", currentWiFi->ssid + " ...", 0);
             Serial.print("\nConnecting to WiFi '"); Serial.print(currentWiFi->ssid); Serial.print("' ");
             WiFi.begin(currentWiFi->ssid.c_str(), currentWiFi->password.c_str());
-            while (WiFi.status() != WL_CONNECTED && wifiCounter<myWiFiAPSize) {
+            while (WiFi.status() != WL_CONNECTED && wifiCounter < myWiFiAPSize) {
                 delay(500);
                 #ifdef INTERNAL_LED_PIN
-                    digitalWrite(INTERNAL_LED_PIN,HIGH);
+                    digitalWrite(INTERNAL_LED_PIN, HIGH);
                 #endif
                 Serial.print('.');
                 delay(500);
                 #ifdef INTERNAL_LED_PIN
-                    digitalWrite(INTERNAL_LED_PIN,LOW);
+                    digitalWrite(INTERNAL_LED_PIN, LOW);
                 #endif
                 if ((millis() - start) > 10000){
                     delay(1000);
-                    if(myWiFiAPIndex >= (myWiFiAPSize - 1)) {
+                    if (myWiFiAPIndex >= (myWiFiAPSize - 1)) {
                         myWiFiAPIndex = 0;
                         wifiCounter++;
                     } else {
@@ -154,7 +166,7 @@ namespace WIFI_Utils {
             }
         }
         #ifdef INTERNAL_LED_PIN
-            digitalWrite(INTERNAL_LED_PIN,LOW);
+            digitalWrite(INTERNAL_LED_PIN, LOW);
         #endif
         if (WiFi.status() == WL_CONNECTED) {
             Serial.print("\nConnected as ");
@@ -162,7 +174,7 @@ namespace WIFI_Utils {
             Serial.print(" / MAC Address: ");
             Serial.println(WiFi.macAddress());
             displayShow("", "     Connected!!", "" , "     loading ...", 1000);
-        } else if (WiFi.status() != WL_CONNECTED) {
+        } else {
             startAP = true;
 
             Serial.println("\nNot connected to WiFi! Starting Auto AP");
