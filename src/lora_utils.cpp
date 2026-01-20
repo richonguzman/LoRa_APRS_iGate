@@ -156,7 +156,7 @@ namespace LoRa_Utils {
         radio.setSpreadingFactor(Config.loramodule.txSpreadingFactor);
         radio.setCodingRate(Config.loramodule.txCodingRate4);
         float signalBandwidth = Config.loramodule.txSignalBandwidth / 1000;
-        radio.setBandwidth(Config.loramodule.txSignalBandwidth);
+        radio.setBandwidth(signalBandwidth);
     }
 
     void changeFreqRx() {
@@ -165,7 +165,7 @@ namespace LoRa_Utils {
         radio.setSpreadingFactor(Config.loramodule.rxSpreadingFactor);
         radio.setCodingRate(Config.loramodule.rxCodingRate4);
         float signalBandwidth = Config.loramodule.rxSignalBandwidth / 1000;
-        radio.setBandwidth(Config.loramodule.rxSignalBandwidth);
+        radio.setBandwidth(signalBandwidth);
     }
 
     void sendNewPacket(const String& newPacket) {

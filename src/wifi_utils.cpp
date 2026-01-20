@@ -16,6 +16,7 @@
  * along with LoRa APRS iGate. If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <HTTPClient.h>
 #include <WiFi.h>
 #include "configuration.h"
 #include "board_pinout.h"
@@ -41,31 +42,55 @@ uint32_t    lastBackupDigiTime  = millis();
 
 namespace WIFI_Utils {
 
-    void checkWiFi() {
-        if (Config.digi.ecoMode == 0) {
-            if (backUpDigiMode) {
-                uint32_t WiFiCheck = millis() - lastBackupDigiTime;
-                if (WiFi.status() != WL_CONNECTED && WiFiCheck >= 15 * 60 * 1000) {
-                    Serial.println("*** Stopping BackUp Digi Mode ***");
-                    backUpDigiMode = false;
-                    wifiCounter = 0;
-                } else if (WiFi.status() == WL_CONNECTED) {
-                    Serial.println("*** WiFi Reconnect Success (Stopping Backup Digi Mode) ***");
-                    backUpDigiMode = false;
-                    wifiCounter = 0;
-                }
-            }
+    bool checkInternetConnection() {
+        HTTPClient http;
+        http.begin("http://connectivitycheck.gstatic.com/generate_204");    // Google Connectivity Detection Endpoint
+        http.setTimeout(2000);
+        http.setConnectTimeout(2000);
+        
+        int httpCode = http.GET();
+        http.end();
+        
+        if (httpCode == 204 || httpCode == HTTP_CODE_OK) {
+            return true;
+        } else {
+            Serial.printf("Internet: FAIL (Code: %d)\n", httpCode);
+            return false;
+        }
+    }
 
-            if (!backUpDigiMode && (WiFi.status() != WL_CONNECTED) && ((millis() - previousWiFiMillis) >= 30 * 1000) && !WiFiAutoAPStarted) {
-                Serial.print(millis());
+    void checkWiFi() {
+        if (Config.digi.ecoMode != 0) return;
+
+        if (backUpDigiMode) {
+            if (WiFi.status() != WL_CONNECTED && ((millis() - lastBackupDigiTime) >= 15 * 60 * 1000)) {
+                Serial.println("*** Stopping BackUp Digi Mode ***");
+                backUpDigiMode = false;
+                wifiCounter = 0;
+            } else if (WiFi.status() == WL_CONNECTED) {
+                Serial.println("*** WiFi Reconnect Success (Stopping Backup Digi Mode) ***");
+                backUpDigiMode = false;
+                wifiCounter = 0;
+            }
+        }
+
+        if (!backUpDigiMode && ((millis() - previousWiFiMillis) >= 60 * 1000) && !WiFiAutoAPStarted) {
+            previousWiFiMillis = millis();
+            if (WiFi.status() == WL_CONNECTED) {
+                if (Config.backupDigiMode) {
+                    bool internetOK = checkInternetConnection();
+                    if (!internetOK && Config.backupDigiMode) {
+                        Serial.println("*** Internet LOST → Backup Digi Mode ***");
+                        backUpDigiMode = true;
+                        WiFi.disconnect();
+                    }
+                }                
+            } else {
                 Serial.println("Reconnecting to WiFi...");
                 WiFi.disconnect();
                 WIFI_Utils::startWiFi();
-                previousWiFiMillis = millis();
 
-                if (Config.backupDigiMode) {
-                    wifiCounter++;
-                }
+                if (Config.backupDigiMode) wifiCounter++;
                 if (wifiCounter >= 2) {
                     Serial.println("*** Starting BackUp Digi Mode ***");
                     backUpDigiMode = true;
