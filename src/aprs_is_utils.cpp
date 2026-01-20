@@ -47,6 +47,8 @@ extern String               versionNumber;
 
 uint32_t    lastRxTime      = millis();
 bool        passcodeValid   = false;
+uint32_t    lastServerCheck = 0;
+
 
 #ifdef HAS_A7670
     extern bool             stationBeacon;
@@ -308,70 +310,77 @@ namespace APRS_IS_Utils {
                 passcodeValid = true;
             }
         }
-        if (passcodeValid && !packet.startsWith("#")) {
-            if (Config.aprs_is.messagesToRF && packet.indexOf("::") > 0) {
-                String Sender = packet.substring(0, packet.indexOf(">"));
-                const String& AddresseeAndMessage = packet.substring(packet.indexOf("::") + 2);
-                String Addressee = AddresseeAndMessage.substring(0, AddresseeAndMessage.indexOf(":"));
-                Addressee.trim();
-                if (Addressee == Config.callsign) {                 // its for me!
-                    String receivedMessage;
-                    if (AddresseeAndMessage.indexOf("{") > 0) {     // ack?
-                        processAckMessage(Sender, AddresseeAndMessage);
-                        receivedMessage = AddresseeAndMessage.substring(AddresseeAndMessage.indexOf(":") + 1, AddresseeAndMessage.indexOf("{"));
-                    } else {
-                        receivedMessage = AddresseeAndMessage.substring(AddresseeAndMessage.indexOf(":") + 1);
-                    }
-                    if (receivedMessage.indexOf("?") == 0) {
-                        Utils::println("Rx Query (APRS-IS)  : " + packet);
-                        String queryAnswer = QUERY_Utils::process(receivedMessage, Sender, true, false);
-                        //Serial.println("---> QUERY Answer : " + queryAnswer.substring(0,queryAnswer.indexOf("\n")));
-                        if (!Config.display.alwaysOn && Config.display.timeout != 0) {
-                            displayToggle(true);
+        if (passcodeValid) {
+            uint32_t currentTime = millis();
+            if (packet.startsWith("#")) {
+                lastServerCheck = currentTime;
+                Utils::print("[DEBUG INFO] Server alive: ");
+                Utils::println(String(lastServerCheck));
+            } else {
+                if (Config.aprs_is.messagesToRF && packet.indexOf("::") > 0) {
+                    String Sender = packet.substring(0, packet.indexOf(">"));
+                    const String& AddresseeAndMessage = packet.substring(packet.indexOf("::") + 2);
+                    String Addressee = AddresseeAndMessage.substring(0, AddresseeAndMessage.indexOf(":"));
+                    Addressee.trim();
+                    if (Addressee == Config.callsign) {                 // its for me!
+                        String receivedMessage;
+                        if (AddresseeAndMessage.indexOf("{") > 0) {     // ack?
+                            processAckMessage(Sender, AddresseeAndMessage);
+                            receivedMessage = AddresseeAndMessage.substring(AddresseeAndMessage.indexOf(":") + 1, AddresseeAndMessage.indexOf("{"));
+                        } else {
+                            receivedMessage = AddresseeAndMessage.substring(AddresseeAndMessage.indexOf(":") + 1);
                         }
-                        lastScreenOn = millis();
-                        #ifdef HAS_A7670
-                            A7670_Utils::uploadToAPRSIS(queryAnswer);
-                        #else
-                            upload(queryAnswer);
-                        #endif
-                        SYSLOG_Utils::log(2, queryAnswer, 0, 0.0, 0); // APRSIS TX
-                        fifthLine = "APRS-IS ----> APRS-IS";
-                        sixthLine = Config.callsign;
-                        for (int j = sixthLine.length();j < 9;j++) {
-                            sixthLine += " ";
+                        if (receivedMessage.indexOf("?") == 0) {
+                            Utils::println("Rx Query (APRS-IS)  : " + packet);
+                            String queryAnswer = QUERY_Utils::process(receivedMessage, Sender, true, false);
+                            //Serial.println("---> QUERY Answer : " + queryAnswer.substring(0,queryAnswer.indexOf("\n")));
+                            if (!Config.display.alwaysOn && Config.display.timeout != 0) {
+                                displayToggle(true);
+                            }
+                            lastScreenOn = currentTime;
+                            #ifdef HAS_A7670
+                                A7670_Utils::uploadToAPRSIS(queryAnswer);
+                            #else
+                                upload(queryAnswer);
+                            #endif
+                            SYSLOG_Utils::log(2, queryAnswer, 0, 0.0, 0); // APRSIS TX
+                            fifthLine = "APRS-IS ----> APRS-IS";
+                            sixthLine = Config.callsign;
+                            for (int j = sixthLine.length();j < 9;j++) {
+                                sixthLine += " ";
+                            }
+                            sixthLine += "> ";
+                            sixthLine += Sender;
+                            seventhLine = "QUERY = ";
+                            seventhLine += receivedMessage;
                         }
-                        sixthLine += "> ";
-                        sixthLine += Sender;
-                        seventhLine = "QUERY = ";
-                        seventhLine += receivedMessage;
-                    }
-                    displayShow(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
-                } else {
-                    Utils::print("Rx Message (APRS-IS): " + packet);
-                    if (STATION_Utils::wasHeard(Addressee) && packet.indexOf("EQNS.") == -1 && packet.indexOf("UNIT.") == -1 && packet.indexOf("PARM.") == -1) {
-                        STATION_Utils::addToOutputPacketBuffer(buildPacketToTx(packet, 1));
-                        displayToggle(true);
-                        lastScreenOn = millis();
-                        Utils::typeOfPacket(packet, 1); // APRS-LoRa
                         displayShow(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
+                    } else {
+                        Utils::print("Rx Message (APRS-IS): " + packet);
+                        if (STATION_Utils::wasHeard(Addressee) && packet.indexOf("EQNS.") == -1 && packet.indexOf("UNIT.") == -1 && packet.indexOf("PARM.") == -1) {
+                            STATION_Utils::addToOutputPacketBuffer(buildPacketToTx(packet, 1));
+                            displayToggle(true);
+                            lastScreenOn = currentTime;
+                            Utils::typeOfPacket(packet, 1); // APRS-LoRa
+                            displayShow(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
+                        }
+                    }
+                } else if (Config.aprs_is.objectsToRF && packet.indexOf(":;") > 0) {
+                    Utils::print("Rx Object (APRS-IS) : " + packet);
+                    if (STATION_Utils::checkObjectTime(packet)) {
+                        STATION_Utils::addToOutputPacketBuffer(buildPacketToTx(packet, 5));
+                        displayToggle(true);
+                        lastScreenOn = currentTime;
+                        Utils::typeOfPacket(packet, 1); // APRS-LoRa
+                        Serial.println();
+                    } else {
+                        Serial.println(" ---> Rejected (Time): No Tx");
                     }
                 }
-            } else if (Config.aprs_is.objectsToRF && packet.indexOf(":;") > 0) {
-                Utils::print("Rx Object (APRS-IS) : " + packet);
-                if (STATION_Utils::checkObjectTime(packet)) {
-                    STATION_Utils::addToOutputPacketBuffer(buildPacketToTx(packet, 5));
-                    displayToggle(true);
-                    lastScreenOn = millis();
-                    Utils::typeOfPacket(packet, 1); // APRS-LoRa
-                    Serial.println();
-                } else {
-                    Serial.println(" ---> Rejected (Time): No Tx");
+                if (Config.tnc.aprsBridgeActive) {
+                    if (Config.tnc.enableServer) TNC_Utils::sendToClients(packet);  // Send received packet to TNC KISS
+                    if (Config.tnc.enableSerial) TNC_Utils::sendToSerial(packet);   // Send received packet to Serial KISS
                 }
-            }
-            if (Config.tnc.aprsBridgeActive) {
-                if (Config.tnc.enableServer) TNC_Utils::sendToClients(packet);  // Send received packet to TNC KISS
-                if (Config.tnc.enableSerial) TNC_Utils::sendToSerial(packet);   // Send received packet to Serial KISS
             }
         }
     }
