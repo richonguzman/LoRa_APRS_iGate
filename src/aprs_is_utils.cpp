@@ -300,6 +300,7 @@ namespace APRS_IS_Utils {
     }
 
     void processAPRSISPacket(const String& packet) {
+        uint32_t currentTime = millis();
         if (!passcodeValid && packet.indexOf(Config.callsign) != -1) {
             if (packet.indexOf("unverified") != -1 ) {
                 Serial.println("\n****APRS PASSCODE NOT VALID****\n");
@@ -307,15 +308,13 @@ namespace APRS_IS_Utils {
                 aprsIsClient.stop();
                 Config.aprs_is.active = false;
             } else if (packet.indexOf("verified") != -1 ) {
+                lastServerCheck = currentTime;
                 passcodeValid = true;
             }
         }
         if (passcodeValid) {
-            uint32_t currentTime = millis();
             if (packet.startsWith("#")) {
                 lastServerCheck = currentTime;
-                Utils::print("[DEBUG INFO] Server alive: ");
-                Utils::println(String(lastServerCheck));
             } else {
                 if (Config.aprs_is.messagesToRF && packet.indexOf("::") > 0) {
                     String Sender = packet.substring(0, packet.indexOf(">"));
