@@ -42,7 +42,7 @@ extern String               fifthLine;
 extern String               sixthLine;
 extern String               seventhLine;
 extern bool                 modemLoggedToAPRSIS;
-extern bool                 backUpDigiMode;
+extern bool                 backupDigiMode;
 extern String               versionNumber;
 
 uint32_t    lastRxTime      = millis();
@@ -96,7 +96,7 @@ namespace APRS_IS_Utils {
         if (WiFi.status() == WL_CONNECTED) {
             wifiState = "OK";
         } else {
-            if (backUpDigiMode || Config.digi.ecoMode == 1 || Config.digi.ecoMode == 2) {
+            if (backupDigiMode || Config.digi.ecoMode == 1 || Config.digi.ecoMode == 2) {
                 wifiState = "--";
             } else {
                 wifiState = "AP";
@@ -308,13 +308,13 @@ namespace APRS_IS_Utils {
                 aprsIsClient.stop();
                 Config.aprs_is.active = false;
             } else if (packet.indexOf("verified") != -1 ) {
-                if (Config.backupDigiMode) lastServerCheck = currentTime;
+                if (Config.digi.backupDigiMode) lastServerCheck = currentTime;
                 passcodeValid = true;
             }
         }
         if (passcodeValid) {
             if (packet.startsWith("#")) {
-                if (Config.backupDigiMode) lastServerCheck = currentTime;
+                if (Config.digi.backupDigiMode) lastServerCheck = currentTime;
             } else {
                 if (Config.aprs_is.messagesToRF && packet.indexOf("::") > 0) {
                     String Sender = packet.substring(0, packet.indexOf(">"));

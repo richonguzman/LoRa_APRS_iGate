@@ -56,12 +56,12 @@ namespace GPS_Utils {
                 Config.aprs_is.objectsToRF  = false;
                 Config.beacon.sendViaRF     = false;
                 Config.digi.mode            = 0;
-                Config.backupDigiMode       = false;
+                Config.digi.backupDigiMode  = false;
             } else if (callsignIsValid && Config.tacticalCallsign != "") {
                 beaconPacket = APRSPacketLib::generateBasePacket(Config.tacticalCallsign, "APLRG1", Config.beacon.path);
                 Config.aprs_is.active       = false;
                 Config.beacon.sendViaAPRSIS = false;
-                Config.backupDigiMode       = false;
+                Config.digi.backupDigiMode  = false;
             }
         } else {
             Config.beacon.sendViaAPRSIS = false;

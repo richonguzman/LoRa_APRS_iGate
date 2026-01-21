@@ -38,7 +38,7 @@ extern String           fourthLine;
 extern String           fifthLine;
 extern String           sixthLine;
 extern String           seventhLine;
-extern bool             backUpDigiMode;
+extern bool             backupDigiMode;
 
 
 namespace DIGI_Utils {
@@ -101,7 +101,7 @@ namespace DIGI_Utils {
         }
         if (temp.indexOf(",") > 2) { // checks for path
             const String& path = temp.substring(temp.indexOf(",") + 1); // after tocall
-            if (Config.digi.mode == 2 || backUpDigiMode) {
+            if (Config.digi.mode == 2 || backupDigiMode) {
                 if (path.indexOf("WIDE1-1") != - 1) {
                     return buildPacket(path, packet, thirdParty, false);
                 } else if (path.indexOf("WIDE1-1") == -1 && (abs(Config.loramodule.txFreq - Config.loramodule.rxFreq) >= 125000)) { //  CrossFreq Digi
@@ -127,7 +127,7 @@ namespace DIGI_Utils {
             } else {
                 return "";
             }
-        } else if (temp.indexOf(",") == -1 && (Config.digi.mode == 2 || backUpDigiMode || Config.digi.mode == 3) && (abs(Config.loramodule.txFreq - Config.loramodule.rxFreq) >= 125000)) {
+        } else if (temp.indexOf(",") == -1 && (Config.digi.mode == 2 || backupDigiMode || Config.digi.mode == 3) && (abs(Config.loramodule.txFreq - Config.loramodule.rxFreq) >= 125000)) {
             return buildPacket("", packet, thirdParty, true);
         } else {
             return "";

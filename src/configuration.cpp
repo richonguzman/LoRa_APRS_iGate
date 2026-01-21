@@ -90,6 +90,7 @@ bool Configuration::writeFile() {
         #if defined(HAS_A7670)
             if (digi.ecoMode == 1) data["digi"]["ecoMode"] = 2;
         #endif
+        data["digi"]["backupDigiMode"]              = digi.backupDigiMode;
 
         data["lora"]["rxActive"]                    = loramodule.rxActive;
         data["lora"]["rxFreq"]                      = loramodule.rxFreq;
@@ -176,8 +177,6 @@ bool Configuration::writeFile() {
         data["other"]["rebootModeTime"]             = rebootModeTime;
 
         data["other"]["rememberStationTime"]        = rememberStationTime;
-
-        data["other"]["backupDigiMode"]             = backupDigiMode;
 
         serializeJson(data, configFile);
         configFile.close();
@@ -275,13 +274,16 @@ bool Configuration::readFile() {
         blacklist                       = data["blacklist"] | "station callsign";
 
         if (!data["digi"].containsKey("mode") ||
-            !data["digi"].containsKey("ecoMode")) needsRewrite = true;
+            !data["digi"].containsKey("ecoMode") ||
+            !data["digi"].containsKey("backupDigiMode")) needsRewrite = true;
         digi.mode                       = data["digi"]["mode"] | 0;
         digi.ecoMode                    = data["digi"]["ecoMode"] | 0;
         if (digi.ecoMode == 1) shouldSleepStop = false;
         #if defined(HAS_A7670)
             if (digi.ecoMode == 1) digi.ecoMode = 2;
         #endif
+        digi.backupDigiMode             = data["digi"]["backupDigiMode"] | false;
+
 
         if (!data["lora"].containsKey("rxActive") ||
             !data["lora"].containsKey("rxFreq") ||
@@ -410,9 +412,6 @@ bool Configuration::readFile() {
         if (!data["other"].containsKey("rememberStationTime")) needsRewrite = true;
         rememberStationTime             = data["other"]["rememberStationTime"] | 30;
 
-        if (!data["other"].containsKey("backupDigiMode")) needsRewrite = true;
-        backupDigiMode                  = data["other"]["backupDigiMode"] | false;
-
         if (wifiAPs.size() == 0) { // If we don't have any WiFi's from config we need to add "empty" SSID for AUTO AP
             WiFi_AP wifiap;
             wifiap.ssid = "";
@@ -484,6 +483,7 @@ void Configuration::setDefaultValues() {
 
     digi.mode                       = 0;
     digi.ecoMode                    = 0;
+    digi.backupDigiMode             = false;
 
     loramodule.rxActive             = true;
     loramodule.rxFreq               = 433775000;
@@ -554,8 +554,6 @@ void Configuration::setDefaultValues() {
     rebootModeTime                  = 0;
 
     rememberStationTime             = 30;
-
-    backupDigiMode                  = false;
 
     Serial.println("New Data Created... All is Written!");
 }

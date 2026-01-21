@@ -53,7 +53,7 @@ extern int                  freqError;
 extern String               distance;
 extern bool                 WiFiConnected;
 extern int                  wxModuleType;
-extern bool                 backUpDigiMode;
+extern bool                 backupDigiMode;
 extern bool                 shouldSleepLowVoltage;
 extern bool                 transmitFlag;
 extern bool                 passcodeValid;
@@ -96,7 +96,7 @@ namespace Utils {
             return "** WiFi AP  Killed **";
         } else if (!WiFiConnected) {
             return "IP :  192.168.4.1";
-        } else if (backUpDigiMode) {
+        } else if (backupDigiMode) {
             return "- BACKUP DIGI MODE -";
         } else {
             return "IP :  " + String(WiFi.localIP()[0]) + "." + String(WiFi.localIP()[1]) + "." + String(WiFi.localIP()[2]) + "." + String(WiFi.localIP()[3]);
@@ -259,7 +259,7 @@ namespace Utils {
                 secondaryBeaconPacket += encodedTelemetry;
             }
 
-            if (Config.beacon.sendViaAPRSIS && Config.aprs_is.active && passcodeValid && !backUpDigiMode) {
+            if (Config.beacon.sendViaAPRSIS && Config.aprs_is.active && passcodeValid && !backupDigiMode) {
                 Utils::println("-- Sending Beacon to APRSIS --");
                 displayShow(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING IGATE BEACON", 0);
                 seventhLine = "     listening...";
@@ -271,7 +271,7 @@ namespace Utils {
                 if (Config.syslog.logBeaconOverTCPIP) SYSLOG_Utils::log(1, "tcp" + beaconPacket, 0, 0.0, 0);   // APRSIS TX
             }
 
-            if (Config.beacon.sendViaRF || backUpDigiMode) {
+            if (Config.beacon.sendViaRF || backupDigiMode) {
                 Utils::println("-- Sending Beacon to RF --");
                 displayShow(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING DIGI BEACON", 0);
                 seventhLine = "     listening...";

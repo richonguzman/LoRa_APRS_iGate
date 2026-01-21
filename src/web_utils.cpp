@@ -200,7 +200,7 @@ namespace WEB_Utils {
 
         Config.digi.mode                    = getParamIntSafe("digi.mode", Config.digi.mode);
         Config.digi.ecoMode                 = getParamIntSafe("digi.ecoMode", Config.digi.ecoMode);
-        
+        Config.digi.backupDigiMode          = request->hasParam("digi.backupDigiMode", true);
 
         Config.loramodule.rxActive          = request->hasParam("lora.rxActive", true);
         Config.loramodule.rxFreq            = getParamIntSafe("lora.rxFreq", Config.loramodule.rxFreq);
@@ -214,13 +214,11 @@ namespace WEB_Utils {
         Config.loramodule.txSignalBandwidth = getParamIntSafe("lora.txSignalBandwidth", Config.loramodule.txSignalBandwidth);
         Config.loramodule.power             = getParamIntSafe("lora.power", Config.loramodule.power);
 
-
         Config.display.alwaysOn             = request->hasParam("display.alwaysOn", true);
         if (!Config.display.alwaysOn) {
             Config.display.timeout          = getParamIntSafe("display.timeout", Config.display.timeout);
         }
         Config.display.turn180              = request->hasParam("display.turn180", true);
-
 
         Config.battery.sendInternalVoltage          = request->hasParam("battery.sendInternalVoltage", true);
         Config.battery.monitorInternalVoltage       = request->hasParam("battery.monitorInternalVoltage", true);
@@ -243,14 +241,12 @@ namespace WEB_Utils {
         }
         Config.battery.sendVoltageAsTelemetry       = request->hasParam("battery.sendVoltageAsTelemetry", true);
 
-
         Config.wxsensor.active                      = request->hasParam("wxsensor.active", true);
         if (Config.wxsensor.active) {
             Config.wxsensor.heightCorrection        = getParamIntSafe("wxsensor.heightCorrection", Config.wxsensor.heightCorrection);
             Config.wxsensor.temperatureCorrection   = getParamFloatSafe("wxsensor.temperatureCorrection", Config.wxsensor.temperatureCorrection);
             Config.beacon.symbol = "_";
         }
-
 
         Config.syslog.active                    = request->hasParam("syslog.active", true);
         if (Config.syslog.active) {
@@ -259,12 +255,10 @@ namespace WEB_Utils {
             Config.syslog.logBeaconOverTCPIP    = request->hasParam("syslog.logBeaconOverTCPIP", true);
         }
 
-
         Config.tnc.enableServer             = request->hasParam("tnc.enableServer", true);
         Config.tnc.enableSerial             = request->hasParam("tnc.enableSerial", true);
         Config.tnc.acceptOwn                = request->hasParam("tnc.acceptOwn", true);
         Config.tnc.aprsBridgeActive         = request->hasParam("tnc.aprsBridgeActive", true);
-
 
         Config.mqtt.active                  = request->hasParam("mqtt.active", true);
         if (Config.mqtt.active) {
@@ -275,7 +269,6 @@ namespace WEB_Utils {
             Config.mqtt.port                = getParamIntSafe("mqtt.port", Config.mqtt.port);
             Config.mqtt.beaconOverMqtt      = request->hasParam("mqtt.beaconOverMqtt", true);
         }
-
 
         Config.rebootMode                   = request->hasParam("other.rebootMode", true);
         if (Config.rebootMode) {
@@ -299,8 +292,6 @@ namespace WEB_Utils {
 
         Config.rememberStationTime          = getParamIntSafe("other.rememberStationTime", Config.rememberStationTime);
 
-        Config.backupDigiMode               = request->hasParam("other.backupDigiMode", true);
-        
         bool saveSuccess = Config.writeFile();
 
         if (saveSuccess) {

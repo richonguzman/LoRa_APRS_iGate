@@ -29,7 +29,7 @@ extern Configuration    Config;
 extern uint8_t          myWiFiAPIndex;
 extern int              myWiFiAPSize;
 extern WiFi_AP          *currentWiFi;
-extern bool             backUpDigiMode;
+extern bool             backupDigiMode;
 extern uint32_t         lastServerCheck;
 
 bool        WiFiConnected       = false;
@@ -46,24 +46,24 @@ namespace WIFI_Utils {
         if (Config.digi.ecoMode != 0) return;
         uint32_t currentTime = millis();
 
-        if (backUpDigiMode) {
+        if (backupDigiMode) {
             if (WiFi.status() != WL_CONNECTED && ((currentTime - lastBackupDigiTime) >= 15 * 60 * 1000)) {
                 Serial.println("*** Stopping BackUp Digi Mode ***");
-                backUpDigiMode = false;
+                backupDigiMode = false;
                 wifiCounter = 0;
             } else if (WiFi.status() == WL_CONNECTED) {
                 Serial.println("*** WiFi Reconnect Success (Stopping Backup Digi Mode) ***");
-                backUpDigiMode = false;
+                backupDigiMode = false;
                 wifiCounter = 0;
             }
         }
 
-        if (!backUpDigiMode && ((currentTime - lastWiFiCheck) >= 30 * 1000) && !WiFiAutoAPStarted) {
+        if (!backupDigiMode && ((currentTime - lastWiFiCheck) >= 30 * 1000) && !WiFiAutoAPStarted) {
             lastWiFiCheck = currentTime;
             if (WiFi.status() == WL_CONNECTED) {
-                if (Config.backupDigiMode && (currentTime - lastServerCheck > 60 * 1000)) {
+                if (Config.digi.backupDigiMode && (currentTime - lastServerCheck > 60 * 1000)) {
                     Serial.println("*** Server Connection LOST → Backup Digi Mode ***");
-                    backUpDigiMode = true;
+                    backupDigiMode = true;
                     WiFi.disconnect();
                     lastBackupDigiTime = currentTime;
                 }                
@@ -72,10 +72,10 @@ namespace WIFI_Utils {
                 WiFi.disconnect();
                 WIFI_Utils::startWiFi();
 
-                if (Config.backupDigiMode) wifiCounter++;
+                if (Config.digi.backupDigiMode) wifiCounter++;
                 if (wifiCounter >= 2) {
                     Serial.println("*** Starting BackUp Digi Mode ***");
-                    backUpDigiMode = true;
+                    backupDigiMode = true;
                     lastBackupDigiTime = currentTime;
                 }
             }

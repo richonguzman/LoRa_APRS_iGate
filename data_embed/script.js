@@ -140,6 +140,7 @@ function loadSettings(settings) {
     // Digi
     document.getElementById("digi.mode").value                          = settings.digi.mode;
     document.getElementById("digi.ecoMode").value                       = settings.digi.ecoMode;
+    document.getElementById("digi.backupDigiMode").checked              = settings.digi.backupDigiMode;
 
     // LoRa
     document.getElementById("lora.rxActive").checked                    = settings.lora.rxActive;
@@ -258,9 +259,6 @@ function loadSettings(settings) {
     // NTP
     document.getElementById("ntp.server").value                         = settings.ntp.server;
     document.getElementById("ntp.gmtCorrection").value                  = settings.ntp.gmtCorrection;
-
-    // Experimental
-    document.getElementById("other.backupDigiMode").checked             = settings.other.backupDigiMode;
 
     updateImage();
 }

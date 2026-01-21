@@ -67,8 +67,8 @@ ___________________________________________________________________*/
 #endif
 
 
-String              versionDate             = "2026-01-20";
-String              versionNumber           = "3.1.7.1";
+String              versionDate             = "2026-01-21";
+String              versionNumber           = "3.2";
 Configuration       Config;
 WiFiClient          aprsIsClient;
 WiFiClient          mqttClient;
@@ -86,7 +86,7 @@ WiFi_AP             *currentWiFi            = &Config.wifiAPs[myWiFiAPIndex];
 bool                isUpdatingOTA           = false;
 uint32_t            lastBatteryCheck        = 0;
 
-bool                backUpDigiMode          = false;
+bool                backupDigiMode          = false;
 bool                modemLoggedToAPRSIS     = false;
 
 #ifdef HAS_EPAPER
@@ -187,7 +187,7 @@ void loop() {
                 APRS_IS_Utils::processLoRaPacket(packet); // Send received packet to APRSIS
             }
 
-            if (Config.loramodule.txActive && (Config.digi.mode == 2 || Config.digi.mode == 3 || backUpDigiMode)) { // If Digi enabled
+            if (Config.loramodule.txActive && (Config.digi.mode == 2 || Config.digi.mode == 3 || backupDigiMode)) { // If Digi enabled
                 STATION_Utils::clean25SegBuffer();
                 DIGI_Utils::processLoRaPacket(packet); // Send received packet to Digi
             }

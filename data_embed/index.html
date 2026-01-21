@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="auto">
+<html lang="en" data-bs-theme="dark">
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -36,8 +36,8 @@
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Backup</a>
                                 <div class="dropdown-menu">
-                                    <a class="dropdown-item" href="#" id="backup">Download</a>
-                                    <a class="dropdown-item" href="#" id="restore">Restore</a>
+                                    <a class="dropdown-item" href="#" id="backup">Download Conf.</a>
+                                    <a class="dropdown-item" href="#" id="restore">Restore Conf.</a>
                                 </div>
                             </li>
                             <li class="nav-item dropdown">
@@ -257,7 +257,7 @@
                                             name="personalNote"
                                             id="personalNote"
                                             class="form-control"
-                                            placeholder="A couple of words"
+                                            placeholder="Describe here your Station"
                                         />
                                     </div>
                                     <div class="col-12 mt-3">
@@ -748,6 +748,24 @@
                                             <option value="1">Ultra Eco Mode (Sleep till Packet Rx (WiFiAP/WebUI & Display disabled))</option>
                                             <option value="2">OFF (Normal Mode - WiFiAP disabled but Serial Output still enabled)</option>
                                         </select>
+                                    </div>                                    
+                                    <div class="col-12 mt-3">
+                                        <div class="form-check form-switch">
+                                            <div class="form-text">
+                                                If WiFi/server connection is lost in iGate-only mode, the device switches to Digipeater mode (WIDE1-1) and retries connection every 15 minutes.
+                                            </div>
+                                            <input
+                                                type="checkbox"
+                                                name="digi.backupDigiMode"
+                                                id="digi.backupDigiMode"
+                                                class="form-check-input"
+                                            />
+                                            <label
+                                                for="digi.backupDigiMode"
+                                                class="form-label"
+                                                >Backup Digipeater Mode</label
+                                            >
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -2127,52 +2145,6 @@
                             </div>
                         </div>
                         <hr>
-
-                        <div class="row my-5 d-flex align-items-top">
-                            <div class="col-lg-3 col-sm-12">
-                                <h5>
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        width="20"
-                                        height="20"
-                                        fill="currentColor"
-                                        class="bi bi-heart-pulse-fill"
-                                        viewBox="0 0 16 16"
-                                    >
-                                        <path
-                                            d="M1.475 9C2.702 10.84 4.779 12.871 8 15c3.221-2.129 5.298-4.16 6.525-6H12a.5.5 0 0 1-.464-.314l-1.457-3.642-1.598 5.593a.5.5 0 0 1-.945.049L5.889 6.568l-1.473 2.21A.5.5 0 0 1 4 9z"
-                                        />
-                                        <path
-                                            d="M.88 8C-2.427 1.68 4.41-2 7.823 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C11.59-2 18.426 1.68 15.12 8h-2.783l-1.874-4.686a.5.5 0 0 0-.945.049L7.921 8.956 6.464 5.314a.5.5 0 0 0-.88-.091L3.732 8z"
-                                        />
-                                    </svg>
-                                    Experimental
-                                </h5>
-                                <small>You can test new features. <u>Use at your own risk!</u></small>
-                            </div>
-                            <div class="col-lg-9 col-sm-12">
-                                <div class="row">
-                                    <div class="col-12">
-                                        <div class="form-check form-switch">
-                                            <div class="form-text">
-                                                When "only" iGate Mode loses WiFi, it will change into a Digipeater Mode and after 15 min check if WiFi available and return to "only" iGate Mode.
-                                            </div>
-                                            <input
-                                                type="checkbox"
-                                                name="other.backupDigiMode"
-                                                id="other.backupDigiMode"
-                                                class="form-check-input"
-                                            />
-                                            <label
-                                                for="other.backupDigiMode"
-                                                class="form-label"
-                                                >Backup Digipeater Mode</label
-                                            >
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </main>
                 <footer
@@ -2227,7 +2199,7 @@
                             <a
                                 href="https://cd3eap.aguayoki.cl/"
                                 target="_blank"
-                                >CD3EAP</a
+                                >CA3EAP</a
                             ></b
                         >: Settings Page.
                     </p>

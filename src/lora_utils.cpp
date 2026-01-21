@@ -81,9 +81,7 @@ namespace LoRa_Utils {
             radio.XTAL = true;
         #endif
         int state = radio.begin(freq);
-        if (state == RADIOLIB_ERR_NONE) {
-            Utils::println("Initializing LoRa Module");
-        } else {
+        if (state != RADIOLIB_ERR_NONE) {
             Utils::println("Starting LoRa failed! State: " + String(state));
             while (true);
         }
