@@ -308,13 +308,13 @@ namespace APRS_IS_Utils {
                 aprsIsClient.stop();
                 Config.aprs_is.active = false;
             } else if (packet.indexOf("verified") != -1 ) {
-                lastServerCheck = currentTime;
+                if (Config.backupDigiMode) lastServerCheck = currentTime;
                 passcodeValid = true;
             }
         }
         if (passcodeValid) {
             if (packet.startsWith("#")) {
-                lastServerCheck = currentTime;
+                if (Config.backupDigiMode) lastServerCheck = currentTime;
             } else {
                 if (Config.aprs_is.messagesToRF && packet.indexOf("::") > 0) {
                     String Sender = packet.substring(0, packet.indexOf(">"));
