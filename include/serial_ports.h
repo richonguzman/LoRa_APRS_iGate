@@ -79,7 +79,6 @@
 // ============================================================================
 #if DEBUG_SERIAL_INDEX >= 0 && (DEBUG_SERIAL_INDEX == 0 || DEBUG_SERIAL_INDEX == 1)
     #define DEBUG_SERIAL debugSerial
-    #define DEBUG_SERIAL_OBJ debugSerial
 #else
     // Debug disabled - create dummy defines that do nothing
     #define DEBUG_SERIAL Serial  // Won't be used, but prevents compilation errors
