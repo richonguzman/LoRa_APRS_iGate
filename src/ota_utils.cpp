@@ -21,6 +21,7 @@
 #include <AsyncTCP.h>
 #include "configuration.h"
 #include "ota_utils.h"
+#include "serial_ports.h"
 #include "display.h"
 
 
@@ -47,7 +48,7 @@ namespace OTA_Utils {
     }
 
     void onOTAStart() {
-        Serial.println("OTA update started!");
+        DEBUG_PRINTLN("OTA update started!");
         displayToggle(true);
         lastScreenOn = millis();
         displayShow("", "", "", " OTA update started!", "", "", "", 1000);
@@ -59,7 +60,7 @@ namespace OTA_Utils {
             displayToggle(true);
             lastScreenOn = millis();
             ota_progress_millis = millis();
-            Serial.printf("OTA Progress Current: %u bytes, Final: %u bytes\n", current, final);
+            DEBUG_PRINTF("OTA Progress Current: %u bytes, Final: %u bytes\n", current, final);
             displayShow("", "", "  OTA Progress : " + String((current*100)/final) + "%", "", "", "", "", 100);
         }
     }
@@ -71,7 +72,7 @@ namespace OTA_Utils {
         String statusMessage = success ? "OTA update success!" : "OTA update fail!";
         String rebootMessage = success ? "Rebooting ..." : "";
 
-        Serial.println(success ? "OTA update finished successfully!" : "There was an error during OTA update!");
+        DEBUG_PRINTLN(success ? "OTA update finished successfully!" : "There was an error during OTA update!");
         displayShow("", "", statusMessage, "", rebootMessage, "", "", 4000);
 
         isUpdatingOTA = false;

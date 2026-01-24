@@ -19,6 +19,7 @@
 #include "configuration.h"
 #include "battery_utils.h"
 #include "board_pinout.h"
+#include "serial_ports.h"
 #include "power_utils.h"
 
 #if defined(HAS_AXP192) || defined(HAS_AXP2101)
@@ -233,9 +234,9 @@ namespace POWER_Utils {
         #ifdef HAS_AXP192
             Wire.begin(SDA, SCL);
             if (begin(Wire)) {
-                Serial.println("AXP192 init done!");
+                DEBUG_PRINTLN("AXP192 init done!");
             } else {
-                Serial.println("AXP192 init failed!");
+                DEBUG_PRINTLN("AXP192 init failed!");
             }
             activateLoRa();
             activateMeasurement();
@@ -256,9 +257,9 @@ namespace POWER_Utils {
                 if (begin(Wire)) beginStatus = true;
             #endif
             if (beginStatus) {
-                Serial.println("AXP2101 init done!");
+                DEBUG_PRINTLN("AXP2101 init done!");
             } else {
-                Serial.println("AXP2101 init failed!");
+                DEBUG_PRINTLN("AXP2101 init failed!");
             }
             activateLoRa();
             activateMeasurement();

@@ -18,6 +18,7 @@
 
 #include "configuration.h"
 #include "board_pinout.h"
+#include "serial_ports.h"
 #include "sleep_utils.h"
 #include "digi_utils.h"
 #include "lora_utils.h"
@@ -71,7 +72,7 @@ namespace SLEEP_Utils {
         if (!shouldSleepStop) {
             uint32_t timeToSleep = getSecondsToSleep();
             esp_sleep_enable_timer_wakeup(timeToSleep * 1000000);   // 1 min = 60sec
-            Serial.print("(Sleeping : "); Serial.print(timeToSleep); Serial.println("seconds)");
+            DEBUG_PRINT("(Sleeping : "); DEBUG_PRINT(timeToSleep); DEBUG_PRINTLN("seconds)");
             delay(100);
             LoRa_Utils::wakeRadio();
             esp_light_sleep_start();
@@ -79,7 +80,7 @@ namespace SLEEP_Utils {
     }
 
     void checkSerial() {
-        if (Config.digi.ecoMode == 1) Serial.end();
+        if (Config.digi.ecoMode == 1) DEBUG_END();
     }
 
 }

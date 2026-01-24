@@ -19,6 +19,7 @@
 #include <WiFiClientSecure.h>
 #include <PubSubClient.h>
 #include "configuration.h"
+#include "serial_ports.h"
 #include "station_utils.h"
 #include "mqtt_utils.h"
 
@@ -33,7 +34,7 @@ namespace MQTT_Utils {
 
     void sendToMqtt(const String& packet) {
         if (!pubSub.connected()) {
-            Serial.println("Can not send to MQTT because it is not connected");
+            DEBUG_PRINTLN("Can not send to MQTT because it is not connected");
             return;
         }
         const String cleanPacket    = packet.substring(3);
@@ -42,29 +43,29 @@ namespace MQTT_Utils {
 
         const bool result           = pubSub.publish(topic.c_str(), cleanPacket.c_str());
         if (result) {
-            Serial.print("Packet sent to MQTT topic "); Serial.println(topic);
+            DEBUG_PRINT("Packet sent to MQTT topic "); DEBUG_PRINTLN(topic);
         } else {
-            Serial.println("Packet not sent to MQTT (check connection)");
+            DEBUG_PRINTLN("Packet not sent to MQTT (check connection)");
         }
     }
 
     void receivedFromMqtt(char* topic, byte* payload, unsigned int length) {
-        Serial.print("Received from MQTT topic "); Serial.print(topic); Serial.print(": ");
+        DEBUG_PRINT("Received from MQTT topic "); DEBUG_PRINT(topic); DEBUG_PRINT(": ");
         for (int i = 0; i < length; i++) {
-            Serial.print((char)payload[i]);
+            DEBUG_PRINT((char)payload[i]);
         }
-        Serial.println();
+        DEBUG_PRINTLN();
         STATION_Utils::addToOutputPacketBuffer(String(payload, length));
     }
 
     void connect() {
         if (pubSub.connected()) return;
         if (Config.mqtt.server.isEmpty() || Config.mqtt.port <= 0) {
-            Serial.println("Connect to MQTT server KO because no host or port given");
+            DEBUG_PRINTLN("Connect to MQTT server KO because no host or port given");
             return;
         }
         pubSub.setServer(Config.mqtt.server.c_str(), Config.mqtt.port);
-        Serial.print("Trying to connect with MQTT Server: " + String(Config.mqtt.server) + " MqttServerPort: " + String(Config.mqtt.port));
+        DEBUG_PRINT("Trying to connect with MQTT Server: " + String(Config.mqtt.server) + " MqttServerPort: " + String(Config.mqtt.port));
 
         bool connected = false;
         if (!Config.mqtt.username.isEmpty()) {
@@ -74,15 +75,15 @@ namespace MQTT_Utils {
         }
 
         if (connected) {
-            Serial.println(" -> Connected !");
+            DEBUG_PRINTLN(" -> Connected !");
             const String subscribedTopic = Config.mqtt.topic + "/" + Config.callsign + "/#";
             if (!pubSub.subscribe(subscribedTopic.c_str())) {
-                Serial.println("Subscribed to MQTT Failed");
+                DEBUG_PRINTLN("Subscribed to MQTT Failed");
             }
-            Serial.print("Subscribed to MQTT topic : ");
-            Serial.println(subscribedTopic);
+            DEBUG_PRINT("Subscribed to MQTT topic : ");
+            DEBUG_PRINTLN(subscribedTopic);
         } else {
-            Serial.println(" -> Not Connected (Retry in a few secs)");
+            DEBUG_PRINTLN(" -> Not Connected (Retry in a few secs)");
         }
     }
 

@@ -25,6 +25,7 @@
 #include "battery_utils.h"
 #include "aprs_is_utils.h"
 #include "board_pinout.h"
+#include "serial_ports.h"
 #include "syslog_utils.h"
 #include "A7670_utils.h"
 #include "lora_utils.h"
@@ -107,14 +108,14 @@ namespace Utils {
         #ifdef INTERNAL_LED_PIN
             digitalWrite(INTERNAL_LED_PIN,HIGH);
         #endif
-        Serial.println("\nStarting Station: " + Config.callsign + "   Version: " + versionDate);
-        Serial.print("(DigiEcoMode: ");
+        DEBUG_PRINTLN("\nStarting Station: " + Config.callsign + "   Version: " + versionDate);
+        DEBUG_PRINT("(DigiEcoMode: ");
         if (Config.digi.ecoMode == 0) {
-            Serial.println("OFF)");
+            DEBUG_PRINTLN("OFF)");
         } else if (Config.digi.ecoMode == 1) {
-            Serial.println("ON)");
+            DEBUG_PRINTLN("ON)");
         } else {
-            Serial.println("ON / Only Serial Output)");
+            DEBUG_PRINTLN("ON / Only Serial Output)");
         }
         displayShow(" LoRa APRS", "", "", "   ( iGATE & DIGI )", "", "" , "  CA2RXU  " + versionDate, 4000);
         #ifdef INTERNAL_LED_PIN
@@ -286,7 +287,7 @@ namespace Utils {
 
     void validateFreqs() {
         if (Config.loramodule.txFreq != Config.loramodule.rxFreq && abs(Config.loramodule.txFreq - Config.loramodule.rxFreq) < 125000) {
-            Serial.println("Tx Freq less than 125kHz from Rx Freq ---> NOT VALID");
+            DEBUG_PRINTLN("Tx Freq less than 125kHz from Rx Freq ---> NOT VALID");
             displayShow("Tx Freq is less than ", "125kHz from Rx Freq", "device will autofix", "and then reboot", 1000);
             Config.loramodule.txFreq = Config.loramodule.rxFreq; // Inform about that but then change the TX QRG to RX QRG and reset the device
             Config.beacon.beaconFreq = 1;   // return to LoRa Tx Beacon Freq
@@ -352,26 +353,26 @@ namespace Utils {
 
     void print(const String& text) {
         if (!Config.tnc.enableSerial) {
-            Serial.print(text);
+            DEBUG_PRINT(text);
         }
     }
 
     void println(const String& text) {
         if (!Config.tnc.enableSerial) {
-            Serial.println(text);
+            DEBUG_PRINTLN(text);
         }
     }
 
     void checkRebootMode() {
         if (Config.rebootMode && Config.rebootModeTime > 0) {
-            Serial.println("(Reboot Time Set to " + String(Config.rebootModeTime) + " hours)");
+            DEBUG_PRINTLN("(Reboot Time Set to " + String(Config.rebootModeTime) + " hours)");
         }
     }
 
     void checkRebootTime() {
         if (Config.rebootMode && Config.rebootModeTime > 0) {
             if (millis() > Config.rebootModeTime * 60 * 60 * 1000) {
-                Serial.println("\n*** Automatic Reboot Time Restart! ****\n");
+                DEBUG_PRINTLN("\n*** Automatic Reboot Time Restart! ****\n");
                 ESP.restart();
             }
         }
@@ -382,7 +383,7 @@ namespace Utils {
             if (mode == 0) {    // at startup
                 delay(3000);
             }
-            Serial.println("\n\n*** Sleeping Low Battey Voltage ***\n\n");
+            DEBUG_PRINTLN("\n\n*** Sleeping Low Battey Voltage ***\n\n");
             esp_sleep_enable_timer_wakeup(30 * 60 * 1000000); // sleep 30 min
             if (mode == 1) {    // low voltage detected after a while
                 displayToggle(false);

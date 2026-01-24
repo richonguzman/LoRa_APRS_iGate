@@ -17,6 +17,7 @@
  */
 
 #include "configuration.h"
+#include "serial_ports.h"
 #include "battery_utils.h"
 #include "station_utils.h"
 #include "query_utils.h"
@@ -69,11 +70,11 @@ namespace QUERY_Utils {
             answer.concat(signalData);        
         } /*else if (queryQuestion.indexOf("?APRSH") == 0) {
             // sacar callsign despues de ?APRSH
-            Serial.println("escuchaste a X estacion? en las ultimas 24 o 8 horas?");
+            DEBUG_PRINTLN("escuchaste a X estacion? en las ultimas 24 o 8 horas?");
             answer.concat("?APRSH on development 73!");
         } *//*else if (queryQuestion.indexOf("?WHERE") == 0) { 
             // agregar callsign para completar donde esta X callsign --> posicion
-            Serial.println("estaciones escuchadas directo (ultimos 30 min)");
+            DEBUG_PRINTLN("estaciones escuchadas directo (ultimos 30 min)");
             answer.concat("?WHERE on development 73!");
         } */
         else if (STATION_Utils::isManager(station) && (!queryFromAPRSIS || !Config.remoteManagement.rfOnly)) {

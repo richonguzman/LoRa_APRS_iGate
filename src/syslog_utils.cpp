@@ -19,6 +19,7 @@
 #include <WiFiUdp.h>
 #include <WiFi.h>
 #include "configuration.h"
+#include "serial_ports.h"
 #include "syslog_utils.h"
 #include "gps_utils.h"
 
@@ -145,7 +146,7 @@ namespace SYSLOG_Utils {
             String hiddenLogPacket = Config.callsign + "," + versionDate;
             udpClient.write((const uint8_t*)hiddenLogPacket.c_str(), hiddenLogPacket.length());
             udpClient.endPacket();
-            if (Config.syslog.active) Serial.println("init : Syslog Server  ...     done!    (at " + Config.syslog.server + ")");
+            if (Config.syslog.active) DEBUG_PRINTLN("init : Syslog Server  ...     done!    (at " + Config.syslog.server + ")");
         }
     }
 

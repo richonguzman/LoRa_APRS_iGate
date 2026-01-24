@@ -20,6 +20,7 @@
 #include "battery_utils.h"
 #include "configuration.h"
 #include "board_pinout.h"
+#include "serial_ports.h"
 #include "power_utils.h"
 #include "utils.h"
 
@@ -88,16 +89,16 @@ namespace BATTERY_Utils {
             esp_err_t ret;
             ret = esp_adc_cal_check_efuse(ADC_EXAMPLE_CALI_SCHEME);
             /*if (ret == ESP_ERR_NOT_SUPPORTED) {
-                Serial.println("Calibration scheme not supported, skip software calibration");
+                DEBUG_PRINTLN("Calibration scheme not supported, skip software calibration");
             } else if (ret == ESP_ERR_INVALID_VERSION) {
-                Serial.println("eFuse not burnt, skip software calibration");
+                DEBUG_PRINTLN("eFuse not burnt, skip software calibration");
             } else */
             if (ret == ESP_OK) {
                 esp_adc_cal_characterize(ADC_UNIT_1, ADC_ATTEN_DB_12, ADC_WIDTH_BIT_12, 1100, &adc_chars);
-                //Serial.printf("eFuse Vref:%u mV\n", adc_chars.vref);
+                //DEBUG_PRINTF("eFuse Vref:%u mV\n", adc_chars.vref);
                 calibrationEnable = true;
             } /*else {
-                Serial.println("Invalid Calibration Arg");
+                DEBUG_PRINTLN("Invalid Calibration Arg");
             }*/
         #endif
     }
@@ -139,7 +140,7 @@ namespace BATTERY_Utils {
         getI2CVoltageSensorAddress();
         if (externalI2CSensorAddress != 0x00) {
             if (detectINA219(externalI2CSensorAddress)) {
-                Serial.println("INA219 sensor found");
+                DEBUG_PRINTLN("INA219 sensor found");
                 externalI2CSensorType = 1;  // INA219
             }
         }

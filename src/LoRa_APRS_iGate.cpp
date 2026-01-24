@@ -62,6 +62,7 @@ ___________________________________________________________________*/
 #include "wx_utils.h"
 #include "display.h"
 #include "utils.h"
+#include "serial_ports.h"
 #ifdef HAS_A7670
     #include "A7670_utils.h"
 #endif
@@ -73,7 +74,6 @@ Configuration       Config;
 WiFiClient          aprsIsClient;
 WiFiClient          mqttClient;
 #ifdef HAS_GPS
-    HardwareSerial  gpsSerial(1);
     TinyGPSPlus     gps;
     uint32_t        gpsSatelliteTime        = 0;
     bool            gpsInfoToggle           = false;
@@ -100,7 +100,7 @@ String firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seven
 
 
 void setup() {
-    Serial.begin(115200);
+    DEBUG_BEGIN(115200);
     POWER_Utils::setup();
     Utils::setupDisplay();
     LoRa_Utils::setup();
