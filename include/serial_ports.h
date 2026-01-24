@@ -90,7 +90,6 @@
 #ifdef HAS_GPS
     #if GPS_SERIAL_INDEX == 0 || GPS_SERIAL_INDEX == 1
         #define GPS_SERIAL gpsSerial
-        #define GPS_SERIAL_OBJ gpsSerial
     #else
         #error "GPS_SERIAL_INDEX must be 0 or 1"
     #endif
@@ -102,7 +101,6 @@
 #ifdef HAS_A7670
     #if A7670_SERIAL_INDEX == 0 || A7670_SERIAL_INDEX == 1
         #define A7670_SERIAL SerialAT
-        #define A7670_SERIAL_OBJ SerialAT
     #else
         #error "A7670_SERIAL_INDEX must be 0 or 1"
     #endif
