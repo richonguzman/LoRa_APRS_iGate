@@ -19,6 +19,7 @@
 #include "configuration.h"
 #include "aprs_is_utils.h"
 #include "board_pinout.h"
+#include "serial_ports.h"
 #include "A7670_utils.h"
 #include "lora_utils.h"
 #include "display.h"
@@ -28,7 +29,6 @@
 #ifdef HAS_A7670
     #define TINY_GSM_MODEM_SIM7600      //The AT instruction of A7670 is compatible with SIM7600 
     #define TINY_GSM_RX_BUFFER 1024     // Set RX buffer to 1Kb
-    #define SerialAT Serial1
     #include <TinyGsmClient.h>
     #include <StreamDebugger.h>
     StreamDebugger debugger(SerialAT, Serial);
@@ -51,7 +51,7 @@
 
         bool checkModemOn() {
             bool modemReady = false;
-            Serial.print("Starting Modem ...              ");
+            DEBUG_PRINT("Starting Modem ...              ");
             displayShow(firstLine, "Starting Modem...", " ", " ", 0);
 
             pinMode(A7670_ResetPin, OUTPUT);        //A7670 Reset
@@ -74,11 +74,11 @@
                 delay(500);
                 if (SerialAT.available()) {
                     String r = SerialAT.readString();
-                    //Serial.println(r);
+                    //DEBUG_PRINTLN(r);
                     if ( r.indexOf("OK") >= 0 ) {
                         modemReady = true;
                         i = 1;
-                        Serial.println("Modem Ready!\n");
+                        DEBUG_PRINTLN("Modem Ready!\n");
                         displayShow(firstLine, "Starting Modem...", "---> Modem Ready", " ", 0);
                         return true;
                     }
@@ -98,14 +98,14 @@
                 //setup_gps();      // if gps active / won't be need for now
             } else {
                 displayShow(firstLine, "Starting Modem...", "---> Failed !!!", " ", 0);
-                Serial.println(F("*********** Failed to connect to the modem! ***********"));
+                DEBUG_PRINTLN(F("*********** Failed to connect to the modem! ***********"));
             }
         }
 
         bool checkATResponse(const String& ATMessage) {
             int delayATMessage = 3000;
             bool validAT = false;
-            //Serial.println(ATMessage);
+            //DEBUG_PRINTLN(ATMessage);
             int i = 10;
             while (i) {
                 if (!validAT) {
@@ -114,34 +114,34 @@
                 delay(500);
                 if (SerialAT.available()) {
                     String response = SerialAT.readString();
-                    //Serial.println(response); // DEBUG of Modem AT message
+                    //DEBUG_PRINTLN(response); // DEBUG of Modem AT message
                     if(response.indexOf("verified") >= 0) {
-                        Serial.println("Logged! (User Validated)\n");
+                        DEBUG_PRINTLN("Logged! (User Validated)\n");
                         displayShow(firstLine, "Connecting APRS-IS...", "---> Logged!", " ", 1000);
-                        Serial.println("####################   APRS-IS FEED   ####################");
+                        DEBUG_PRINTLN("####################   APRS-IS FEED   ####################");
                         validAT = true;
                         i = 1;
                         delayATMessage = 0;
                     } else if (ATMessage == "AT+NETOPEN" && response.indexOf("OK") >= 0) {
-                        Serial.println("Port Open!");
+                        DEBUG_PRINTLN("Port Open!");
                         displayShow(firstLine, "Opening Port...", "---> Port Open", " ", 0);
                         validAT = true;
                         i = 1;
                         delayATMessage = 0;
                     } else if (ATMessage == "AT+NETOPEN" && response.indexOf("Network is already opened") >= 0) {
-                        Serial.println("Port Open! (was already opened)");
+                        DEBUG_PRINTLN("Port Open! (was already opened)");
                         displayShow(firstLine, "Opening Port...", "---> Port Open", " ", 0);
                         validAT = true;
                         i = 1;
                         delayATMessage = 0;
                     } else if (ATMessage.indexOf("AT+CIPOPEN") == 0 && response.indexOf("PB DONE") >= 0) {
-                        Serial.println("Contacted!");
+                        DEBUG_PRINTLN("Contacted!");
                         displayShow(firstLine, "Connecting APRS-IS...", "---> Contacted", " ", 0);
                         validAT = true;
                         i = 1;
                         delayATMessage = 0;
                     } else if (ATMessage.indexOf("AT+CIPSEND=0,") == 0 && response.indexOf(">") >= 0) {
-                        Serial.print(".");
+                        DEBUG_PRINT(".");
                         validAT = true;
                         i = 1;
                         delayATMessage = 0;
@@ -171,24 +171,24 @@
             loginInfo += String(Config.aprs_is.passcode);
             loginInfo += " vers CA2RXU_LoRa_iGate 1.3 filter ";
             loginInfo += Config.aprs_is.filter;
-            Serial.println("-----> Connecting to APRS IS");
+            DEBUG_PRINTLN("-----> Connecting to APRS IS");
             while (!modemStartUp) {
-                Serial.print("Opening Port...                 ");
+                DEBUG_PRINT("Opening Port...                 ");
                 displayShow(firstLine, "Opening Port...", " ", " ", 0);
                 modemStartUp = checkATResponse("AT+NETOPEN");
                 delay(2000);
             } while (!serverStartUp) {
-                Serial.print("Connecting APRS-IS Server...    ");
+                DEBUG_PRINT("Connecting APRS-IS Server...    ");
                 displayShow(firstLine, "Connecting APRS-IS...", " ", " ", 0);
                 serverStartUp = checkATResponse("AT+CIPOPEN=0,\"TCP\",\"" + String(Config.aprs_is.server) + "\"," + String(Config.aprs_is.port));
                 delay(2000);
             } while (!userBytesSent) {
-                Serial.print("Writing User Login Data       ");
+                DEBUG_PRINT("Writing User Login Data       ");
                 displayShow(firstLine, "Connecting APRS-IS...", "---> User Login Data", " ", 0);
                 userBytesSent = checkATResponse("AT+CIPSEND=0," + String(loginInfo.length()+1));
                 delay(2000);
             } while (!modemLoggedToAPRSIS) {
-                Serial.print(".");
+                DEBUG_PRINT(".");
                 modemLoggedToAPRSIS = checkATResponse(loginInfo);
                 delay(2000);
             }
@@ -198,13 +198,13 @@
             beaconBytesSent = checkATResponse("AT+CIPSEND=0," + String(packet.length()+1));
             delay(2000);
             if (beaconBytesSent) {
-                Serial.print(".");
+                DEBUG_PRINT(".");
                 beaconSent = checkATResponse(packet);
             } 
             if (!beaconSent) {
-                Serial.println("------------------------------------> UPLOAD FAILED!!!");
+                DEBUG_PRINTLN("------------------------------------> UPLOAD FAILED!!!");
             } else {
-                Serial.println("Packet Uploaded to APRS-IS!");
+                DEBUG_PRINTLN("Packet Uploaded to APRS-IS!");
             }
             beaconBytesSent = false;
             beaconSent      = false;

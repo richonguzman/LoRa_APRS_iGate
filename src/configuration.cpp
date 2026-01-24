@@ -20,6 +20,7 @@
 #include <SPIFFS.h>
 #include "configuration.h"
 #include "board_pinout.h"
+#include "serial_ports.h"
 #include "display.h"
 
 
@@ -27,13 +28,13 @@ bool shouldSleepStop = true;
 
 
 bool Configuration::writeFile() {
-    Serial.println("Saving configuration...");
+    DEBUG_PRINTLN("Saving configuration...");
 
     StaticJsonDocument<3584> data;
     File configFile = SPIFFS.open("/igate_conf.json", "w");
 
     if (!configFile) {
-        Serial.println("Error: Could not open config file for writing");
+        DEBUG_PRINTLN("Error: Could not open config file for writing");
         return false;
     }
     try {
@@ -166,14 +167,14 @@ bool Configuration::writeFile() {
         configFile.close();
         return true;
     } catch (...) {
-        Serial.println("Error: Exception occurred while saving config");
+        DEBUG_PRINTLN("Error: Exception occurred while saving config");
         configFile.close();
         return false;
     }
 }
 
 bool Configuration::readFile() {
-    Serial.println("Reading config..");
+    DEBUG_PRINTLN("Reading config..");
     File configFile = SPIFFS.open("/igate_conf.json", "r");
 
     if (configFile) {
@@ -182,7 +183,7 @@ bool Configuration::readFile() {
 
         DeserializationError error = deserializeJson(data, configFile);
         if (error) {
-            Serial.println("Failed to read file, using default configuration");
+            DEBUG_PRINTLN("Failed to read file, using default configuration");
         }
 
         JsonArray WiFiArray = data["wifi"]["AP"];
@@ -404,15 +405,15 @@ bool Configuration::readFile() {
         configFile.close();
 
         if (needsRewrite) {
-            Serial.println("Config JSON incomplete, rewriting...");
+            DEBUG_PRINTLN("Config JSON incomplete, rewriting...");
             writeFile();
             delay(1000);
             ESP.restart();
         } 
-        Serial.println("Config read successfuly");
+        DEBUG_PRINTLN("Config read successfuly");
         return true;
     } else {
-        Serial.println("Config file not found");
+        DEBUG_PRINTLN("Config file not found");
         return false;
     }
 }
@@ -537,15 +538,15 @@ void Configuration::setDefaultValues() {
 
     backupDigiMode                  = false;
 
-    Serial.println("New Data Created... All is Written!");
+    DEBUG_PRINTLN("New Data Created... All is Written!");
 }
 
 Configuration::Configuration() {
     if (!SPIFFS.begin(false)) {
-        Serial.println("SPIFFS Mount Failed");
+        DEBUG_PRINTLN("SPIFFS Mount Failed");
         return;
     } else {
-        Serial.println("SPIFFS Mounted");
+        DEBUG_PRINTLN("SPIFFS Mounted");
     }
 
     bool exists = SPIFFS.exists("/igate_conf.json");

@@ -19,6 +19,7 @@
 #include <WiFi.h>
 #include "ESPmDNS.h"
 #include "configuration.h"
+#include "serial_ports.h"
 #include "station_utils.h"
 #include "kiss_protocol.h"
 #include "aprs_is_utils.h"
@@ -52,15 +53,15 @@ namespace TNC_Utils {
             tncServer.begin();
             String host = "igate-" + Config.callsign;
             if (!MDNS.begin(host.c_str())) {
-                Serial.println("Error Starting mDNS");
+                DEBUG_PRINTLN("Error Starting mDNS");
                 tncServer.stop();
                 return;
             }
             if (!MDNS.addService("tnc", "tcp", TNC_PORT)) {
-                Serial.println("Error: Could not add mDNS service");
+                DEBUG_PRINTLN("Error: Could not add mDNS service");
             }
-            Serial.println("TNC server started successfully");
-            Serial.println("mDNS Host: " + host + ".local");
+            DEBUG_PRINTLN("TNC server started successfully");
+            DEBUG_PRINTLN("mDNS Host: " + host + ".local");
         }
     }
 
@@ -129,8 +130,8 @@ namespace TNC_Utils {
     }
 
     void readFromSerial() {
-        while (Serial.available() > 0) {
-            char character = Serial.read();
+        while (DEBUG_AVAILABLE() > 0) {
+            char character = DEBUG_READ();
             handleInputData(character, -1);
         }
     }
@@ -158,8 +159,8 @@ namespace TNC_Utils {
 
     void sendToSerial(const String& packet, bool stripBytes) {
         String cleanPacket = stripBytes ? packet.substring(3): packet;
-        Serial.print(encodeKISS(cleanPacket));
-        Serial.flush();
+        DEBUG_PRINT(encodeKISS(cleanPacket));
+        DEBUG_FLUSH();
     }
 
     void loop() {

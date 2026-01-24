@@ -22,6 +22,7 @@
 #include "aprs_is_utils.h"
 #include "station_utils.h"
 #include "board_pinout.h"
+#include "serial_ports.h"
 #include "syslog_utils.h"
 #include "query_utils.h"
 #include "A7670_utils.h"
@@ -60,22 +61,22 @@ namespace APRS_IS_Utils {
     }
 
     void connect() {
-        Serial.print("Connecting to APRS-IS ...     ");
+        DEBUG_PRINT("Connecting to APRS-IS ...     ");
         uint8_t count = 0;
         while (!aprsIsClient.connect(Config.aprs_is.server.c_str(), Config.aprs_is.port) && count < 20) {
-            Serial.println("Didn't connect with server...");
+            DEBUG_PRINTLN("Didn't connect with server...");
             delay(1000);
             aprsIsClient.stop();
             aprsIsClient.flush();
-            Serial.println("Run client.stop");
-            Serial.println("Trying to connect with Server: " + String(Config.aprs_is.server) + " AprsServerPort: " + String(Config.aprs_is.port));
+            DEBUG_PRINTLN("Run client.stop");
+            DEBUG_PRINTLN("Trying to connect with Server: " + String(Config.aprs_is.server) + " AprsServerPort: " + String(Config.aprs_is.port));
             count++;
-            Serial.println("Try: " + String(count));
+            DEBUG_PRINTLN("Try: " + String(count));
         }
         if (count == 20) {
-            Serial.println("Tried: " + String(count) + " FAILED!");
+            DEBUG_PRINTLN("Tried: " + String(count) + " FAILED!");
         } else {
-            Serial.println("Connected!\n(Server: " + String(Config.aprs_is.server) + " / Port: " + String(Config.aprs_is.port) + ")");
+            DEBUG_PRINTLN("Connected!\n(Server: " + String(Config.aprs_is.server) + " / Port: " + String(Config.aprs_is.port) + ")");
             // String filter = "t/m/" + Config.callsign + "/" + (String)Config.aprs_is.reportingDistance;
             String aprsAuth = "user ";
             aprsAuth += Config.callsign;
@@ -158,7 +159,7 @@ namespace APRS_IS_Utils {
             String ackMessage = "ack";
             ackMessage.concat(packet.substring(packet.indexOf("{") + 1));
             ackMessage.trim();
-            //Serial.println(ackMessage);
+            //DEBUG_PRINTLN(ackMessage);
 
             String addToBuffer = Config.callsign;
             addToBuffer += ">APLRG1";
@@ -277,7 +278,7 @@ namespace APRS_IS_Utils {
     void processAPRSISPacket(const String& packet) {
         if (!passcodeValid && packet.indexOf(Config.callsign) != -1) {
             if (packet.indexOf("unverified") != -1 ) {
-                Serial.println("\n****APRS PASSCODE NOT VALID****\n");
+                DEBUG_PRINTLN("\n****APRS PASSCODE NOT VALID****\n");
                 displayShow(firstLine, "", "    APRS PASSCODE", "    NOT VALID !!!", "", "", "", 3000);
                 aprsIsClient.stop();
                 Config.aprs_is.active = false;
@@ -320,7 +321,7 @@ namespace APRS_IS_Utils {
                         Utils::println("Rx Query (APRS-IS)  : " + packet);
                         Sender.trim();
                         String queryAnswer = QUERY_Utils::process(receivedMessage, Sender, true, false);
-                        //Serial.println("---> QUERY Answer : " + queryAnswer.substring(0,queryAnswer.indexOf("\n")));
+                        //DEBUG_PRINTLN("---> QUERY Answer : " + queryAnswer.substring(0,queryAnswer.indexOf("\n")));
                         if (!Config.display.alwaysOn && Config.display.timeout != 0) {
                             displayToggle(true);
                         }
@@ -360,9 +361,9 @@ namespace APRS_IS_Utils {
                     displayToggle(true);
                     lastScreenOn = millis();
                     Utils::typeOfPacket(packet, 1); // APRS-LoRa
-                    Serial.println();
+                    DEBUG_PRINTLN();
                 } else {
-                    Serial.println(" ---> Rejected (Time): No Tx");
+                    DEBUG_PRINTLN(" ---> Rejected (Time): No Tx");
                 }
             }
             if (Config.tnc.aprsBridgeActive) {
@@ -379,7 +380,7 @@ namespace APRS_IS_Utils {
             if (aprsIsClient.connected()) {
                 if (aprsIsClient.available()) {
                     String aprsisPacket = aprsIsClient.readStringUntil('\r');
-                    aprsisPacket.trim();    // Serial.println(aprsisPacket);
+                    aprsisPacket.trim();    // DEBUG_PRINTLN(aprsisPacket);
                     processAPRSISPacket(aprsisPacket);
                     lastRxTime = millis();
                 }

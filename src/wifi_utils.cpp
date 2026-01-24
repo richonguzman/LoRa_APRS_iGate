@@ -19,6 +19,7 @@
 #include <WiFi.h>
 #include "configuration.h"
 #include "board_pinout.h"
+#include "serial_ports.h"
 #include "wifi_utils.h"
 #include "display.h"
 #include "utils.h"
@@ -46,19 +47,19 @@ namespace WIFI_Utils {
             if (backUpDigiMode) {
                 uint32_t WiFiCheck = millis() - lastBackupDigiTime;
                 if (WiFi.status() != WL_CONNECTED && WiFiCheck >= 15 * 60 * 1000) {
-                    Serial.println("*** Stopping BackUp Digi Mode ***");
+                    DEBUG_PRINTLN("*** Stopping BackUp Digi Mode ***");
                     backUpDigiMode = false;
                     wifiCounter = 0;
                 } else if (WiFi.status() == WL_CONNECTED) {
-                    Serial.println("*** WiFi Reconnect Success (Stopping Backup Digi Mode) ***");
+                    DEBUG_PRINTLN("*** WiFi Reconnect Success (Stopping Backup Digi Mode) ***");
                     backUpDigiMode = false;
                     wifiCounter = 0;
                 }
             }
 
             if (!backUpDigiMode && (WiFi.status() != WL_CONNECTED) && ((millis() - previousWiFiMillis) >= 30 * 1000) && !WiFiAutoAPStarted) {
-                Serial.print(millis());
-                Serial.println("Reconnecting to WiFi...");
+                DEBUG_PRINT(millis());
+                DEBUG_PRINTLN("Reconnecting to WiFi...");
                 WiFi.disconnect();
                 WIFI_Utils::startWiFi();
                 previousWiFiMillis = millis();
@@ -67,7 +68,7 @@ namespace WIFI_Utils {
                     wifiCounter++;
                 }
                 if (wifiCounter >= 2) {
-                    Serial.println("*** Starting BackUp Digi Mode ***");
+                    DEBUG_PRINTLN("*** Starting BackUp Digi Mode ***");
                     backUpDigiMode = true;
                     lastBackupDigiTime = millis();
                 }
@@ -98,14 +99,14 @@ namespace WIFI_Utils {
             delay(500);
             unsigned long start = millis();
             displayShow("", "Connecting to WiFi:", "", currentWiFi->ssid + " ...", 0);
-            Serial.print("\nConnecting to WiFi '"); Serial.print(currentWiFi->ssid); Serial.print("' ");
+            DEBUG_PRINT("\nConnecting to WiFi '"); DEBUG_PRINT(currentWiFi->ssid); DEBUG_PRINT("' ");
             WiFi.begin(currentWiFi->ssid.c_str(), currentWiFi->password.c_str());
             while (WiFi.status() != WL_CONNECTED && wifiCounter<myWiFiAPSize) {
                 delay(500);
                 #ifdef INTERNAL_LED_PIN
                     digitalWrite(INTERNAL_LED_PIN,HIGH);
                 #endif
-                Serial.print('.');
+                DEBUG_PRINT('.');
                 delay(500);
                 #ifdef INTERNAL_LED_PIN
                     digitalWrite(INTERNAL_LED_PIN,LOW);
@@ -121,7 +122,7 @@ namespace WIFI_Utils {
                     wifiCounter++;
                     currentWiFi = &Config.wifiAPs[myWiFiAPIndex];
                     start = millis();
-                    Serial.print("\nConnecting to WiFi '"); Serial.print(currentWiFi->ssid); Serial.println("' ...");
+                    DEBUG_PRINT("\nConnecting to WiFi '"); DEBUG_PRINT(currentWiFi->ssid); DEBUG_PRINTLN("' ...");
                     displayShow("", "Connecting to WiFi:", "", currentWiFi->ssid + " ...", 0);
                     WiFi.disconnect();
                     WiFi.begin(currentWiFi->ssid.c_str(), currentWiFi->password.c_str());
@@ -132,20 +133,20 @@ namespace WIFI_Utils {
             digitalWrite(INTERNAL_LED_PIN,LOW);
         #endif
         if (WiFi.status() == WL_CONNECTED) {
-            Serial.print("\nConnected as ");
-            Serial.print(WiFi.localIP());
-            Serial.print(" / MAC Address: ");
-            Serial.println(WiFi.macAddress());
+            DEBUG_PRINT("\nConnected as ");
+            DEBUG_PRINT(WiFi.localIP());
+            DEBUG_PRINT(" / MAC Address: ");
+            DEBUG_PRINTLN(WiFi.macAddress());
             displayShow("", "     Connected!!", "" , "     loading ...", 1000);
         } else if (WiFi.status() != WL_CONNECTED) {
             startAP = true;
 
-            Serial.println("\nNot connected to WiFi! Starting Auto AP");
+            DEBUG_PRINTLN("\nNot connected to WiFi! Starting Auto AP");
             displayShow("", " WiFi Not Connected!", "" , "     loading ...", 1000);
         }
         WiFiConnected = !startAP;
         if (startAP) {
-            Serial.println("\nNot connected to WiFi! Starting Auto AP");
+            DEBUG_PRINTLN("\nNot connected to WiFi! Starting Auto AP");
             displayShow("", "   Starting Auto AP", " Please connect to it " , "     loading ...", 1000);
 
             startAutoAP();
@@ -160,12 +161,12 @@ namespace WIFI_Utils {
                 if (WiFiAutoAPTime == 0) {
                     WiFiAutoAPTime = millis();
                 } else if ((millis() - WiFiAutoAPTime) > Config.wifiAutoAP.timeout * 60 * 1000) {
-                    Serial.println("Stopping auto AP");
+                    DEBUG_PRINTLN("Stopping auto AP");
 
                     WiFiAutoAPStarted = false;
                     WiFi.softAPdisconnect(true);
 
-                    Serial.println("Auto AP stopped (timeout)");
+                    DEBUG_PRINTLN("Auto AP stopped (timeout)");
                 }
             }
         }

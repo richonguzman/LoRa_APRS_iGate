@@ -19,6 +19,7 @@
 #include <ArduinoJson.h>
 #include "configuration.h"
 #include "ota_utils.h"
+#include "serial_ports.h"
 #include "web_utils.h"
 #include "display.h"
 #include "utils.h"
@@ -115,7 +116,7 @@ namespace WEB_Utils {
     }
 
     void handleWriteConfiguration(AsyncWebServerRequest *request) {
-        Serial.println("Got new Configuration Data from www");
+        DEBUG_PRINTLN("Got new Configuration Data from www");
 
         auto getParamStringSafe = [&](const String& name, const String& defaultValue = "") -> String {
             if (request->hasParam(name, true)) {
@@ -303,7 +304,7 @@ namespace WEB_Utils {
         bool saveSuccess = Config.writeFile();
 
         if (saveSuccess) {
-            Serial.println("Configuration saved successfully");
+            DEBUG_PRINTLN("Configuration saved successfully");
             AsyncWebServerResponse *response = request->beginResponse(302, "text/html", "");
             response->addHeader("Location", "/?success=1");
             request->send(response);
@@ -312,7 +313,7 @@ namespace WEB_Utils {
             delay(500);
             ESP.restart();
         } else {
-            Serial.println("Error saving configuration!");
+            DEBUG_PRINTLN("Error saving configuration!");
             String errorPage = "<!DOCTYPE html><html><head><title>Error</title></head><body>";
             errorPage += "<h1>Configuration Error:</h1>";
             errorPage += "<p>Couldn't save new configuration. Please try again.</p>";

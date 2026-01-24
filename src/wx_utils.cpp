@@ -22,6 +22,7 @@
 #endif
 #include "configuration.h"
 #include "board_pinout.h"
+#include "serial_ports.h"
 #include "wx_utils.h"
 #include "display.h"
 
@@ -74,7 +75,7 @@ namespace WX_Utils {
             #endif
             delay(5);
             if (err == 0) {
-                //Serial.println(addr); //this shows any connected board to I2C
+                //DEBUG_PRINTLN(addr); //this shows any connected board to I2C
                 if (addr == 0x76 || addr == 0x77) { // BME or BMP
                     wxModuleAddress = addr;
                     return;
@@ -97,19 +98,19 @@ namespace WX_Utils {
                 if (wxModuleAddress == 0x76 || wxModuleAddress == 0x77) {
                     #if defined(HELTEC_V3) || defined(HELTEC_V3_2) || defined(HELTEC_WSL_V3) || defined(HELTEC_WSL_V3_DISPLAY)
                         if (bme280.begin(wxModuleAddress, &Wire1)) {
-                            Serial.println("BME280 sensor found");
+                            DEBUG_PRINTLN("BME280 sensor found");
                             wxModuleType    = 1;
                             wxModuleFound   = true;
                         }
                     #else
                         if (bme280.begin(wxModuleAddress)) {
-                            Serial.println("BME280 sensor found");
+                            DEBUG_PRINTLN("BME280 sensor found");
                             wxModuleType    = 1;
                             wxModuleFound   = true;
                         }
                         if (!wxModuleFound) {
                             if (bme680.begin(wxModuleAddress)) {
-                                Serial.println("BME680 sensor found");
+                                DEBUG_PRINTLN("BME680 sensor found");
                                 wxModuleType    = 3;
                                 wxModuleFound   = true;
                             }
@@ -117,18 +118,18 @@ namespace WX_Utils {
                     #endif
                     if (!wxModuleFound) {
                         if (bmp280.begin(wxModuleAddress)) {
-                            Serial.println("BMP280 sensor found");
+                            DEBUG_PRINTLN("BMP280 sensor found");
                             wxModuleType    = 2;
                             wxModuleFound   = true;
                             if (aht20.begin()) {
-                                Serial.println("AHT20 sensor found");
+                                DEBUG_PRINTLN("AHT20 sensor found");
                                 if (wxModuleType == 2) wxModuleType = 6;
                             }
                         }
                     }
                 } else if (wxModuleAddress == 0x40 && Config.battery.useExternalI2CSensor == false) {
                     if(si7021.begin()) {
-                        Serial.println("Si7021 sensor found");
+                        DEBUG_PRINTLN("Si7021 sensor found");
                         wxModuleType    = 4;
                         wxModuleFound   = true;
                     }
@@ -136,7 +137,7 @@ namespace WX_Utils {
                 #ifdef LIGHTGATEWAY_PLUS_1_0
                 else if (wxModuleAddress == 0x70) {
                     if (shtc3.begin()) {
-                        Serial.println("SHTC3 sensor found");
+                        DEBUG_PRINTLN("SHTC3 sensor found");
                         wxModuleType    = 5;
                         wxModuleFound   = true;
                     }
@@ -144,7 +145,7 @@ namespace WX_Utils {
                 #endif
                 if (!wxModuleFound) {
                     displayShow("ERROR", "", "BME/BMP/Si7021/SHTC3 sensor active", "but no sensor found...", 2000);
-                    Serial.println("BME/BMP/Si7021/SHTC3 sensor Active in config but not found! Check Wiring");
+                    DEBUG_PRINTLN("BME/BMP/Si7021/SHTC3 sensor Active in config but not found! Check Wiring");
                 } else {
                     switch (wxModuleType) {
                         case 1:
@@ -154,7 +155,7 @@ namespace WX_Utils {
                                         Adafruit_BME280::SAMPLING_X1,
                                         Adafruit_BME280::FILTER_OFF
                                         );
-                            Serial.println("BME280 Module init done!");
+                            DEBUG_PRINTLN("BME280 Module init done!");
                             break;
                         case 2:
                             bmp280.setSampling(Adafruit_BMP280::MODE_FORCED,
@@ -162,7 +163,7 @@ namespace WX_Utils {
                                         Adafruit_BMP280::SAMPLING_X1,
                                         Adafruit_BMP280::FILTER_OFF
                                         ); 
-                            Serial.println("BMP280 Module init done!");
+                            DEBUG_PRINTLN("BMP280 Module init done!");
                             break;
                         case 3:
                             #if !defined(HELTEC_V3) && !defined(HELTEC_V3_2)
@@ -170,7 +171,7 @@ namespace WX_Utils {
                                 bme680.setHumidityOversampling(BME680_OS_1X);
                                 bme680.setPressureOversampling(BME680_OS_1X);
                                 bme680.setIIRFilterSize(BME680_FILTER_SIZE_0);
-                                Serial.println("BMP680 Module init done!");
+                                DEBUG_PRINTLN("BMP680 Module init done!");
                             #endif
                             break;
                     }
@@ -293,7 +294,7 @@ namespace WX_Utils {
         }
 
         if (isnan(newTemp) || isnan(newHum) || isnan(newPress)) {
-            Serial.println("BME/BMP/Si7021 Module data failed");
+            DEBUG_PRINTLN("BME/BMP/Si7021 Module data failed");
             fifthLine = "";
             return ".../...g...t...";
         } else {
