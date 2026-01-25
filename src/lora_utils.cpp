@@ -119,7 +119,7 @@ namespace LoRa_Utils {
         #endif*/
 
         #ifdef HAS_1W_LORA  // Ebyte E22 400M30S (SX1268) / 900M30S (SX1262) / Ebyte E220 400M30S (LLCC68)
-            state = radio.setOutputPower(Config.loramodule.power); // max value 20dB for 1W modules as they have Low Noise Amp
+            state = radio.setOutputPower(Config.loramodule.power > 20 ? 20 : Config.loramodule.power); // max value 20dB for 1W modules as they have Low Noise Amp
             radio.setCurrentLimit(140); // to be validated (100 , 120, 140)?
         #endif
         #if defined(HAS_SX1278) || defined(HAS_SX1276)
@@ -127,7 +127,7 @@ namespace LoRa_Utils {
             radio.setCurrentLimit(100); // to be validated (80 , 100)?
         #endif
         #if (defined(HAS_SX1268) || defined(HAS_SX1262)) && !defined(HAS_1W_LORA)
-            state = radio.setOutputPower(Config.loramodule.power + 2); // values available: 10, 17, 22 --> if 20 in tracker_conf.json it will be updated to 22.
+            state = radio.setOutputPower(Config.loramodule.power);
             radio.setCurrentLimit(140);
         #endif
 
