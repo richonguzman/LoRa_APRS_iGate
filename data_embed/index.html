@@ -1818,46 +1818,68 @@
                             </div>
                             <div class="col-9">
                                 <div class="row">
-                                    <div class="col-6">
-                                        <label
-                                            for="wifi.autoAP.password"
-                                            class="form-label"
-                                            >Password</label
-                                        >
-                                        <div class="input-group">
+                                    <div class="col-12">
+                                        <div class="form-check form-switch">
                                             <input
-                                                type="password"
-                                                name="wifi.autoAP.password"
-                                                id="wifi.autoAP.password"
-                                                class="form-control"
-                                                placeholder="1234567890"
-                                                required=""
+                                                type="checkbox"
+                                                name="wifi.autoAP.enabled"
+                                                id="wifi.autoAP.enabled"
+                                                class="form-check-input"
                                             />
-                                        </div>
-                                    </div>
-                                    <div class="col-6">
-                                        <label
-                                            for="wifi.autoAP.timeout"
-                                            class="form-label"
-                                            >WiFiAP timeout (to search again)</label
-                                        >
-                                        <div class="input-group">
-                                            <input
-                                                type="number"
-                                                name="wifi.autoAP.timeout"
-                                                id="wifi.autoAP.timeout"
-                                                class="form-control"
-                                                placeholder="10"
-                                                required=""
-                                                step="1"
-                                                min="0"
-                                            />
-                                            <span class="input-group-text"
-                                                >minutes</span
+                                            <label
+                                                for="wifi.autoAP.enabled"
+                                                class="form-label"
+                                                >Enable Auto AP</label
                                             >
                                             <div class="form-text">
-                                                Set to <strong>0</strong> if you don't
-                                                want WiFi AP to stop.
+                                                Create WiFi AP when no network is available
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="wifi-autoap-config" style="{{wifi.autoAP.enabled ? '' : 'display:none'}}">
+                                    <div class="row mt-3">
+                                        <div class="col-6">
+                                            <label
+                                                for="wifi.autoAP.password"
+                                                class="form-label"
+                                                >Password</label
+                                            >
+                                            <div class="input-group">
+                                                <input
+                                                    type="password"
+                                                    name="wifi.autoAP.password"
+                                                    id="wifi.autoAP.password"
+                                                    class="form-control"
+                                                    placeholder="1234567890"
+                                                    required=""
+                                                />
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <label
+                                                for="wifi.autoAP.timeout"
+                                                class="form-label"
+                                                >WiFiAP timeout (to search again)</label
+                                            >
+                                            <div class="input-group">
+                                                <input
+                                                    type="number"
+                                                    name="wifi.autoAP.timeout"
+                                                    id="wifi.autoAP.timeout"
+                                                    class="form-control"
+                                                    placeholder="10"
+                                                    required=""
+                                                    step="1"
+                                                    min="0"
+                                                />
+                                                <span class="input-group-text"
+                                                    >minutes</span
+                                                >
+                                                <div class="form-text">
+                                                    Set to <strong>0</strong> if you don't
+                                                    want WiFi AP to stop.
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
