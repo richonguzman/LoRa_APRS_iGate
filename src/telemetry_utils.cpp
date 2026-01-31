@@ -68,10 +68,10 @@ namespace TELEMETRY_Utils {
     }
 
     void sendBaseTelemetryPacket(const String& prefix, const std::vector<String>& values) {
-        String packet = prefix + joinWithCommas(values);
-
+        String packet           = prefix + joinWithCommas(values);
+        String currentCallsign  = (Config.tacticalCallsign != "") ? Config.tacticalCallsign : Config.callsign;
         if (Config.beacon.sendViaAPRSIS) {
-            String baseAPRSISTelemetryPacket = APRSPacketLib::generateMessagePacket(Config.callsign, "APLRG1", "TCPIP,qAC", Config.callsign, packet);
+            String baseAPRSISTelemetryPacket = APRSPacketLib::generateMessagePacket(currentCallsign, "APLRG1", "TCPIP,qAC", currentCallsign, packet);
             #ifdef HAS_A7670
                 A7670_Utils::uploadToAPRSIS(baseAPRSISTelemetryPacket);
             #else
@@ -79,7 +79,7 @@ namespace TELEMETRY_Utils {
             #endif
             delay(300);
         } else if (Config.beacon.sendViaRF) {
-            String baseRFTelemetryPacket = APRSPacketLib::generateMessagePacket(Config.callsign, "APLRG1", Config.beacon.path, Config.callsign, packet);
+            String baseRFTelemetryPacket = APRSPacketLib::generateMessagePacket(currentCallsign, "APLRG1", Config.beacon.path, currentCallsign, packet);
             LoRa_Utils::sendNewPacket(baseRFTelemetryPacket);
             delay(3000);
         }
