@@ -38,34 +38,39 @@ uint32_t    lastBackupDigiTime  = millis();
 namespace WIFI_Utils {
 
     void checkWiFi() {
-        if (Config.digi.ecoMode == 0) {
-            if (backUpDigiMode) {
-                uint32_t WiFiCheck = millis() - lastBackupDigiTime;
-                if (!networkManager->isWiFiConnected() && WiFiCheck >= 15 * 60 * 1000) {
-                    Serial.println("*** Stopping BackUp Digi Mode ***");
-                    backUpDigiMode = false;
-                    wifiCounter = 0;
-                } else if (networkManager->isWiFiConnected()) {
-                    Serial.println("*** WiFi Reconnect Success (Stopping Backup Digi Mode) ***");
-                    backUpDigiMode = false;
-                    wifiCounter = 0;
-                }
+        if (Config.digi.ecoMode != 0) {
+            return;
+        }
+
+        if (!networkManager->hasWiFiNetworks()) {
+            return;
+        }
+
+        if (backUpDigiMode) {
+            uint32_t WiFiCheck = millis() - lastBackupDigiTime;
+            if (!networkManager->isWiFiConnected() && WiFiCheck >= 15 * 60 * 1000) {
+                Serial.println("*** Stopping BackUp Digi Mode ***");
+                backUpDigiMode = false;
+                wifiCounter = 0;
+            } else if (networkManager->isWiFiConnected()) {
+                Serial.println("*** WiFi Reconnect Success (Stopping Backup Digi Mode) ***");
+                backUpDigiMode = false;
+                wifiCounter = 0;
             }
+        }
 
-            if (!backUpDigiMode && (!networkManager->isWiFiConnected()) && ((millis() - previousWiFiMillis) >= 30 * 1000) && !networkManager->isWifiAPActive()) {
-                Serial.print(millis());
-                Serial.println("Reconnecting to WiFi...");
-                WIFI_Utils::startWiFi();
-                previousWiFiMillis = millis();
+        if (!backUpDigiMode && (!networkManager->isWiFiConnected()) && ((millis() - previousWiFiMillis) >= 30 * 1000) && !networkManager->isWifiAPActive()) {
+            Serial.println("Reconnecting to WiFi...");
+            WIFI_Utils::startWiFi();
+            previousWiFiMillis = millis();
 
-                if (Config.backupDigiMode) {
-                    wifiCounter++;
-                }
-                if (wifiCounter >= 2) {
-                    Serial.println("*** Starting BackUp Digi Mode ***");
-                    backUpDigiMode = true;
-                    lastBackupDigiTime = millis();
-                }
+            if (Config.backupDigiMode) {
+                wifiCounter++;
+            }
+            if (wifiCounter >= 2) {
+                Serial.println("*** Starting BackUp Digi Mode ***");
+                backUpDigiMode = true;
+                lastBackupDigiTime = millis();
             }
         }
     }
@@ -76,8 +81,6 @@ namespace WIFI_Utils {
     }
 
     void startWiFi() {
-        bool hasNetworks = false;
-
         networkManager->clearWiFiNetworks();
         for (size_t i = 0; i < Config.wifiAPs.size(); i++) {
             const WiFi_AP& wifiAP = Config.wifiAPs[i];
@@ -85,11 +88,10 @@ namespace WIFI_Utils {
                 continue;
             }
 
-            hasNetworks = true;
             networkManager->addWiFiNetwork(wifiAP.ssid, wifiAP.password);
         }
 
-        if (!hasNetworks) {
+        if (!networkManager->hasWiFiNetworks()) {
             Serial.println("WiFi SSID not set!");
             if (Config.wifiAutoAP.enabled) {
                 Serial.println("Starting AP fallback...");
