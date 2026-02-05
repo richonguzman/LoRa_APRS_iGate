@@ -235,8 +235,10 @@ function loadSettings(settings) {
     RebootModeTime.disabled     = !RebootModeCheckbox.check;
 
     // WiFi Auto AP
+    document.getElementById("wifi.autoAP.enabled").checked              = settings.wifi.autoAP.enabled;
     document.getElementById("wifi.autoAP.password").value               = settings.wifi.autoAP.password;
     document.getElementById("wifi.autoAP.timeout").value                = settings.wifi.autoAP.timeout;
+    toggleWiFiAutoAPFields();
 
     // OTA
     document.getElementById("ota.username").value                       = settings.ota.username;
@@ -432,6 +434,18 @@ WebadminCheckbox.addEventListener("change", function () {
     WebadminUsername.disabled   = !this.checked;
     WebadminPassword.disabled   = !this.checked;
 });
+
+// WiFi Auto AP Switches
+const WiFiAutoAPCheckbox             = document.querySelector('input[name="wifi.autoAP.enabled"]');
+WiFiAutoAPCheckbox.addEventListener("change", function () {
+    toggleWiFiAutoAPFields();
+});
+
+function toggleWiFiAutoAPFields() {
+    const isEnabled = WiFiAutoAPCheckbox.checked;
+    const autoAPConfig = document.getElementById('wifi-autoap-config');
+    if (autoAPConfig) autoAPConfig.style.display = isEnabled ? 'block' : 'none';
+}
 
 
 document.querySelector(".new button").addEventListener("click", function () {

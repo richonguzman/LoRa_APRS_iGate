@@ -32,6 +32,7 @@ public:
 
 class WiFi_Auto_AP {
 public:
+    bool    enabled;            // Enable Auto AP
     String  password;
     int     timeout;
 };

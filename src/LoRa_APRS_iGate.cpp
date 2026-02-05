@@ -41,9 +41,10 @@ ___________________________________________________________________*/
 #include <ElegantOTA.h>
 #include <TinyGPS++.h>
 #include <Arduino.h>
-#include <WiFi.h>
+#include <WiFiClient.h>
 #include <vector>
 #include "configuration.h"
+#include "network_manager.h"
 #include "aprs_is_utils.h"
 #include "station_utils.h"
 #include "battery_utils.h"
@@ -79,9 +80,7 @@ WiFiClient          mqttClient;
     bool            gpsInfoToggle           = false;
 #endif
 
-uint8_t             myWiFiAPIndex           = 0;
-int                 myWiFiAPSize            = Config.wifiAPs.size();
-WiFi_AP             *currentWiFi            = &Config.wifiAPs[myWiFiAPIndex];
+NetworkManager      *networkManager;
 
 bool                isUpdatingOTA           = false;
 uint32_t            lastBatteryCheck        = 0;
@@ -101,6 +100,12 @@ String firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seven
 
 void setup() {
     Serial.begin(115200);
+    networkManager = new NetworkManager();
+    networkManager->setup();
+    if (Config.wifiAutoAP.enabled) {
+        networkManager->setAPTimeout(Config.wifiAutoAP.timeout * 60 * 1000); // Convert minutes to milliseconds
+    }
+    networkManager->setHostName("iGATE-" + Config.callsign);
     POWER_Utils::setup();
     Utils::setupDisplay();
     LoRa_Utils::setup();
@@ -132,7 +137,7 @@ void loop() {
         Utils::checkSleepByLowBatteryVoltage(1);
         SLEEP_Utils::startSleeping();
     } else {
-        WIFI_Utils::checkAutoAPTimeout();
+        networkManager->loop();
 
         if (isUpdatingOTA) {
             ElegantOTA.loop();
@@ -161,11 +166,14 @@ void loop() {
         #endif
 
         #ifdef HAS_A7670
+            // TODO: Make this part of Network manager, and use ESP-IDF network stack instead manual AT commands
             if (Config.aprs_is.active && !modemLoggedToAPRSIS) A7670_Utils::APRS_IS_connect();
         #else
             WIFI_Utils::checkWiFi();
-            if (Config.aprs_is.active && (WiFi.status() == WL_CONNECTED) && !aprsIsClient.connected()) APRS_IS_Utils::connect();
-            if (Config.mqtt.active && (WiFi.status() == WL_CONNECTED) && !mqttClient.connected()) MQTT_Utils::connect();
+            if (networkManager->isConnected()) {
+                if (Config.aprs_is.active && !aprsIsClient.connected()) APRS_IS_Utils::connect();
+                if (Config.mqtt.active && !mqttClient.connected()) MQTT_Utils::connect();
+            }
         #endif
 
         NTP_Utils::update();
@@ -174,7 +182,7 @@ void loop() {
 
         Utils::checkDisplayInterval();
         Utils::checkBeaconInterval();
-        
+
         APRS_IS_Utils::checkStatus(); // Need that to update display, maybe split this and send APRSIS status to display func?
 
         String packet = "";
