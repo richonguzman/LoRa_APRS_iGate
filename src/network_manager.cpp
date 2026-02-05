@@ -198,6 +198,14 @@ void NetworkManager::clearWiFiNetworks() {
     _wifiNetworks.clear();
 }
 
+bool NetworkManager::hasWiFiNetworks() const {
+    return !_wifiNetworks.empty();
+}
+
+size_t NetworkManager::getWiFiNetworkCount() const {
+    return _wifiNetworks.size();
+}
+
 bool NetworkManager::connectWiFi() {
     if (_wifiNetworks.empty()) {
         return false;

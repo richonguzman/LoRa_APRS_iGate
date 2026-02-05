@@ -50,6 +50,8 @@ public:
     void setAPTimeout(unsigned long timeout);
     void addWiFiNetwork(const String& ssid, const String& psk = "");
     void clearWiFiNetworks();
+    bool hasWiFiNetworks() const;
+    size_t getWiFiNetworkCount() const;
     bool connectWiFi();
     bool connectWiFi(const String& ssid, const String& psk = "");
     bool disconnectWiFi();
