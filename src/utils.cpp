@@ -34,6 +34,7 @@
 #include "display.h"
 #include "utils.h"
 
+#define DAY_MS (24UL * 60UL * 60UL * 1000UL)
 
 extern Configuration        Config;
 extern TinyGPSPlus          gps;
@@ -65,6 +66,7 @@ bool        sendStartTelemetry  = true;
 bool        beaconUpdate        = false;
 uint32_t    lastBeaconTx        = 0;
 uint32_t    lastScreenOn        = millis();
+uint32_t    lastStatusTx        = 0;
 bool        callsignIsValid     = false;
 String      beaconPacket;
 String      secondaryBeaconPacket;
@@ -81,14 +83,18 @@ namespace Utils {
             status.concat(Config.beacon.statusPacket);
             APRS_IS_Utils::upload(status);
             SYSLOG_Utils::log(2, status, 0, 0.0, 0);   // APRSIS TX
-            statusAfterBoot = false;
         }
         if (statusAfterBoot && !Config.beacon.sendViaAPRSIS && Config.beacon.sendViaRF) {
             status.concat(":>");
             status.concat(Config.beacon.statusPacket);
             STATION_Utils::addToOutputPacketBuffer(status, true);   // treated also as beacon on Tx Freq
-            statusAfterBoot = false;
         }
+        statusAfterBoot = false;
+        lastStatusTx = millis();
+    }
+
+    void checkStatusInterval() {
+        if (lastStatusTx == 0 || millis() - lastStatusTx > DAY_MS) statusAfterBoot = true;
     }
 
     String getLocalIP() {
@@ -283,9 +289,8 @@ namespace Utils {
             beaconUpdate = false;
         }
 
-        if (statusAfterBoot && Config.beacon.statusActive && !Config.beacon.statusPacket.isEmpty()) {
-            processStatus();
-        }
+        checkStatusInterval();
+        if (statusAfterBoot && Config.beacon.statusActive && !Config.beacon.statusPacket.isEmpty()) processStatus();
     }
 
     void checkDisplayInterval() {
