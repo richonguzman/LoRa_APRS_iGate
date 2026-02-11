@@ -61,7 +61,7 @@ namespace WIFI_Utils {
         if (!backupDigiMode && ((currentTime - lastWiFiCheck) >= 30 * 1000) && !WiFiAutoAPStarted) {
             lastWiFiCheck = currentTime;
             if (WiFi.status() == WL_CONNECTED) {
-                if (Config.digi.backupDigiMode && (currentTime - lastServerCheck > 60 * 1000)) {
+                if (Config.digi.backupDigiMode && (currentTime - lastServerCheck > 30 * 1000)) {
                     Serial.println("*** Server Connection LOST → Backup Digi Mode ***");
                     backupDigiMode = true;
                     WiFi.disconnect();
