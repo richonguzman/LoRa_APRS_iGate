@@ -19,6 +19,8 @@
 #ifndef BOARD_PINOUT_H_
 #define BOARD_PINOUT_H_
 
+    #define ESP32
+
     //  LoRa Radio
     #define HAS_LLCC68
     #define HAS_1W_LORA

@@ -19,6 +19,8 @@
 #ifndef BOARD_PINOUT_H_
 #define BOARD_PINOUT_H_
 
+    #define ESP32
+
     //  LoRa Radio
     #define HAS_SX1276
     #define RADIO_SCLK_PIN          5
@@ -49,5 +51,6 @@
     #define INTERNAL_LED_PIN        25
     #define BATTERY_PIN             37
     #define ADC_CTRL                21
-    
+    #define ADC_CTRL_INVERTED       1
+
 #endif

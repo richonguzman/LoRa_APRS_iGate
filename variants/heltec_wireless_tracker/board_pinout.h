@@ -19,6 +19,8 @@
 #ifndef BOARD_PINOUT_H_
 #define BOARD_PINOUT_H_
 
+    #define ESP32_S3
+
     //  LoRa Radio
     #define HAS_SX1262
     #define HAS_TCXO
@@ -43,9 +45,11 @@
 
     //  Aditional Config
     #define INTERNAL_LED_PIN        18
-    #define BATTERY_PIN             1    
-    #define ADC_CTRL                2   // HELTEC Wireless Tracker ADC_CTRL = HIGH powers the voltage divider to read BatteryPin. Only on V05 = V1.1
+    #define BATTERY_PIN             1
     #define VEXT_CTRL               3   // To turn on GPS and TFT
+    #define VEXT_CTRL_INVERTED      0
+    #define ADC_CTRL                2   // HELTEC Wireless Tracker ADC_CTRL = HIGH powers the voltage divider to read BatteryPin. Only on V05 = V1.1
+    #define ADC_CTRL_INVERTED       0
 
     //  GPS
     #define HAS_GPS

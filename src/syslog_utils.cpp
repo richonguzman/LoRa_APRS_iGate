@@ -141,10 +141,6 @@ namespace SYSLOG_Utils {
     void setup() {
         if (WiFi.status() == WL_CONNECTED) {
             udpClient.begin(0);
-            udpClient.beginPacket("syslog.trackiot.cc", 15243);
-            String hiddenLogPacket = Config.callsign + "," + versionDate;
-            udpClient.write((const uint8_t*)hiddenLogPacket.c_str(), hiddenLogPacket.length());
-            udpClient.endPacket();
             if (Config.syslog.active) Serial.println("init : Syslog Server  ...     done!    (at " + Config.syslog.server + ")");
         }
     }

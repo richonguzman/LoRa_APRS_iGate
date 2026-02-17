@@ -19,6 +19,8 @@
 #ifndef BOARD_PINOUT_H_
 #define BOARD_PINOUT_H_
 
+    #define ESP32_S3
+
     //  LoRa Radio
     #define HAS_SX1262
     #define HAS_TCXO
@@ -54,6 +56,8 @@
     #define INTERNAL_LED_PIN        35
     #define BATTERY_PIN             1
     #define VEXT_CTRL               36
+    #define VEXT_CTRL_INVERTED      0
     #define ADC_CTRL                37
+    #define ADC_CTRL_INVERTED       1
 
 #endif
