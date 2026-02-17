@@ -51,10 +51,10 @@ namespace SLEEP_Utils {
         if (Config.digi.ecoMode == 1) {
             pinMode(RADIO_WAKEUP_PIN, INPUT);
             attachInterrupt(digitalPinToInterrupt(RADIO_WAKEUP_PIN), wakeUpLoRaPacketReceived, RISING);
-            #if defined(ESP32) || defined(ESP32_S2) || defined(ESP32_S3)
+            #if defined(HAS_ESP32) || defined(HAS_ESP32_S2) || defined(HAS_ESP32_S3)
                 esp_sleep_enable_ext1_wakeup(GPIO_WAKEUP_PIN, ESP_EXT1_WAKEUP_ANY_HIGH);
             #endif
-            #if defined(ESP32_C3)
+            #if defined(HAS_ESP32_C3)
                 esp_deep_sleep_enable_gpio_wakeup(1ULL << GPIO_WAKEUP_PIN, ESP_GPIO_WAKEUP_GPIO_HIGH);
             #endif
         }
