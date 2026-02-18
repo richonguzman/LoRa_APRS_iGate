@@ -1,17 +1,17 @@
 /* Copyright (C) 2025 Ricardo Guzman - CA2RXU
- * 
+ *
  * This file is part of LoRa APRS iGate.
- * 
+ *
  * LoRa APRS iGate is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or 
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * LoRa APRS iGate is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with LoRa APRS iGate. If not, see <https://www.gnu.org/licenses/>.
  */
@@ -49,9 +49,9 @@ namespace QUERY_Utils {
             answer.concat(versionDate);
         } else if (queryQuestion == "?APRSP") {
             answer.concat("iGate QTH: ");
-            answer.concat(String(Config.beacon.latitude,3));
+            answer.concat(String(Config.beacon.latitude,2));
             answer.concat(" ");
-            answer.concat(String(Config.beacon.longitude,3));
+            answer.concat(String(Config.beacon.longitude,2));
         } else if (queryQuestion == "?APRSL") {
             if (lastHeardStations.size() == 0) {
                 char answerArray[50];
@@ -66,12 +66,12 @@ namespace QUERY_Utils {
         } else if (queryQuestion == "?APRSSR") {
             char signalData[35];
             snprintf(signalData, sizeof(signalData), " %ddBm / %.2fdB / %dHz", rssi, snr, freqError);
-            answer.concat(signalData);        
+            answer.concat(signalData);
         } /*else if (queryQuestion.indexOf("?APRSH") == 0) {
             // sacar callsign despues de ?APRSH
             Serial.println("escuchaste a X estacion? en las ultimas 24 o 8 horas?");
             answer.concat("?APRSH on development 73!");
-        } *//*else if (queryQuestion.indexOf("?WHERE") == 0) { 
+        } *//*else if (queryQuestion.indexOf("?WHERE") == 0) {
             // agregar callsign para completar donde esta X callsign --> posicion
             Serial.println("estaciones escuchadas directo (ultimos 30 min)");
             answer.concat("?WHERE on development 73!");
@@ -126,7 +126,7 @@ namespace QUERY_Utils {
                 } else {
                     Config.loramodule.txActive = false;
                     answer = "TX=OFF";
-                } 
+                }
             } else if (queryQuestion.indexOf("?TX=?") == 0) {
                 answer = (Config.loramodule.txActive) ? "TX=ON" : "TX=OFF";
             } else if (queryQuestion.indexOf("?COMMIT") == 0) {     // saving for next reboot
