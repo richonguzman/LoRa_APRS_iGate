@@ -134,15 +134,17 @@ namespace GPS_Utils {
         }
 
         String Latitude             = infoGPS.substring(0,8);                   // First 8 characters are Latitude
+        int latitudeColonIndex      = Latitude.indexOf(".");
         float convertedLatitude     = Latitude.substring(0,2).toFloat();        // First 2 digits (Degrees)
         convertedLatitude += Latitude.substring(2,4).toFloat() / 60;            // Next 2 digits (Minutes)
-        convertedLatitude += Latitude.substring(Latitude.indexOf(".") + 1, Latitude.indexOf(".") + 3).toFloat() / (60*100);
+        convertedLatitude += Latitude.substring(latitudeColonIndex + 1, latitudeColonIndex + 3).toFloat() / (60*100);
         if (Latitude.endsWith("S")) convertedLatitude = -convertedLatitude;     // Handle Southern Hemisphere
 
         String Longitude            = infoGPS.substring(9,18);                  // Next 9 characters are Longitude
+        int longitudeColonIndex     = Longitude.indexOf(".");
         float convertedLongitude    = Longitude.substring(0,3).toFloat();       // First 3 digits (Degrees)
         convertedLongitude += Longitude.substring(3,5).toFloat() / 60;          // Next 2 digits (Minutes)
-        convertedLongitude += Longitude.substring(Longitude.indexOf(".") + 1, Longitude.indexOf(".") + 3).toFloat() / (60*100);
+        convertedLongitude += Longitude.substring(longitudeColonIndex + 1, longitudeColonIndex + 3).toFloat() / (60*100);
         if (Longitude.endsWith("W")) convertedLongitude = -convertedLongitude;  // Handle Western Hemisphere
 
         return buildDistanceAndComment(convertedLatitude, convertedLongitude, infoGPS.substring(19));

@@ -312,7 +312,6 @@ namespace Utils {
     }
 
     void typeOfPacket(const String& packet, const uint8_t packetType) {
-        String sender = packet.substring(0,packet.indexOf(">"));
         switch (packetType) {
             case 0: // LoRa-APRS
                 fifthLine = "LoRa Rx ----> APRS-IS";
@@ -328,6 +327,7 @@ namespace Utils {
         int firstColonIndex = packet.indexOf(":");
         char nextChar       = packet[firstColonIndex + 1];
 
+        String sender = packet.substring(0,packet.indexOf(">"));
         for (int i = sender.length(); i < 9; i++) {
             sender += " ";
         }
@@ -419,9 +419,10 @@ namespace Utils {
         if (callsign == "WLNK-1") return true;
 
         String cleanCallsign;
-        if (callsign.indexOf("-") > 0) {    // SSID Validation
-            cleanCallsign = callsign.substring(0, callsign.indexOf("-"));
-            String ssid = callsign.substring(callsign.indexOf("-") + 1);
+        int hypenCallsignIndex = callsign.indexOf("-");
+        if (hypenCallsignIndex > 0) {    // SSID Validation
+            cleanCallsign = callsign.substring(0, hypenCallsignIndex);
+            String ssid = callsign.substring(hypenCallsignIndex + 1);
             if (ssid.indexOf("-") != -1 || ssid.length() > 2) return false;
             if (ssid.length() == 2 && ssid[0] == '0') return false;
             for (int i = 0; i < ssid.length(); i++) {

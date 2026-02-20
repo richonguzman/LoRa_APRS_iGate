@@ -1,17 +1,17 @@
 /* Copyright (C) 2025 Ricardo Guzman - CA2RXU
- * 
+ *
  * This file is part of LoRa APRS iGate.
- * 
+ *
  * LoRa APRS iGate is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or 
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * LoRa APRS iGate is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with LoRa APRS iGate. If not, see <https://www.gnu.org/licenses/>.
  */
@@ -29,17 +29,16 @@ bool validateKISSFrame(const String& kissFormattedFrame) {
 }
 
 String encodeAddressAX25(String tnc2Address) {
-    bool hasBeenDigipited = tnc2Address.indexOf('*') != -1;
-
-    if (tnc2Address.indexOf('-') == -1) {
+    bool hasBeenDigipited   = tnc2Address.indexOf('*') != -1;
+    int tnc2AddressIndex    = tnc2Address.indexOf('-');
+    if (tnc2AddressIndex == -1) {
         if (hasBeenDigipited) {
             tnc2Address = tnc2Address.substring(0, tnc2Address.length() - 1);
         }
-
         tnc2Address += "-0";
     }
 
-    int separatorIndex = tnc2Address.indexOf('-');
+    int separatorIndex = tnc2AddressIndex;
     int ssid = tnc2Address.substring(separatorIndex + 1).toInt();
 
     String kissAddress = "";
@@ -131,8 +130,9 @@ String encodeKISS(const String& frame) {
 
     if (validateTNC2Frame(frame)) {
         String address = "";
-        bool dstAddresWritten = false;
-        for (int p = 0; p <= frame.indexOf(':'); p++) {
+        bool dstAddresWritten   = false;
+        int colonFrameIndex     = frame.indexOf(':');
+        for (int p = 0; p <= colonFrameIndex; p++) {
             char currentChar = frame.charAt(p);
             if (currentChar == ':' || currentChar == '>' || currentChar == ',') {
                 if (!dstAddresWritten && (currentChar == ',' || currentChar == ':')) {
@@ -151,7 +151,7 @@ String encodeKISS(const String& frame) {
         ax25Frame.setCharAt(ax25Frame.length() - 1, (char)(lastAddressChar | IS_LAST_ADDRESS_POSITION_MASK));
         ax25Frame += (char)APRS_CONTROL_FIELD;
         ax25Frame += (char)APRS_INFORMATION_FIELD;
-        ax25Frame += frame.substring(frame.indexOf(':') + 1);
+        ax25Frame += frame.substring(colonFrameIndex + 1);
     }
 
     String kissFrame = encapsulateKISS(ax25Frame, CMD_DATA);

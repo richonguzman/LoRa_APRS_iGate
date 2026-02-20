@@ -99,39 +99,39 @@ namespace DIGI_Utils {
         } else {
             temp = packet.substring(packet.indexOf(">") + 1, packet.indexOf(":"));
         }
-        if (temp.indexOf(",") > 2) { // checks for path in temp
-            const String& path = temp.substring(temp.indexOf(",") + 1); // extract path after tocall
-            if (Config.digi.mode == 2 || backupDigiMode) {
-                if (path.indexOf("WIDE1-1") != - 1) {
-                    return buildPacket(path, packet, thirdParty, false);
-                } else if (path.indexOf("WIDE1-1") == -1 && (abs(Config.loramodule.txFreq - Config.loramodule.rxFreq) >= 125000)) { //  CrossFreq Digi
-                    return buildPacket(path, packet, thirdParty, true);
-                } else {
-                    return "";
-                }
-            } else if (Config.digi.mode == 3) {
-                if (path.indexOf("WIDE1-1") != -1 || path.indexOf("WIDE2-") != -1) {
-                    int wide1Index = path.indexOf("WIDE1-1");
-                    int wide2Index = path.indexOf("WIDE2-");
+        int commaIndex      = temp.indexOf(",");
+        int digiMode        = Config.digi.mode;
+        bool crossFreq      = abs(Config.loramodule.txFreq - Config.loramodule.rxFreq) >= 125000;   // CrossFreq Digi
 
-                    // WIDE1-1 && WIDE2-n   /   only WIDE1-1    /   only WIDE2-n
-                    if ((wide1Index != -1 && wide2Index != -1 && wide1Index < wide2Index) || (wide1Index != -1 && wide2Index == -1) || (wide1Index == -1 && wide2Index != -1)) {
-                        return buildPacket(path, packet, thirdParty, false);
-                    }
-                    return "";
-                } else if (path.indexOf("WIDE1-1") == -1 && path.indexOf("WIDE2-") == -1 && (abs(Config.loramodule.txFreq - Config.loramodule.rxFreq) >= 125000)) {    //  CrossFreq Digi
-                    return buildPacket(path, packet, thirdParty, true);
-                } else {
-                    return "";
+        if (commaIndex > 2) {   // Packet has "path"
+            const String& path  = temp.substring(commaIndex + 1);
+            if (digiMode == 2 || backupDigiMode) {
+                bool hasWide = path.indexOf("WIDE1-1") != -1;
+                if (hasWide || crossFreq) {
+                    return buildPacket(path, packet, thirdParty, !hasWide);
                 }
-            } else {
                 return "";
             }
-        } else if (temp.indexOf(",") == -1 && (Config.digi.mode == 2 || backupDigiMode || Config.digi.mode == 3) && (abs(Config.loramodule.txFreq - Config.loramodule.rxFreq) >= 125000)) {
-            return buildPacket("", packet, thirdParty, true);
-        } else {
+            if (digiMode == 3) {
+                int wide1Index = path.indexOf("WIDE1-1");
+                int wide2Index = path.indexOf("WIDE2-");
+                bool hasWide1 = wide1Index != -1;
+                bool hasWide2 = wide2Index != -1;
+
+                if (hasWide1 && hasWide2 && wide2Index < wide1Index) return "";                     // check that WIDE1 before WIDE2
+
+                if (hasWide1 || hasWide2) return buildPacket(path, packet, thirdParty, false);      // regular APRS with WIDEn-N
+
+                if (crossFreq) return buildPacket(path, packet, thirdParty, true);                  // CrossFreq (without WIDE)
+
+                return "";
+            }
             return "";
         }
+
+        if (commaIndex == -1 && (digiMode == 2 || backupDigiMode || digiMode == 3) && crossFreq) return buildPacket("", packet, thirdParty, true);  // no "path" but is CrossFreq Digi
+
+        return "";
     }
 
     void processLoRaPacket(const String& packet) {
@@ -156,8 +156,9 @@ namespace DIGI_Utils {
             STATION_Utils::updateLastHeard(Sender);
             Utils::typeOfPacket(temp, 2);    // Digi
             bool queryMessage = false;
-            if (temp.indexOf("::") > 10) {   // it's a message
-                String AddresseeAndMessage  = temp.substring(temp.indexOf("::") + 2);
+            int doubleColonIndex = temp.indexOf("::");
+            if (doubleColonIndex > 10) {   // it's a message
+                String AddresseeAndMessage  = temp.substring(doubleColonIndex + 2);
                 String Addressee            = AddresseeAndMessage.substring(0, AddresseeAndMessage.indexOf(":"));
                 Addressee.trim();
                 if (Addressee == (Config.tacticalCallsign == "" ? Config.callsign : Config.tacticalCallsign)) {     // it's a message for me!
@@ -173,7 +174,6 @@ namespace DIGI_Utils {
                 }
             }
         }
-        //}
     }
 
 }
