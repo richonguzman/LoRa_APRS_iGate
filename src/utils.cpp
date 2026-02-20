@@ -1,17 +1,17 @@
 /* Copyright (C) 2025 Ricardo Guzman - CA2RXU
- * 
+ *
  * This file is part of LoRa APRS iGate.
- * 
+ *
  * LoRa APRS iGate is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or 
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * LoRa APRS iGate is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with LoRa APRS iGate. If not, see <https://www.gnu.org/licenses/>.
  */
@@ -61,13 +61,13 @@ extern bool                 passcodeValid;
 
 extern std::vector<LastHeardStation>    lastHeardStations;
 
-bool        statusAfterBoot     = true;
-bool        sendStartTelemetry  = true;
-bool        beaconUpdate        = false;
-uint32_t    lastBeaconTx        = 0;
-uint32_t    lastScreenOn        = millis();
-uint32_t    lastStatusTx        = 0;
-bool        callsignIsValid     = false;
+bool        statusAfterBoot         = true;
+bool        sendStartTelemetry      = true;
+bool        beaconUpdate            = false;
+uint32_t    lastBeaconTx            = 0;
+uint32_t    lastScreenOn            = millis();
+uint32_t    lastStatusTx            = 0;
+bool        stationCallsignIsValid  = false;
 String      beaconPacket;
 String      secondaryBeaconPacket;
 
@@ -157,9 +157,9 @@ namespace Utils {
         if (beaconUpdate) {
             if (!Config.display.alwaysOn && Config.display.timeout != 0) displayToggle(true);
 
-            if (sendStartTelemetry && 
+            if (sendStartTelemetry &&
                 Config.battery.sendVoltageAsTelemetry &&
-                !Config.wxsensor.active && 
+                !Config.wxsensor.active &&
                 (Config.battery.sendInternalVoltage || Config.battery.sendExternalVoltage) &&
                 (lastBeaconTx > 0)) {
                 TELEMETRY_Utils::sendEquationsUnitsParameters();
@@ -198,7 +198,7 @@ namespace Utils {
             }
             beaconPacket            += Config.beacon.comment;
             secondaryBeaconPacket   += Config.beacon.comment;
-            if (callsignIsValid && Config.tacticalCallsign != "") {
+            if (stationCallsignIsValid && Config.tacticalCallsign != "") {
                 beaconPacket            += " de ";
                 beaconPacket            += Config.callsign;
                 secondaryBeaconPacket   += " de ";
@@ -244,7 +244,7 @@ namespace Utils {
                     if (Config.battery.sendExternalVoltage) {
                         char externalVoltageInfo[10];  // "xx.xxV\0" (max 7 chars)
                         snprintf(externalVoltageInfo, sizeof(externalVoltageInfo), "%.2fV", externalVoltage);
-                    
+
                         char sixthLineBuffer[25];  // Ensure enough space
                         snprintf(sixthLineBuffer, sizeof(sixthLineBuffer), "    (Ext V=%s)", externalVoltageInfo);
                         sixthLine = sixthLineBuffer;
@@ -415,9 +415,9 @@ namespace Utils {
         }
     }
 
-    bool checkValidCallsign(const String& callsign) {
+    bool callsignIsValid(const String& callsign) {
         if (callsign == "WLNK-1") return true;
-        
+
         String cleanCallsign;
         if (callsign.indexOf("-") > 0) {    // SSID Validation
             cleanCallsign = callsign.substring(0, callsign.indexOf("-"));

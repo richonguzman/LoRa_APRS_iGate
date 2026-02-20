@@ -1,17 +1,17 @@
 /* Copyright (C) 2025 Ricardo Guzman - CA2RXU
- * 
+ *
  * This file is part of LoRa APRS iGate.
- * 
+ *
  * LoRa APRS iGate is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or 
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * LoRa APRS iGate is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with LoRa APRS iGate. If not, see <https://www.gnu.org/licenses/>.
  */
@@ -44,7 +44,7 @@
 #endif
 
 extern Configuration    Config;
-extern bool             callsignIsValid;
+extern bool             stationCallsignIsValid;
 
 
 namespace POWER_Utils {
@@ -73,7 +73,7 @@ namespace POWER_Utils {
             #if ADC_CTRL_INVERTED == 1
                 digitalWrite(ADC_CTRL, LOW);
             #else
-                digitalWrite(ADC_CTRL, HIGH);   
+                digitalWrite(ADC_CTRL, HIGH);
             #endif
         }
 
@@ -110,7 +110,7 @@ namespace POWER_Utils {
         #else
             return false;
         #endif
-    }    
+    }
 
     void activateGPS() {
         #ifdef HAS_AXP192
@@ -320,11 +320,11 @@ namespace POWER_Utils {
         #ifdef USE_WIRE1_WITH_BOARD_I2C_PINS
             Wire1.begin(BOARD_I2C_SDA, BOARD_I2C_SCL);
         #endif
-        
+
         delay(1000);
         BATTERY_Utils::setup();
         BATTERY_Utils::startupBatteryHealth();
-        callsignIsValid = Utils::checkValidCallsign(Config.callsign);
+        stationCallsignIsValid = Utils::callsignIsValid(Config.callsign);
         setCpuFrequencyMhz(80);
     }
 

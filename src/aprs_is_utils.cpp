@@ -1,22 +1,22 @@
 /* Copyright (C) 2025 Ricardo Guzman - CA2RXU
- * 
+ *
  * This file is part of LoRa APRS iGate.
- * 
+ *
  * LoRa APRS iGate is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or 
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * LoRa APRS iGate is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with LoRa APRS iGate. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <APRSPacketLib.h> 
+#include <APRSPacketLib.h>
 #include <WiFi.h>
 #include "configuration.h"
 #include "aprs_is_utils.h"
@@ -204,7 +204,7 @@ namespace APRS_IS_Utils {
                 int firstColonIndex = packet.indexOf(":");
                 if (firstColonIndex > 5 && firstColonIndex < (packet.length() - 1) && packet[firstColonIndex + 1] != '}' && packet.indexOf("TCPIP") == -1) {
                     const String& Sender = packet.substring(3, packet.indexOf(">"));
-                    if (Sender != Config.callsign && Utils::checkValidCallsign(Sender)) {
+                    if (Sender != Config.callsign && Utils::callsignIsValid(Sender)) {
                         STATION_Utils::updateLastHeard(Sender);
                         Utils::typeOfPacket(packet.substring(3), 0);  // LoRa-APRS
                         const String& AddresseeAndMessage = packet.substring(packet.indexOf("::") + 2);

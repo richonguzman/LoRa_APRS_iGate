@@ -1,17 +1,17 @@
 /* Copyright (C) 2025 Ricardo Guzman - CA2RXU
- * 
+ *
  * This file is part of LoRa APRS iGate.
- * 
+ *
  * LoRa APRS iGate is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or 
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * LoRa APRS iGate is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with LoRa APRS iGate. If not, see <https://www.gnu.org/licenses/>.
  */
@@ -51,12 +51,13 @@ namespace SLEEP_Utils {
         if (Config.digi.ecoMode == 1) {
             pinMode(RADIO_WAKEUP_PIN, INPUT);
             attachInterrupt(digitalPinToInterrupt(RADIO_WAKEUP_PIN), wakeUpLoRaPacketReceived, RISING);
-            #if defined(HAS_ESP32) || defined(HAS_ESP32_S2) || defined(HAS_ESP32_S3)
+
+            #if defined(CONFIG_IDF_TARGET_ESP32) || defined(CONFIG_IDF_TARGET_ESP32S2) || defined(CONFIG_IDF_TARGET_ESP32S3)
                 esp_sleep_enable_ext1_wakeup(GPIO_WAKEUP_PIN, ESP_EXT1_WAKEUP_ANY_HIGH);
-            #endif
-            #if defined(HAS_ESP32_C3)
+            #elif defined(CONFIG_IDF_TARGET_ESP32C3)
                 esp_deep_sleep_enable_gpio_wakeup(1ULL << GPIO_WAKEUP_PIN, ESP_GPIO_WAKEUP_GPIO_HIGH);
             #endif
+            //#if defined(ARDUINO_ARCH_STM32) || defined(ARDUINO_ARCH_NRF52)
         }
         #endif
     }

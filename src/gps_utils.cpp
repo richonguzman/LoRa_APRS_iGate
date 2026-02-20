@@ -1,17 +1,17 @@
 /* Copyright (C) 2025 Ricardo Guzman - CA2RXU
- * 
+ *
  * This file is part of LoRa APRS iGate.
- * 
+ *
  * LoRa APRS iGate is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or 
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * LoRa APRS iGate is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with LoRa APRS iGate. If not, see <https://www.gnu.org/licenses/>.
  */
@@ -34,7 +34,7 @@
 extern Configuration    Config;
 extern HardwareSerial   gpsSerial;
 extern TinyGPSPlus      gps;
-extern bool             callsignIsValid;
+extern bool             stationCallsignIsValid;
 String                  distance, iGateBeaconPacket, iGateLoRaBeaconPacket;
 
 
@@ -49,7 +49,7 @@ namespace GPS_Utils {
         String encodedGPS   = APRSPacketLib::encodeGPSIntoBase91(Config.beacon.latitude, Config.beacon.longitude, 0, 0, Config.beacon.symbol, false, 0, true, Config.beacon.ambiguityLevel);
 
         if (Config.callsign.indexOf("NOCALL-10") != 0) {
-            if (!callsignIsValid) {
+            if (!stationCallsignIsValid) {
                 displayShow("***** ERROR ******", "CALLSIGN = NOT VALID!", "", "Only Rx Mode Active", 3000);
                 Config.loramodule.txActive  = false;
                 Config.aprs_is.messagesToRF = false;
@@ -57,7 +57,7 @@ namespace GPS_Utils {
                 Config.beacon.sendViaRF     = false;
                 Config.digi.mode            = 0;
                 Config.digi.backupDigiMode  = false;
-            } else if (callsignIsValid && Config.tacticalCallsign != "") {
+            } else if (stationCallsignIsValid && Config.tacticalCallsign != "") {
                 beaconPacket = APRSPacketLib::generateBasePacket(Config.tacticalCallsign, "APLRG1", Config.beacon.path);
                 Config.aprs_is.active       = false;
                 Config.beacon.sendViaAPRSIS = false;
@@ -155,7 +155,7 @@ namespace GPS_Utils {
         const uint8_t nonEncondedLatitudeOffset     = 9;    // "N" / "S"
         const uint8_t nonEncondedLongitudeOffset    = 19;   // "E" / "W"
         const uint8_t encodedByteOffset             = 14;
-        
+
         int indexOfExclamation  = packet.indexOf(":!");
         int indexOfEqual        = packet.indexOf(":=");
         int baseIndex           = - 1;

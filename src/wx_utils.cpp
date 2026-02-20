@@ -1,17 +1,17 @@
 /* Copyright (C) 2025 Ricardo Guzman - CA2RXU
- * 
+ *
  * This file is part of LoRa APRS iGate.
- * 
+ *
  * LoRa APRS iGate is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or 
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * LoRa APRS iGate is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with LoRa APRS iGate. If not, see <https://www.gnu.org/licenses/>.
  */
@@ -42,7 +42,7 @@ float newHum, newTemp, newPress, newGas;
 
 
 Adafruit_BME280     bme280;
-Adafruit_AHTX0      aht20; 
+Adafruit_AHTX0      aht20;
 #if defined(HELTEC_V3) || defined(HELTEC_V3_2)
 Adafruit_BMP280     bmp280(&Wire1);
 Adafruit_Si7021     si7021  = Adafruit_Si7021();
@@ -161,7 +161,7 @@ namespace WX_Utils {
                                         Adafruit_BMP280::SAMPLING_X1,
                                         Adafruit_BMP280::SAMPLING_X1,
                                         Adafruit_BMP280::FILTER_OFF
-                                        ); 
+                                        );
                             Serial.println("BMP280 Module init done!");
                             break;
                         case 3:
@@ -306,7 +306,7 @@ namespace WX_Utils {
                 humStr  = "..";
             }
 
-            String presStr = (wxModuleType == 4 || wxModuleType == 5) 
+            String presStr = (wxModuleType == 4 || wxModuleType == 5)
                 ? "....."
                 : generatePresString(newPress + getAltitudeCorrection() / CORRECTION_FACTOR);
 

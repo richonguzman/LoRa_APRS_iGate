@@ -1,17 +1,17 @@
 /* Copyright (C) 2025 Ricardo Guzman - CA2RXU
- * 
+ *
  * This file is part of LoRa APRS iGate.
- * 
+ *
  * LoRa APRS iGate is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or 
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * LoRa APRS iGate is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with LoRa APRS iGate. If not, see <https://www.gnu.org/licenses/>.
  */
@@ -75,7 +75,7 @@ namespace DIGI_Utils {
         } else {   // CrossFreq Digipeater
             String suffix = thirdParty ? ":}" : ":";
             String packetToRepeat = packet.substring(0, packet.indexOf(suffix));
-            
+
             String terms[] = {",WIDE1*", ",WIDE2*", "*"};
             for (String term : terms) {
                 int index = packetToRepeat.indexOf(term);
@@ -99,8 +99,8 @@ namespace DIGI_Utils {
         } else {
             temp = packet.substring(packet.indexOf(">") + 1, packet.indexOf(":"));
         }
-        if (temp.indexOf(",") > 2) { // checks for path
-            const String& path = temp.substring(temp.indexOf(",") + 1); // after tocall
+        if (temp.indexOf(",") > 2) { // checks for path in temp
+            const String& path = temp.substring(temp.indexOf(",") + 1); // extract path after tocall
             if (Config.digi.mode == 2 || backupDigiMode) {
                 if (path.indexOf("WIDE1-1") != - 1) {
                     return buildPacket(path, packet, thirdParty, false);
@@ -135,45 +135,45 @@ namespace DIGI_Utils {
     }
 
     void processLoRaPacket(const String& packet) {
-        if (packet.indexOf("NOGATE") == -1) {
-            bool thirdPartyPacket = false;
-            String temp, Sender;
-            int firstColonIndex = packet.indexOf(":");
-            if (firstColonIndex > 5 && firstColonIndex < (packet.length() - 1) && packet[firstColonIndex + 1] == '}' && packet.indexOf("TCPIP") > 0) {   // 3rd Party 
-                thirdPartyPacket = true;
-                temp    = packet.substring(packet.indexOf(":}") + 2);
-                Sender  = temp.substring(0, temp.indexOf(">"));
-            } else {
-                temp    = packet.substring(3);
-                Sender  = packet.substring(3, packet.indexOf(">"));
-            }
-            if (Sender != (Config.tacticalCallsign == "" ? Config.callsign : Config.tacticalCallsign)) {    // Avoid listening to own packets
-                if (!thirdPartyPacket && Config.tacticalCallsign == "" && !Utils::checkValidCallsign(Sender)) {
-                    return;
+        if (packet.indexOf("NOGATE") >= 0) return;
+
+        bool thirdPartyPacket = false;
+        String temp, Sender;
+        int firstColonIndex = packet.indexOf(":");
+        if (firstColonIndex > 5 && firstColonIndex < (packet.length() - 1) && packet[firstColonIndex + 1] == '}' && packet.indexOf("TCPIP") > 0) {   // 3rd Party
+            thirdPartyPacket = true;
+            temp    = packet.substring(packet.indexOf(":}") + 2);
+            Sender  = temp.substring(0, temp.indexOf(">"));
+        } else {
+            temp    = packet.substring(3);
+            Sender  = packet.substring(3, packet.indexOf(">"));
+        }
+
+        if (Sender == (Config.tacticalCallsign == "" ? Config.callsign : Config.tacticalCallsign)) return;  // Avoid listening to self packets
+        if (!thirdPartyPacket && Config.tacticalCallsign == "" && !Utils::callsignIsValid(Sender)) return;  // No thirdParty + no tactical y no valid callsign
+
+        if (STATION_Utils::check25SegBuffer(Sender, temp.substring(temp.indexOf(":") + 2))) {
+            STATION_Utils::updateLastHeard(Sender);
+            Utils::typeOfPacket(temp, 2);    // Digi
+            bool queryMessage = false;
+            if (temp.indexOf("::") > 10) {   // it's a message
+                String AddresseeAndMessage  = temp.substring(temp.indexOf("::") + 2);
+                String Addressee            = AddresseeAndMessage.substring(0, AddresseeAndMessage.indexOf(":"));
+                Addressee.trim();
+                if (Addressee == (Config.tacticalCallsign == "" ? Config.callsign : Config.tacticalCallsign)) {     // it's a message for me!
+                    queryMessage = APRS_IS_Utils::processReceivedLoRaMessage(Sender, AddresseeAndMessage, thirdPartyPacket);
                 }
-                if (STATION_Utils::check25SegBuffer(Sender, temp.substring(temp.indexOf(":") + 2))) {
-                    STATION_Utils::updateLastHeard(Sender);
-                    Utils::typeOfPacket(temp, 2);    // Digi
-                    bool queryMessage = false;
-                    if (temp.indexOf("::") > 10) {   // it's a message
-                        String AddresseeAndMessage  = temp.substring(temp.indexOf("::") + 2);
-                        String Addressee            = AddresseeAndMessage.substring(0, AddresseeAndMessage.indexOf(":"));
-                        Addressee.trim();
-                        if (Addressee == (Config.tacticalCallsign == "" ? Config.callsign : Config.tacticalCallsign)) {     // it's a message for me!
-                            queryMessage = APRS_IS_Utils::processReceivedLoRaMessage(Sender, AddresseeAndMessage, thirdPartyPacket);
-                        }
-                    }
-                    if (!queryMessage) {
-                        String loraPacket = generateDigipeatedPacket(packet.substring(3), thirdPartyPacket);
-                        if (loraPacket != "") {
-                            STATION_Utils::addToOutputPacketBuffer(loraPacket);
-                            if (Config.digi.ecoMode != 1) displayToggle(true);
-                            lastScreenOn = millis();
-                        }
-                    }
+            }
+            if (!queryMessage) {
+                String loraPacket = generateDigipeatedPacket(packet.substring(3), thirdPartyPacket);
+                if (loraPacket != "") {
+                    STATION_Utils::addToOutputPacketBuffer(loraPacket);
+                    if (Config.digi.ecoMode != 1) displayToggle(true);
+                    lastScreenOn = millis();
                 }
             }
         }
+        //}
     }
 
 }
