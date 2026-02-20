@@ -44,37 +44,38 @@ extern bool             backupDigiMode;
 namespace DIGI_Utils {
 
     String buildPacket(const String& path, const String& packet, bool thirdParty, bool crossFreq) {
+        String stationCallsign = (Config.tacticalCallsign == "" ? Config.callsign : Config.tacticalCallsign);
         if (!crossFreq) {
             String packetToRepeat = packet.substring(0, packet.indexOf(",") + 1);
             String tempPath = path;
+            int digiMode = Config.digi.mode;
 
-            if (path.indexOf("WIDE1-1") != -1 && (Config.digi.mode == 2 || Config.digi.mode == 3)) {
-                tempPath.replace("WIDE1-1", (Config.tacticalCallsign == "" ? Config.callsign : Config.tacticalCallsign) + "*");
-            } else if (path.indexOf("WIDE2-") != -1 && Config.digi.mode == 3) {
-                if (path.indexOf(",WIDE1*") != -1) {
-                    tempPath.remove(path.indexOf(",WIDE1*"), 7);
+            if (path.indexOf("WIDE1-1") != -1 && (digiMode == 2 || digiMode == 3)) {
+                tempPath.replace("WIDE1-1", stationCallsign + "*");
+            } else if (path.indexOf("WIDE2-") != -1 && digiMode == 3) {
+                int wide1AsteriskIndex = path.indexOf(",WIDE1*");   // less memory than: tempPath.replace(",WIDE1*", "");
+                if (wide1AsteriskIndex != -1) {
+                    tempPath.remove(wide1AsteriskIndex, 7);
                 }
-                if (path.indexOf("*") != -1) {
-                    tempPath.remove(path.indexOf("*"), 1);
+                int asteriskIndex = path.indexOf("*");              // less memory than: tempPath.replace("*", "");
+                if (asteriskIndex != -1) {
+                    tempPath.remove(asteriskIndex, 1);
                 }
                 if (path.indexOf("WIDE2-1") != -1) {
-                    tempPath.replace("WIDE2-1", (Config.tacticalCallsign == "" ? Config.callsign : Config.tacticalCallsign) + "*");
+                    tempPath.replace("WIDE2-1", stationCallsign + "*");
                 } else if (path.indexOf("WIDE2-2") != -1) {
-                    tempPath.replace("WIDE2-2", (Config.tacticalCallsign == "" ? Config.callsign : Config.tacticalCallsign) + "*,WIDE2-1");
+                    tempPath.replace("WIDE2-2", stationCallsign + "*,WIDE2-1");
                 } else {
                     return "";
                 }
             }
             packetToRepeat += tempPath;
-            if (thirdParty) {
-                packetToRepeat += APRS_IS_Utils::checkForStartingBytes(packet.substring(packet.indexOf(":}")));
-            } else {
-                packetToRepeat += APRS_IS_Utils::checkForStartingBytes(packet.substring(packet.indexOf(":")));
-            }
+            packetToRepeat += APRS_IS_Utils::checkForStartingBytes(packet.substring(packet.indexOf(thirdParty ? ":}" : ":")));
             return packetToRepeat;
         } else {   // CrossFreq Digipeater
-            String suffix = thirdParty ? ":}" : ":";
-            String packetToRepeat = packet.substring(0, packet.indexOf(suffix));
+            String suffix   = thirdParty ? ":}" : ":";
+            int suffixIndex = packet.indexOf(suffix);
+            String packetToRepeat = packet.substring(0, suffixIndex);
 
             String terms[] = {",WIDE1*", ",WIDE2*", "*"};
             for (String term : terms) {
@@ -84,9 +85,9 @@ namespace DIGI_Utils {
                 }
             }
             packetToRepeat += ",";
-            packetToRepeat += (Config.tacticalCallsign == "" ? Config.callsign : Config.tacticalCallsign);
+            packetToRepeat += stationCallsign;
             packetToRepeat += "*";
-            packetToRepeat += APRS_IS_Utils::checkForStartingBytes(packet.substring(packet.indexOf(suffix)));
+            packetToRepeat += APRS_IS_Utils::checkForStartingBytes(packet.substring(suffixIndex));
             return packetToRepeat;
         }
     }
@@ -149,19 +150,20 @@ namespace DIGI_Utils {
             Sender  = packet.substring(3, packet.indexOf(">"));
         }
 
-        if (Sender == (Config.tacticalCallsign == "" ? Config.callsign : Config.tacticalCallsign)) return;  // Avoid listening to self packets
+        String stationCallsign = Config.tacticalCallsign == "" ? Config.callsign : Config.tacticalCallsign;
+        if (Sender == stationCallsign) return;          // Avoid listening to self packets
         if (!thirdPartyPacket && Config.tacticalCallsign == "" && !Utils::callsignIsValid(Sender)) return;  // No thirdParty + no tactical y no valid callsign
 
         if (STATION_Utils::check25SegBuffer(Sender, temp.substring(temp.indexOf(":") + 2))) {
             STATION_Utils::updateLastHeard(Sender);
-            Utils::typeOfPacket(temp, 2);    // Digi
+            Utils::typeOfPacket(temp, 2);               // Digi
             bool queryMessage = false;
             int doubleColonIndex = temp.indexOf("::");
-            if (doubleColonIndex > 10) {   // it's a message
+            if (doubleColonIndex > 10) {                // it's a message
                 String AddresseeAndMessage  = temp.substring(doubleColonIndex + 2);
                 String Addressee            = AddresseeAndMessage.substring(0, AddresseeAndMessage.indexOf(":"));
                 Addressee.trim();
-                if (Addressee == (Config.tacticalCallsign == "" ? Config.callsign : Config.tacticalCallsign)) {     // it's a message for me!
+                if (Addressee == stationCallsign) {     // it's a message for me!
                     queryMessage = APRS_IS_Utils::processReceivedLoRaMessage(Sender, AddresseeAndMessage, thirdPartyPacket);
                 }
             }
