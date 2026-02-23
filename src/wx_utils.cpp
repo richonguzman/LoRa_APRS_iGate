@@ -61,9 +61,9 @@ namespace WX_Utils {
     void getWxModuleAddres() {
         uint8_t err, addr;
         for(addr = 1; addr < 0x7F; addr++) {
-            #if defined(HELTEC_V3) || defined(HELTEC_V3_2) || defined(HELTEC_WSL_V3) || defined(HELTEC_WSL_V3_DISPLAY)
-                Wire1.beginTransmission(addr);
-                err = Wire1.endTransmission();
+            #ifdef SENSOR_I2C_BUS
+                SENSOR_I2C_BUS.beginTransmission(addr);
+                err = SENSOR_I2C_BUS.endTransmission();
             #else
                 Wire.beginTransmission(addr);
                 #ifdef LIGHTGATEWAY_PLUS_1_0

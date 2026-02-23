@@ -296,12 +296,8 @@ namespace POWER_Utils {
             Wire.begin(OLED_SDA, OLED_SCL);
         #endif
 
-        #ifdef USE_WIRE_WITH_BOARD_I2C_PINS
-            Wire.begin(BOARD_I2C_SDA, BOARD_I2C_SCL);
-        #endif
-
-        #ifdef USE_WIRE1_WITH_BOARD_I2C_PINS
-            Wire1.begin(BOARD_I2C_SDA, BOARD_I2C_SCL);
+        #ifdef SENSOR_I2C_BUS
+            SENSOR_I2C_BUS.begin(BOARD_I2C_SDA, BOARD_I2C_SCL);
         #endif
 
         delay(1000);

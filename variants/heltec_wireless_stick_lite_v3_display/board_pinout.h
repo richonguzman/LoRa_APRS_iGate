@@ -33,7 +33,7 @@
     #define GPIO_WAKEUP_PIN         GPIO_SEL_14
 
     //  I2C
-    #define USE_WIRE1_WITH_BOARD_I2C_PINS
+    #define SENSOR_I2C_BUS          Wire1
     #define BOARD_I2C_SDA           41
     #define BOARD_I2C_SCL           42
 

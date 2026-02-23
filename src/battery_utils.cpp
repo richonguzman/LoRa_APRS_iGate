@@ -1,17 +1,17 @@
 /* Copyright (C) 2025 Ricardo Guzman - CA2RXU
- * 
+ *
  * This file is part of LoRa APRS iGate.
- * 
+ *
  * LoRa APRS iGate is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or 
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * LoRa APRS iGate is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with LoRa APRS iGate. If not, see <https://www.gnu.org/licenses/>.
  */
@@ -105,9 +105,9 @@ namespace BATTERY_Utils {
     void getI2CVoltageSensorAddress() {
         uint8_t err, addr;
         for(addr = 1; addr < 0x7F; addr++) {
-            #if defined(HELTEC_V3) || defined(HELTEC_V3_2) || defined(HELTEC_WSL_V3) || defined(HELTEC_WSL_V3_DISPLAY)
-                Wire1.beginTransmission(addr);
-                err = Wire1.endTransmission();
+            #ifdef SENSOR_I2C_BUS
+                SENSOR_I2C_BUS.beginTransmission(addr);
+                err = SENSOR_I2C_BUS.endTransmission();
             #else
                 Wire.beginTransmission(addr);
                 err = Wire.endTransmission();
@@ -145,7 +145,7 @@ namespace BATTERY_Utils {
         }
     }
 
-    float checkInternalVoltage() { 
+    float checkInternalVoltage() {
         #if defined(HAS_AXP192) || defined(HAS_AXP2101)
             if(POWER_Utils::isBatteryConnected()) {
                 return POWER_Utils::getBatteryVoltage();
@@ -153,7 +153,7 @@ namespace BATTERY_Utils {
                 return 0.0;
             }
         #else
-            
+
             #ifdef ADC_CTRL
                 POWER_Utils::adc_ctrl_ON();
             #endif
@@ -177,7 +177,7 @@ namespace BATTERY_Utils {
                         #endif
                     #endif
                 #endif
-                delay(3); 
+                delay(3);
             }
 
             #ifdef ADC_CTRL
@@ -241,7 +241,7 @@ namespace BATTERY_Utils {
             #else
                 extVoltage = ((((sampleSum/100.0)* adcReadingTransformation) + readingCorrection) * voltageDividerTransformation) - multiplyCorrection;
             #endif
-            
+
             return extVoltage; // raw voltage without mapping
 
             // return mapVoltage(voltage, 5.05, 6.32, 4.5, 5.5); // mapped voltage

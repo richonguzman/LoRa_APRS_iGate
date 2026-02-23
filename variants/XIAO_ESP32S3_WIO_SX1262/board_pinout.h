@@ -39,8 +39,8 @@
     #define INTERNAL_LED_PIN    48
 
     //  I2C
-    #define USE_WIRE_WITH_OLED_PINS
-    #define OLED_SDA            5
-    #define OLED_SCL            6
+    #define SENSOR_I2C_BUS      Wire
+    #define BOARD_I2C_SDA       5
+    #define BOARD_I2C_SCL       6
 
 #endif

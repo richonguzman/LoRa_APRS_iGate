@@ -34,7 +34,7 @@
 
     //  I2C
     #define USE_WIRE_WITH_OLED_PINS
-    #define USE_WIRE1_WITH_BOARD_I2C_PINS
+    #define SENSOR_I2C_BUS          Wire1
     #define BOARD_I2C_SDA           41
     #define BOARD_I2C_SCL           42
 
