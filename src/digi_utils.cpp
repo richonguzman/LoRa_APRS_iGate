@@ -43,24 +43,29 @@ extern bool             backupDigiMode;
 
 namespace DIGI_Utils {
 
-    String buildPacket(const String& path, const String& packet, bool thirdParty, bool crossFreq) {
-        String stationCallsign = (Config.tacticalCallsign == "" ? Config.callsign : Config.tacticalCallsign);
-        if (!crossFreq) {
-            String packetToRepeat = packet.substring(0, packet.indexOf(",") + 1);
-            String tempPath = path;
-            int digiMode = Config.digi.mode;
+    String cleanPathAsterisks(String path) {
+        String terms[] = {",WIDE1*", ",WIDE2*", "*"};
+        for (String term : terms) {
+            int index = path.indexOf(term);
+            if (index != -1) path.remove(index, term.length());     // less memory than: tempPath.replace("*", "");
+        }
+        return path;
+    }
 
-            if (path.indexOf("WIDE1-1") != -1 && (digiMode == 2 || digiMode == 3)) {
+    String buildPacket(const String& path, const String& packet, bool thirdParty, bool crossFreq) {
+        String stationCallsign  = (Config.tacticalCallsign == "" ? Config.callsign : Config.tacticalCallsign);
+        String suffix           = thirdParty ? ":}" : ":";
+        int suffixIndex         = packet.indexOf(suffix);
+        String packetToRepeat;
+        if (!crossFreq) {
+            int digiMode        = Config.digi.mode;
+            String tempPath     = path;
+
+            if (tempPath.indexOf("WIDE1-1") != -1 && (digiMode == 2 || digiMode == 3)) {    // WIDE1-1 Digipeater
+                if (tempPath.indexOf("*") != -1 ) return "";                                  // "*" shouldn't be in WIDE1-1 (only) type of packet
                 tempPath.replace("WIDE1-1", stationCallsign + "*");
-            } else if (path.indexOf("WIDE2-") != -1 && digiMode == 3) {
-                int wide1AsteriskIndex = path.indexOf(",WIDE1*");   // less memory than: tempPath.replace(",WIDE1*", "");
-                if (wide1AsteriskIndex != -1) {
-                    tempPath.remove(wide1AsteriskIndex, 7);
-                }
-                int asteriskIndex = path.indexOf("*");              // less memory than: tempPath.replace("*", "");
-                if (asteriskIndex != -1) {
-                    tempPath.remove(asteriskIndex, 1);
-                }
+            } else if (tempPath.indexOf("WIDE2-") != -1 && digiMode == 3) {                 // WIDE2-n Digipeater
+                tempPath = cleanPathAsterisks(path);
                 if (path.indexOf("WIDE2-1") != -1) {
                     tempPath.replace("WIDE2-1", stationCallsign + "*");
                 } else if (path.indexOf("WIDE2-2") != -1) {
@@ -69,32 +74,22 @@ namespace DIGI_Utils {
                     return "";
                 }
             }
+            packetToRepeat = packet.substring(0, packet.indexOf(",") + 1);
             packetToRepeat += tempPath;
-            packetToRepeat += APRS_IS_Utils::checkForStartingBytes(packet.substring(packet.indexOf(thirdParty ? ":}" : ":")));
-            return packetToRepeat;
         } else {   // CrossFreq Digipeater
-            String suffix   = thirdParty ? ":}" : ":";
-            int suffixIndex = packet.indexOf(suffix);
-            String packetToRepeat = packet.substring(0, suffixIndex);
-
-            String terms[] = {",WIDE1*", ",WIDE2*", "*"};
-            for (String term : terms) {
-                int index = packetToRepeat.indexOf(term);
-                if (index != -1) {
-                    packetToRepeat.remove(index, term.length());
-                }
-            }
+            packetToRepeat = cleanPathAsterisks(packet.substring(0, suffixIndex));
+            if (packetToRepeat.indexOf(stationCallsign) != -1) return "";                   // stationCallsign shouldn't be in path
             packetToRepeat += ",";
             packetToRepeat += stationCallsign;
             packetToRepeat += "*";
-            packetToRepeat += APRS_IS_Utils::checkForStartingBytes(packet.substring(suffixIndex));
-            return packetToRepeat;
         }
+        packetToRepeat += APRS_IS_Utils::checkForStartingBytes(packet.substring(suffixIndex));
+        return packetToRepeat;
     }
 
     String generateDigipeatedPacket(const String& packet, bool thirdParty){
         String temp;
-        if (thirdParty) { // only header is used
+        if (thirdParty) {   // only header is used
             const String& header = packet.substring(0, packet.indexOf(":}"));
             temp = header.substring(header.indexOf(">") + 1);
         } else {
@@ -104,7 +99,7 @@ namespace DIGI_Utils {
         int digiMode        = Config.digi.mode;
         bool crossFreq      = abs(Config.loramodule.txFreq - Config.loramodule.rxFreq) >= 125000;   // CrossFreq Digi
 
-        if (commaIndex > 2) {   // Packet has "path"
+        if (commaIndex > 2) {   // "path" found
             const String& path  = temp.substring(commaIndex + 1);
             if (digiMode == 2 || backupDigiMode) {
                 bool hasWide = path.indexOf("WIDE1-1") != -1;
