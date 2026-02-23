@@ -44,10 +44,11 @@
     //  Aditional Config
     #define INTERNAL_LED_PIN        18
     #define BATTERY_PIN             1
-    #define VEXT_CTRL               3   // To turn on GPS and TFT
-    #define VEXT_CTRL_INVERTED      0
-    #define ADC_CTRL                2   // HELTEC Wireless Tracker ADC_CTRL = HIGH powers the voltage divider to read BatteryPin. Only on V05 = V1.1
-    #define ADC_CTRL_INVERTED       0
+
+    #define ADC_CTRL_PIN            2   // HELTEC Wireless Tracker ADC_CTRL = HIGH powers the voltage divider to read BatteryPin. Only on V05 = V1.1
+    #define ADC_CTRL_ON_STATE       HIGH
+    #define VEXT_CTRL_PIN           3   // To turn on GPS and TFT
+    #define VEXT_CTRL_ON_STATE      HIGH
 
     //  GPS
     #define HAS_GPS

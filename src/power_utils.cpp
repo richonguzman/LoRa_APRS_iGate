@@ -49,40 +49,23 @@ extern bool             stationCallsignIsValid;
 
 namespace POWER_Utils {
 
-    #ifdef VEXT_CTRL
-        void vext_ctrl_ON() {
-            #if VEXT_CTRL_INVERTED == 1
-                digitalWrite(VEXT_CTRL, Config.digi.ecoMode == 1 ? HIGH : LOW);
-            #else
-                digitalWrite(VEXT_CTRL, Config.digi.ecoMode == 1 ? LOW : HIGH);
-            #endif
-        }
-
-        void vext_ctrl_OFF() {
-            #if VEXT_CTRL_INVERTED == 1
-                digitalWrite(VEXT_CTRL, Config.digi.ecoMode == 1 ? LOW : HIGH);
-            #else
-                digitalWrite(VEXT_CTRL, Config.digi.ecoMode == 1 ? HIGH : LOW);
-            #endif
-        }
-    #endif
-
-
-    #ifdef ADC_CTRL
+    #ifdef ADC_CTRL_PIN
         void adc_ctrl_ON() {
-            #if ADC_CTRL_INVERTED == 1
-                digitalWrite(ADC_CTRL, LOW);
-            #else
-                digitalWrite(ADC_CTRL, HIGH);
-            #endif
+            digitalWrite(ADC_CTRL_PIN, ADC_CTRL_ON_STATE);
         }
 
         void adc_ctrl_OFF() {
-            #if ADC_CTRL_INVERTED == 1
-                digitalWrite(ADC_CTRL, HIGH);
-            #else
-                digitalWrite(ADC_CTRL, LOW);
-            #endif
+            digitalWrite(ADC_CTRL_PIN, !ADC_CTRL_ON_STATE);
+        }
+    #endif
+
+    #ifdef VEXT_CTRL_PIN
+        void vext_ctrl_ON() {
+            digitalWrite(VEXT_CTRL_PIN, Config.digi.ecoMode == 1 ? !VEXT_CTRL_ON_STATE : VEXT_CTRL_ON_STATE);
+        }
+
+        void vext_ctrl_OFF() {
+            digitalWrite(VEXT_CTRL_PIN, Config.digi.ecoMode == 1 ? VEXT_CTRL_ON_STATE : !VEXT_CTRL_ON_STATE);
         }
     #endif
 

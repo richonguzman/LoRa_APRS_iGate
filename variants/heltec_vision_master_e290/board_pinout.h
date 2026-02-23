@@ -50,9 +50,10 @@
     //  Aditional Config
     #define INTERNAL_LED_PIN        45
     #define BATTERY_PIN             7
-    #define ADC_CTRL                46
-    #define ADC_CTRL_INVERTED       0
-    #define VEXT_CTRL               18
-    #define VEXT_CTRL_INVERTED      0
+
+    #define ADC_CTRL_PIN            46
+    #define ADC_CTRL_ON_STATE       HIGH
+    #define VEXT_CTRL_PIN           18
+    #define VEXT_CTRL_ON_STATE      HIGH
 
 #endif

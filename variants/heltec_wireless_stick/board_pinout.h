@@ -50,9 +50,11 @@
     //  Aditional Config
     #define INTERNAL_LED_PIN        35
     #define BATTERY_PIN             1
-    #define ADC_CTRL                37
-    #define VEXT_CTRL               36
-    #define VEXT_CTRL_INVERTED      1
+
+    #define ADC_CTRL_PIN            37
+    #define ADC_CTRL_ON_STATE       LOW
+    #define VEXT_CTRL_PIN           36
+    #define VEXT_CTRL_ON_STATE      LOW
 
     #define BOARD_I2C_SDA           41
     #define BOARD_I2C_SCL           42
