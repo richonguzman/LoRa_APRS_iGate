@@ -162,13 +162,13 @@ namespace DIGI_Utils {
                     queryMessage = APRS_IS_Utils::processReceivedLoRaMessage(Sender, AddresseeAndMessage, thirdPartyPacket);
                 }
             }
-            if (!queryMessage) {
-                String loraPacket = generateDigipeatedPacket(packet.substring(3), thirdPartyPacket);
-                if (loraPacket != "") {
-                    STATION_Utils::addToOutputPacketBuffer(loraPacket);
-                    if (Config.digi.ecoMode != 1) displayToggle(true);
-                    lastScreenOn = millis();
-                }
+            if (queryMessage) return;                   // answer should not be repeated.
+
+            String loraPacket = generateDigipeatedPacket(packet.substring(3), thirdPartyPacket);
+            if (loraPacket != "") {
+                STATION_Utils::addToOutputPacketBuffer(loraPacket);
+                if (Config.digi.ecoMode != 1) displayToggle(true);
+                lastScreenOn = millis();
             }
         }
     }
