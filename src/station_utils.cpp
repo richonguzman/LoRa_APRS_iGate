@@ -1,17 +1,17 @@
 /* Copyright (C) 2025 Ricardo Guzman - CA2RXU
- * 
+ *
  * This file is part of LoRa APRS iGate.
- * 
+ *
  * LoRa APRS iGate is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or 
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * LoRa APRS iGate is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with LoRa APRS iGate. If not, see <https://www.gnu.org/licenses/>.
  */
@@ -45,11 +45,9 @@ std::vector<OutputPacketBuffer> outputPacketBuffer;
 
 struct Packet25SegBuffer {
     uint32_t    receivedTime;
-    String      station;
-    String      payload;
+    uint32_t    hash;
 };
 std::vector<Packet25SegBuffer>  packet25SegBuffer;
-
 
 bool saveNewDigiEcoModeConfig   = false;
 bool packetIsBeacon             = false;
@@ -166,18 +164,33 @@ namespace STATION_Utils {
         return false;
     }
 
-    void clean25SegBuffer() {
-        if (!packet25SegBuffer.empty() && (millis() - packet25SegBuffer[0].receivedTime) >  25 * 1000) packet25SegBuffer.erase(packet25SegBuffer.begin());
-    }
-
-    bool check25SegBuffer(const String& station, const String& textMessage) {
-        if (!packet25SegBuffer.empty()) {
-            for (int i = 0; i < packet25SegBuffer.size(); i++) {
-                if (packet25SegBuffer[i].station == station && packet25SegBuffer[i].payload == textMessage) return false;
+    void clean25SegHashBuffer() {
+        uint32_t currentTime = millis();
+        for (int i = packet25SegBuffer.size() - 1; i >= 0; i--) {
+            if ((currentTime - packet25SegBuffer[i].receivedTime) > 25 * 1000) {
+                packet25SegBuffer.erase(packet25SegBuffer.begin() + i);
             }
         }
-        packet25SegBuffer.emplace_back(Packet25SegBuffer{millis(), station, textMessage});
-        return true;
+    }
+
+    uint32_t makeHash(const String& station, const String& payload) {   // DJB2 Hash
+        uint32_t h = 5381;
+        for (size_t i = 0; i < station.length(); i++)
+            h = ((h << 5) + h) + station[i];
+        for (size_t i = 0; i < payload.length(); i++)
+            h = ((h << 5) + h) + payload[i];
+        return h;
+    }
+
+    bool isIn25SegHashBuffer(const String& station, const String& textMessage) {
+        uint32_t newHash = makeHash(station, textMessage);
+        uint32_t currentTime = millis();
+        clean25SegHashBuffer();
+        for (int i = 0; i < packet25SegBuffer.size(); i++) {
+            if (packet25SegBuffer[i].hash == newHash) return true;
+        }
+        packet25SegBuffer.push_back({currentTime, newHash});
+        return false;
     }
 
     void processOutputPacketBufferUltraEcoMode() {

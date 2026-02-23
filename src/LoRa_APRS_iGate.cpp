@@ -188,7 +188,6 @@ void loop() {
             }
 
             if (Config.loramodule.txActive && (Config.digi.mode == 2 || Config.digi.mode == 3 || backupDigiMode)) { // If Digi enabled
-                STATION_Utils::clean25SegBuffer();
                 DIGI_Utils::processLoRaPacket(packet); // Send received packet to Digi
             }
 

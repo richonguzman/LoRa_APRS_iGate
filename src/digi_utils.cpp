@@ -149,27 +149,27 @@ namespace DIGI_Utils {
         if (Sender == stationCallsign) return;          // Avoid listening to self packets
         if (!thirdPartyPacket && Config.tacticalCallsign == "" && !Utils::callsignIsValid(Sender)) return;  // No thirdParty + no tactical y no valid callsign
 
-        if (STATION_Utils::check25SegBuffer(Sender, temp.substring(temp.indexOf(":") + 2))) {
-            STATION_Utils::updateLastHeard(Sender);
-            Utils::typeOfPacket(temp, 2);               // Digi
-            bool queryMessage = false;
-            int doubleColonIndex = temp.indexOf("::");
-            if (doubleColonIndex > 10) {                // it's a message
-                String AddresseeAndMessage  = temp.substring(doubleColonIndex + 2);
-                String Addressee            = AddresseeAndMessage.substring(0, AddresseeAndMessage.indexOf(":"));
-                Addressee.trim();
-                if (Addressee == stationCallsign) {     // it's a message for me!
-                    queryMessage = APRS_IS_Utils::processReceivedLoRaMessage(Sender, AddresseeAndMessage, thirdPartyPacket);
-                }
-            }
-            if (queryMessage) return;                   // answer should not be repeated.
+        if (STATION_Utils::isIn25SegHashBuffer(Sender, temp.substring(temp.indexOf(":") + 2))) return;
 
-            String loraPacket = generateDigipeatedPacket(packet.substring(3), thirdPartyPacket);
-            if (loraPacket != "") {
-                STATION_Utils::addToOutputPacketBuffer(loraPacket);
-                if (Config.digi.ecoMode != 1) displayToggle(true);
-                lastScreenOn = millis();
+        STATION_Utils::updateLastHeard(Sender);
+        Utils::typeOfPacket(temp, 2);               // Digi
+        bool queryMessage = false;
+        int doubleColonIndex = temp.indexOf("::");
+        if (doubleColonIndex > 10) {                // it's a message
+            String AddresseeAndMessage  = temp.substring(doubleColonIndex + 2);
+            String Addressee            = AddresseeAndMessage.substring(0, AddresseeAndMessage.indexOf(":"));
+            Addressee.trim();
+            if (Addressee == stationCallsign) {     // it's a message for me!
+                queryMessage = APRS_IS_Utils::processReceivedLoRaMessage(Sender, AddresseeAndMessage, thirdPartyPacket);
             }
+        }
+        if (queryMessage) return;                   // answer should not be repeated.
+
+        String loraPacket = generateDigipeatedPacket(packet.substring(3), thirdPartyPacket);
+        if (loraPacket != "") {
+            STATION_Utils::addToOutputPacketBuffer(loraPacket);
+            if (Config.digi.ecoMode != 1) displayToggle(true);
+            lastScreenOn = millis();
         }
     }
 
