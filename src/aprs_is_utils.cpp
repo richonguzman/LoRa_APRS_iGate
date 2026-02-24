@@ -135,30 +135,30 @@ namespace APRS_IS_Utils {
     }
 
     String checkForStartingBytes(const String& packet) {
-        if (packet.indexOf("\x3c\xff\x01") != -1) {
-            return packet.substring(0, packet.indexOf("\x3c\xff\x01"));
-        } else {
-            return packet;
-        }
+        int index = packet.indexOf("\x3c\xff\x01");
+        return (index != -1) ? packet.substring(0, index) : packet;
     }
 
     String buildPacketToUpload(const String& packet) {
-        String packetToUpload = packet.substring(3, packet.indexOf(":"));
+        int colonIndex = packet.indexOf(":");
+        String packetToUpload = packet.substring(3, colonIndex);
         if (Config.aprs_is.active && passcodeValid && Config.aprs_is.messagesToRF) {
             packetToUpload += ",qAR,";
         } else {
             packetToUpload += ",qAO,";
         }
         packetToUpload += Config.callsign;
-        packetToUpload += checkForStartingBytes(packet.substring(packet.indexOf(":")));
+        packetToUpload += checkForStartingBytes(packet.substring(colonIndex));
         return packetToUpload;
     }
 
     bool processReceivedLoRaMessage(const String& sender, const String& packet, bool thirdParty) {
         String receivedMessage;
-        if (packet.indexOf("{") > 0) {     // ack?
+        int leftCurlyBraceIndex = packet.indexOf("{");
+        int colonIndex          = packet.indexOf(":");
+        if (leftCurlyBraceIndex > 0) {     // ack?
             String ackMessage = "ack";
-            ackMessage.concat(packet.substring(packet.indexOf("{") + 1));
+            ackMessage.concat(packet.substring(leftCurlyBraceIndex + 1));
             ackMessage.trim();
             //Serial.println(ackMessage);
 
@@ -180,9 +180,9 @@ namespace APRS_IS_Utils {
             addToBuffer += ":";
             addToBuffer += ackMessage;
             STATION_Utils::addToOutputPacketBuffer(addToBuffer);
-            receivedMessage = packet.substring(packet.indexOf(":") + 1, packet.indexOf("{"));
+            receivedMessage = packet.substring(colonIndex + 1, leftCurlyBraceIndex);
         } else {
-            receivedMessage = packet.substring(packet.indexOf(":") + 1);
+            receivedMessage = packet.substring(colonIndex + 1);
         }
         if (receivedMessage.indexOf("?") == 0) {
             if (!Config.display.alwaysOn && Config.display.timeout != 0) {
@@ -207,29 +207,30 @@ namespace APRS_IS_Utils {
                     if (Sender != Config.callsign && Utils::callsignIsValid(Sender)) {
                         STATION_Utils::updateLastHeard(Sender);
                         Utils::typeOfPacket(packet.substring(3), 0);  // LoRa-APRS
-                        const String& AddresseeAndMessage = packet.substring(packet.indexOf("::") + 2);
+                        int doubleColonIndex = packet.indexOf("::");
+                        const String& AddresseeAndMessage = packet.substring(doubleColonIndex + 2);
                         String Addressee = AddresseeAndMessage.substring(0, AddresseeAndMessage.indexOf(":"));
                         Addressee.trim();
                         bool queryMessage = false;
-                        if (packet.indexOf("::") > 10 && Addressee == Config.callsign) {      // its a message for me!
+                        if (doubleColonIndex > 10 && Addressee == Config.callsign) {      // its a message for me!
                             queryMessage = processReceivedLoRaMessage(Sender, checkForStartingBytes(AddresseeAndMessage), false);
                         }
-                        if (!queryMessage) {
-                            const String& aprsPacket = buildPacketToUpload(packet);
-                            if (!Config.display.alwaysOn && Config.display.timeout != 0) {
-                                displayToggle(true);
-                            }
-                            lastScreenOn = millis();
-                            #ifdef HAS_A7670
-                                stationBeacon = true;
-                                A7670_Utils::uploadToAPRSIS(aprsPacket);
-                                stationBeacon = false;
-                            #else
-                                upload(aprsPacket);
-                            #endif
-                            Utils::println("---> Uploaded to APRS-IS");
-                            displayShow(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
+                        if (queryMessage) return;
+
+                        const String& aprsPacket = buildPacketToUpload(packet);
+                        if (!Config.display.alwaysOn && Config.display.timeout != 0) {
+                            displayToggle(true);
                         }
+                        lastScreenOn = millis();
+                        #ifdef HAS_A7670
+                            stationBeacon = true;
+                            A7670_Utils::uploadToAPRSIS(aprsPacket);
+                            stationBeacon = false;
+                        #else
+                            upload(aprsPacket);
+                        #endif
+                        Utils::println("---> Uploaded to APRS-IS");
+                        displayShow(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
                     }
                 }
             }
@@ -245,26 +246,30 @@ namespace APRS_IS_Utils {
         outputPacket.concat(",TCPIP,");
         outputPacket.concat(Config.callsign);
         outputPacket.concat("*");
+        int colonEqualIndex         = packet.indexOf(":=");
+        int doubleColonIndex        = packet.indexOf("::");
+        int colonInvAccentIndex     = packet.indexOf(":`");
+
         switch (packetType) {
             case 0: // gps
-                if (packet.indexOf(":=") > 0) {
-                    outputPacket += packet.substring(packet.indexOf(":="));
+                if (colonEqualIndex > 0) {
+                    outputPacket += packet.substring(colonEqualIndex);
                 } else {
                     outputPacket += packet.substring(packet.indexOf(":!"));
                 }
                 break;
             case 1: // messages
-                outputPacket += packet.substring(packet.indexOf("::"));
+                outputPacket += packet.substring(doubleColonIndex);
                 break;
             case 2: // status
                 outputPacket += packet.substring(packet.indexOf(":>"));
                 break;
             case 3: // telemetry
-                outputPacket += packet.substring(packet.indexOf("::"));
+                outputPacket += packet.substring(doubleColonIndex);
                 break;
             case 4: // mic-e
-                if (packet.indexOf(":`") > 0) {
-                    outputPacket += packet.substring(packet.indexOf(":`"));
+                if (colonInvAccentIndex > 0) {
+                    outputPacket += packet.substring(colonInvAccentIndex);
                 } else {
                     outputPacket += packet.substring(packet.indexOf(":'"));
                 }
@@ -316,18 +321,21 @@ namespace APRS_IS_Utils {
             if (packet.startsWith("#")) {
                 if (Config.digi.backupDigiMode) lastServerCheck = currentTime;
             } else {
-                if (Config.aprs_is.messagesToRF && packet.indexOf("::") > 0) {
+                int doubleColonIndex = packet.indexOf("::");
+                if (Config.aprs_is.messagesToRF && doubleColonIndex > 0) {
                     String Sender = packet.substring(0, packet.indexOf(">"));
-                    const String& AddresseeAndMessage = packet.substring(packet.indexOf("::") + 2);
-                    String Addressee = AddresseeAndMessage.substring(0, AddresseeAndMessage.indexOf(":"));
+                    const String& AddresseeAndMessage = packet.substring(doubleColonIndex + 2);
+                    int colonIndex = AddresseeAndMessage.indexOf(":");
+                    String Addressee = AddresseeAndMessage.substring(0, colonIndex);
                     Addressee.trim();
                     if (Addressee == Config.callsign) {                 // its for me!
                         String receivedMessage;
-                        if (AddresseeAndMessage.indexOf("{") > 0) {     // ack?
+                        int curlyBraceIndex = AddresseeAndMessage.indexOf("{");
+                        if (curlyBraceIndex > 0) {     // ack?
                             processAckMessage(Sender, AddresseeAndMessage);
-                            receivedMessage = AddresseeAndMessage.substring(AddresseeAndMessage.indexOf(":") + 1, AddresseeAndMessage.indexOf("{"));
+                            receivedMessage = AddresseeAndMessage.substring(colonIndex + 1, curlyBraceIndex);
                         } else {
-                            receivedMessage = AddresseeAndMessage.substring(AddresseeAndMessage.indexOf(":") + 1);
+                            receivedMessage = AddresseeAndMessage.substring(colonIndex + 1);
                         }
                         if (receivedMessage.indexOf("?") == 0) {
                             Utils::println("Rx Query (APRS-IS)  : " + packet);

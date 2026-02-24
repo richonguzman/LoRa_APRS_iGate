@@ -25,6 +25,8 @@
 #include "utils.h"
 #include <vector>
 
+#define SECS_TO_WAIT            3   // soon to be deleted...
+
 
 extern Configuration            Config;
 extern uint32_t                 lastRxTime;
@@ -212,7 +214,7 @@ namespace STATION_Utils {
     }
 
     void processOutputPacketBuffer() {
-        int timeToWait                  = 3 * 1000;      // 3 segs between packet Tx and also Rx ???
+        int timeToWait                  = SECS_TO_WAIT * 1000;          // 3 segs between packet Tx and also Rx ???
         uint32_t lastRx                 = millis() - lastRxTime;
         uint32_t lastTx                 = millis() - lastTxTime;
         if (outputPacketBuffer.size() > 0 && lastTx > timeToWait && lastRx > timeToWait) {

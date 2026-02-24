@@ -61,14 +61,14 @@ namespace DIGI_Utils {
             int digiMode        = Config.digi.mode;
             String tempPath     = path;
 
-            if (tempPath.indexOf("WIDE1-1") != -1 && (digiMode == 2 || digiMode == 3)) {    // WIDE1-1 Digipeater
-                if (tempPath.indexOf("*") != -1 ) return "";                                  // "*" shouldn't be in WIDE1-1 (only) type of packet
+            if (tempPath.indexOf("WIDE1-1") != -1 && (digiMode == 2 || digiMode == 3)) {    // WIDE1-1
+                if (tempPath.indexOf("*") != -1 ) return "";                                // "*" shouldn't be in WIDE1-1 (only) type of packet
                 tempPath.replace("WIDE1-1", stationCallsign + "*");
             } else if (tempPath.indexOf("WIDE2-") != -1 && digiMode == 3) {                 // WIDE2-n Digipeater
                 tempPath = cleanPathAsterisks(path);
-                if (path.indexOf("WIDE2-1") != -1) {
+                if (tempPath.indexOf("WIDE2-1") != -1) {
                     tempPath.replace("WIDE2-1", stationCallsign + "*");
-                } else if (path.indexOf("WIDE2-2") != -1) {
+                } else if (tempPath.indexOf("WIDE2-2") != -1) {
                     tempPath.replace("WIDE2-2", stationCallsign + "*,WIDE2-1");
                 } else {
                     return "";
@@ -153,8 +153,8 @@ namespace DIGI_Utils {
 
         STATION_Utils::updateLastHeard(Sender);
         Utils::typeOfPacket(temp, 2);               // Digi
-        bool queryMessage = false;
-        int doubleColonIndex = temp.indexOf("::");
+        bool queryMessage       = false;
+        int doubleColonIndex    = temp.indexOf("::");
         if (doubleColonIndex > 10) {                // it's a message
             String AddresseeAndMessage  = temp.substring(doubleColonIndex + 2);
             String Addressee            = AddresseeAndMessage.substring(0, AddresseeAndMessage.indexOf(":"));
