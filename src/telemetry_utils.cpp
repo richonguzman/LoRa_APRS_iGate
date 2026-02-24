@@ -1,17 +1,17 @@
 /* Copyright (C) 2025 Ricardo Guzman - CA2RXU
- * 
+ *
  * This file is part of LoRa APRS iGate.
- * 
+ *
  * LoRa APRS iGate is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or 
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * LoRa APRS iGate is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with LoRa APRS iGate. If not, see <https://www.gnu.org/licenses/>.
  */
@@ -29,10 +29,11 @@
 #include "display.h"
 
 
-extern  Configuration       Config;
-extern  bool                sendStartTelemetry;
+extern      Configuration       Config;
 
-int     telemetryCounter    = random(1,999);
+int         telemetryCounter    = random(1,999);
+uint32_t    telemetryEUPTime    = 0;
+bool        sendEUP             = false;    // Equations Units Parameters
 
 
 namespace TELEMETRY_Utils {
@@ -89,7 +90,7 @@ namespace TELEMETRY_Utils {
         sendBaseTelemetryPacket("EQNS.", getEquationCoefficients());
         sendBaseTelemetryPacket("UNIT.", getUnitLabels());
         sendBaseTelemetryPacket("PARM.", getParameterNames());
-        sendStartTelemetry = false;
+        sendEUP = false;
     }
 
     String generateEncodedTelemetryBytes(float value, bool counterBytes, byte telemetryType) {
@@ -106,7 +107,7 @@ namespace TELEMETRY_Utils {
                 case 3: tempValue = (value * 8); break;         // Pressure
                 default: tempValue = value; break;
             }
-        }        
+        }
 
         int firstByte   = tempValue / 91;
         tempValue       -= firstByte * 91;
@@ -125,6 +126,13 @@ namespace TELEMETRY_Utils {
         if (Config.battery.sendExternalVoltage) telemetry += generateEncodedTelemetryBytes(BATTERY_Utils::checkExternalVoltage(), false, Config.battery.useExternalI2CSensor ? 0 : 1);
         telemetry += "|";
         return telemetry;
+    }
+
+    void checkEUPInterval() {
+        if (telemetryEUPTime == 0 || millis() - telemetryEUPTime > 24UL * 60UL * 60UL * 1000UL) {
+            sendEUP = true;
+            telemetryEUPTime = millis();
+        }
     }
 
 }

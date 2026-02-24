@@ -58,11 +58,12 @@ extern bool                 backupDigiMode;
 extern bool                 shouldSleepLowVoltage;
 extern bool                 transmitFlag;
 extern bool                 passcodeValid;
+extern bool                 sendEUP;    // Equations Units Parameters
 
 extern std::vector<LastHeardStation>    lastHeardStations;
 
 bool        statusAfterBoot         = true;
-bool        sendStartTelemetry      = true;
+
 bool        beaconUpdate            = false;
 uint32_t    lastBeaconTx            = 0;
 uint32_t    lastScreenOn            = millis();
@@ -157,7 +158,8 @@ namespace Utils {
         if (beaconUpdate) {
             if (!Config.display.alwaysOn && Config.display.timeout != 0) displayToggle(true);
 
-            if (sendStartTelemetry &&
+            TELEMETRY_Utils::checkEUPInterval();
+            if (sendEUP &&
                 Config.battery.sendVoltageAsTelemetry &&
                 !Config.wxsensor.active &&
                 (Config.battery.sendInternalVoltage || Config.battery.sendExternalVoltage) &&

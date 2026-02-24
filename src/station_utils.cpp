@@ -40,6 +40,7 @@ std::vector<LastHeardStation>   lastHeardObjects;
 struct OutputPacketBuffer {
     String      packet;
     bool        isBeacon;
+    OutputPacketBuffer(const String& p, bool b) : packet(p), isBeacon(b) {}
 };
 std::vector<OutputPacketBuffer> outputPacketBuffer;
 
@@ -57,19 +58,18 @@ namespace STATION_Utils {
 
     std::vector<String> loadCallsignList(const String& list) {
         std::vector<String> loadedList;
+        int start       = 0;
+        int listLength  = list.length();
 
-        String callsigns = list;
-        callsigns.trim();
+        while (start < listLength) {
+            while (start < listLength && list[start] == ' ') start++;  // avoid blank spaces
+            if (start >= listLength) break;
 
-        while (callsigns.length() > 0) {    // != ""
-            int spaceIndex = callsigns.indexOf(" ");
-            if (spaceIndex == -1) {         // No more spaces, add the last part
-                loadedList.push_back(callsigns);
-                break;
-            }
-            loadedList.push_back(callsigns.substring(0, spaceIndex));
-            callsigns = callsigns.substring(spaceIndex + 1);
-            callsigns.trim();               // Trim in case of multiple spaces
+            int end = start;
+            while (end < listLength && list[end] != ' ') end++;         // find another blank space or reach listLength
+
+            loadedList.emplace_back(list.substring(start, end));
+            start = end + 1;                                            // keep on searching if listLength not reached
         }
         return loadedList;
     }
@@ -126,36 +126,33 @@ namespace STATION_Utils {
     }
 
     void deleteNotHeard() {
-        std::vector<LastHeardStation>  lastHeardStation_temp;
-        for (int i = 0; i < lastHeardStations.size(); i++) {
-            if (millis() - lastHeardStations[i].lastHeardTime < Config.rememberStationTime * 60 * 1000) {
-                lastHeardStation_temp.push_back(lastHeardStations[i]);
+        uint32_t currentTime    = millis();
+        uint32_t timeout        = Config.rememberStationTime * 60UL * 1000UL;
+
+        for (int i = lastHeardStations.size() - 1; i >= 0; i--) {
+            if (currentTime - lastHeardStations[i].lastHeardTime >= timeout) {
+                lastHeardStations.erase(lastHeardStations.begin() + i);
             }
         }
-        lastHeardStations.clear();
-        for (int j = 0; j < lastHeardStation_temp.size(); j++) {
-            lastHeardStations.push_back(lastHeardStation_temp[j]);
-        }
-        lastHeardStation_temp.clear();
     }
 
     void updateLastHeard(const String& station) {
         deleteNotHeard();
-        bool stationHeard = false;
-        for (int i = 0; i < lastHeardStations.size(); i++) {
+        uint32_t currentTime = millis();
+        for (size_t i = 0; i < lastHeardStations.size(); i++) {
             if (lastHeardStations[i].station == station) {
-                lastHeardStations[i].lastHeardTime = millis();
-                stationHeard = true;
-                break;
+                lastHeardStations[i].lastHeardTime = currentTime;
+                Utils::showActiveStations();
+                return;
             }
         }
-        if (!stationHeard) lastHeardStations.emplace_back(LastHeardStation{millis(), station});
+        lastHeardStations.emplace_back(LastHeardStation{currentTime, station});
         Utils::showActiveStations();
     }
 
     bool wasHeard(const String& station) {
         deleteNotHeard();
-        for (int i = 0; i < lastHeardStations.size(); i++) {
+        for (size_t i = 0; i < lastHeardStations.size(); i++) {
             if (lastHeardStations[i].station == station) {
                 Utils::println(" ---> Listened Station");
                 return true;
@@ -184,9 +181,9 @@ namespace STATION_Utils {
     }
 
     bool isIn25SegHashBuffer(const String& station, const String& textMessage) {
-        uint32_t newHash = makeHash(station, textMessage);
-        uint32_t currentTime = millis();
         clean25SegHashBuffer();
+        uint32_t newHash        = makeHash(station, textMessage);
+        uint32_t currentTime    = millis();
         for (int i = 0; i < packet25SegBuffer.size(); i++) {
             if (packet25SegBuffer[i].hash == newHash) return true;
         }
@@ -243,11 +240,7 @@ namespace STATION_Utils {
     }
 
     void addToOutputPacketBuffer(const String& packet, bool flag) {
-        OutputPacketBuffer entry;
-        entry.packet    = packet;
-        entry.isBeacon  = flag;
-
-        outputPacketBuffer.push_back(entry);
+        outputPacketBuffer.emplace_back(OutputPacketBuffer{packet, flag});
     }
 
 }
