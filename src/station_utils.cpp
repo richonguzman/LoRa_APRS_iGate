@@ -83,8 +83,9 @@ namespace STATION_Utils {
         for (size_t i = 0; i < list.size(); i++) {
             int wildcardIndex = list[i].indexOf("*");
             if (wildcardIndex >= 0) {
-                String wildcard = list[i].substring(0, wildcardIndex);
-                if (callsign.startsWith(wildcard)) return true;
+                if (wildcardIndex >= 2 && callsign.length() >= wildcardIndex && strncmp(callsign.c_str(), list[i].c_str(), wildcardIndex) == 0) {
+                    return true;
+                }
             } else {
                 if (list[i] == callsign) return true;
             }

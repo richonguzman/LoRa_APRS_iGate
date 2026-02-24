@@ -1,17 +1,17 @@
 /* Copyright (C) 2025 Ricardo Guzman - CA2RXU
- * 
+ *
  * This file is part of LoRa APRS iGate.
- * 
+ *
  * LoRa APRS iGate is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or 
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * LoRa APRS iGate is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with LoRa APRS iGate. If not, see <https://www.gnu.org/licenses/>.
  */
@@ -43,7 +43,7 @@ bool transmitFlag    = true;
 #ifdef HAS_SX1268
     #if defined(LIGHTGATEWAY_1_0) || defined(LIGHTGATEWAY_PLUS_1_0)
         SPIClass loraSPI(FSPI);
-        SX1268 radio = new Module(RADIO_CS_PIN, RADIO_DIO1_PIN, RADIO_RST_PIN, RADIO_BUSY_PIN, loraSPI); 
+        SX1268 radio = new Module(RADIO_CS_PIN, RADIO_DIO1_PIN, RADIO_RST_PIN, RADIO_BUSY_PIN, loraSPI);
     #else
         SX1268 radio = new Module(RADIO_CS_PIN, RADIO_DIO1_PIN, RADIO_RST_PIN, RADIO_BUSY_PIN);
     #endif
@@ -100,11 +100,11 @@ namespace LoRa_Utils {
                 while (true);
         }
          #endif*/
-         
+
         radio.setSpreadingFactor(Config.loramodule.rxSpreadingFactor);
         radio.setCodingRate(Config.loramodule.rxCodingRate4);
         float signalBandwidth = Config.loramodule.rxSignalBandwidth / 1000;
-        radio.setBandwidth(signalBandwidth);        
+        radio.setBandwidth(signalBandwidth);
         radio.setCRC(true);
 
         #if (defined(RADIO_RXEN) && defined(RADIO_TXEN))    // QRP Labs LightGateway has 400M22S (SX1268)
@@ -174,7 +174,7 @@ namespace LoRa_Utils {
                 changeFreqTx();
             }
         }
-        
+
         #ifdef INTERNAL_LED_PIN
             if (Config.digi.ecoMode != 1) digitalWrite(INTERNAL_LED_PIN, HIGH);     // disabled in Ultra Eco Mode
         #endif
