@@ -1,17 +1,17 @@
 /* Copyright (C) 2025 Ricardo Guzman - CA2RXU
- * 
+ *
  * This file is part of LoRa APRS iGate.
- * 
+ *
  * LoRa APRS iGate is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or 
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * LoRa APRS iGate is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with LoRa APRS iGate. If not, see <https://www.gnu.org/licenses/>.
  */
@@ -96,12 +96,12 @@ bool Configuration::writeFile() {
         data["lora"]["rxFreq"]                      = loramodule.rxFreq;
         data["lora"]["rxCodingRate4"]               = loramodule.rxCodingRate4;
         data["lora"]["rxSignalBandwidth"]           = loramodule.rxSignalBandwidth;
-        data["lora"]["txActive"]                    = loramodule.txActive;      
+        data["lora"]["txActive"]                    = loramodule.txActive;
         data["lora"]["txFreq"]                      = loramodule.txFreq;
         data["lora"]["txCodingRate4"]               = loramodule.txCodingRate4;
-        data["lora"]["txSignalBandwidth"]           = loramodule.txSignalBandwidth;        
-        data["lora"]["power"]                       = loramodule.power;       
-        
+        data["lora"]["txSignalBandwidth"]           = loramodule.txSignalBandwidth;
+        data["lora"]["power"]                       = loramodule.power;
+
         int rxSpreadingFactor = loramodule.rxSpreadingFactor;
         int txSpreadingFactor = loramodule.txSpreadingFactor;
         #if defined(HAS_SX1276) || defined(HAS_SX1278)
@@ -222,7 +222,7 @@ bool Configuration::readFile() {
         callsign                        = data["callsign"] | "NOCALL-10";
         if (!data.containsKey("tacticalCallsign")) needsRewrite = true;
         tacticalCallsign                = data["tacticalCallsign"] | "";
-        
+
         if (!data["aprs_is"].containsKey("active") ||
             !data["aprs_is"].containsKey("passcode") ||
             !data["aprs_is"].containsKey("server") ||
@@ -300,14 +300,14 @@ bool Configuration::readFile() {
         loramodule.rxFreq               = data["lora"]["rxFreq"] | 433775000;
         loramodule.rxSpreadingFactor    = data["lora"]["rxSpreadingFactor"] | 12;
         loramodule.rxCodingRate4        = data["lora"]["rxCodingRate4"] | 5;
-        loramodule.rxSignalBandwidth    = data["lora"]["rxSignalBandwidth"] | 125000;        
+        loramodule.rxSignalBandwidth    = data["lora"]["rxSignalBandwidth"] | 125000;
         loramodule.txActive             = data["lora"]["txActive"] | false;
         loramodule.txFreq               = data["lora"]["txFreq"] | 433775000;
         loramodule.txSpreadingFactor    = data["lora"]["txSpreadingFactor"] | 12;
         loramodule.txCodingRate4        = data["lora"]["txCodingRate4"] | 5;
         loramodule.txSignalBandwidth    = data["lora"]["txSignalBandwidth"] | 125000;
         loramodule.power                = data["lora"]["power"] | 20;
-        
+
         if (!data["display"].containsKey("alwaysOn") ||
             !data["display"].containsKey("timeout") ||
             !data["display"].containsKey("turn180")) needsRewrite = true;
@@ -381,7 +381,7 @@ bool Configuration::readFile() {
         mqtt.password                   = data["mqtt"]["password"] | "";
         mqtt.port                       = data["mqtt"]["port"] | 1883;
         mqtt.beaconOverMqtt             = data["mqtt"]["beaconOverMqtt"] | false;
-        
+
         if (!data["ota"].containsKey("username") ||
             !data["ota"].containsKey("password")) needsRewrite = true;
         ota.username                    = data["ota"]["username"] | "";
@@ -426,7 +426,7 @@ bool Configuration::readFile() {
             writeFile();
             delay(1000);
             ESP.restart();
-        } 
+        }
         Serial.println("Config read successfuly");
         return true;
     } else {
@@ -434,7 +434,7 @@ bool Configuration::readFile() {
         return false;
     }
 }
-    
+
 void Configuration::setDefaultValues() {
 
     WiFi_AP wifiap;
@@ -470,14 +470,14 @@ void Configuration::setDefaultValues() {
     beacon.sendViaAPRSIS            = true;
     beacon.sendViaRF                = false;
     beacon.beaconFreq               = 1;
-    
+
     beacon.statusActive             = false;
-    beacon.statusPacket             = "";    
+    beacon.statusPacket             = "";
 
     beacon.gpsActive                = false;
     beacon.ambiguityLevel           = 0;
 
-    personalNote                    = "";   
+    personalNote                    = "";
 
     blacklist                       = "";
 
@@ -500,7 +500,7 @@ void Configuration::setDefaultValues() {
     display.alwaysOn                = true;
     display.timeout                 = 4;
     display.turn180                 = false;
-    
+
     battery.sendInternalVoltage     = false;
     battery.monitorInternalVoltage  = false;
     battery.internalSleepVoltage    = 2.9;

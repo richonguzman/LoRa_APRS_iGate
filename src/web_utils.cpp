@@ -1,17 +1,17 @@
 /* Copyright (C) 2025 Ricardo Guzman - CA2RXU
- * 
+ *
  * This file is part of LoRa APRS iGate.
- * 
+ *
  * LoRa APRS iGate is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or 
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * LoRa APRS iGate is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with LoRa APRS iGate. If not, see <https://www.gnu.org/licenses/>.
  */
@@ -88,7 +88,7 @@ namespace WEB_Utils {
             return request->requestAuthentication();
 
         File file = SPIFFS.open("/igate_conf.json");
-        
+
         String fileContent;
         while(file.available()){
             fileContent += String((char)file.read());
@@ -161,7 +161,7 @@ namespace WEB_Utils {
 
         Config.callsign                     = getParamStringSafe("callsign", Config.callsign);
         Config.tacticalCallsign             = getParamStringSafe("tacticalCallsign", Config.tacticalCallsign);
-        
+
         Config.wifiAutoAP.password          = getParamStringSafe("wifi.autoAP.password", Config.wifiAutoAP.password);
         Config.wifiAutoAP.timeout           = getParamIntSafe("wifi.autoAP.timeout", Config.wifiAutoAP.timeout);
 
@@ -299,7 +299,7 @@ namespace WEB_Utils {
             AsyncWebServerResponse *response = request->beginResponse(302, "text/html", "");
             response->addHeader("Location", "/?success=1");
             request->send(response);
-            
+
             displayToggle(false);
             delay(500);
             ESP.restart();
@@ -309,7 +309,7 @@ namespace WEB_Utils {
             errorPage += "<h1>Configuration Error:</h1>";
             errorPage += "<p>Couldn't save new configuration. Please try again.</p>";
             errorPage += "<a href='/'>Back</a></body></html>";
-            
+
             AsyncWebServerResponse *response = request->beginResponse(500, "text/html", errorPage);
             request->send(response);
         }

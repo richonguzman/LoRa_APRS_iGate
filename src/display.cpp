@@ -1,17 +1,17 @@
 /* Copyright (C) 2025 Ricardo Guzman - CA2RXU
- * 
+ *
  * This file is part of LoRa APRS iGate.
- * 
+ *
  * LoRa APRS iGate is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or 
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * LoRa APRS iGate is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with LoRa APRS iGate. If not, see <https://www.gnu.org/licenses/>.
  */
@@ -26,7 +26,7 @@
     #ifdef HAS_TFT
         #include <TFT_eSPI.h>
 
-        TFT_eSPI tft = TFT_eSPI(); 
+        TFT_eSPI tft = TFT_eSPI();
         TFT_eSprite sprite  = TFT_eSprite(&tft);
 
         #ifdef HELTEC_WIRELESS_TRACKER
@@ -176,7 +176,7 @@ void displayToggle(bool toggle) {
                     #else
                         if (displayFound) display.ssd1306_command(SSD1306_DISPLAYOFF);
                     #endif
-                    
+
                 #endif
             #endif
         }
