@@ -419,44 +419,53 @@ namespace Utils {
 
     bool callsignIsValid(const String& callsign) {
         if (callsign == "WLNK-1") return true;
+        int totalCallsignLength = callsign.length();
+        if (totalCallsignLength < 4) return false;
 
-        String cleanCallsign;
-        int hypenCallsignIndex = callsign.indexOf("-");
-        if (hypenCallsignIndex > 0) {    // SSID Validation
-            cleanCallsign = callsign.substring(0, hypenCallsignIndex);
-            String ssid = callsign.substring(hypenCallsignIndex + 1);
-            if (ssid.indexOf("-") != -1 || ssid.length() > 2) return false;
-            if (ssid.length() == 2 && ssid[0] == '0') return false;
-            for (int i = 0; i < ssid.length(); i++) {
-                if (!isAlphaNumeric(ssid[i])) return false;
+        int hyphenIndex         = callsign.indexOf("-");
+        int baseCallsignLength  = (hyphenIndex > 0) ? hyphenIndex : totalCallsignLength;
+
+        if (hyphenIndex > 0) {    // SSID Validation
+            if (hyphenIndex < 4) return false;                                  // base Callsign must have at least 4 characters
+            int ssidStart   = hyphenIndex + 1;
+            int ssidLength  = totalCallsignLength - ssidStart;
+            if (ssidLength == 0 || ssidLength > 2) return false;
+            if (callsign.indexOf('-', ssidStart) != -1) return false;           // avoid another "-" in ssid
+            if (ssidLength == 2 && callsign[ssidStart] == '0') return false;    // ssid can't start with "0"
+            for (int i = ssidStart; i < totalCallsignLength; i++) {
+                if (!isDigit(callsign[i])) return false;
             }
+        }
+
+        if (baseCallsignLength < 4 || baseCallsignLength > 6) return false;
+
+        bool padded = false;    // Callsigns with 4 characters like A0AA are padded into 5 characters for further analisis : A0AA --> _A0AA
+        if (baseCallsignLength == 4 && isAlpha(callsign[0]) && isDigit(callsign[1]) && isAlpha(callsign[2]) && isAlpha(callsign[3])) padded = true;
+        char c0, c1, c2, c3;
+        if (padded) {
+            c0 = ' ';
+            c1 = callsign[0];
+            c2 = callsign[1];
+            c3 = callsign[2];
         } else {
-            cleanCallsign = callsign;
+            c0 = callsign[0];
+            c1 = callsign[1];
+            c2 = callsign[2];
+            c3 = callsign[3];
+        }
+        if (!isDigit(c2) || !isAlpha(c3)) {                                     // __0A__ must be validated
+            if (c0 != 'R' && !isDigit(c1) && !isAlpha(c2)) return false;        // to accepto R0A___
         }
 
-        if (cleanCallsign.length() < 4 || cleanCallsign.length() > 6) return false;
+        bool isValid =
+            ((isAlphaNumeric(c0) || c0 == ' ') && isAlpha(c1)) ||               //  AA0A (+A+A) + _A0AA (+A) + 0A0A (+A+A)
+            (isAlpha(c0) && isDigit(c1)) ||                                     //  A00A (+A+A)
+            (c0 == 'R' && baseCallsignLength == 6 && isDigit(c1) && isAlpha(c2) && isAlpha(c3) && isAlpha(callsign[4]));  //  R0AA (+A+A)
+        if (!isValid) return false;                                             // also 00__ avoided
 
-        if (cleanCallsign.length() < 6 && isAlpha(cleanCallsign[0]) && isDigit(cleanCallsign[1]) && isAlpha(cleanCallsign[2]) && isAlpha(cleanCallsign[3]) ) {
-            cleanCallsign = " " + cleanCallsign;    // A0AA --> _A0AA
-        }
-
-        if (!isDigit(cleanCallsign[2]) || !isAlpha(cleanCallsign[3])) {     // __0A__ must be validated
-            if (cleanCallsign[0] != 'R' && !isDigit(cleanCallsign[1]) && !isAlpha(cleanCallsign[2])) return false;    // to accepto R0A___
-        }
-
-        bool isValid = false;
-        if ((isAlphaNumeric(cleanCallsign[0]) || cleanCallsign[0] == ' ') && isAlpha(cleanCallsign[1])) {
-            isValid = true;     //  AA0A (+A+A) + _A0AA (+A) + 0A0A (+A+A)
-        } else if (isAlpha(cleanCallsign[0]) && isDigit(cleanCallsign[1])) {
-            isValid = true;     //  A00A (+A+A)
-        } else if (cleanCallsign[0] == 'R' && cleanCallsign.length() == 6 && isDigit(cleanCallsign[1]) && isAlpha(cleanCallsign[2]) && isAlpha(cleanCallsign[3]) && isAlpha(cleanCallsign[4])) {
-            isValid = true;     //  R0AA (+A+A)
-        }
-        if (!isValid) return false;   // also 00__ avoided
-
-        if (cleanCallsign.length() > 4) {   // to validate ____AA
-            for (int i = 5; i <= cleanCallsign.length(); i++) {
-                if (!isAlpha(cleanCallsign[i - 1])) return false;
+        if (baseCallsignLength > 4 ) {                                          // to validate ____AA
+            for (int i = 4; i < baseCallsignLength; i++) {
+                if (!isAlpha(callsign[i])) return false;
             }
         }
         return true;
