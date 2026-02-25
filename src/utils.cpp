@@ -62,8 +62,7 @@ extern bool                 sendEUP;    // Equations Units Parameters
 
 extern std::vector<LastHeardStation>    lastHeardStations;
 
-bool        statusAfterBoot         = true;
-
+bool        statusUpdate            = true;
 bool        beaconUpdate            = false;
 uint32_t    lastBeaconTx            = 0;
 uint32_t    lastScreenOn            = millis();
@@ -76,26 +75,30 @@ String      secondaryBeaconPacket;
 namespace Utils {
 
     void processStatus() {
-        String status = APRSPacketLib::generateBasePacket(Config.callsign, "APLRG1", Config.beacon.path);
+        bool sendOverAPRSIS = Config.beacon.sendViaAPRSIS && Config.aprs_is.active && WiFi.status() == WL_CONNECTED;
+        bool sendOverRF     = !Config.beacon.sendViaAPRSIS && Config.beacon.sendViaRF;
 
-        if (WiFi.status() == WL_CONNECTED && Config.aprs_is.active && Config.beacon.sendViaAPRSIS) {
-            delay(1000);
-            status.concat(",qAC:>");
-            status.concat(Config.beacon.statusPacket);
-            APRS_IS_Utils::upload(status);
-            SYSLOG_Utils::log(2, status, 0, 0.0, 0);   // APRSIS TX
+        if (!sendOverAPRSIS && !sendOverRF) {
+            statusUpdate = false;
+            return;
         }
-        if (statusAfterBoot && !Config.beacon.sendViaAPRSIS && Config.beacon.sendViaRF) {
-            status.concat(":>");
-            status.concat(Config.beacon.statusPacket);
-            STATION_Utils::addToOutputPacketBuffer(status, true);   // treated also as beacon on Tx Freq
+
+        String statusPacket = APRSPacketLib::generateBasePacket(Config.callsign, "APLRG1", Config.beacon.path);
+        statusPacket += sendOverAPRSIS ? ",qAC:>" : ":>";
+        statusPacket += Config.beacon.statusPacket;
+
+        if (sendOverAPRSIS) {
+            APRS_IS_Utils::upload(statusPacket);
+            SYSLOG_Utils::log(2, statusPacket, 0, 0.0, 0);              // APRSIS TX
+        } else {
+            STATION_Utils::addToOutputPacketBuffer(statusPacket, true); // treated also as beacon on Tx Freq
         }
-        statusAfterBoot = false;
+        statusUpdate = false;
         lastStatusTx = millis();
     }
 
     void checkStatusInterval() {
-        if (lastStatusTx == 0 || millis() - lastStatusTx > DAY_MS) statusAfterBoot = true;
+        if (lastStatusTx == 0 || millis() - lastStatusTx > DAY_MS) statusUpdate = true;
     }
 
     String getLocalIP() {
@@ -292,7 +295,7 @@ namespace Utils {
         }
 
         checkStatusInterval();
-        if (statusAfterBoot && Config.beacon.statusActive && !Config.beacon.statusPacket.isEmpty()) processStatus();
+        if (statusUpdate && Config.beacon.statusActive && !Config.beacon.statusPacket.isEmpty()) processStatus();
     }
 
     void checkDisplayInterval() {

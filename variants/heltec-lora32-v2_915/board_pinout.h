@@ -49,7 +49,7 @@
     #define INTERNAL_LED_PIN        25
     #define BATTERY_PIN             37
 
-    #define ADC_CTRL                21
+    #define ADC_CTRL_PIN            21
     #define ADC_CTRL_ON_STATE       LOW
 
 #endif
