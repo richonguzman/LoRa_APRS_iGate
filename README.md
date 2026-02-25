@@ -51,6 +51,10 @@ ____________________________________________________
 <br />
 
 # Timeline (Versions):
+- 2026-02-25 Code Improvements: reduced String comparisons and improved logic for faster code execution.
+- 2026-02-15 Digipeater code/logic improved.
+- 2026-02-08 Heltec V2 915MHz added.
+- 2026-02-05 Improved "digiBackupMode" to check "APRS-IS" server connection.
 - 2026-01-07 Tactical Callsign added.
 - 2026-01-05 Heltec V4 support added.
 - 2025-12-22 Heltec Wireless Paper V1.2 and VisionMaster E290 Added. Thanks HA5SZI.
@@ -85,7 +89,7 @@ ____________________________________________________
 - 2024.10.08 New EcoMode for Remote Digipeaters without WiFi/WiFiAP, Screen, Leds (Example: LILYGO LoRa32 uses only 24mA, with WifiAP 150mA). APRS Message/Queries can start/stop this mode too.
 - 2024.10.06 Cross Frequency Digipeater Rules added.
 - 2024.09.23 Libraries Update for SDK3
-- 2024.09.23 Added Enconded Telemetry for Battery (+ External Voltage) in Station GPS Beacon Packet. 
+- 2024.09.23 Added Enconded Telemetry for Battery (+ External Voltage) in Station GPS Beacon Packet.
 - 2024.08.23 Wemos S2 Mini DIY LoRa added.
 - 2024.08.19 HELTEC Wireless Paper working (still missing Epaper code).
 - 2024.08.13 Web Authentication for WebUI. Thanks Mitja S57PNX.
