@@ -51,6 +51,7 @@ ____________________________________________________
 <br />
 
 # Timeline (Versions):
+- 2026-02-26 9M2IBR ESP32 1W (400M30S) + GPS board added.
 - 2026-02-25 Code Improvements: reduced String comparisons and improved logic for faster code execution.
 - 2026-02-15 Digipeater code/logic improved.
 - 2026-02-08 Heltec V2 915MHz added.
