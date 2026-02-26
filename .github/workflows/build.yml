@@ -98,7 +98,9 @@ jobs:
                     - name: XIAO_ESP32S3_WIO_SX1262
                       chip: esp32s3
                     - name: TROY_LoRa_APRS
-                      chip: esp32                    
+                      chip: esp32
+                    - name: ESP32_9M2IBR_1W_LoRa_GPS
+                      chip: esp32
         steps:
             - uses: actions/checkout@v3
 
