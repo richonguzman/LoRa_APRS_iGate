@@ -20,18 +20,23 @@
 #define BOARD_PINOUT_H_
 
     //  LoRa Radio
-    #define HAS_SX1262
+    #define HAS_SX1268
+    #define HAS_1W_LORA
     #define HAS_TCXO
-    #define RADIO_SCLK_PIN          12
-    #define RADIO_MISO_PIN          13
-    #define RADIO_MOSI_PIN          11
-    #define RADIO_CS_PIN            10
-    #define RADIO_DIO0_PIN          -1
-    #define RADIO_RST_PIN           5
-    #define RADIO_DIO1_PIN          1
-    #define RADIO_BUSY_PIN          4
+    #define RADIO_SCLK_PIN          18
+    #define RADIO_MISO_PIN          19
+    #define RADIO_MOSI_PIN          23
+    #define RADIO_CS_PIN            5
+    #define RADIO_RST_PIN           27
+    #define RADIO_DIO1_PIN          12
+    #define RADIO_BUSY_PIN          14
+    #define RADIO_RXEN              32
+    #define RADIO_TXEN              25
     #define RADIO_WAKEUP_PIN        RADIO_DIO1_PIN
-    #define GPIO_WAKEUP_PIN         GPIO_SEL_1
+    #define GPIO_WAKEUP_PIN         GPIO_SEL_12
+
+    //  I2C
+    #define USE_WIRE_WITH_OLED_PINS
 
     //  Display
     #define HAS_DISPLAY
@@ -41,19 +46,18 @@
     #undef  OLED_SCL
     #undef  OLED_RST
 
-    #define OLED_SDA                17
-    #define OLED_SCL                18
-    #define OLED_RST                16
-    #define OLED_DISPLAY_HAS_RST_PIN
-
-    //  Aditional Config
-    #define HAS_AXP2101
+    #define OLED_SDA                21
+    #define OLED_SCL                22
+    #define OLED_RST                -1      // Reset pin # (or -1 if sharing Arduino reset pin)
 
     //  GPS
     #define HAS_GPS
-    #define GPS_RX                  8
-    #define GPS_TX                  9
+    #define GPS_BAUDRATE            9600
+    #define GPS_RX                  17
+    #define GPS_TX                  16
 
-    #define BOARD_HAS_PSRAM
+    //  Aditional Config
+    #define INTERNAL_LED_PIN        2
+    #define BATTERY_PIN             35
 
 #endif

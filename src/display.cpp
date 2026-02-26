@@ -57,7 +57,7 @@
             String lastEpaperText;
         #else
             #include <Adafruit_GFX.h>
-            #if defined(TTGO_T_Beam_S3_SUPREME_V3)
+            #ifdef HAS_SH1106
                 #include <Adafruit_SH110X.h>
                 Adafruit_SH1106G display(128, 64, &Wire, OLED_RST);
             #else
@@ -117,7 +117,7 @@ void displaySetup() {
                     digitalWrite(OLED_RST, HIGH);
                 #endif
 
-                #if defined(TTGO_T_Beam_S3_SUPREME_V3)
+                #ifdef HAS_SH1106
                     if (display.begin(0x3c, false)) {
                         displayFound = true;
                         if (Config.display.turn180) display.setRotation(2);
@@ -157,7 +157,7 @@ void displayToggle(bool toggle) {
                     display.printCenter("EPAPER Display Disabled by toggle...");
                     display.update();
                 #else
-                    #if defined(TTGO_T_Beam_S3_SUPREME_V3)
+                    #ifdef HAS_SH1106
                         if (displayFound) display.oled_command(SH110X_DISPLAYON);
                     #else
                         if (displayFound) display.ssd1306_command(SSD1306_DISPLAYON);
@@ -171,7 +171,7 @@ void displayToggle(bool toggle) {
                 #ifdef HAS_EPAPER
                     display.update();
                 #else
-                    #if defined(TTGO_T_Beam_S3_SUPREME_V3)
+                    #ifdef HAS_SH1106
                         if (displayFound) display.oled_command(SH110X_DISPLAYOFF);
                     #else
                         if (displayFound) display.ssd1306_command(SSD1306_DISPLAYOFF);
@@ -222,7 +222,7 @@ void displayShow(const String& header, const String& line1, const String& line2,
             #else
                 if (displayFound) {
                     display.clearDisplay();
-                    #if defined(TTGO_T_Beam_S3_SUPREME_V3)
+                    #ifdef HAS_SH1106
                         display.setTextColor(SH110X_WHITE);
                     #else
                         display.setTextColor(WHITE);
@@ -234,7 +234,7 @@ void displayShow(const String& header, const String& line1, const String& line2,
                         display.setCursor(0, 8 + (8 * i));
                         display.println(*lines[i]);
                     }
-                    #if defined(TTGO_T_Beam_S3_SUPREME_V3)
+                    #ifdef HAS_SH1106
                         display.setContrast(1);
                     #else
                         display.ssd1306_command(SSD1306_SETCONTRAST);
@@ -288,7 +288,7 @@ void displayShow(const String& header, const String& line1, const String& line2,
             #else
                 if (displayFound) {
                     display.clearDisplay();
-                    #if defined(TTGO_T_Beam_S3_SUPREME_V3)
+                    #ifdef HAS_SH1106
                         display.setTextColor(SH110X_WHITE);
                     #else
                         display.setTextColor(WHITE);
@@ -301,7 +301,7 @@ void displayShow(const String& header, const String& line1, const String& line2,
                         display.setCursor(0, 16 + (8 * i));
                         display.println(*lines[i]);
                     }
-                    #if defined(TTGO_T_Beam_S3_SUPREME_V3)
+                    #ifdef HAS_SH1106
                         display.setContrast(1);
                     #else
                         display.ssd1306_command(SSD1306_SETCONTRAST);
