@@ -39,15 +39,10 @@ String encodeAddressAX25(String tnc2Address) {
     int ssid            = tnc2Address.substring(separatorIndex + 1).toInt();
     String kissAddress = "";
     for (int i = 0; i < 6; ++i) {
-        char addressChar;
-        if (tnc2Address.length() > i && i < separatorIndex) {
-            addressChar = tnc2Address.charAt(i);
-        } else {
-            addressChar = ' ';
-        }
+        char addressChar = ' ';
+        if (tnc2Address.length() > i && i < separatorIndex) addressChar = tnc2Address.charAt(i);
         kissAddress += (char)(addressChar << 1);
     }
-
     kissAddress += (char)((ssid << 1) | 0b01100000 | (hasBeenDigipited ? HAS_BEEN_DIGIPITED_MASK : 0));
     return kissAddress;
 }
