@@ -29,18 +29,14 @@ bool validateKISSFrame(const String& kissFormattedFrame) {
 }
 
 String encodeAddressAX25(String tnc2Address) {
-    bool hasBeenDigipited   = tnc2Address.indexOf('*') != -1;
-    int tnc2AddressIndex    = tnc2Address.indexOf('-');
-    if (tnc2AddressIndex == -1) {
-        if (hasBeenDigipited) {
-            tnc2Address = tnc2Address.substring(0, tnc2Address.length() - 1);
-        }
+    bool hasBeenDigipited = tnc2Address.indexOf('*') != -1;
+    if (tnc2Address.indexOf('-') == -1) {
+        if (hasBeenDigipited) tnc2Address = tnc2Address.substring(0, tnc2Address.length() - 1);
         tnc2Address += "-0";
     }
 
-    int separatorIndex = tnc2AddressIndex;
-    int ssid = tnc2Address.substring(separatorIndex + 1).toInt();
-
+    int separatorIndex  = tnc2Address.indexOf('-');;
+    int ssid            = tnc2Address.substring(separatorIndex + 1).toInt();
     String kissAddress = "";
     for (int i = 0; i < 6; ++i) {
         char addressChar;
