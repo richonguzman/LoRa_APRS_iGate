@@ -61,11 +61,11 @@ namespace WX_Utils {
 
     void getWxModuleAddres() {
         uint8_t err, addr;
-        uint8_t extI2Caddr = BATTERY_Utils::externalI2CSensorActive();
+        uint8_t extI2Caddr = BATTERY_Utils::externalI2CSensorActiveAddr();
 
         for(addr = 1; addr < 0x7F; addr++) {
             if (addr == extI2Caddr) {
-                Serial.printf("0x%x occupied by I2C power sensor, skipping at Wx setup", addr);
+                Serial.printf("0x%x occupied by I2C power sensor, skipping for Wx setup\n", addr);
                 continue;
             }
             #ifdef SENSOR_I2C_BUS

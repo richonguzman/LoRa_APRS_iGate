@@ -126,7 +126,7 @@ namespace BATTERY_Utils {
         return ina219.begin();
     }
 
-    uint8_t externalI2CSensorActive() {
+    uint8_t externalI2CSensorActiveAddr() {
         if ( externalI2CSensorType != 0 ) {
             return externalI2CSensorAddress;
         }
