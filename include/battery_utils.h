@@ -26,6 +26,7 @@ namespace BATTERY_Utils {
 
     void    adcCalibration();
     void    adcCalibrationCheck();
+    uint8_t externalI2CSensorActive();
 
     void    setup();
     float   checkInternalVoltage();

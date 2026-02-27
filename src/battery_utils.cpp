@@ -126,6 +126,13 @@ namespace BATTERY_Utils {
         return ina219.begin();
     }
 
+    uint8_t externalI2CSensorActive() {
+        if ( externalI2CSensorType != 0 ) {
+            return externalI2CSensorAddress;
+        }
+        return 0x00;
+    }
+
     void setup() {
         if ((Config.battery.sendExternalVoltage || Config.battery.monitorExternalVoltage) && Config.battery.voltageDividerR2 != 0) voltageDividerTransformation = (Config.battery.voltageDividerR1 + Config.battery.voltageDividerR2) / Config.battery.voltageDividerR2;
 
