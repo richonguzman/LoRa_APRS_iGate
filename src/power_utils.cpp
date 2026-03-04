@@ -263,8 +263,8 @@ namespace POWER_Utils {
             pinMode(Config.battery.externalVoltagePin, INPUT);
         }
 
-        #ifdef VEXT_CTRL
-            pinMode(VEXT_CTRL,OUTPUT); // GPS + TFT on HELTEC Wireless_Tracker and only for Oled in HELTEC V3
+        #ifdef VEXT_CTRL_PIN
+            pinMode(VEXT_CTRL_PIN,OUTPUT); // GPS + TFT on HELTEC Wireless_Tracker and only for Oled in HELTEC V3
             vext_ctrl_ON();
         #endif
 

@@ -408,9 +408,9 @@ namespace Utils {
             if (mode == 1) {    // low voltage detected after a while
                 displayToggle(false);
             }
-            #ifdef VEXT_CTRL
+            #ifdef VEXT_CTRL_PIN
                 #ifndef HELTEC_WSL_V3
-                    digitalWrite(VEXT_CTRL, LOW);
+                    digitalWrite(VEXT_CTRL_PIN, LOW);
                 #endif
             #endif
             LoRa_Utils::sleepRadio();
