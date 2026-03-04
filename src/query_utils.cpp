@@ -101,7 +101,6 @@ namespace QUERY_Utils {
                     if (digiEcoMode == 0) {     // Start Digipeater EcoMode
                         answer = "DigiEcoMode:ON";
                         Config.digi.ecoMode         = 1;
-                        Config.aprs_is.active       = false;
                         shouldSleepLowVoltage       = true;     // to make sure all packets in outputPacketBuffer are sent before restart.
                         saveNewDigiEcoModeConfig    = true;
                     } else {

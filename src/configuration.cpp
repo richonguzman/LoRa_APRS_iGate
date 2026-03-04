@@ -87,6 +87,7 @@ bool Configuration::writeFile() {
 
         data["digi"]["mode"]                        = digi.mode;
         data["digi"]["ecoMode"]                     = digi.ecoMode;
+        if (digi.ecoMode == 1) data["aprs_is"]["active"] = false;
         #if defined(HAS_A7670)
             if (digi.ecoMode == 1) data["digi"]["ecoMode"] = 2;
         #endif
