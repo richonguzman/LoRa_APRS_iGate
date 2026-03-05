@@ -102,7 +102,9 @@ void setup() {
     Serial.begin(115200);
     networkManager = new NetworkManager();
     networkManager->setup();
-    networkManager->setAPTimeout(Config.wifiAutoAP.timeout * 60 * 1000); // Convert minutes to milliseconds
+    if (Config.wifiAutoAP.enabled) {
+        networkManager->setAPTimeout(Config.wifiAutoAP.timeout * 60 * 1000); // Convert minutes to milliseconds
+    }
     networkManager->setHostName("iGATE-" + Config.callsign);
     POWER_Utils::setup();
     Utils::setupDisplay();

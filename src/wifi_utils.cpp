@@ -96,8 +96,11 @@ namespace WIFI_Utils {
         }
 
         if (!hasNetworks) {
-            Serial.println("WiFi SSID not set! Starting Auto AP");
-            startAutoAP();
+            Serial.println("WiFi SSID not set!");
+            if (Config.wifiAutoAP.enabled) {
+                Serial.println("Starting AP fallback...");
+                startAutoAP();
+            }
             return;
         }
 
@@ -114,10 +117,14 @@ namespace WIFI_Utils {
             Serial.println(networkManager->getWiFimacAddress());
             displayShow("", "     Connected!!", "" , "     loading ...", 1000);
         } else {
-            Serial.println("\nNot connected to WiFi! Starting Auto AP");
-            displayShow("", " WiFi Not Connected!", "" , "     loading ...", 1000);
-
-            startAutoAP();
+            Serial.println("\nNot connected to WiFi!");
+            if (Config.wifiAutoAP.enabled) {
+                Serial.println("Starting AP fallback...");
+                displayShow("", " WiFi Not Connected!", "" , "     loading ...", 1000);
+                startAutoAP();
+            } else {
+                displayShow("", " WiFi Not Connected!", "" , "     loading ...", 1000);
+            }
         }
     }
 
