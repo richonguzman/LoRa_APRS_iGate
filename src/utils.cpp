@@ -104,6 +104,8 @@ namespace Utils {
     String getLocalIP() {
         if (Config.digi.ecoMode == 1 || Config.digi.ecoMode == 2) {
             return "** WiFi AP  Killed **";
+        } else if (networkManager->isEthernetConnected()) {
+            return "LAN: " + networkManager->getEthernetIP().toString();
         } else if (!networkManager->isWiFiConnected() && networkManager->isWifiAPActive()) {
             return "IP :  " + networkManager->getWiFiAPIP().toString();
         } else if (backupDigiMode) {
