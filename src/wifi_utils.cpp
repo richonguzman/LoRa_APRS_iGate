@@ -40,6 +40,11 @@ namespace WIFI_Utils {
 
     void checkWiFi() {
         if (Config.digi.ecoMode != 0) return;
+
+        if (!networkManager->hasWiFiNetworks()) {
+            return;
+        }
+
         uint32_t currentTime = millis();
 
         if (backupDigiMode) {
@@ -82,8 +87,6 @@ namespace WIFI_Utils {
     }
 
     void startWiFi() {
-        bool hasNetworks = false;
-
         networkManager->clearWiFiNetworks();
         for (size_t i = 0; i < Config.wifiAPs.size(); i++) {
             const WiFi_AP& wifiAP = Config.wifiAPs[i];
@@ -91,11 +94,10 @@ namespace WIFI_Utils {
                 continue;
             }
 
-            hasNetworks = true;
             networkManager->addWiFiNetwork(wifiAP.ssid, wifiAP.password);
         }
 
-        if (!hasNetworks) {
+        if (!networkManager->hasWiFiNetworks()) {
             Serial.println("WiFi SSID not set!");
             if (Config.wifiAutoAP.enabled) {
                 Serial.println("Starting AP fallback...");
