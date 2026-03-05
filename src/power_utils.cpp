@@ -272,8 +272,8 @@ namespace POWER_Utils {
             if (Config.beacon.gpsActive && Config.digi.ecoMode != 1) activateGPS();
         #endif
 
-        #ifdef ADC_CTRL
-            pinMode(ADC_CTRL, OUTPUT);
+        #ifdef ADC_CTRL_PIN
+            pinMode(ADC_CTRL_PIN, OUTPUT);
             adc_ctrl_OFF();
         #endif
 

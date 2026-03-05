@@ -154,7 +154,7 @@ namespace BATTERY_Utils {
             }
         #else
 
-            #ifdef ADC_CTRL
+            #ifdef ADC_CTRL_PIN
                 POWER_Utils::adc_ctrl_ON();
             #endif
 
@@ -180,7 +180,7 @@ namespace BATTERY_Utils {
                 delay(3);
             }
 
-            #ifdef ADC_CTRL
+            #ifdef ADC_CTRL_PIN
                 POWER_Utils::adc_ctrl_OFF();
 
                 #ifdef HELTEC_WP_V1

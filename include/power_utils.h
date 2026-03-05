@@ -34,7 +34,7 @@ namespace POWER_Utils {
         void vext_ctrl_OFF();
     #endif
 
-    #ifdef ADC_CTRL
+    #ifdef ADC_CTRL_PIN
         void adc_ctrl_ON();
         void adc_ctrl_OFF();
     #endif
