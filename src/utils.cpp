@@ -18,9 +18,9 @@
 
 #include <APRSPacketLib.h>
 #include <TinyGPS++.h>
-#include <WiFi.h>
 #include "telemetry_utils.h"
 #include "configuration.h"
+#include "network_manager.h"
 #include "station_utils.h"
 #include "battery_utils.h"
 #include "aprs_is_utils.h"
@@ -37,6 +37,7 @@
 #define DAY_MS (24UL * 60UL * 60UL * 1000UL)
 
 extern Configuration        Config;
+extern NetworkManager       *networkManager;
 extern TinyGPSPlus          gps;
 extern String               versionDate;
 extern String               firstLine;
@@ -52,7 +53,6 @@ extern int                  rssi;
 extern float                snr;
 extern int                  freqError;
 extern String               distance;
-extern bool                 WiFiConnected;
 extern int                  wxModuleType;
 extern bool                 backupDigiMode;
 extern bool                 shouldSleepLowVoltage;
@@ -75,7 +75,7 @@ String      secondaryBeaconPacket;
 namespace Utils {
 
     void processStatus() {
-        bool sendOverAPRSIS = Config.beacon.sendViaAPRSIS && Config.aprs_is.active && WiFi.status() == WL_CONNECTED;
+        bool sendOverAPRSIS = Config.beacon.sendViaAPRSIS && Config.aprs_is.active && networkManager->isConnected();
         bool sendOverRF     = !Config.beacon.sendViaAPRSIS && Config.beacon.sendViaRF;
 
         if (!sendOverAPRSIS && !sendOverRF) {
@@ -104,12 +104,12 @@ namespace Utils {
     String getLocalIP() {
         if (Config.digi.ecoMode == 1 || Config.digi.ecoMode == 2) {
             return "** WiFi AP  Killed **";
-        } else if (!WiFiConnected) {
-            return "IP :  192.168.4.1";
+        } else if (!networkManager->isWiFiConnected() && networkManager->isWifiAPActive()) {
+            return "IP :  " + networkManager->getWiFiAPIP().toString();
         } else if (backupDigiMode) {
             return "- BACKUP DIGI MODE -";
         } else {
-            return "IP :  " + String(WiFi.localIP()[0]) + "." + String(WiFi.localIP()[1]) + "." + String(WiFi.localIP()[2]) + "." + String(WiFi.localIP()[3]);
+            return "IP :  " + networkManager->getWiFiIP().toString();
         }
     }
 
