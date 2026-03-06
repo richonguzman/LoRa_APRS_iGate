@@ -25,11 +25,29 @@
 
 bool shouldSleepStop = true;
 
+void Configuration::setup() {
+    if (!SPIFFS.begin(false)) {
+        Serial.println("SPIFFS Mount Failed");
+        return;
+    } else {
+        Serial.println("SPIFFS Mounted");
+    }
+
+    bool exists = SPIFFS.exists("/igate_conf.json");
+    if (!exists) {
+        setDefaultValues();
+        writeFile();
+        delay(1000);
+        ESP.restart();
+    }
+
+    readFile();
+}
 
 bool Configuration::writeFile() {
     Serial.println("Saving configuration...");
 
-    StaticJsonDocument<3584> data;
+    DynamicJsonDocument data(3584);
     File configFile = SPIFFS.open("/igate_conf.json", "w");
 
     if (!configFile) {
@@ -538,23 +556,4 @@ void Configuration::setDefaultValues() {
     backupDigiMode                  = false;
 
     Serial.println("New Data Created... All is Written!");
-}
-
-Configuration::Configuration() {
-    if (!SPIFFS.begin(false)) {
-        Serial.println("SPIFFS Mount Failed");
-        return;
-    } else {
-        Serial.println("SPIFFS Mounted");
-    }
-
-    bool exists = SPIFFS.exists("/igate_conf.json");
-    if (!exists) {
-        setDefaultValues();
-        writeFile();
-        delay(1000);
-        ESP.restart();
-    }
-
-    readFile();
 }
