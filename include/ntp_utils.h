@@ -24,7 +24,7 @@
 
 namespace NTP_Utils {
 
-    void    setup();
+    bool    setup();
     void    update();
     String  getFormatedTime();
 

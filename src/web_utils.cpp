@@ -161,7 +161,7 @@ namespace WEB_Utils {
 
         Config.callsign                     = getParamStringSafe("callsign", Config.callsign);
         Config.tacticalCallsign             = getParamStringSafe("tacticalCallsign", Config.tacticalCallsign);
-
+        Config.wifiAutoAP.enabled           = request->hasParam("wifi.autoAP.enabled", true);
         Config.wifiAutoAP.password          = getParamStringSafe("wifi.autoAP.password", Config.wifiAutoAP.password);
         Config.wifiAutoAP.timeout           = getParamIntSafe("wifi.autoAP.timeout", Config.wifiAutoAP.timeout);
 
