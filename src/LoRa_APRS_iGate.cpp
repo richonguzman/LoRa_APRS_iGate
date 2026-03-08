@@ -68,7 +68,7 @@ ___________________________________________________________________*/
 
 
 String              versionDate             = "2026-03-08";
-String              versionNumber           = "3.3";
+String              versionNumber           = "3.2.100";
 Configuration       Config;
 WiFiClient          aprsIsClient;
 WiFiClient          mqttClient;
