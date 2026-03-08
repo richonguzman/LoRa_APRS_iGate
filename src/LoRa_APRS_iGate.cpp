@@ -68,7 +68,7 @@ ___________________________________________________________________*/
 
 
 String              versionDate             = "2026-03-08";
-String              versionNumber           = "3.2.102";
+String              versionNumber           = "3.2.103";
 Configuration       Config;
 WiFiClient          aprsIsClient;
 WiFiClient          mqttClient;
@@ -101,6 +101,7 @@ String firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seven
 
 void setup() {
     Serial.begin(115200);
+    Config.setup();
     POWER_Utils::setup();
     Utils::setupDisplay();
     LoRa_Utils::setup();
