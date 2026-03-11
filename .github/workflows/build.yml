@@ -115,7 +115,7 @@ jobs:
 
             - name: Build target
               run: |
-                  pio run -e ${{ matrix.target.name }} 
+                  pio run -e ${{ matrix.target.name }}
 
             - name: Build FS
               run: |
@@ -130,7 +130,7 @@ jobs:
                   cp .pio/build/${{ matrix.target.name }}/partitions.bin installer/firmware/
                   cp .pio/build/${{ matrix.target.name }}/spiffs.bin installer/firmware/
                   cp ~/.platformio/packages/framework-arduinoespressif32/tools/partitions/boot_app0.bin installer/firmware/
-              
+
             - name: Merge for web flashing
               run: |
                   if [ "${{ matrix.target.chip }}" == "esp32" ]; then
