@@ -1,7 +1,7 @@
 #include <Arduino.h>
 
 #include "network_manager.h"
- 
+
  // Constructor
 NetworkManager::NetworkManager() { }
 
@@ -52,13 +52,9 @@ bool NetworkManager::_connectWiFi(const WiFiNetwork& network) {
     }
     Serial.println();
 
-    if (isWiFiConnected()) {
-        Serial.println("[NM] WiFi connected! IP: " + WiFi.localIP().toString());
-        return true;
-    }
+    if (isWiFiConnected()) return true;
 
-    Serial.println("[NM] Failed to connect to WiFi after " + String(attempts) + " attempts. SSID: " +
-                    network.ssid);
+    Serial.println("[NM] Failed to connect to WiFi after " + String(attempts) + " attempts. SSID: " + network.ssid);
     return false;
 }
 

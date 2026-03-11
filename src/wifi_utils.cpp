@@ -90,10 +90,7 @@ namespace WIFI_Utils {
         networkManager->clearWiFiNetworks();
         for (size_t i = 0; i < Config.wifiAPs.size(); i++) {
             const WiFi_AP& wifiAP = Config.wifiAPs[i];
-            if (wifiAP.ssid.isEmpty()) {
-                continue;
-            }
-
+            if (wifiAP.ssid.isEmpty()) continue;
             networkManager->addWiFiNetwork(wifiAP.ssid, wifiAP.password);
         }
 
@@ -113,13 +110,13 @@ namespace WIFI_Utils {
             digitalWrite(INTERNAL_LED_PIN, LOW);
         #endif
         if (networkManager->isWiFiConnected()) {
-            Serial.print("\nConnected as ");
+            Serial.print("[WiFi] Connected as ");
             Serial.print(networkManager->getWiFiIP());
             Serial.print(" / MAC Address: ");
             Serial.println(networkManager->getWiFimacAddress());
             displayShow("", "     Connected!!", "" , "     loading ...", 1000);
         } else {
-            Serial.println("\nNot connected to WiFi!");
+            Serial.println("[WiFi] Not connected to WiFi!");
             if (Config.wifiAutoAP.enabled) {
                 Serial.println("Starting AP fallback...");
                 displayShow("", " WiFi Not Connected!", "" , "     loading ...", 1000);

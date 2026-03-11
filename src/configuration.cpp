@@ -29,7 +29,7 @@ bool shouldSleepStop = true;
 bool Configuration::writeFile() {
     Serial.println("Saving configuration...");
 
-    StaticJsonDocument<3584> data;
+    DynamicJsonDocument data(3584);
     File configFile = SPIFFS.open("/igate_conf.json", "w");
 
     if (!configFile) {
@@ -563,7 +563,7 @@ void Configuration::setDefaultValues() {
     Serial.println("New Data Created... All is Written!");
 }
 
-Configuration::Configuration() {
+void Configuration::setup() {
     if (!SPIFFS.begin(false)) {
         Serial.println("SPIFFS Mount Failed");
         return;

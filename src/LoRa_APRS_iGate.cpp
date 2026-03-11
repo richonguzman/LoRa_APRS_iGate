@@ -68,8 +68,8 @@ ___________________________________________________________________*/
 #endif
 
 
-String              versionDate             = "2026-03-08";
-String              versionNumber           = "3.2.102";
+String              versionDate             = "2026-03-10";
+String              versionNumber           = "3.2.105";
 Configuration       Config;
 WiFiClient          aprsIsClient;
 WiFiClient          mqttClient;
@@ -100,6 +100,7 @@ String firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seven
 
 void setup() {
     Serial.begin(115200);
+    Config.setup();
     networkManager = new NetworkManager();
     networkManager->setup();
     if (Config.wifiAutoAP.enabled) {
