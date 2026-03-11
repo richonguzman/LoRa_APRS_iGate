@@ -29,7 +29,7 @@ bool shouldSleepStop = true;
 bool Configuration::writeFile() {
     Serial.println("Saving configuration...");
 
-    DynamicJsonDocument data(3584);
+    JsonDocument data;
     File configFile = SPIFFS.open("/igate_conf.json", "w");
 
     if (!configFile) {
@@ -196,8 +196,7 @@ bool Configuration::readFile() {
 
     if (configFile) {
         bool needsRewrite = false;
-        StaticJsonDocument<3584> data;
-
+        JsonDocument data;
         DeserializationError error = deserializeJson(data, configFile);
         if (error) {
             Serial.println("Failed to read file, using default configuration");
@@ -212,28 +211,28 @@ bool Configuration::readFile() {
             wifiAPs.push_back(wifiap);
         }
 
-        if (!data["other"].containsKey("startupDelay")) needsRewrite = true;
+        if (data["other"]["startupDelay"].isNull()) needsRewrite = true;
         startupDelay                    = data["other"]["startupDelay"] | 0;
 
-        if (!data["wifi"]["autoAP"].containsKey("enabled") ||
-            !data["wifi"]["autoAP"].containsKey("password") ||
-            !data["wifi"]["autoAP"].containsKey("timeout")) needsRewrite = true;
+        if (data["wifi"]["autoAP"]["enabled"].isNull() ||
+            data["wifi"]["autoAP"]["password"].isNull() ||
+            data["wifi"]["autoAP"]["timeout"].isNull()) needsRewrite = true;
         wifiAutoAP.enabled              = data["wifi"]["autoAP"]["enabled"] | true;
         wifiAutoAP.password             = data["wifi"]["autoAP"]["password"] | "1234567890";
         wifiAutoAP.timeout              = data["wifi"]["autoAP"]["timeout"] | 10;
 
-        if (!data.containsKey("callsign")) needsRewrite = true;
+        if (data["callsign"].isNull()) needsRewrite = true;
         callsign                        = data["callsign"] | "NOCALL-10";
-        if (!data.containsKey("tacticalCallsign")) needsRewrite = true;
+        if (data["tacticalCallsign"].isNull()) needsRewrite = true;
         tacticalCallsign                = data["tacticalCallsign"] | "";
 
-        if (!data["aprs_is"].containsKey("active") ||
-            !data["aprs_is"].containsKey("passcode") ||
-            !data["aprs_is"].containsKey("server") ||
-            !data["aprs_is"].containsKey("port") ||
-            !data["aprs_is"].containsKey("filter") ||
-            !data["aprs_is"].containsKey("messagesToRF") ||
-            !data["aprs_is"].containsKey("objectsToRF")) needsRewrite = true;
+        if (data["aprs_is"]["active"].isNull() ||
+            data["aprs_is"]["passcode"].isNull() ||
+            data["aprs_is"]["server"].isNull() ||
+            data["aprs_is"]["port"].isNull() ||
+            data["aprs_is"]["filter"].isNull() ||
+            data["aprs_is"]["messagesToRF"].isNull() ||
+            data["aprs_is"]["objectsToRF"].isNull()) needsRewrite = true;
         aprs_is.active                  = data["aprs_is"]["active"] | false;
         aprs_is.passcode                = data["aprs_is"]["passcode"] | "XYZWV";
         aprs_is.server                  = data["aprs_is"]["server"] | "rotate.aprs2.net";
@@ -242,20 +241,20 @@ bool Configuration::readFile() {
         aprs_is.messagesToRF            = data["aprs_is"]["messagesToRF"] | false;
         aprs_is.objectsToRF             = data["aprs_is"]["objectsToRF"] | false;
 
-        if (!data["beacon"].containsKey("latitude") ||
-            !data["beacon"].containsKey("longitude") ||
-            !data["beacon"].containsKey("comment") ||
-            !data["beacon"].containsKey("interval") ||
-            !data["beacon"].containsKey("overlay") ||
-            !data["beacon"].containsKey("symbol") ||
-            !data["beacon"].containsKey("path") ||
-            !data["beacon"].containsKey("sendViaAPRSIS") ||
-            !data["beacon"].containsKey("sendViaRF") ||
-            !data["beacon"].containsKey("beaconFreq") ||
-            !data["beacon"].containsKey("statusActive") ||
-            !data["beacon"].containsKey("statusPacket") ||
-            !data["beacon"].containsKey("gpsActive") ||
-            !data["beacon"].containsKey("ambiguityLevel")) needsRewrite = true;
+        if (data["beacon"]["latitude"].isNull() ||
+            data["beacon"]["longitude"].isNull() ||
+            data["beacon"]["comment"].isNull() ||
+            data["beacon"]["interval"].isNull() ||
+            data["beacon"]["overlay"].isNull() ||
+            data["beacon"]["symbol"].isNull() ||
+            data["beacon"]["path"].isNull() ||
+            data["beacon"]["sendViaAPRSIS"].isNull() ||
+            data["beacon"]["sendViaRF"].isNull() ||
+            data["beacon"]["beaconFreq"].isNull() ||
+            data["beacon"]["statusActive"].isNull() ||
+            data["beacon"]["statusPacket"].isNull() ||
+            data["beacon"]["gpsActive"].isNull() ||
+            data["beacon"]["ambiguityLevel"].isNull()) needsRewrite = true;
         beacon.latitude                 = data["beacon"]["latitude"] | 0.0;
         beacon.longitude                = data["beacon"]["longitude"] | 0.0;
         beacon.comment                  = data["beacon"]["comment"] | "LoRa APRS";
@@ -271,15 +270,15 @@ bool Configuration::readFile() {
         beacon.gpsActive                = data["beacon"]["gpsActive"] | false;
         beacon.ambiguityLevel           = data["beacon"]["ambiguityLevel"] | 0;
 
-        if (!data.containsKey("personalNote")) needsRewrite = true;
+        if (data["personalNote"].isNull()) needsRewrite = true;
         personalNote    	            = data["personalNote"] | "personal note here";
 
-        if (!data.containsKey("blacklist")) needsRewrite = true;
+        if (data["blacklist"].isNull()) needsRewrite = true;
         blacklist                       = data["blacklist"] | "station callsign";
 
-        if (!data["digi"].containsKey("mode") ||
-            !data["digi"].containsKey("ecoMode") ||
-            !data["digi"].containsKey("backupDigiMode")) needsRewrite = true;
+        if (data["digi"]["mode"].isNull() ||
+            data["digi"]["ecoMode"].isNull() ||
+            data["digi"]["backupDigiMode"].isNull()) needsRewrite = true;
         digi.mode                       = data["digi"]["mode"] | 0;
         digi.ecoMode                    = data["digi"]["ecoMode"] | 0;
         if (digi.ecoMode == 1) shouldSleepStop = false;
@@ -289,17 +288,17 @@ bool Configuration::readFile() {
         digi.backupDigiMode             = data["digi"]["backupDigiMode"] | false;
 
 
-        if (!data["lora"].containsKey("rxActive") ||
-            !data["lora"].containsKey("rxFreq") ||
-            !data["lora"].containsKey("rxSpreadingFactor") ||
-            !data["lora"].containsKey("rxCodingRate4") ||
-            !data["lora"].containsKey("rxSignalBandwidth") ||
-            !data["lora"].containsKey("txActive") ||
-            !data["lora"].containsKey("txFreq") ||
-            !data["lora"].containsKey("txSpreadingFactor") ||
-            !data["lora"].containsKey("txCodingRate4") ||
-            !data["lora"].containsKey("txSignalBandwidth") ||
-            !data["lora"].containsKey("power")) needsRewrite = true;
+        if (data["lora"]["rxActive"].isNull() ||
+            data["lora"]["rxFreq"].isNull() ||
+            data["lora"]["rxSpreadingFactor"].isNull() ||
+            data["lora"]["rxCodingRate4"].isNull() ||
+            data["lora"]["rxSignalBandwidth"].isNull() ||
+            data["lora"]["txActive"].isNull() ||
+            data["lora"]["txFreq"].isNull() ||
+            data["lora"]["txSpreadingFactor"].isNull() ||
+            data["lora"]["txCodingRate4"].isNull() ||
+            data["lora"]["txSignalBandwidth"].isNull() ||
+            data["lora"]["power"].isNull()) needsRewrite = true;
         loramodule.rxActive             = data["lora"]["rxActive"] | true;
         loramodule.rxFreq               = data["lora"]["rxFreq"] | 433775000;
         loramodule.rxSpreadingFactor    = data["lora"]["rxSpreadingFactor"] | 12;
@@ -312,9 +311,9 @@ bool Configuration::readFile() {
         loramodule.txSignalBandwidth    = data["lora"]["txSignalBandwidth"] | 125000;
         loramodule.power                = data["lora"]["power"] | 20;
 
-        if (!data["display"].containsKey("alwaysOn") ||
-            !data["display"].containsKey("timeout") ||
-            !data["display"].containsKey("turn180")) needsRewrite = true;
+        if (data["display"]["alwaysOn"].isNull() ||
+            data["display"]["timeout"].isNull() ||
+            data["display"]["turn180"].isNull()) needsRewrite = true;
         #ifdef HAS_EPAPER
             display.alwaysOn            = true;
         #else
@@ -323,17 +322,17 @@ bool Configuration::readFile() {
         display.timeout                 = data["display"]["timeout"] | 4;
         display.turn180                 = data["display"]["turn180"] | false;
 
-        if (!data["battery"].containsKey("sendInternalVoltage") ||
-            !data["battery"].containsKey("monitorInternalVoltage") ||
-            !data["battery"].containsKey("internalSleepVoltage") ||
-            !data["battery"].containsKey("sendExternalVoltage") ||
-            !data["battery"].containsKey("monitorExternalVoltage") ||
-            !data["battery"].containsKey("externalSleepVoltage") ||
-            !data["battery"].containsKey("useExternalI2CSensor") ||
-            !data["battery"].containsKey("voltageDividerR1") ||
-            !data["battery"].containsKey("voltageDividerR2") ||
-            !data["battery"].containsKey("externalVoltagePin") ||
-            !data["battery"].containsKey("sendVoltageAsTelemetry")) needsRewrite = true;
+        if (data["battery"]["sendInternalVoltage"].isNull() ||
+            data["battery"]["monitorInternalVoltage"].isNull() ||
+            data["battery"]["internalSleepVoltage"].isNull() ||
+            data["battery"]["sendExternalVoltage"].isNull() ||
+            data["battery"]["monitorExternalVoltage"].isNull() ||
+            data["battery"]["externalSleepVoltage"].isNull() ||
+            data["battery"]["useExternalI2CSensor"].isNull() ||
+            data["battery"]["voltageDividerR1"].isNull() ||
+            data["battery"]["voltageDividerR2"].isNull() ||
+            data["battery"]["externalVoltagePin"].isNull() ||
+            data["battery"]["sendVoltageAsTelemetry"].isNull()) needsRewrite = true;
         battery.sendInternalVoltage     = data["battery"]["sendInternalVoltage"] | false;
         battery.monitorInternalVoltage  = data["battery"]["monitorInternalVoltage"] | false;
         battery.internalSleepVoltage    = data["battery"]["internalSleepVoltage"] | 2.9;
@@ -346,38 +345,38 @@ bool Configuration::readFile() {
         battery.externalVoltagePin      = data["battery"]["externalVoltagePin"] | 34;
         battery.sendVoltageAsTelemetry  = data["battery"]["sendVoltageAsTelemetry"] | false;
 
-        if (!data["wxsensor"].containsKey("active") ||
-            !data["wxsensor"].containsKey("heightCorrection") ||
-            !data["wxsensor"].containsKey("temperatureCorrection")) needsRewrite = true;
+        if (data["wxsensor"]["active"].isNull() ||
+            data["wxsensor"]["heightCorrection"].isNull() ||
+            data["wxsensor"]["temperatureCorrection"].isNull()) needsRewrite = true;
         wxsensor.active                 = data["wxsensor"]["active"] | false;
         wxsensor.heightCorrection       = data["wxsensor"]["heightCorrection"] | 0;
         wxsensor.temperatureCorrection  = data["wxsensor"]["temperatureCorrection"] | 0.0;
 
-        if (!data["syslog"].containsKey("active") ||
-            !data["syslog"].containsKey("server") ||
-            !data["syslog"].containsKey("port") ||
-            !data["syslog"].containsKey("logBeaconOverTCPIP")) needsRewrite = true;
+        if (data["syslog"]["active"].isNull() ||
+            data["syslog"]["server"].isNull() ||
+            data["syslog"]["port"].isNull() ||
+            data["syslog"]["logBeaconOverTCPIP"].isNull()) needsRewrite = true;
         syslog.active                   = data["syslog"]["active"] | false;
         syslog.server                   = data["syslog"]["server"] | "lora.link9.net";
         syslog.port                     = data["syslog"]["port"] | 1514;
         syslog.logBeaconOverTCPIP       = data["syslog"]["logBeaconOverTCPIP"] | false;
 
-        if (!data["tnc"].containsKey("enableServer") ||
-            !data["tnc"].containsKey("enableSerial") ||
-            !data["tnc"].containsKey("acceptOwn") ||
-            !data["tnc"].containsKey("aprsBridgeActive")) needsRewrite = true;
+        if (data["tnc"]["enableServer"].isNull() ||
+            data["tnc"]["enableSerial"].isNull() ||
+            data["tnc"]["acceptOwn"].isNull() ||
+            data["tnc"]["aprsBridgeActive"].isNull()) needsRewrite = true;
         tnc.enableServer                = data["tnc"]["enableServer"] | false;
         tnc.enableSerial                = data["tnc"]["enableSerial"] | false;
         tnc.acceptOwn                   = data["tnc"]["acceptOwn"] | false;
         tnc.aprsBridgeActive            = data["tnc"]["aprsBridgeActive"] | false;
 
-        if (!data["mqtt"].containsKey("active") ||
-            !data["mqtt"].containsKey("server") ||
-            !data["mqtt"].containsKey("topic") ||
-            !data["mqtt"].containsKey("username") ||
-            !data["mqtt"].containsKey("password") ||
-            !data["mqtt"].containsKey("port") ||
-            !data["mqtt"].containsKey("beaconOverMqtt")) needsRewrite = true;
+        if (data["mqtt"]["active"].isNull() ||
+            data["mqtt"]["server"].isNull() ||
+            data["mqtt"]["topic"].isNull() ||
+            data["mqtt"]["username"].isNull() ||
+            data["mqtt"]["password"].isNull() ||
+            data["mqtt"]["port"].isNull() ||
+            data["mqtt"]["beaconOverMqtt"].isNull()) needsRewrite = true;
         mqtt.active                     = data["mqtt"]["active"] | false;
         mqtt.server                     = data["mqtt"]["server"] | "";
         mqtt.topic                      = data["mqtt"]["topic"] | "aprs-igate";
@@ -386,34 +385,34 @@ bool Configuration::readFile() {
         mqtt.port                       = data["mqtt"]["port"] | 1883;
         mqtt.beaconOverMqtt             = data["mqtt"]["beaconOverMqtt"] | false;
 
-        if (!data["ota"].containsKey("username") ||
-            !data["ota"].containsKey("password")) needsRewrite = true;
+        if (data["ota"]["username"].isNull() ||
+            data["ota"]["password"].isNull()) needsRewrite = true;
         ota.username                    = data["ota"]["username"] | "";
         ota.password                    = data["ota"]["password"] | "";
 
-        if (!data["webadmin"].containsKey("active") ||
-            !data["webadmin"].containsKey("username") ||
-            !data["webadmin"].containsKey("password")) needsRewrite = true;
+        if (data["webadmin"]["active"].isNull() ||
+            data["webadmin"]["username"].isNull() ||
+            data["webadmin"]["password"].isNull()) needsRewrite = true;
         webadmin.active                 = data["webadmin"]["active"] | false;
         webadmin.username               = data["webadmin"]["username"] | "admin";
         webadmin.password               = data["webadmin"]["password"] | "";
 
-        if (!data["remoteManagement"].containsKey("managers") ||
-            !data["remoteManagement"].containsKey("rfOnly")) needsRewrite = true;
+        if (data["remoteManagement"]["managers"].isNull() ||
+            data["remoteManagement"]["rfOnly"].isNull()) needsRewrite = true;
         remoteManagement.managers       = data["remoteManagement"]["managers"] | "";
         remoteManagement.rfOnly         = data["remoteManagement"]["rfOnly"] | true;
 
-        if (!data["ntp"].containsKey("server") ||
-            !data["ntp"].containsKey("gmtCorrection")) needsRewrite = true;
+        if (data["ntp"]["server"].isNull() ||
+            data["ntp"]["gmtCorrection"].isNull()) needsRewrite = true;
         ntp.server                      = data["ntp"]["server"] | "pool.ntp.org";
         ntp.gmtCorrection               = data["ntp"]["gmtCorrection"] | 0.0;
 
-        if (!data["other"].containsKey("rebootMode") ||
-            !data["other"].containsKey("rebootModeTime")) needsRewrite = true;
+        if (data["other"]["rebootMode"].isNull() ||
+            data["other"]["rebootModeTime"].isNull()) needsRewrite = true;
         rebootMode                      = data["other"]["rebootMode"] | false;
         rebootModeTime                  = data["other"]["rebootModeTime"] | 6;
 
-        if (!data["other"].containsKey("rememberStationTime")) needsRewrite = true;
+        if (data["other"]["rememberStationTime"].isNull()) needsRewrite = true;
         rememberStationTime             = data["other"]["rememberStationTime"] | 30;
 
         if (wifiAPs.size() == 0) { // If we don't have any WiFi's from config we need to add "empty" SSID for AUTO AP
