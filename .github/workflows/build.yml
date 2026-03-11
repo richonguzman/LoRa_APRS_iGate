@@ -55,6 +55,8 @@ jobs:
                       chip: esp32
                     - name: ttgo-t-beam-v1_SX1268
                       chip: esp32
+                    - name: ttgo-t-beam-v1_SX1262
+                      chip: esp32
                     - name: ttgo-t-beam-v1_2_SX1262
                       chip: esp32
                     - name: ttgo_t_deck_plus
