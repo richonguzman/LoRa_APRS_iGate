@@ -98,7 +98,7 @@ namespace WEB_Utils {
     }
 
     void handleReceivedPackets(AsyncWebServerRequest *request) {
-        StaticJsonDocument<1536> data;
+        JsonDocument data;
 
         for (int i = 0; i < receivedPackets.size(); i++) {
             data[i]["rxTime"]   = receivedPackets[i].rxTime;
