@@ -80,6 +80,9 @@ bool Configuration::writeFile() {
         data["beacon"]["statusPacket"]              = beacon.statusPacket;
 
         data["beacon"]["gpsActive"]                 = beacon.gpsActive;
+        #if !defined(HAS_GPS)
+            data["beacon"]["gpsActive"]             = false;
+        #endif
         data["beacon"]["ambiguityLevel"]            = beacon.ambiguityLevel;
 
         data["personalNote"]                        = personalNote;

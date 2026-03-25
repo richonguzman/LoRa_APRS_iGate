@@ -68,8 +68,8 @@ ___________________________________________________________________*/
 #endif
 
 
-String              versionDate             = "2026-03-11";
-String              versionNumber           = "3.2.107";
+String              versionDate             = "2026-03-25";
+String              versionNumber           = "3.2.3";
 Configuration       Config;
 WiFiClient          aprsIsClient;
 WiFiClient          mqttClient;

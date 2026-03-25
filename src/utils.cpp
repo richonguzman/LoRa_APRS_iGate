@@ -153,11 +153,18 @@ namespace Utils {
             beaconUpdate = true;
         }
 
+        bool configLocationIsValid = !(Config.beacon.latitude == 0.0 && Config.beacon.longitude == 0.0);
         #ifdef HAS_GPS
-            if (Config.beacon.gpsActive && gps.location.lat() == 0.0 && gps.location.lng() == 0.0 && Config.beacon.latitude == 0.0 && Config.beacon.longitude == 0.0) {
-                GPS_Utils::getData();
-                beaconUpdate = false;
+            if (Config.beacon.gpsActive) {      // GPS activated
+                if (!gps.location.isValid()) {
+                    GPS_Utils::getData();       // refresh GPS
+                    beaconUpdate = false;
+                }
+            } else {                            // GPS not active: use saved data in Config
+                if (!configLocationIsValid) beaconUpdate = false;
             }
+        #else                                   // No GPS available: use saved data in Config
+            if (!configLocationIsValid) beaconUpdate = false;
         #endif
 
         if (beaconUpdate) {

@@ -46,7 +46,7 @@ Adafruit_INA219     ina219;
 #ifdef HAS_ADC_CALIBRATION
     #include <esp_adc_cal.h>
 
-    #if defined(TTGO_LORA32_V2_1) || defined(TTGO_LORA32_V2_1_915)
+    #if defined(TTGO_LORA32_V2_1) || defined(TTGO_LORA32_V2_1_GPS) || defined(TTGO_LORA32_V2_1_915) || defined(TTGO_LORA32_V2_1_915_GPS)
         #define InternalBattery_ADC_Channel ADC1_CHANNEL_7  // t_lora32 pin35
         #define ExternalVoltage_ADC_Channel ADC1_CHANNEL_6  // t_lora32 pin34
     #endif
