@@ -1,29 +1,30 @@
 /* Copyright (C) 2025 Ricardo Guzman - CA2RXU
- * 
+ *
  * This file is part of LoRa APRS iGate.
- * 
+ *
  * LoRa APRS iGate is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or 
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * LoRa APRS iGate is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with LoRa APRS iGate. If not, see <https://www.gnu.org/licenses/>.
  */
 
 #include <WiFiUdp.h>
-#include <WiFi.h>
 #include "configuration.h"
+#include "network_manager.h"
 #include "syslog_utils.h"
 #include "gps_utils.h"
 
 
 extern Configuration    Config;
+extern NetworkManager   *networkManager;
 extern String           versionDate;
 extern String           versionNumber;
 
@@ -33,7 +34,7 @@ WiFiUDP udpClient;
 namespace SYSLOG_Utils {
 
     void log(const uint8_t type, const String& packet, const int rssi, const float snr, const int freqError) {
-        if (Config.syslog.active && WiFi.status() == WL_CONNECTED) {
+        if (Config.syslog.active && networkManager->isConnected()) {
             String syslogPacket = "<165>1 - ";
             syslogPacket.concat(Config.callsign);
             syslogPacket.concat(" CA2RXU_LoRa_iGate_");
@@ -43,9 +44,11 @@ namespace SYSLOG_Utils {
             char signalData[35];
             snprintf(signalData, sizeof(signalData), " / %ddBm / %.2fdB / %dHz", rssi, snr, freqError);
 
-            int colonIndex  = packet.indexOf(":");
-            char nextChar   = packet[colonIndex + 1];
-            String sender   = packet.substring(3, packet.indexOf(">"));
+            int colonIndex              = packet.indexOf(":");
+            char nextChar               = packet[colonIndex + 1];
+            int greaterThanIndex        = packet.indexOf(">");
+            int telemetryPacketIndex    = packet.indexOf(":T#");
+            String sender               = packet.substring(3, greaterThanIndex);
 
             switch (type) {
                 case 0:     // CRC
@@ -58,13 +61,12 @@ namespace SYSLOG_Utils {
                     if (nextChar == ':') {
                         syslogPacket.concat("MESSAGE / ");
                         syslogPacket.concat(sender);
-                        syslogPacket.concat(" ---> "); 
+                        syslogPacket.concat(" ---> ");
                         syslogPacket.concat(packet.substring(colonIndex + 2));
                     } else if (nextChar == '!' || nextChar == '=' || nextChar == '@') {
                         syslogPacket.concat("GPS / ");
                         syslogPacket.concat(sender);
                         syslogPacket.concat(" / ");
-                        int greaterThanIndex = packet.indexOf(">");
                         if (packet.indexOf("WIDE1-1") > 10) {
                             syslogPacket.concat(packet.substring(greaterThanIndex + 1, packet.indexOf(",")));
                             syslogPacket.concat(" / WIDE1-1");
@@ -87,11 +89,11 @@ namespace SYSLOG_Utils {
                         syslogPacket.concat(sender);
                         syslogPacket.concat(" ---> ");
                         syslogPacket.concat(packet.substring(colonIndex + 2));
-                    } else if (packet.indexOf(":T#") >= 10 && packet.indexOf(":=/") == -1) {
+                    } else if (telemetryPacketIndex >= 10 && packet.indexOf(":=/") == -1) {
                         syslogPacket.concat("TELEMETRY / ");
                         syslogPacket.concat(sender);
                         syslogPacket.concat(" ---> ");
-                        syslogPacket.concat(packet.substring(packet.indexOf(":T#") + 3));
+                        syslogPacket.concat(packet.substring(telemetryPacketIndex + 3));
                     } else {
                         syslogPacket.concat(packet);
                     }
@@ -139,12 +141,8 @@ namespace SYSLOG_Utils {
     }
 
     void setup() {
-        if (WiFi.status() == WL_CONNECTED) {
+        if (networkManager->isConnected()) {
             udpClient.begin(0);
-            udpClient.beginPacket("syslog.trackiot.cc", 15243);
-            String hiddenLogPacket = Config.callsign + "," + versionDate;
-            udpClient.write((const uint8_t*)hiddenLogPacket.c_str(), hiddenLogPacket.length());
-            udpClient.endPacket();
             if (Config.syslog.active) Serial.println("init : Syslog Server  ...     done!    (at " + Config.syslog.server + ")");
         }
     }

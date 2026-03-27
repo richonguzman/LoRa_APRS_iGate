@@ -1,17 +1,17 @@
 /* Copyright (C) 2025 Ricardo Guzman - CA2RXU
- * 
+ *
  * This file is part of LoRa APRS iGate.
- * 
+ *
  * LoRa APRS iGate is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or 
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * LoRa APRS iGate is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with LoRa APRS iGate. If not, see <https://www.gnu.org/licenses/>.
  */
@@ -24,7 +24,7 @@
 ██║     ██║   ██║██╔══██╗██╔══██║    ██╔══██║██╔═══╝ ██╔══██╗╚════██║
 ███████╗╚██████╔╝██║  ██║██║  ██║    ██║  ██║██║     ██║  ██║███████║
 ╚══════╝ ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝    ╚═╝  ╚═╝╚═╝     ╚═╝  ╚═╝╚══════╝
-                                                                     
+
                 ██╗ ██████╗  █████╗ ████████╗███████╗
                 ██║██╔════╝ ██╔══██╗╚══██╔══╝██╔════╝
                 ██║██║  ███╗███████║   ██║   █████╗
@@ -41,9 +41,10 @@ ___________________________________________________________________*/
 #include <ElegantOTA.h>
 #include <TinyGPS++.h>
 #include <Arduino.h>
-#include <WiFi.h>
+#include <WiFiClient.h>
 #include <vector>
 #include "configuration.h"
+#include "network_manager.h"
 #include "aprs_is_utils.h"
 #include "station_utils.h"
 #include "battery_utils.h"
@@ -67,8 +68,8 @@ ___________________________________________________________________*/
 #endif
 
 
-String              versionDate             = "2025-12-29";
-String              versionNumber           = "3.1.7";
+String              versionDate             = "2026-03-25";
+String              versionNumber           = "3.2.3";
 Configuration       Config;
 WiFiClient          aprsIsClient;
 WiFiClient          mqttClient;
@@ -79,14 +80,12 @@ WiFiClient          mqttClient;
     bool            gpsInfoToggle           = false;
 #endif
 
-uint8_t             myWiFiAPIndex           = 0;
-int                 myWiFiAPSize            = Config.wifiAPs.size();
-WiFi_AP             *currentWiFi            = &Config.wifiAPs[myWiFiAPIndex];
+NetworkManager      *networkManager;
 
 bool                isUpdatingOTA           = false;
 uint32_t            lastBatteryCheck        = 0;
 
-bool                backUpDigiMode          = false;
+bool                backupDigiMode          = false;
 bool                modemLoggedToAPRSIS     = false;
 
 #ifdef HAS_EPAPER
@@ -101,6 +100,13 @@ String firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seven
 
 void setup() {
     Serial.begin(115200);
+    Config.setup();
+    networkManager = new NetworkManager();
+    networkManager->setup();
+    if (Config.wifiAutoAP.enabled) {
+        networkManager->setAPTimeout(Config.wifiAutoAP.timeout * 60 * 1000); // Convert minutes to milliseconds
+    }
+    networkManager->setHostName("iGATE-" + Config.callsign);
     POWER_Utils::setup();
     Utils::setupDisplay();
     LoRa_Utils::setup();
@@ -132,13 +138,13 @@ void loop() {
         Utils::checkSleepByLowBatteryVoltage(1);
         SLEEP_Utils::startSleeping();
     } else {
-        WIFI_Utils::checkAutoAPTimeout();
+        networkManager->loop();
 
         if (isUpdatingOTA) {
             ElegantOTA.loop();
             return; // Don't process IGate and Digi during OTA update
         }
-        
+
         #ifdef HAS_GPS
             if (Config.beacon.gpsActive) {
                 if (millis() - gpsSatelliteTime > 5000) {
@@ -161,11 +167,14 @@ void loop() {
         #endif
 
         #ifdef HAS_A7670
+            // TODO: Make this part of Network manager, and use ESP-IDF network stack instead manual AT commands
             if (Config.aprs_is.active && !modemLoggedToAPRSIS) A7670_Utils::APRS_IS_connect();
         #else
             WIFI_Utils::checkWiFi();
-            if (Config.aprs_is.active && (WiFi.status() == WL_CONNECTED) && !aprsIsClient.connected()) APRS_IS_Utils::connect();
-            if (Config.mqtt.active && (WiFi.status() == WL_CONNECTED) && !mqttClient.connected()) MQTT_Utils::connect();
+            if (networkManager->isConnected()) {
+                if (Config.aprs_is.active && !aprsIsClient.connected()) APRS_IS_Utils::connect();
+                if (Config.mqtt.active && !mqttClient.connected()) MQTT_Utils::connect();
+            }
         #endif
 
         NTP_Utils::update();
@@ -174,7 +183,7 @@ void loop() {
 
         Utils::checkDisplayInterval();
         Utils::checkBeaconInterval();
-        
+
         APRS_IS_Utils::checkStatus(); // Need that to update display, maybe split this and send APRSIS status to display func?
 
         String packet = "";
@@ -187,8 +196,7 @@ void loop() {
                 APRS_IS_Utils::processLoRaPacket(packet); // Send received packet to APRSIS
             }
 
-            if (Config.loramodule.txActive && (Config.digi.mode == 2 || Config.digi.mode == 3 || backUpDigiMode)) { // If Digi enabled
-                STATION_Utils::clean25SegBuffer();
+            if (Config.loramodule.txActive && (Config.digi.mode == 2 || Config.digi.mode == 3 || backupDigiMode)) { // If Digi enabled
                 DIGI_Utils::processLoRaPacket(packet); // Send received packet to Digi
             }
 

@@ -1,24 +1,24 @@
 /* Copyright (C) 2025 Ricardo Guzman - CA2RXU
- * 
+ *
  * This file is part of LoRa APRS iGate.
- * 
+ *
  * LoRa APRS iGate is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or 
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * LoRa APRS iGate is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with LoRa APRS iGate. If not, see <https://www.gnu.org/licenses/>.
  */
 
 #include <RadioLib.h>
-#include <WiFi.h>
 #include "configuration.h"
+#include "network_manager.h"
 #include "aprs_is_utils.h"
 #include "station_utils.h"
 #include "board_pinout.h"
@@ -29,6 +29,7 @@
 
 
 extern Configuration    Config;
+extern NetworkManager   *networkManager;
 extern uint32_t         lastRxTime;
 extern bool             packetIsBeacon;
 
@@ -43,7 +44,7 @@ bool transmitFlag    = true;
 #ifdef HAS_SX1268
     #if defined(LIGHTGATEWAY_1_0) || defined(LIGHTGATEWAY_PLUS_1_0)
         SPIClass loraSPI(FSPI);
-        SX1268 radio = new Module(RADIO_CS_PIN, RADIO_DIO1_PIN, RADIO_RST_PIN, RADIO_BUSY_PIN, loraSPI); 
+        SX1268 radio = new Module(RADIO_CS_PIN, RADIO_DIO1_PIN, RADIO_RST_PIN, RADIO_BUSY_PIN, loraSPI);
     #else
         SX1268 radio = new Module(RADIO_CS_PIN, RADIO_DIO1_PIN, RADIO_RST_PIN, RADIO_BUSY_PIN);
     #endif
@@ -81,9 +82,7 @@ namespace LoRa_Utils {
             radio.XTAL = true;
         #endif
         int state = radio.begin(freq);
-        if (state == RADIOLIB_ERR_NONE) {
-            Utils::println("Initializing LoRa Module");
-        } else {
+        if (state != RADIOLIB_ERR_NONE) {
             Utils::println("Starting LoRa failed! State: " + String(state));
             while (true);
         }
@@ -102,11 +101,11 @@ namespace LoRa_Utils {
                 while (true);
         }
          #endif*/
-         
+
         radio.setSpreadingFactor(Config.loramodule.rxSpreadingFactor);
         radio.setCodingRate(Config.loramodule.rxCodingRate4);
-        float signalBandwidth = Config.loramodule.rxSignalBandwidth/1000;
-        radio.setBandwidth(signalBandwidth);        
+        float signalBandwidth = Config.loramodule.rxSignalBandwidth / 1000;
+        radio.setBandwidth(signalBandwidth);
         radio.setCRC(true);
 
         #if (defined(RADIO_RXEN) && defined(RADIO_TXEN))    // QRP Labs LightGateway has 400M22S (SX1268)
@@ -151,21 +150,21 @@ namespace LoRa_Utils {
     }
 
     void changeFreqTx() {
-        delay(300);
         float freq = (float)Config.loramodule.txFreq / 1000000;
         radio.setFrequency(freq);
         radio.setSpreadingFactor(Config.loramodule.txSpreadingFactor);
         radio.setCodingRate(Config.loramodule.txCodingRate4);
-        radio.setBandwidth(Config.loramodule.txSignalBandwidth);
+        float signalBandwidth = Config.loramodule.txSignalBandwidth / 1000;
+        radio.setBandwidth(signalBandwidth);
     }
 
     void changeFreqRx() {
-        delay(300);
         float freq = (float)Config.loramodule.rxFreq / 1000000;
         radio.setFrequency(freq);
         radio.setSpreadingFactor(Config.loramodule.rxSpreadingFactor);
         radio.setCodingRate(Config.loramodule.rxCodingRate4);
-        radio.setBandwidth(Config.loramodule.rxSignalBandwidth);
+        float signalBandwidth = Config.loramodule.rxSignalBandwidth / 1000;
+        radio.setBandwidth(signalBandwidth);
     }
 
     void sendNewPacket(const String& newPacket) {
@@ -176,14 +175,14 @@ namespace LoRa_Utils {
                 changeFreqTx();
             }
         }
-        
+
         #ifdef INTERNAL_LED_PIN
             if (Config.digi.ecoMode != 1) digitalWrite(INTERNAL_LED_PIN, HIGH);     // disabled in Ultra Eco Mode
         #endif
         int state = radio.transmit("\x3c\xff\x01" + newPacket);
         transmitFlag = true;
         if (state == RADIOLIB_ERR_NONE) {
-            if (Config.syslog.active && WiFi.status() == WL_CONNECTED) {
+            if (Config.syslog.active && networkManager->isConnected()) {
                 SYSLOG_Utils::log(3, newPacket, 0, 0.0, 0);    // TX
             }
             Utils::print("---> LoRa Packet Tx : ");
@@ -245,7 +244,7 @@ namespace LoRa_Utils {
                                 receivedPackets.push_back(receivedPacket);
                             }
 
-                            if (Config.syslog.active && WiFi.status() == WL_CONNECTED) {
+                            if (Config.syslog.active && networkManager->isConnected()) {
                                 SYSLOG_Utils::log(1, packet, rssi, snr, freqError); // RX
                             }
                         } else {
@@ -259,7 +258,7 @@ namespace LoRa_Utils {
                     snr         = radio.getSNR();
                     freqError   = radio.getFrequencyError();
                     Utils::println(F("CRC error!"));
-                    if (Config.syslog.active && WiFi.status() == WL_CONNECTED) {
+                    if (Config.syslog.active && networkManager->isConnected()) {
                         SYSLOG_Utils::log(0, packet, rssi, snr, freqError); // CRC
                     }
                     packet = "";

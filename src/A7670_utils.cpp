@@ -1,17 +1,17 @@
 /* Copyright (C) 2025 Ricardo Guzman - CA2RXU
- * 
+ *
  * This file is part of LoRa APRS iGate.
- * 
+ *
  * LoRa APRS iGate is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or 
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * LoRa APRS iGate is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with LoRa APRS iGate. If not, see <https://www.gnu.org/licenses/>.
  */
@@ -26,7 +26,7 @@
 
 
 #ifdef HAS_A7670
-    #define TINY_GSM_MODEM_SIM7600      //The AT instruction of A7670 is compatible with SIM7600 
+    #define TINY_GSM_MODEM_SIM7600      //The AT instruction of A7670 is compatible with SIM7600
     #define TINY_GSM_RX_BUFFER 1024     // Set RX buffer to 1Kb
     #define SerialAT Serial1
     #include <TinyGsmClient.h>
@@ -115,6 +115,8 @@
                 if (SerialAT.available()) {
                     String response = SerialAT.readString();
                     //Serial.println(response); // DEBUG of Modem AT message
+                    int responseOKIndex = response.indexOf("OK");
+                    int callsignIndex   = ATMessage.indexOf(Config.callsign);
                     if(response.indexOf("verified") >= 0) {
                         Serial.println("Logged! (User Validated)\n");
                         displayShow(firstLine, "Connecting APRS-IS...", "---> Logged!", " ", 1000);
@@ -122,7 +124,7 @@
                         validAT = true;
                         i = 1;
                         delayATMessage = 0;
-                    } else if (ATMessage == "AT+NETOPEN" && response.indexOf("OK") >= 0) {
+                    } else if (ATMessage == "AT+NETOPEN" && responseOKIndex >= 0) {
                         Serial.println("Port Open!");
                         displayShow(firstLine, "Opening Port...", "---> Port Open", " ", 0);
                         validAT = true;
@@ -145,14 +147,14 @@
                         validAT = true;
                         i = 1;
                         delayATMessage = 0;
-                    } else if (ATMessage.indexOf(Config.callsign) >= 3 && !modemLoggedToAPRSIS && response.indexOf("OK") >= 0 && !stationBeacon) { // login info
+                    } else if (callsignIndex >= 3 && !modemLoggedToAPRSIS && responseOKIndex >= 0 && !stationBeacon) { // login info
                         validAT = true;
                         delayATMessage = 0;
-                    } else if (ATMessage.indexOf(Config.callsign) == 0 && !beaconSent && response.indexOf("OK") >= 0 && !stationBeacon) {   // self beacon or querys
+                    } else if (callsignIndex == 0 && !beaconSent && responseOKIndex >= 0 && !stationBeacon) {   // self beacon or querys
                         validAT = true;
                         i = 1;
                         delayATMessage = 0;
-                    } else if (stationBeacon && response.indexOf("OK") >= 0) { //upload others beacons
+                    } else if (stationBeacon && responseOKIndex >= 0) { //upload others beacons
                         validAT = true;
                         i = 1;
                         delayATMessage = 0;
@@ -200,7 +202,7 @@
             if (beaconBytesSent) {
                 Serial.print(".");
                 beaconSent = checkATResponse(packet);
-            } 
+            }
             if (!beaconSent) {
                 Serial.println("------------------------------------> UPLOAD FAILED!!!");
             } else {
@@ -221,5 +223,5 @@
             delay(1);
         }
     }
-    
+
 #endif

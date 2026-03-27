@@ -36,7 +36,8 @@
     "blacklist": "",
     "digi": {
         "mode": 0,
-        "ecoMode": 0
+        "ecoMode": 0,
+        "backupDigiMode": false
     },
     "lora": {
         "rxActive": true,
@@ -113,7 +114,6 @@
     },
     "other": {
         "rememberStationTime": 30,
-        "backupDigiMode": false,
         "rebootMode": false,
         "rebootModeTime": 6,
         "startupDelay": 0

@@ -1,17 +1,17 @@
 /* Copyright (C) 2025 Ricardo Guzman - CA2RXU
- * 
+ *
  * This file is part of LoRa APRS iGate.
- * 
+ *
  * LoRa APRS iGate is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or 
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * LoRa APRS iGate is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with LoRa APRS iGate. If not, see <https://www.gnu.org/licenses/>.
  */
@@ -20,6 +20,7 @@
 #include "battery_utils.h"
 #include "board_pinout.h"
 #include "power_utils.h"
+#include "utils.h"
 
 #if defined(HAS_AXP192) || defined(HAS_AXP2101)
     #ifdef TTGO_T_Beam_S3_SUPREME_V3
@@ -43,48 +44,28 @@
 #endif
 
 extern Configuration    Config;
+extern bool             stationCallsignIsValid;
 
 
 namespace POWER_Utils {
 
-    #ifdef VEXT_CTRL
-        void vext_ctrl_ON() {
-            #if defined(HELTEC_WIRELESS_TRACKER) || defined(HELTEC_V3) || defined(HELTEC_VM_E290)
-                digitalWrite(VEXT_CTRL, Config.digi.ecoMode == 1 ? LOW : HIGH);
-            #endif
-            #if defined(HELTEC_WP_V1) || defined(HELTEC_WP_V1_2) || defined(HELTEC_WS) || defined(HELTEC_V3_2) || defined(HELTEC_WSL_V3)
-                digitalWrite(VEXT_CTRL, Config.digi.ecoMode == 1 ? HIGH : LOW);
-            #endif
-        }
-
-        void vext_ctrl_OFF() {
-            #if defined(HELTEC_WIRELESS_TRACKER) || defined(HELTEC_V3) || defined(HELTEC_VM_E290)
-                digitalWrite(VEXT_CTRL, Config.digi.ecoMode == 1 ? HIGH : LOW);
-            #endif
-            #if defined(HELTEC_WP_V1) || defined(HELTEC_WP_V1_2) || defined(HELTEC_WS) || defined(HELTEC_V3_2) || defined(HELTEC_WSL_V3)
-                digitalWrite(VEXT_CTRL, Config.digi.ecoMode == 1 ? LOW : HIGH);
-            #endif
-        }
-    #endif
-
-
-    #ifdef ADC_CTRL
+    #ifdef ADC_CTRL_PIN
         void adc_ctrl_ON() {
-            #if defined(HELTEC_WIRELESS_TRACKER) || defined(HELTEC_V3_2) || defined(HELTEC_VM_E290)
-                digitalWrite(ADC_CTRL, HIGH);
-            #endif
-            #if defined(HELTEC_V3) || defined(HELTEC_V2) || defined(HELTEC_WSL_V3) || defined(HELTEC_WP_V1) || defined(HELTEC_WP_V1_2)
-                digitalWrite(ADC_CTRL, LOW);
-            #endif
+            digitalWrite(ADC_CTRL_PIN, ADC_CTRL_ON_STATE);
         }
 
         void adc_ctrl_OFF() {
-            #if defined(HELTEC_WIRELESS_TRACKER) || defined(HELTEC_V3_2) || defined(HELTEC_VM_E290)
-                digitalWrite(ADC_CTRL, LOW);
-            #endif
-            #if defined(HELTEC_V3) || defined(HELTEC_V2) || defined(HELTEC_WSL_V3) || defined(HELTEC_WP_V1) || defined(HELTEC_WP_V1_2)
-                digitalWrite(ADC_CTRL, HIGH);
-            #endif
+            digitalWrite(ADC_CTRL_PIN, !ADC_CTRL_ON_STATE);
+        }
+    #endif
+
+    #ifdef VEXT_CTRL_PIN
+        void vext_ctrl_ON() {
+            digitalWrite(VEXT_CTRL_PIN, Config.digi.ecoMode == 1 ? !VEXT_CTRL_ON_STATE : VEXT_CTRL_ON_STATE);
+        }
+
+        void vext_ctrl_OFF() {
+            digitalWrite(VEXT_CTRL_PIN, Config.digi.ecoMode == 1 ? VEXT_CTRL_ON_STATE : !VEXT_CTRL_ON_STATE);
         }
     #endif
 
@@ -112,7 +93,7 @@ namespace POWER_Utils {
         #else
             return false;
         #endif
-    }    
+    }
 
     void activateGPS() {
         #ifdef HAS_AXP192
@@ -282,8 +263,8 @@ namespace POWER_Utils {
             pinMode(Config.battery.externalVoltagePin, INPUT);
         }
 
-        #ifdef VEXT_CTRL
-            pinMode(VEXT_CTRL,OUTPUT); // GPS + TFT on HELTEC Wireless_Tracker and only for Oled in HELTEC V3
+        #ifdef VEXT_CTRL_PIN
+            pinMode(VEXT_CTRL_PIN,OUTPUT); // GPS + TFT on HELTEC Wireless_Tracker and only for Oled in HELTEC V3
             vext_ctrl_ON();
         #endif
 
@@ -291,8 +272,8 @@ namespace POWER_Utils {
             if (Config.beacon.gpsActive && Config.digi.ecoMode != 1) activateGPS();
         #endif
 
-        #ifdef ADC_CTRL
-            pinMode(ADC_CTRL, OUTPUT);
+        #ifdef ADC_CTRL_PIN
+            pinMode(ADC_CTRL_PIN, OUTPUT);
             adc_ctrl_OFF();
         #endif
 
@@ -315,17 +296,14 @@ namespace POWER_Utils {
             Wire.begin(OLED_SDA, OLED_SCL);
         #endif
 
-        #ifdef USE_WIRE_WITH_BOARD_I2C_PINS
-            Wire.begin(BOARD_I2C_SDA, BOARD_I2C_SCL);
+        #ifdef SENSOR_I2C_BUS
+            SENSOR_I2C_BUS.begin(BOARD_I2C_SDA, BOARD_I2C_SCL);
         #endif
 
-        #ifdef USE_WIRE1_WITH_BOARD_I2C_PINS
-            Wire1.begin(BOARD_I2C_SDA, BOARD_I2C_SCL);
-        #endif
-        
         delay(1000);
         BATTERY_Utils::setup();
         BATTERY_Utils::startupBatteryHealth();
+        stationCallsignIsValid = Utils::callsignIsValid(Config.callsign);
         setCpuFrequencyMhz(80);
     }
 

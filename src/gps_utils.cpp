@@ -1,17 +1,17 @@
 /* Copyright (C) 2025 Ricardo Guzman - CA2RXU
- * 
+ *
  * This file is part of LoRa APRS iGate.
- * 
+ *
  * LoRa APRS iGate is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or 
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * LoRa APRS iGate is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with LoRa APRS iGate. If not, see <https://www.gnu.org/licenses/>.
  */
@@ -34,6 +34,7 @@
 extern Configuration    Config;
 extern HardwareSerial   gpsSerial;
 extern TinyGPSPlus      gps;
+extern bool             stationCallsignIsValid;
 String                  distance, iGateBeaconPacket, iGateLoRaBeaconPacket;
 
 
@@ -44,18 +45,29 @@ namespace GPS_Utils {
     }
 
     void generateBeacons() {
-        if (Config.callsign.indexOf("NOCALL-10") != 0 && !Utils::checkValidCallsign(Config.callsign)) {
-            displayShow("***** ERROR ******", "CALLSIGN = NOT VALID!", "", "Only Rx Mode Active", 3000);
-            Config.loramodule.txActive  = false;
-            Config.aprs_is.messagesToRF = false;
-            Config.aprs_is.objectsToRF  = false;
+        String beaconPacket = APRSPacketLib::generateBasePacket(Config.callsign, "APLRG1", Config.beacon.path);
+        String encodedGPS   = APRSPacketLib::encodeGPSIntoBase91(Config.beacon.latitude, Config.beacon.longitude, 0, 0, Config.beacon.symbol, false, 0, true, Config.beacon.ambiguityLevel);
+
+        if (Config.callsign.indexOf("NOCALL-10") != 0) {
+            if (!stationCallsignIsValid) {
+                displayShow("***** ERROR ******", "CALLSIGN = NOT VALID!", "", "Only Rx Mode Active", 3000);
+                Config.loramodule.txActive  = false;
+                Config.aprs_is.messagesToRF = false;
+                Config.aprs_is.objectsToRF  = false;
+                Config.beacon.sendViaRF     = false;
+                Config.digi.mode            = 0;
+                Config.digi.backupDigiMode  = false;
+            } else if (stationCallsignIsValid && Config.tacticalCallsign != "") {
+                beaconPacket = APRSPacketLib::generateBasePacket(Config.tacticalCallsign, "APLRG1", Config.beacon.path);
+                Config.aprs_is.active       = false;
+                Config.beacon.sendViaAPRSIS = false;
+                Config.digi.backupDigiMode  = false;
+            }
+        } else {
+            Config.beacon.sendViaAPRSIS = false;
             Config.beacon.sendViaRF     = false;
-            Config.digi.mode            = 0;
-            Config.backupDigiMode       = false;
         }
-        String beaconPacket     = APRSPacketLib::generateBasePacket(Config.callsign, "APLRG1", Config.beacon.path);
-        String encodedGPS       = APRSPacketLib::encodeGPSIntoBase91(Config.beacon.latitude, Config.beacon.longitude, 0, 0, Config.beacon.symbol, false, 0, true, Config.beacon.ambiguityLevel);
-        
+
         iGateBeaconPacket       = beaconPacket;
         iGateBeaconPacket       += ",qAC:=";
         iGateBeaconPacket       += Config.beacon.overlay;
@@ -122,15 +134,17 @@ namespace GPS_Utils {
         }
 
         String Latitude             = infoGPS.substring(0,8);                   // First 8 characters are Latitude
+        int latitudeColonIndex      = Latitude.indexOf(".");
         float convertedLatitude     = Latitude.substring(0,2).toFloat();        // First 2 digits (Degrees)
         convertedLatitude += Latitude.substring(2,4).toFloat() / 60;            // Next 2 digits (Minutes)
-        convertedLatitude += Latitude.substring(Latitude.indexOf(".") + 1, Latitude.indexOf(".") + 3).toFloat() / (60*100);
+        convertedLatitude += Latitude.substring(latitudeColonIndex + 1, latitudeColonIndex + 3).toFloat() / (60*100);
         if (Latitude.endsWith("S")) convertedLatitude = -convertedLatitude;     // Handle Southern Hemisphere
 
         String Longitude            = infoGPS.substring(9,18);                  // Next 9 characters are Longitude
+        int longitudeColonIndex     = Longitude.indexOf(".");
         float convertedLongitude    = Longitude.substring(0,3).toFloat();       // First 3 digits (Degrees)
         convertedLongitude += Longitude.substring(3,5).toFloat() / 60;          // Next 2 digits (Minutes)
-        convertedLongitude += Longitude.substring(Longitude.indexOf(".") + 1, Longitude.indexOf(".") + 3).toFloat() / (60*100);
+        convertedLongitude += Longitude.substring(longitudeColonIndex + 1, longitudeColonIndex + 3).toFloat() / (60*100);
         if (Longitude.endsWith("W")) convertedLongitude = -convertedLongitude;  // Handle Western Hemisphere
 
         return buildDistanceAndComment(convertedLatitude, convertedLongitude, infoGPS.substring(19));
@@ -143,7 +157,7 @@ namespace GPS_Utils {
         const uint8_t nonEncondedLatitudeOffset     = 9;    // "N" / "S"
         const uint8_t nonEncondedLongitudeOffset    = 19;   // "E" / "W"
         const uint8_t encodedByteOffset             = 14;
-        
+
         int indexOfExclamation  = packet.indexOf(":!");
         int indexOfEqual        = packet.indexOf(":=");
         int baseIndex           = - 1;

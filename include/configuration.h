@@ -1,17 +1,17 @@
 /* Copyright (C) 2025 Ricardo Guzman - CA2RXU
- * 
+ *
  * This file is part of LoRa APRS iGate.
- * 
+ *
  * LoRa APRS iGate is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or 
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * LoRa APRS iGate is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with LoRa APRS iGate. If not, see <https://www.gnu.org/licenses/>.
  */
@@ -32,6 +32,7 @@ public:
 
 class WiFi_Auto_AP {
 public:
+    bool    enabled;            // Enable Auto AP
     String  password;
     int     timeout;
 };
@@ -44,7 +45,7 @@ public:
     int     interval;
     String  overlay;
     String  symbol;
-    String  path;    
+    String  path;
     bool    sendViaAPRSIS;
     bool    sendViaRF;
     int     beaconFreq;
@@ -68,7 +69,8 @@ public:
 class DIGI {
 public:
     int     mode;
-    int     ecoMode;        // 0 = Not Active | 1 = Ultra EcoMode | 2 = Not Active (WiFi OFF, Serial ON)  
+    int     ecoMode;        // 0 = Not Active | 1 = Ultra EcoMode | 2 = Not Active (WiFi OFF, Serial ON)
+    bool    backupDigiMode;
 };
 
 class LoraModule {
@@ -77,7 +79,7 @@ public:
     long    rxFreq;
     int     rxSpreadingFactor;
     int     rxCodingRate4;
-    long    rxSignalBandwidth;    
+    long    rxSignalBandwidth;
     bool    txActive;
     long    txFreq;
     int     txSpreadingFactor;
@@ -170,8 +172,8 @@ public:
 class Configuration {
 public:
     String                  callsign;
+    String                  tacticalCallsign;
     int                     rememberStationTime;
-    bool                    backupDigiMode;
     bool                    rebootMode;
     int                     rebootModeTime;
     int                     startupDelay;
@@ -187,16 +189,16 @@ public:
     BATTERY                 battery;
     WXSENSOR                wxsensor;
     SYSLOG                  syslog;
-    TNC                     tnc;  
+    TNC                     tnc;
     OTA                     ota;
     WEBADMIN                webadmin;
-    NTP                     ntp;    
+    NTP                     ntp;
     REMOTE_MANAGEMENT       remoteManagement;
     MQTT                    mqtt;
 
+    void setup();
     void setDefaultValues();
     bool writeFile();
-    Configuration();
 
 private:
     bool readFile();

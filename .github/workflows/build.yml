@@ -13,11 +13,17 @@ jobs:
                 target:
                     - name: ttgo-lora32-v21
                       chip: esp32
+                    - name: ttgo-lora32-v21_GPS
+                      chip: esp32
                     - name: ttgo-lora32-v21_915
                       chip: esp32
+                    - name: ttgo-lora32-v21_915_GPS
+                      chip: esp32                      
                     - name: ttgo_lora32_t3s3_v1_2
                       chip: esp32s3
                     - name: heltec-lora32-v2
+                      chip: esp32
+                    - name: heltec-lora32-v2_915
                       chip: esp32
                     - name: heltec_wifi_lora_32_V3
                       chip: esp32s3
@@ -52,6 +58,8 @@ jobs:
                     - name: ttgo-t-beam-v1_915
                       chip: esp32
                     - name: ttgo-t-beam-v1_SX1268
+                      chip: esp32
+                    - name: ttgo-t-beam-v1_SX1262
                       chip: esp32
                     - name: ttgo-t-beam-v1_2_SX1262
                       chip: esp32
@@ -96,7 +104,9 @@ jobs:
                     - name: XIAO_ESP32S3_WIO_SX1262
                       chip: esp32s3
                     - name: TROY_LoRa_APRS
-                      chip: esp32                    
+                      chip: esp32
+                    - name: ESP32_9M2IBR_1W_LoRa_GPS
+                      chip: esp32
         steps:
             - uses: actions/checkout@v3
 
@@ -109,7 +119,7 @@ jobs:
 
             - name: Build target
               run: |
-                  pio run -e ${{ matrix.target.name }} 
+                  pio run -e ${{ matrix.target.name }}
 
             - name: Build FS
               run: |
@@ -124,7 +134,7 @@ jobs:
                   cp .pio/build/${{ matrix.target.name }}/partitions.bin installer/firmware/
                   cp .pio/build/${{ matrix.target.name }}/spiffs.bin installer/firmware/
                   cp ~/.platformio/packages/framework-arduinoespressif32/tools/partitions/boot_app0.bin installer/firmware/
-              
+
             - name: Merge for web flashing
               run: |
                   if [ "${{ matrix.target.chip }}" == "esp32" ]; then

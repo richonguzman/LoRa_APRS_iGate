@@ -1,17 +1,17 @@
 /* Copyright (C) 2025 Ricardo Guzman - CA2RXU
- * 
+ *
  * This file is part of LoRa APRS iGate.
- * 
+ *
  * LoRa APRS iGate is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or 
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * LoRa APRS iGate is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with LoRa APRS iGate. If not, see <https://www.gnu.org/licenses/>.
  */
@@ -88,7 +88,7 @@ namespace WEB_Utils {
             return request->requestAuthentication();
 
         File file = SPIFFS.open("/igate_conf.json");
-        
+
         String fileContent;
         while(file.available()){
             fileContent += String((char)file.read());
@@ -98,7 +98,7 @@ namespace WEB_Utils {
     }
 
     void handleReceivedPackets(AsyncWebServerRequest *request) {
-        StaticJsonDocument<1536> data;
+        JsonDocument data;
 
         for (int i = 0; i < receivedPackets.size(); i++) {
             data[i]["rxTime"]   = receivedPackets[i].rxTime;
@@ -160,7 +160,8 @@ namespace WEB_Utils {
         Config.startupDelay                 = getParamIntSafe("startupDelay", Config.startupDelay);
 
         Config.callsign                     = getParamStringSafe("callsign", Config.callsign);
-        
+        Config.tacticalCallsign             = getParamStringSafe("tacticalCallsign", Config.tacticalCallsign);
+        Config.wifiAutoAP.enabled           = request->hasParam("wifi.autoAP.enabled", true);
         Config.wifiAutoAP.password          = getParamStringSafe("wifi.autoAP.password", Config.wifiAutoAP.password);
         Config.wifiAutoAP.timeout           = getParamIntSafe("wifi.autoAP.timeout", Config.wifiAutoAP.timeout);
 
@@ -199,7 +200,7 @@ namespace WEB_Utils {
 
         Config.digi.mode                    = getParamIntSafe("digi.mode", Config.digi.mode);
         Config.digi.ecoMode                 = getParamIntSafe("digi.ecoMode", Config.digi.ecoMode);
-        
+        Config.digi.backupDigiMode          = request->hasParam("digi.backupDigiMode", true);
 
         Config.loramodule.rxActive          = request->hasParam("lora.rxActive", true);
         Config.loramodule.rxFreq            = getParamIntSafe("lora.rxFreq", Config.loramodule.rxFreq);
@@ -213,13 +214,11 @@ namespace WEB_Utils {
         Config.loramodule.txSignalBandwidth = getParamIntSafe("lora.txSignalBandwidth", Config.loramodule.txSignalBandwidth);
         Config.loramodule.power             = getParamIntSafe("lora.power", Config.loramodule.power);
 
-
         Config.display.alwaysOn             = request->hasParam("display.alwaysOn", true);
         if (!Config.display.alwaysOn) {
             Config.display.timeout          = getParamIntSafe("display.timeout", Config.display.timeout);
         }
         Config.display.turn180              = request->hasParam("display.turn180", true);
-
 
         Config.battery.sendInternalVoltage          = request->hasParam("battery.sendInternalVoltage", true);
         Config.battery.monitorInternalVoltage       = request->hasParam("battery.monitorInternalVoltage", true);
@@ -242,14 +241,12 @@ namespace WEB_Utils {
         }
         Config.battery.sendVoltageAsTelemetry       = request->hasParam("battery.sendVoltageAsTelemetry", true);
 
-
         Config.wxsensor.active                      = request->hasParam("wxsensor.active", true);
         if (Config.wxsensor.active) {
             Config.wxsensor.heightCorrection        = getParamIntSafe("wxsensor.heightCorrection", Config.wxsensor.heightCorrection);
             Config.wxsensor.temperatureCorrection   = getParamFloatSafe("wxsensor.temperatureCorrection", Config.wxsensor.temperatureCorrection);
             Config.beacon.symbol = "_";
         }
-
 
         Config.syslog.active                    = request->hasParam("syslog.active", true);
         if (Config.syslog.active) {
@@ -258,12 +255,10 @@ namespace WEB_Utils {
             Config.syslog.logBeaconOverTCPIP    = request->hasParam("syslog.logBeaconOverTCPIP", true);
         }
 
-
         Config.tnc.enableServer             = request->hasParam("tnc.enableServer", true);
         Config.tnc.enableSerial             = request->hasParam("tnc.enableSerial", true);
         Config.tnc.acceptOwn                = request->hasParam("tnc.acceptOwn", true);
         Config.tnc.aprsBridgeActive         = request->hasParam("tnc.aprsBridgeActive", true);
-
 
         Config.mqtt.active                  = request->hasParam("mqtt.active", true);
         if (Config.mqtt.active) {
@@ -274,7 +269,6 @@ namespace WEB_Utils {
             Config.mqtt.port                = getParamIntSafe("mqtt.port", Config.mqtt.port);
             Config.mqtt.beaconOverMqtt      = request->hasParam("mqtt.beaconOverMqtt", true);
         }
-
 
         Config.rebootMode                   = request->hasParam("other.rebootMode", true);
         if (Config.rebootMode) {
@@ -298,8 +292,6 @@ namespace WEB_Utils {
 
         Config.rememberStationTime          = getParamIntSafe("other.rememberStationTime", Config.rememberStationTime);
 
-        Config.backupDigiMode               = request->hasParam("other.backupDigiMode", true);
-        
         bool saveSuccess = Config.writeFile();
 
         if (saveSuccess) {
@@ -307,7 +299,7 @@ namespace WEB_Utils {
             AsyncWebServerResponse *response = request->beginResponse(302, "text/html", "");
             response->addHeader("Location", "/?success=1");
             request->send(response);
-            
+
             displayToggle(false);
             delay(500);
             ESP.restart();
@@ -317,7 +309,7 @@ namespace WEB_Utils {
             errorPage += "<h1>Configuration Error:</h1>";
             errorPage += "<p>Couldn't save new configuration. Please try again.</p>";
             errorPage += "<a href='/'>Back</a></body></html>";
-            
+
             AsyncWebServerResponse *response = request->beginResponse(500, "text/html", errorPage);
             request->send(response);
         }

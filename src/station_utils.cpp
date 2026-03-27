@@ -1,17 +1,17 @@
 /* Copyright (C) 2025 Ricardo Guzman - CA2RXU
- * 
+ *
  * This file is part of LoRa APRS iGate.
- * 
+ *
  * LoRa APRS iGate is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or 
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * LoRa APRS iGate is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with LoRa APRS iGate. If not, see <https://www.gnu.org/licenses/>.
  */
@@ -24,6 +24,8 @@
 #include "display.h"
 #include "utils.h"
 #include <vector>
+
+#define SECS_TO_WAIT            3   // soon to be deleted...
 
 
 extern Configuration            Config;
@@ -40,16 +42,15 @@ std::vector<LastHeardStation>   lastHeardObjects;
 struct OutputPacketBuffer {
     String      packet;
     bool        isBeacon;
+    OutputPacketBuffer(const String& p, bool b) : packet(p), isBeacon(b) {}
 };
 std::vector<OutputPacketBuffer> outputPacketBuffer;
 
 struct Packet25SegBuffer {
     uint32_t    receivedTime;
-    String      station;
-    String      payload;
+    uint32_t    hash;
 };
 std::vector<Packet25SegBuffer>  packet25SegBuffer;
-
 
 bool saveNewDigiEcoModeConfig   = false;
 bool packetIsBeacon             = false;
@@ -59,19 +60,18 @@ namespace STATION_Utils {
 
     std::vector<String> loadCallsignList(const String& list) {
         std::vector<String> loadedList;
+        int start       = 0;
+        int listLength  = list.length();
 
-        String callsigns = list;
-        callsigns.trim();
+        while (start < listLength) {
+            while (start < listLength && list[start] == ' ') start++;  // avoid blank spaces
+            if (start >= listLength) break;
 
-        while (callsigns.length() > 0) {    // != ""
-            int spaceIndex = callsigns.indexOf(" ");
-            if (spaceIndex == -1) {         // No more spaces, add the last part
-                loadedList.push_back(callsigns);
-                break;
-            }
-            loadedList.push_back(callsigns.substring(0, spaceIndex));
-            callsigns = callsigns.substring(spaceIndex + 1);
-            callsigns.trim();               // Trim in case of multiple spaces
+            int end = start;
+            while (end < listLength && list[end] != ' ') end++;         // find another blank space or reach listLength
+
+            loadedList.emplace_back(list.substring(start, end));
+            start = end + 1;                                            // keep on searching if listLength not reached
         }
         return loadedList;
     }
@@ -85,8 +85,9 @@ namespace STATION_Utils {
         for (size_t i = 0; i < list.size(); i++) {
             int wildcardIndex = list[i].indexOf("*");
             if (wildcardIndex >= 0) {
-                String wildcard = list[i].substring(0, wildcardIndex);
-                if (callsign.startsWith(wildcard)) return true;
+                if (wildcardIndex >= 2 && callsign.length() >= wildcardIndex && strncmp(callsign.c_str(), list[i].c_str(), wildcardIndex) == 0) {
+                    return true;
+                }
             } else {
                 if (list[i] == callsign) return true;
             }
@@ -127,36 +128,33 @@ namespace STATION_Utils {
     }
 
     void deleteNotHeard() {
-        std::vector<LastHeardStation>  lastHeardStation_temp;
-        for (int i = 0; i < lastHeardStations.size(); i++) {
-            if (millis() - lastHeardStations[i].lastHeardTime < Config.rememberStationTime * 60 * 1000) {
-                lastHeardStation_temp.push_back(lastHeardStations[i]);
+        uint32_t currentTime    = millis();
+        uint32_t timeout        = Config.rememberStationTime * 60UL * 1000UL;
+
+        for (int i = lastHeardStations.size() - 1; i >= 0; i--) {
+            if (currentTime - lastHeardStations[i].lastHeardTime >= timeout) {
+                lastHeardStations.erase(lastHeardStations.begin() + i);
             }
         }
-        lastHeardStations.clear();
-        for (int j = 0; j < lastHeardStation_temp.size(); j++) {
-            lastHeardStations.push_back(lastHeardStation_temp[j]);
-        }
-        lastHeardStation_temp.clear();
     }
 
     void updateLastHeard(const String& station) {
         deleteNotHeard();
-        bool stationHeard = false;
-        for (int i = 0; i < lastHeardStations.size(); i++) {
+        uint32_t currentTime = millis();
+        for (size_t i = 0; i < lastHeardStations.size(); i++) {
             if (lastHeardStations[i].station == station) {
-                lastHeardStations[i].lastHeardTime = millis();
-                stationHeard = true;
-                break;
+                lastHeardStations[i].lastHeardTime = currentTime;
+                Utils::showActiveStations();
+                return;
             }
         }
-        if (!stationHeard) lastHeardStations.emplace_back(LastHeardStation{millis(), station});
+        lastHeardStations.emplace_back(LastHeardStation{currentTime, station});
         Utils::showActiveStations();
     }
 
     bool wasHeard(const String& station) {
         deleteNotHeard();
-        for (int i = 0; i < lastHeardStations.size(); i++) {
+        for (size_t i = 0; i < lastHeardStations.size(); i++) {
             if (lastHeardStations[i].station == station) {
                 Utils::println(" ---> Listened Station");
                 return true;
@@ -166,18 +164,33 @@ namespace STATION_Utils {
         return false;
     }
 
-    void clean25SegBuffer() {
-        if (!packet25SegBuffer.empty() && (millis() - packet25SegBuffer[0].receivedTime) >  25 * 1000) packet25SegBuffer.erase(packet25SegBuffer.begin());
-    }
-
-    bool check25SegBuffer(const String& station, const String& textMessage) {
-        if (!packet25SegBuffer.empty()) {
-            for (int i = 0; i < packet25SegBuffer.size(); i++) {
-                if (packet25SegBuffer[i].station == station && packet25SegBuffer[i].payload == textMessage) return false;
+    void clean25SegHashBuffer() {
+        uint32_t currentTime = millis();
+        for (int i = packet25SegBuffer.size() - 1; i >= 0; i--) {
+            if ((currentTime - packet25SegBuffer[i].receivedTime) > 25 * 1000) {
+                packet25SegBuffer.erase(packet25SegBuffer.begin() + i);
             }
         }
-        packet25SegBuffer.emplace_back(Packet25SegBuffer{millis(), station, textMessage});
-        return true;
+    }
+
+    uint32_t makeHash(const String& station, const String& payload) {   // DJB2 Hash
+        uint32_t h = 5381;
+        for (size_t i = 0; i < station.length(); i++)
+            h = ((h << 5) + h) + station[i];
+        for (size_t i = 0; i < payload.length(); i++)
+            h = ((h << 5) + h) + payload[i];
+        return h;
+    }
+
+    bool isIn25SegHashBuffer(const String& station, const String& textMessage) {
+        clean25SegHashBuffer();
+        uint32_t newHash        = makeHash(station, textMessage);
+        uint32_t currentTime    = millis();
+        for (int i = 0; i < packet25SegBuffer.size(); i++) {
+            if (packet25SegBuffer[i].hash == newHash) return true;
+        }
+        packet25SegBuffer.push_back({currentTime, newHash});
+        return false;
     }
 
     void processOutputPacketBufferUltraEcoMode() {
@@ -201,7 +214,7 @@ namespace STATION_Utils {
     }
 
     void processOutputPacketBuffer() {
-        int timeToWait                  = 3 * 1000;      // 3 segs between packet Tx and also Rx ???
+        int timeToWait                  = SECS_TO_WAIT * 1000;          // 3 segs between packet Tx and also Rx ???
         uint32_t lastRx                 = millis() - lastRxTime;
         uint32_t lastTx                 = millis() - lastTxTime;
         if (outputPacketBuffer.size() > 0 && lastTx > timeToWait && lastRx > timeToWait) {
@@ -229,11 +242,7 @@ namespace STATION_Utils {
     }
 
     void addToOutputPacketBuffer(const String& packet, bool flag) {
-        OutputPacketBuffer entry;
-        entry.packet    = packet;
-        entry.isBeacon  = flag;
-
-        outputPacketBuffer.push_back(entry);
+        outputPacketBuffer.emplace_back(OutputPacketBuffer{packet, flag});
     }
 
 }

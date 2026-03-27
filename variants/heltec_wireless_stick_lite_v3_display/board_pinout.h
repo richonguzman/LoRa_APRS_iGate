@@ -1,17 +1,17 @@
 /* Copyright (C) 2025 Ricardo Guzman - CA2RXU
- * 
+ *
  * This file is part of LoRa APRS iGate.
- * 
+ *
  * LoRa APRS iGate is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or 
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * LoRa APRS iGate is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with LoRa APRS iGate. If not, see <https://www.gnu.org/licenses/>.
  */
@@ -33,7 +33,7 @@
     #define GPIO_WAKEUP_PIN         GPIO_SEL_14
 
     //  I2C
-    #define USE_WIRE1_WITH_BOARD_I2C_PINS
+    #define SENSOR_I2C_BUS          Wire1
     #define BOARD_I2C_SDA           41
     #define BOARD_I2C_SCL           42
 
@@ -44,7 +44,10 @@
     //  Aditional Config
     #define INTERNAL_LED_PIN        35
     #define BATTERY_PIN             1
-    #define VEXT_CTRL               36
-    #define ADC_CTRL                37
+
+    #define ADC_CTRL_PIN            37
+    #define ADC_CTRL_ON_STATE       LOW
+    #define VEXT_CTRL_PIN           36
+    #define VEXT_CTRL_ON_STATE      LOW
 
 #endif
