@@ -50,11 +50,29 @@ bool Configuration::writeFile() {
         data["wifi"]["autoAP"]["enabled"]           = wifiAutoAP.enabled;
         data["wifi"]["autoAP"]["password"]          = wifiAutoAP.password;
         data["wifi"]["autoAP"]["timeout"]           = wifiAutoAP.timeout;
+        data["wifi"]["autoAP"]["disableOnLan"]      = wifiAutoAP.disableOnLan;
+
+        data["wifi"]["staticIP"]["enabled"]         = wifiStaticIP.enabled;
+        data["wifi"]["staticIP"]["ip"]              = wifiStaticIP.ip;
+        data["wifi"]["staticIP"]["gateway"]         = wifiStaticIP.gateway;
+        data["wifi"]["staticIP"]["subnet"]          = wifiStaticIP.subnet;
+        data["wifi"]["staticIP"]["dns1"]            = wifiStaticIP.dns1;
+        data["wifi"]["staticIP"]["dns2"]            = wifiStaticIP.dns2;
+
+        data["ethernet"]["staticIP"]["enabled"]     = ethernetStaticIP.enabled;
+        data["ethernet"]["staticIP"]["ip"]          = ethernetStaticIP.ip;
+        data["ethernet"]["staticIP"]["gateway"]     = ethernetStaticIP.gateway;
+        data["ethernet"]["staticIP"]["subnet"]      = ethernetStaticIP.subnet;
+        data["ethernet"]["staticIP"]["dns1"]        = ethernetStaticIP.dns1;
+        data["ethernet"]["staticIP"]["dns2"]        = ethernetStaticIP.dns2;
 
         callsign.trim();
         data["callsign"]                            = callsign;
         tacticalCallsign.trim();
         data["tacticalCallsign"]                    = tacticalCallsign;
+        hostname.trim();
+        data["other"]["hostname"]                   = hostname;
+        data["other"]["mdnsEnabled"]                = mdnsEnabled;
 
         data["aprs_is"]["active"]                   = aprs_is.active;
         data["aprs_is"]["passcode"]                 = aprs_is.passcode;
@@ -223,11 +241,28 @@ bool Configuration::readFile() {
         wifiAutoAP.enabled              = data["wifi"]["autoAP"]["enabled"] | true;
         wifiAutoAP.password             = data["wifi"]["autoAP"]["password"] | "1234567890";
         wifiAutoAP.timeout              = data["wifi"]["autoAP"]["timeout"] | 10;
+        wifiAutoAP.disableOnLan         = data["wifi"]["autoAP"]["disableOnLan"] | false;
+
+        wifiStaticIP.enabled            = data["wifi"]["staticIP"]["enabled"] | false;
+        wifiStaticIP.ip                 = data["wifi"]["staticIP"]["ip"] | "";
+        wifiStaticIP.gateway            = data["wifi"]["staticIP"]["gateway"] | "";
+        wifiStaticIP.subnet             = data["wifi"]["staticIP"]["subnet"] | "255.255.255.0";
+        wifiStaticIP.dns1               = data["wifi"]["staticIP"]["dns1"] | "8.8.8.8";
+        wifiStaticIP.dns2               = data["wifi"]["staticIP"]["dns2"] | "8.8.4.4";
+
+        ethernetStaticIP.enabled        = data["ethernet"]["staticIP"]["enabled"] | false;
+        ethernetStaticIP.ip             = data["ethernet"]["staticIP"]["ip"] | "";
+        ethernetStaticIP.gateway        = data["ethernet"]["staticIP"]["gateway"] | "";
+        ethernetStaticIP.subnet         = data["ethernet"]["staticIP"]["subnet"] | "255.255.255.0";
+        ethernetStaticIP.dns1           = data["ethernet"]["staticIP"]["dns1"] | "8.8.8.8";
+        ethernetStaticIP.dns2           = data["ethernet"]["staticIP"]["dns2"] | "8.8.4.4";
 
         if (data["callsign"].isNull()) needsRewrite = true;
         callsign                        = data["callsign"] | "NOCALL-10";
         if (data["tacticalCallsign"].isNull()) needsRewrite = true;
         tacticalCallsign                = data["tacticalCallsign"] | "";
+        hostname                        = data["other"]["hostname"] | "";
+        mdnsEnabled                     = data["other"]["mdnsEnabled"] | false;
 
         if (data["aprs_is"]["active"].isNull() ||
             data["aprs_is"]["passcode"].isNull() ||
@@ -454,9 +489,26 @@ void Configuration::setDefaultValues() {
     wifiAutoAP.enabled              = true;
     wifiAutoAP.password             = "1234567890";
     wifiAutoAP.timeout              = 10;
+    wifiAutoAP.disableOnLan         = false;
+
+    wifiStaticIP.enabled            = false;
+    wifiStaticIP.ip                 = "";
+    wifiStaticIP.gateway            = "";
+    wifiStaticIP.subnet             = "255.255.255.0";
+    wifiStaticIP.dns1               = "8.8.8.8";
+    wifiStaticIP.dns2               = "8.8.4.4";
+
+    ethernetStaticIP.enabled        = false;
+    ethernetStaticIP.ip             = "";
+    ethernetStaticIP.gateway        = "";
+    ethernetStaticIP.subnet         = "255.255.255.0";
+    ethernetStaticIP.dns1           = "8.8.8.8";
+    ethernetStaticIP.dns2           = "8.8.4.4";
 
     callsign                        = "N0CALL-10";
     tacticalCallsign                = "";
+    hostname                        = "";
+    mdnsEnabled                     = false;
 
     aprs_is.active                  = false;
     aprs_is.passcode                = "XYZVW";

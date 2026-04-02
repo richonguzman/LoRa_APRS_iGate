@@ -95,6 +95,11 @@ namespace APRS_IS_Utils {
 
     void checkStatus() {
         String wifiState, aprsisState;
+        #ifdef HAS_ETHERNET
+        if (Config.wifiAutoAP.disableOnLan && networkManager->isEthernetConnected()) {
+            wifiState = "off";
+        } else
+        #endif
         if (networkManager->isWiFiConnected()) {
             wifiState = "OK";
         } else {

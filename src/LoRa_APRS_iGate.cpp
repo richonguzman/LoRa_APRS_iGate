@@ -68,7 +68,7 @@ ___________________________________________________________________*/
 #endif
 
 
-String              versionDate             = "2026-03-25";
+String              versionDate             = "2026-04-02";
 String              versionNumber           = "3.2.3";
 Configuration       Config;
 WiFiClient          aprsIsClient;
@@ -106,7 +106,7 @@ void setup() {
     if (Config.wifiAutoAP.enabled) {
         networkManager->setAPTimeout(Config.wifiAutoAP.timeout * 60 * 1000); // Convert minutes to milliseconds
     }
-    networkManager->setHostName("iGATE-" + Config.callsign);
+    networkManager->setHostName(Config.hostname.isEmpty() ? ("iGATE-" + Config.callsign) : Config.hostname);
     POWER_Utils::setup();
     Utils::setupDisplay();
     LoRa_Utils::setup();

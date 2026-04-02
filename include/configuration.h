@@ -30,11 +30,22 @@ public:
     String  password;
 };
 
+class StaticIP {
+public:
+    bool    enabled;
+    String  ip;
+    String  gateway;
+    String  subnet;
+    String  dns1;
+    String  dns2;
+};
+
 class WiFi_Auto_AP {
 public:
     bool    enabled;            // Enable Auto AP
     String  password;
     int     timeout;
+    bool    disableOnLan;       // Disable WiFi STA when Ethernet is connected
 };
 
 class BEACON {
@@ -173,6 +184,8 @@ class Configuration {
 public:
     String                  callsign;
     String                  tacticalCallsign;
+    String                  hostname;
+    bool                    mdnsEnabled;
     int                     rememberStationTime;
     bool                    rebootMode;
     int                     rebootModeTime;
@@ -181,6 +194,8 @@ public:
     String                  blacklist;
     std::vector<WiFi_AP>    wifiAPs;
     WiFi_Auto_AP            wifiAutoAP;
+    StaticIP                wifiStaticIP;
+    StaticIP                ethernetStaticIP;
     BEACON                  beacon;
     APRS_IS                 aprs_is;
     DIGI                    digi;

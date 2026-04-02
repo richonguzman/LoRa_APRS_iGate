@@ -17,7 +17,9 @@
  */
 
 #include <ArduinoJson.h>
+#include <ESPmDNS.h>
 #include "configuration.h"
+#include "network_manager.h"
 #include "ota_utils.h"
 #include "web_utils.h"
 #include "display.h"
@@ -25,6 +27,7 @@
 
 
 extern Configuration               Config;
+extern NetworkManager              *networkManager;
 extern uint32_t                    lastBeaconTx;
 extern std::vector<ReceivedPacket> receivedPackets;
 
@@ -97,6 +100,20 @@ namespace WEB_Utils {
         request->send(200, "application/json", fileContent);
     }
 
+    void handleCapabilities(AsyncWebServerRequest *request) {
+        JsonDocument data;
+        data["wifiMac"]     = networkManager->getWiFimacAddress();
+        data["hasEthernet"] = networkManager->isEthernetEnabled();
+        if (networkManager->isEthernetEnabled()) {
+            data["ethernetMac"] = networkManager->getEthernetMACAddress();
+        }
+        String buffer;
+        serializeJson(data, buffer);
+        AsyncWebServerResponse *response = request->beginResponse(200, "application/json", buffer);
+        response->addHeader("Cache-Control", "no-store");
+        request->send(response);
+    }
+
     void handleReceivedPackets(AsyncWebServerRequest *request) {
         JsonDocument data;
 
@@ -161,9 +178,30 @@ namespace WEB_Utils {
 
         Config.callsign                     = getParamStringSafe("callsign", Config.callsign);
         Config.tacticalCallsign             = getParamStringSafe("tacticalCallsign", Config.tacticalCallsign);
+        Config.hostname                     = getParamStringSafe("hostname", Config.hostname);
+        Config.mdnsEnabled                  = request->hasParam("mdns.enabled", true);
         Config.wifiAutoAP.enabled           = request->hasParam("wifi.autoAP.enabled", true);
         Config.wifiAutoAP.password          = getParamStringSafe("wifi.autoAP.password", Config.wifiAutoAP.password);
         Config.wifiAutoAP.timeout           = getParamIntSafe("wifi.autoAP.timeout", Config.wifiAutoAP.timeout);
+        Config.wifiAutoAP.disableOnLan      = request->hasParam("wifi.autoAP.disableOnLan", true);
+
+        Config.wifiStaticIP.enabled         = request->hasParam("wifi.staticIP.enabled", true);
+        if (Config.wifiStaticIP.enabled) {
+            Config.wifiStaticIP.ip          = getParamStringSafe("wifi.staticIP.ip",      Config.wifiStaticIP.ip);
+            Config.wifiStaticIP.gateway     = getParamStringSafe("wifi.staticIP.gateway", Config.wifiStaticIP.gateway);
+            Config.wifiStaticIP.subnet      = getParamStringSafe("wifi.staticIP.subnet",  Config.wifiStaticIP.subnet);
+            Config.wifiStaticIP.dns1        = getParamStringSafe("wifi.staticIP.dns1",    Config.wifiStaticIP.dns1);
+            Config.wifiStaticIP.dns2        = getParamStringSafe("wifi.staticIP.dns2",    Config.wifiStaticIP.dns2);
+        }
+
+        Config.ethernetStaticIP.enabled     = request->hasParam("ethernet.staticIP.enabled", true);
+        if (Config.ethernetStaticIP.enabled) {
+            Config.ethernetStaticIP.ip      = getParamStringSafe("ethernet.staticIP.ip",      Config.ethernetStaticIP.ip);
+            Config.ethernetStaticIP.gateway = getParamStringSafe("ethernet.staticIP.gateway", Config.ethernetStaticIP.gateway);
+            Config.ethernetStaticIP.subnet  = getParamStringSafe("ethernet.staticIP.subnet",  Config.ethernetStaticIP.subnet);
+            Config.ethernetStaticIP.dns1    = getParamStringSafe("ethernet.staticIP.dns1",    Config.ethernetStaticIP.dns1);
+            Config.ethernetStaticIP.dns2    = getParamStringSafe("ethernet.staticIP.dns2",    Config.ethernetStaticIP.dns2);
+        }
 
         Config.aprs_is.active               = request->hasParam("aprs_is.active", true);
         if (Config.aprs_is.active) {
@@ -360,6 +398,7 @@ namespace WEB_Utils {
         if (Config.digi.ecoMode == 0) {
             server.on("/", HTTP_GET, handleHome);
             server.on("/status", HTTP_GET, handleStatus);
+            server.on("/capabilities.json", HTTP_GET, handleCapabilities);
             server.on("/received-packets.json", HTTP_GET, handleReceivedPackets);
             server.on("/configuration.json", HTTP_GET, handleReadConfiguration);
             server.on("/configuration.json", HTTP_POST, handleWriteConfiguration);
@@ -375,6 +414,15 @@ namespace WEB_Utils {
             server.onNotFound(handleNotFound);
 
             server.begin();
+
+            if (Config.mdnsEnabled) {
+                String mdnsHost = Config.hostname.isEmpty() ? ("igate-" + Config.callsign) : Config.hostname;
+                mdnsHost.toLowerCase();
+                if (MDNS.begin(mdnsHost.c_str())) {
+                    MDNS.addService("http", "tcp", 80);
+                    Serial.println("[mDNS] Started: " + mdnsHost + ".local");
+                }
+            }
         }
     }
 

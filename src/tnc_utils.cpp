@@ -50,17 +50,11 @@ namespace TNC_Utils {
         if (Config.tnc.enableServer && Config.digi.ecoMode == 0) {
             tncServer.stop();
             tncServer.begin();
-            String host = "igate-" + Config.callsign;
-            if (!MDNS.begin(host.c_str())) {
-                Serial.println("Error Starting mDNS");
-                tncServer.stop();
-                return;
+            Serial.println("TNC server started on port " + String(TNC_PORT));
+            if (Config.mdnsEnabled) {
+                MDNS.addService("kiss-tnc", "tcp", TNC_PORT);
+                Serial.println("[mDNS] _kiss-tnc._tcp announced on port " + String(TNC_PORT));
             }
-            if (!MDNS.addService("tnc", "tcp", TNC_PORT)) {
-                Serial.println("Error: Could not add mDNS service");
-            }
-            Serial.println("TNC server started successfully");
-            Serial.println("mDNS Host: " + host + ".local");
         }
     }
 

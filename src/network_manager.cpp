@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include "esp_mac.h"
 
 #include "network_manager.h"
 
@@ -26,11 +27,27 @@ bool NetworkManager::_connectWiFi(const WiFiNetwork& network) {
 
     _wifiSTAmode = true;
 
+    // Hostname must be set before WiFi.mode() on Arduino Core 2.x for DHCP option 12
     if (!_hostName.isEmpty()) {
         WiFi.setHostname(_hostName.c_str());
+        Serial.println("[NM] WiFi hostname: " + _hostName);
     }
 
     WiFi.mode(_wifiAPmode ? WIFI_AP_STA : WIFI_STA);
+
+    if (!_wifiStaticIP.isEmpty()) {
+        // Static IP — must be applied after mode() and before begin()
+        IPAddress ip, gw, sn, d1, d2;
+        if (ip.fromString(_wifiStaticIP) && gw.fromString(_wifiStaticGW) && sn.fromString(_wifiStaticSN)) {
+            d1.fromString(_wifiStaticDNS1);
+            d2.fromString(_wifiStaticDNS2);
+            WiFi.config(ip, gw, sn, d1, d2);
+            Serial.println("[NM] WiFi static IP: " + _wifiStaticIP);
+        }
+    } else {
+        // DHCP — WiFi.config(INADDR_NONE) re-enables DHCP after mode change
+        WiFi.config(INADDR_NONE, INADDR_NONE, INADDR_NONE);
+    }
 
     Serial.println("[NM] Attempting to connect to WiFi: " + network.ssid);
     WiFi.begin(network.ssid.c_str(), network.psk.c_str());
@@ -77,6 +94,12 @@ void NetworkManager::_processAPTimeout() {
 
 void NetworkManager::_onNetworkEvent(arduino_event_id_t event, arduino_event_info_t /*info*/) {
     switch (event) {
+        case ARDUINO_EVENT_WIFI_STA_START:
+            if (!_hostName.isEmpty()) {
+                Serial.println("[NM] WiFi STA Setting Hostname: " + _hostName);
+                WiFi.setHostname(_hostName.c_str());
+            }
+            break;
         case ARDUINO_EVENT_ETH_START:
             Serial.println("[NM] ETH Started");
             if (!_hostName.isEmpty()) {
@@ -124,6 +147,19 @@ void NetworkManager::loop() {
 
 void NetworkManager::setHostName(const String& hostName) {
     _hostName = hostName;
+}
+
+void NetworkManager::setWiFiStaticIP(const String& ip, const String& gw, const String& sn,
+                                      const String& dns1, const String& dns2) {
+    _wifiStaticIP   = ip;
+    _wifiStaticGW   = gw;
+    _wifiStaticSN   = sn;
+    _wifiStaticDNS1 = dns1;
+    _wifiStaticDNS2 = dns2;
+}
+
+void NetworkManager::clearWiFiStaticIP() {
+    _wifiStaticIP = "";
 }
 
 // WiFi methods
@@ -304,7 +340,16 @@ IPAddress NetworkManager::getEthernetIP() const {
 }
 
 String NetworkManager::getEthernetMACAddress() const {
-    return ETH.macAddress();
+    uint8_t mac[6];
+    esp_read_mac(mac, ESP_MAC_ETH);
+    char buf[18];
+    snprintf(buf, sizeof(buf), "%02X:%02X:%02X:%02X:%02X:%02X",
+             mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+    return String(buf);
+}
+
+bool NetworkManager::isEthernetEnabled() const {
+    return _ethernetMode;
 }
 
 // Check if network is available

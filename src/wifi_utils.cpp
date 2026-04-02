@@ -40,7 +40,9 @@ namespace WIFI_Utils {
 
     void checkWiFi() {
         if (Config.digi.ecoMode != 0) return;
-
+        #ifdef HAS_ETHERNET
+            if (Config.wifiAutoAP.disableOnLan && networkManager->isEthernetConnected()) return;
+        #endif
         if (!networkManager->hasWiFiNetworks()) {
             return;
         }
@@ -103,6 +105,13 @@ namespace WIFI_Utils {
             return;
         }
 
+        if (Config.wifiStaticIP.enabled && !Config.wifiStaticIP.ip.isEmpty()) {
+            networkManager->setWiFiStaticIP(Config.wifiStaticIP.ip, Config.wifiStaticIP.gateway,
+                                             Config.wifiStaticIP.subnet, Config.wifiStaticIP.dns1,
+                                             Config.wifiStaticIP.dns2);
+        } else {
+            networkManager->clearWiFiStaticIP();
+        }
         displayShow("", "Connecting to WiFi:", "", "     loading ...", 0);
         networkManager->connectWiFi();
 
@@ -128,6 +137,32 @@ namespace WIFI_Utils {
     }
 
     void setup() {
+        #ifdef HAS_ETHERNET
+            // Init Ethernet first so we can decide whether to skip WiFi
+            displayShow("", " Starting Ethernet", "", "     loading ...", 0);
+            networkManager->ethernetConnect(ETH_PHY_LAN8720, ETHERNET_PHY_ADDR, ETHERNET_PHY_MDC, ETHERNET_PHY_MDIO, ETHERNET_PHY_NRST, ETH_CLOCK_GPIO17_OUT, true);
+            if (Config.ethernetStaticIP.enabled && !Config.ethernetStaticIP.ip.isEmpty()) {
+                networkManager->setEthernetIP(Config.ethernetStaticIP.ip, Config.ethernetStaticIP.gateway, Config.ethernetStaticIP.subnet, Config.ethernetStaticIP.dns1, Config.ethernetStaticIP.dns2);
+                Serial.println("[ETH] Static IP: " + Config.ethernetStaticIP.ip);
+            }
+            uint8_t ethAttempts = 0;
+            while (!networkManager->isEthernetConnected() && ethAttempts < 10) {
+                delay(500);
+                ethAttempts++;
+            }
+            if (networkManager->isEthernetConnected()) {
+                Serial.print("[ETH] Connected: ");
+                Serial.println(networkManager->getEthernetIP().toString());
+                displayShow("", "  Ethernet Ready!", "" , "     loading ...", 1000);
+                if (Config.wifiAutoAP.disableOnLan) {
+                    Serial.println("[WiFi] Disabled (LAN connected)");
+                    btStop();
+                    return;
+                }
+            } else {
+                Serial.println("[ETH] Link not established (WiFi fallback active)");
+            }
+        #endif
         if (Config.digi.ecoMode == 0) startWiFi();
         btStop();
     }

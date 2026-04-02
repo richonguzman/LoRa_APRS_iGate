@@ -26,6 +26,13 @@ private:
     String _hostName = "";
     std::vector<WiFiNetwork> _wifiNetworks;
 
+    // WiFi static IP (empty = use DHCP)
+    String _wifiStaticIP      = "";
+    String _wifiStaticGW      = "";
+    String _wifiStaticSN      = "";
+    String _wifiStaticDNS1    = "";
+    String _wifiStaticDNS2    = "";
+
     int _findWiFiNetworkIndex(const String& ssid) const;
     bool _connectWiFi(const WiFiNetwork& network);
     void _processAPTimeout();
@@ -43,6 +50,9 @@ public:
     void loop();
 
     void setHostName(const String& hostName);
+    void setWiFiStaticIP(const String& ip, const String& gw, const String& sn,
+                         const String& dns1 = "", const String& dns2 = "");
+    void clearWiFiStaticIP();
 
     // WiFi methods
     bool setupAP(String apName, String apPsk = "");
@@ -76,6 +86,7 @@ public:
     // Check if specific network is connected
     bool isWiFiConnected() const;
     bool isEthernetConnected() const;
+    bool isEthernetEnabled() const;
     bool isModemConnected() const;
 
     bool isWifiAPActive() const;

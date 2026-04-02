@@ -55,6 +55,8 @@ function loadSettings(settings) {
     // General
     document.getElementById("callsign").value                           = settings.callsign;
     document.getElementById("tacticalCallsign").value                   = settings.tacticalCallsign;
+    document.getElementById("hostname").value                           = (settings.other && settings.other.hostname) ? settings.other.hostname : "";
+    document.getElementById("mdns.enabled").checked                    = (settings.other && settings.other.mdnsEnabled) ? settings.other.mdnsEnabled : false;
     document.getElementById("beacon.comment").value                     = settings.beacon.comment;
     document.getElementById("beacon.path").value                        = settings.beacon.path;
     document.getElementById("beacon.symbol").value                      = settings.beacon.symbol;
@@ -240,7 +242,28 @@ function loadSettings(settings) {
     document.getElementById("wifi.autoAP.enabled").checked              = settings.wifi.autoAP.enabled;
     document.getElementById("wifi.autoAP.password").value               = settings.wifi.autoAP.password;
     document.getElementById("wifi.autoAP.timeout").value                = settings.wifi.autoAP.timeout;
+    document.getElementById("wifi.autoAP.disableOnLan").checked         = settings.wifi.autoAP.disableOnLan || false;
     toggleWiFiAutoAPFields();
+
+    // WiFi Static IP
+    const wifiSIP = (settings.wifi && settings.wifi.staticIP) ? settings.wifi.staticIP : {};
+    document.getElementById("wifi.staticIP.enabled").checked            = wifiSIP.enabled  || false;
+    document.getElementById("wifi.staticIP.ip").value                   = wifiSIP.ip       || "";
+    document.getElementById("wifi.staticIP.gateway").value              = wifiSIP.gateway  || "";
+    document.getElementById("wifi.staticIP.subnet").value               = wifiSIP.subnet   || "255.255.255.0";
+    document.getElementById("wifi.staticIP.dns1").value                 = wifiSIP.dns1     || "8.8.8.8";
+    document.getElementById("wifi.staticIP.dns2").value                 = wifiSIP.dns2     || "8.8.4.4";
+    toggleStaticIPFields("wifi.staticIP.enabled", "wifi-static-ip-config");
+
+    // Ethernet Static IP
+    const ethSIP = (settings.ethernet && settings.ethernet.staticIP) ? settings.ethernet.staticIP : {};
+    document.getElementById("ethernet.staticIP.enabled").checked        = ethSIP.enabled   || false;
+    document.getElementById("ethernet.staticIP.ip").value               = ethSIP.ip        || "";
+    document.getElementById("ethernet.staticIP.gateway").value          = ethSIP.gateway   || "";
+    document.getElementById("ethernet.staticIP.subnet").value           = ethSIP.subnet    || "255.255.255.0";
+    document.getElementById("ethernet.staticIP.dns1").value             = ethSIP.dns1      || "8.8.8.8";
+    document.getElementById("ethernet.staticIP.dns2").value             = ethSIP.dns2      || "8.8.4.4";
+    toggleStaticIPFields("ethernet.staticIP.enabled", "ethernet-static-ip-config");
 
     // OTA
     document.getElementById("ota.username").value                       = settings.ota.username;
@@ -446,6 +469,19 @@ function toggleWiFiAutoAPFields() {
     if (autoAPConfig) autoAPConfig.style.display = isEnabled ? 'block' : 'none';
 }
 
+function toggleStaticIPFields(checkboxId, configDivId) {
+    const cb  = document.getElementById(checkboxId);
+    const div = document.getElementById(configDivId);
+    if (cb && div) div.style.display = cb.checked ? 'block' : 'none';
+}
+
+document.getElementById("wifi.staticIP.enabled").addEventListener("change", function() {
+    toggleStaticIPFields("wifi.staticIP.enabled", "wifi-static-ip-config");
+});
+document.getElementById("ethernet.staticIP.enabled").addEventListener("change", function() {
+    toggleStaticIPFields("ethernet.staticIP.enabled", "ethernet-static-ip-config");
+});
+
 
 document.querySelector(".new button").addEventListener("click", function () {
     const networksContainer = document.querySelector(".list-networks");
@@ -546,6 +582,27 @@ form.addEventListener("submit", async (event) => {
 });
 
 fetchSettings();
+
+fetch("/capabilities.json?t=" + Date.now())
+    .then(r => r.json())
+    .then(cap => {
+        if (cap.wifiMac) {
+            document.getElementById("wifi-mac-label").textContent = "(MAC: " + cap.wifiMac + ")";
+        }
+        if (cap.ethernetMac) {
+            document.getElementById("ethernet-mac-label").textContent = "(MAC: " + cap.ethernetMac + ")";
+        }
+        if (!cap.hasEthernet) {
+            ["lan-toggle-section", "lan-ethernet-section"].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.style.opacity = "0.35";
+                    el.style.pointerEvents = "none";
+                }
+            });
+        }
+    })
+    .catch(() => {});
 
 function loadReceivedPackets(packets) {
     if (packets) {
