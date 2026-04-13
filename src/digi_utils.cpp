@@ -23,7 +23,6 @@
 #include "digi_utils.h"
 #include "wifi_utils.h"
 #include "lora_utils.h"
-#include "gps_utils.h"
 #include "display.h"
 #include "utils.h"
 
