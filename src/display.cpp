@@ -68,7 +68,7 @@
                     #if defined RPC_LORA_DIGIGATE_1W
                         #define SCREEN_HEIGHT 32
                     #else
-                        #define SCREEN HEIGHT 64
+                        #define SCREEN_HEIGHT 64
                     #endif
                     Adafruit_SSD1306 display(128, SCREEN_HEIGHT, &Wire, OLED_RST);
                 #endif
