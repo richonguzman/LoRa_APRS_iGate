@@ -24,6 +24,7 @@
 #include "board_pinout.h"
 #include "wx_utils.h"
 #include "display.h"
+#include "battery_utils.h"
 
 
 #define SEALEVELPRESSURE_HPA    (1013.25)
@@ -60,7 +61,13 @@ namespace WX_Utils {
 
     void getWxModuleAddres() {
         uint8_t err, addr;
+        uint8_t extI2Caddr = BATTERY_Utils::externalI2CSensorActiveAddr();
+
         for(addr = 1; addr < 0x7F; addr++) {
+            if (addr == extI2Caddr) {
+                Serial.printf("0x%x occupied by I2C power sensor, skipping for Wx setup\n", addr);
+                continue;
+            }
             #ifdef SENSOR_I2C_BUS
                 SENSOR_I2C_BUS.beginTransmission(addr);
                 err = SENSOR_I2C_BUS.endTransmission();
@@ -78,7 +85,7 @@ namespace WX_Utils {
                 if (addr == 0x76 || addr == 0x77) { // BME or BMP
                     wxModuleAddress = addr;
                     return;
-                } else if (addr == 0x40) {          // Si7011
+                } else if (addr == 0x40) {          // Si7021
                     wxModuleAddress = addr;
                     return;
                 } else if (addr == 0x70) {          // SHTC3
