@@ -52,6 +52,5 @@
     //  Aditional Config
     #define INTERNAL_LED_PIN        2
     #define BATTERY_PIN             35
-    #define algo
 
 #endif
