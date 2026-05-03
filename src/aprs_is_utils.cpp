@@ -186,18 +186,17 @@ namespace APRS_IS_Utils {
         } else {
             receivedMessage = packet.substring(colonIndex + 1);
         }
-        if (receivedMessage.indexOf("?") == 0) {
+        String queryResult = QUERY_Utils::process(receivedMessage, sender, false, thirdParty);
+        if (queryResult != "") {
             if (!Config.display.alwaysOn && Config.display.timeout != 0) {
                 displayToggle(true);
             }
-            STATION_Utils::addToOutputPacketBuffer(QUERY_Utils::process(receivedMessage, sender, false, thirdParty));
+            STATION_Utils::addToOutputPacketBuffer(queryResult);
             lastScreenOn = millis();
             displayShow(firstLine, secondLine, thirdLine, fourthLine, fifthLine, "Callsign = " + sender, "TYPE --> QUERY", 0);
             return true;
         }
-        else {
-            return false;
-        }
+        return false;
     }
 
     void processLoRaPacket(const String& packet) {
@@ -339,10 +338,9 @@ namespace APRS_IS_Utils {
                         } else {
                             receivedMessage = AddresseeAndMessage.substring(colonIndex + 1);
                         }
-                        if (receivedMessage.indexOf("?") == 0) {
+                        String queryAnswer = QUERY_Utils::process(receivedMessage, Sender, true, false);
+                        if (queryAnswer != "") {
                             Utils::println("Rx Query (APRS-IS)  : " + packet);
-                            String queryAnswer = QUERY_Utils::process(receivedMessage, Sender, true, false);
-                            //Serial.println("---> QUERY Answer : " + queryAnswer.substring(0,queryAnswer.indexOf("\n")));
                             if (!Config.display.alwaysOn && Config.display.timeout != 0) {
                                 displayToggle(true);
                             }

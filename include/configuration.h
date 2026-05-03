@@ -158,6 +158,18 @@ public:
     bool    rfOnly;
 };
 
+class IO_PIN {
+public:
+    int     pin;
+    String  name;
+    bool    state;
+};
+
+class IO_CONTROL {
+public:
+    IO_PIN  pins[3];
+};
+
 class MQTT {
 public:
     bool    active;
@@ -195,6 +207,7 @@ public:
     NTP                     ntp;
     REMOTE_MANAGEMENT       remoteManagement;
     MQTT                    mqtt;
+    IO_CONTROL              ioControl;
 
     void setup();
     void setDefaultValues();
