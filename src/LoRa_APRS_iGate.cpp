@@ -62,6 +62,7 @@ ___________________________________________________________________*/
 #include "ntp_utils.h"
 #include "wx_utils.h"
 #include "display.h"
+#include "query_utils.h"
 #include "utils.h"
 #ifdef HAS_A7670
     #include "A7670_utils.h"
@@ -113,6 +114,7 @@ void setup() {
     Utils::validateFreqs();
     GPS_Utils::setup();
     STATION_Utils::loadBlacklistAndManagers();
+    QUERY_Utils::setupIoPins();
     Utils::startupDelay();
     SLEEP_Utils::setup();
     WIFI_Utils::setup();
@@ -222,6 +224,7 @@ void loop() {
             displayShow(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
         #endif
 
+        QUERY_Utils::checkPendingPinRestarts();
         Utils::checkRebootTime();
         Utils::checkSleepByLowBatteryVoltage(1);
     }

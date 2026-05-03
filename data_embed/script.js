@@ -258,6 +258,14 @@ function loadSettings(settings) {
     document.getElementById("remoteManagement.managers").value          = settings.remoteManagement.managers;
     document.getElementById("remoteManagement.rfOnly").checked          = settings.remoteManagement.rfOnly;
 
+    // IO Pin Control
+    if (settings.ioControl) {
+        for (let i = 0; i < 3; i++) {
+            document.getElementById("ioControl.pin" + i + ".pin").value  = settings.ioControl.pins[i].pin;
+            document.getElementById("ioControl.pin" + i + ".name").value = settings.ioControl.pins[i].name;
+        }
+    }
+
     // NTP
     document.getElementById("ntp.server").value                         = settings.ntp.server;
     document.getElementById("ntp.gmtCorrection").value                  = settings.ntp.gmtCorrection;

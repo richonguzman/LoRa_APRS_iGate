@@ -292,6 +292,11 @@ namespace WEB_Utils {
 
         Config.rememberStationTime          = getParamIntSafe("other.rememberStationTime", Config.rememberStationTime);
 
+        for (int i = 0; i < 3; i++) {
+            Config.ioControl.pins[i].pin    = getParamIntSafe("ioControl.pin" + String(i) + ".pin",  Config.ioControl.pins[i].pin);
+            Config.ioControl.pins[i].name   = getParamStringSafe("ioControl.pin" + String(i) + ".name", Config.ioControl.pins[i].name);
+        }
+
         bool saveSuccess = Config.writeFile();
 
         if (saveSuccess) {

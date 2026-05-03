@@ -33,6 +33,8 @@ extern bool                             shouldSleepLowVoltage;
 extern bool                             saveNewDigiEcoModeConfig;
 extern String                           versionNumber;
 
+static uint32_t pendingPinRestart[3] = {0, 0, 0};
+
 
 namespace QUERY_Utils {
 
@@ -134,6 +136,32 @@ namespace QUERY_Utils {
             } else if (queryQuestion.startsWith("?COMMIT")) {     // saving for next reboot
                 answer = "New Config Saved";
                 Config.writeFile();
+            } else {
+                for (int i = 0; i < 3; i++) {
+                    if (Config.ioControl.pins[i].pin < 0 || Config.ioControl.pins[i].name == "") continue;
+                    String pinName = Config.ioControl.pins[i].name;
+                    pinName.toUpperCase();
+                    if (queryQuestion == pinName + " ON") {
+                        Config.ioControl.pins[i].state = true;
+                        Config.writeFile();
+                        digitalWrite(Config.ioControl.pins[i].pin, HIGH);
+                        answer = Config.ioControl.pins[i].name + ":ON";
+                        break;
+                    } else if (queryQuestion == pinName + " OFF") {
+                        Config.ioControl.pins[i].state = false;
+                        Config.writeFile();
+                        digitalWrite(Config.ioControl.pins[i].pin, LOW);
+                        answer = Config.ioControl.pins[i].name + ":OFF";
+                        break;
+                    } else if (queryQuestion == pinName + " RESTART") {
+                        Config.ioControl.pins[i].state = true;
+                        Config.writeFile();
+                        digitalWrite(Config.ioControl.pins[i].pin, LOW);
+                        pendingPinRestart[i] = millis();
+                        answer = Config.ioControl.pins[i].name + ":RESTART(15s)";
+                        break;
+                    }
+                }
             }
         }
 
@@ -165,6 +193,26 @@ namespace QUERY_Utils {
         queryAnswer += char(random(97, 123));
         queryAnswer += "*";
         return queryAnswer;
+    }
+
+    void setupIoPins() {
+        for (int i = 0; i < 3; i++) {
+            if (Config.ioControl.pins[i].pin >= 0) {
+                pinMode(Config.ioControl.pins[i].pin, OUTPUT);
+                digitalWrite(Config.ioControl.pins[i].pin, Config.ioControl.pins[i].state ? HIGH : LOW);
+            }
+        }
+    }
+
+    void checkPendingPinRestarts() {
+        for (int i = 0; i < 3; i++) {
+            if (pendingPinRestart[i] > 0 && millis() - pendingPinRestart[i] >= 15000) {
+                if (Config.ioControl.pins[i].pin >= 0) {
+                    digitalWrite(Config.ioControl.pins[i].pin, HIGH);
+                }
+                pendingPinRestart[i] = 0;
+            }
+        }
     }
 
 }

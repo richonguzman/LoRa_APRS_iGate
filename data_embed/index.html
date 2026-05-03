@@ -2105,6 +2105,49 @@
                         <div class="row my-5 d-flex align-items-top">
                             <div class="col-lg-3 col-sm-12">
                                 <h5>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-toggles" viewBox="0 0 16 16">
+                                        <path d="M4.5 9a3.5 3.5 0 1 0 0 7h7a3.5 3.5 0 1 0 0-7zm7 6a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5m-7-14a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5m2.45 0A3.49 3.49 0 0 1 8 3.5 3.49 3.49 0 0 1 6.95 6h4.55a2.5 2.5 0 0 0 0-5zM4.5 0h7a3.5 3.5 0 1 1 0 7h-7a3.5 3.5 0 1 1 0-7"/>
+                                    </svg>
+                                    IO Pin Control
+                                </h5>
+                                <small>Control GPIO pins via APRS messages.<br>Commands: <b>&lt;name&gt; ON</b>, <b>&lt;name&gt; OFF</b>, <b>&lt;name&gt; RESTART</b> (off for 15 sec, then on).<br>Set pin to -1 to disable.</small>
+                            </div>
+                            <div class="col-lg-9 col-sm-12">
+                                <div class="row fw-bold mb-1">
+                                    <div class="col-3"><small>GPIO pin no.</small></div>
+                                    <div class="col-9"><small>Name (used in APRS command)</small></div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-3">
+                                        <input type="number" name="ioControl.pin0.pin" id="ioControl.pin0.pin" class="form-control form-control-sm" value="-1" min="-1" max="48" />
+                                    </div>
+                                    <div class="col-9">
+                                        <input type="text" name="ioControl.pin0.name" id="ioControl.pin0.name" class="form-control form-control-sm" placeholder="e.g. RELAY1" oninput="this.value = this.value.toUpperCase();" />
+                                    </div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-3">
+                                        <input type="number" name="ioControl.pin1.pin" id="ioControl.pin1.pin" class="form-control form-control-sm" value="-1" min="-1" max="48" />
+                                    </div>
+                                    <div class="col-9">
+                                        <input type="text" name="ioControl.pin1.name" id="ioControl.pin1.name" class="form-control form-control-sm" placeholder="e.g. PUMP" oninput="this.value = this.value.toUpperCase();" />
+                                    </div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-3">
+                                        <input type="number" name="ioControl.pin2.pin" id="ioControl.pin2.pin" class="form-control form-control-sm" value="-1" min="-1" max="48" />
+                                    </div>
+                                    <div class="col-9">
+                                        <input type="text" name="ioControl.pin2.name" id="ioControl.pin2.name" class="form-control form-control-sm" placeholder="e.g. LIGHT" oninput="this.value = this.value.toUpperCase();" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+
+                        <div class="row my-5 d-flex align-items-top">
+                            <div class="col-lg-3 col-sm-12">
+                                <h5>
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
                                         width="20"

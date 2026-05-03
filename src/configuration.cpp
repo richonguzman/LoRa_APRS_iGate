@@ -183,6 +183,12 @@ bool Configuration::writeFile() {
 
         data["other"]["rememberStationTime"]        = rememberStationTime;
 
+        for (int i = 0; i < 3; i++) {
+            data["ioControl"]["pins"][i]["pin"]     = ioControl.pins[i].pin;
+            data["ioControl"]["pins"][i]["name"]    = ioControl.pins[i].name;
+            data["ioControl"]["pins"][i]["state"]   = ioControl.pins[i].state;
+        }
+
         serializeJson(data, configFile);
         configFile.close();
         return true;
@@ -418,6 +424,13 @@ bool Configuration::readFile() {
         if (data["other"]["rememberStationTime"].isNull()) needsRewrite = true;
         rememberStationTime             = data["other"]["rememberStationTime"] | 30;
 
+        if (data["ioControl"]["pins"][0]["pin"].isNull()) needsRewrite = true;
+        for (int i = 0; i < 3; i++) {
+            ioControl.pins[i].pin       = data["ioControl"]["pins"][i]["pin"] | -1;
+            ioControl.pins[i].name      = data["ioControl"]["pins"][i]["name"] | "";
+            ioControl.pins[i].state     = data["ioControl"]["pins"][i]["state"] | false;
+        }
+
         if (wifiAPs.size() == 0) { // If we don't have any WiFi's from config we need to add "empty" SSID for AUTO AP
             WiFi_AP wifiap;
             wifiap.ssid = "";
@@ -561,6 +574,12 @@ void Configuration::setDefaultValues() {
     rebootModeTime                  = 0;
 
     rememberStationTime             = 30;
+
+    for (int i = 0; i < 3; i++) {
+        ioControl.pins[i].pin       = -1;
+        ioControl.pins[i].name      = "";
+        ioControl.pins[i].state     = false;
+    }
 
     Serial.println("New Data Created... All is Written!");
 }

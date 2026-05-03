@@ -25,6 +25,8 @@
 namespace QUERY_Utils {
 
     String process(const String& query, const String& station, bool queryFromAPRSIS, bool thirdParty);
+    void   setupIoPins();
+    void   checkPendingPinRestarts();
 
 }
 
