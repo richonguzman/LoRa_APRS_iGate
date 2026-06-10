@@ -75,6 +75,7 @@ public:
 
 class LoraModule {
 public:
+    bool    cadActive;
     bool    rxActive;
     long    rxFreq;
     int     rxSpreadingFactor;

@@ -97,6 +97,7 @@ bool Configuration::writeFile() {
         #endif
         data["digi"]["backupDigiMode"]              = digi.backupDigiMode;
 
+        data["lora"]["cadActive"]                   = loramodule.cadActive;
         data["lora"]["rxActive"]                    = loramodule.rxActive;
         data["lora"]["rxFreq"]                      = loramodule.rxFreq;
         data["lora"]["rxCodingRate4"]               = loramodule.rxCodingRate4;
@@ -291,7 +292,8 @@ bool Configuration::readFile() {
         digi.backupDigiMode             = data["digi"]["backupDigiMode"] | false;
 
 
-        if (data["lora"]["rxActive"].isNull() ||
+        if (data["lora"]["cadActive"].isNull() ||
+            data["lora"]["rxActive"].isNull() ||
             data["lora"]["rxFreq"].isNull() ||
             data["lora"]["rxSpreadingFactor"].isNull() ||
             data["lora"]["rxCodingRate4"].isNull() ||
@@ -302,6 +304,7 @@ bool Configuration::readFile() {
             data["lora"]["txCodingRate4"].isNull() ||
             data["lora"]["txSignalBandwidth"].isNull() ||
             data["lora"]["power"].isNull()) needsRewrite = true;
+        loramodule.cadActive            = data["lora"]["cadActive"] | true;
         loramodule.rxActive             = data["lora"]["rxActive"] | true;
         loramodule.rxFreq               = data["lora"]["rxFreq"] | 433775000;
         loramodule.rxSpreadingFactor    = data["lora"]["rxSpreadingFactor"] | 12;
@@ -492,6 +495,7 @@ void Configuration::setDefaultValues() {
     digi.ecoMode                    = 0;
     digi.backupDigiMode             = false;
 
+    loramodule.cadActive            = true;
     loramodule.rxActive             = true;
     loramodule.rxFreq               = 433775000;
     loramodule.rxSpreadingFactor    = 12;

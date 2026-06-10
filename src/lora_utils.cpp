@@ -27,10 +27,13 @@
 #include "display.h"
 #include "utils.h"
 
+//
+#define DIFS_SLOTS 2   // Number of secuential CAD slots to consider a free channel to Tx
+int BO_MAX = 4;        // Max Backoff
+//
 
 extern Configuration    Config;
 extern NetworkManager   *networkManager;
-extern uint32_t         lastRxTime;
 extern bool             packetIsBeacon;
 
 extern std::vector<ReceivedPacket> receivedPackets;
@@ -167,6 +170,34 @@ namespace LoRa_Utils {
         radio.setBandwidth(signalBandwidth);
     }
 
+    //
+    bool doCAD() {              // Checks for CAD (Channel Activity Detection)
+        int state = radio.scanChannel();
+        if (state == RADIOLIB_LORA_DETECTED) {
+            return true;
+        } else if (state == RADIOLIB_CHANNEL_FREE) {
+            return false;
+        } else {                // CAD failed, return true for safety
+            return true;
+        }
+    }
+
+    bool doDIFS() {             // DIFS (Distributed Inter-Frame Space) Return True = channel free
+        for (uint8_t i = DIFS_SLOTS; i > 0; i--) {
+            if (doCAD()) return false;
+        }
+        return true;
+    }
+
+    void waitForDIFS() {
+        while (!doDIFS()) {
+            //
+            Serial.println("DIFS failed, retry");
+            //
+        }
+    }
+    //
+
     void sendNewPacket(const String& newPacket) {
         if (!Config.loramodule.txActive) return;
 
@@ -179,6 +210,19 @@ namespace LoRa_Utils {
         #ifdef INTERNAL_LED_PIN
             if (Config.digi.ecoMode != 1) digitalWrite(INTERNAL_LED_PIN, HIGH);     // disabled in Ultra Eco Mode
         #endif
+
+        //
+        #ifdef HAS_SX1262
+            if (Config.loramodule.cadActive) {
+                //
+                Serial.println("checking for DIFS");
+                //
+                waitForDIFS();
+                //
+            }
+        #endif
+        //
+
         int state = radio.transmit("\x3c\xff\x01" + newPacket);
         transmitFlag = true;
         if (state == RADIOLIB_ERR_NONE) {
@@ -250,7 +294,6 @@ namespace LoRa_Utils {
                         } else {
                             packet = "";
                         }
-                        lastRxTime = millis();
                         return packet;
                     }
                 } else if (state == RADIOLIB_ERR_CRC_MISMATCH) {
