@@ -27,10 +27,8 @@
 #include "display.h"
 #include "utils.h"
 
-//
-#define DIFS_SLOTS 2   // Number of secuential CAD slots to consider a free channel to Tx
-int BO_MAX = 4;        // Max Backoff
-//
+
+
 
 extern Configuration    Config;
 extern NetworkManager   *networkManager;
@@ -64,6 +62,9 @@ bool transmitFlag    = true;
 
 int rssi, freqError;
 float snr;
+
+#define DIFS_SLOTS  2       // Number of secuential CAD slots to consider a free channel to Tx
+int backoffMax      = 4;    // Max Backoff value (number of CAD slots to wait before Tx)
 
 
 namespace LoRa_Utils {
@@ -170,19 +171,11 @@ namespace LoRa_Utils {
         radio.setBandwidth(signalBandwidth);
     }
 
-    //
-    bool doCAD() {              // Checks for CAD (Channel Activity Detection)
-        int state = radio.scanChannel();
-        if (state == RADIOLIB_LORA_DETECTED) {
-            return true;
-        } else if (state == RADIOLIB_CHANNEL_FREE) {
-            return false;
-        } else {                // CAD failed, return true for safety
-            return true;
-        }
+    bool doCAD() {      // CAD (Channel Activity Detection)
+        return radio.scanChannel() != RADIOLIB_CHANNEL_FREE;    // false=channel free | true=RADIOLIB_LORA_DETECTED or CAD failed
     }
 
-    bool doDIFS() {             // DIFS (Distributed Inter-Frame Space) Return True = channel free
+    bool doDIFS() {
         for (uint8_t i = DIFS_SLOTS; i > 0; i--) {
             if (doCAD()) return false;
         }
@@ -191,12 +184,20 @@ namespace LoRa_Utils {
 
     void waitForDIFS() {
         while (!doDIFS()) {
-            //
-            Serial.println("DIFS failed, retry");
-            //
+            Serial.println("CAD/DIFS failed, retry...");
         }
     }
-    //
+
+    void doBEB() {
+        int backoffCounter = random(1, backoffMax + 1);
+        while (backoffCounter > 0) {
+            if (doCAD()) {
+                waitForDIFS();  // busy channel: freeze backoff and restart DIFS
+            } else {
+                backoffCounter--;
+            }
+        }
+    }
 
     void sendNewPacket(const String& newPacket) {
         if (!Config.loramodule.txActive) return;
@@ -211,17 +212,10 @@ namespace LoRa_Utils {
             if (Config.digi.ecoMode != 1) digitalWrite(INTERNAL_LED_PIN, HIGH);     // disabled in Ultra Eco Mode
         #endif
 
-        //
-        #ifdef HAS_SX1262
-            if (Config.loramodule.cadActive) {
-                //
-                Serial.println("checking for DIFS");
-                //
-                waitForDIFS();
-                //
-            }
-        #endif
-        //
+        if (Config.loramodule.cadActive) {
+            waitForDIFS();  // DIFS (Distributed Inter-Frame Space)
+            doBEB();        // BEB  (Binary Exponential Backoff)
+        }
 
         int state = radio.transmit("\x3c\xff\x01" + newPacket);
         transmitFlag = true;
