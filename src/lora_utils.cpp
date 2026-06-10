@@ -36,8 +36,11 @@ extern bool             packetIsBeacon;
 
 extern std::vector<ReceivedPacket> receivedPackets;
 
-bool operationDone   = true;
-bool transmitFlag    = true;
+bool operationDone      = true;
+bool transmitFlag       = true;
+
+#define DIFS_SLOTS      2       // Number of secuential CAD slots to consider a free channel to Tx
+int  backoffMax         = 4;    // Max Backoff value (number of CAD slots to wait before Tx)
 
 #ifdef HAS_SX1262
     SX1262 radio = new Module(RADIO_CS_PIN, RADIO_DIO1_PIN, RADIO_RST_PIN, RADIO_BUSY_PIN);
@@ -62,9 +65,6 @@ bool transmitFlag    = true;
 
 int rssi, freqError;
 float snr;
-
-#define DIFS_SLOTS  2       // Number of secuential CAD slots to consider a free channel to Tx
-int backoffMax      = 4;    // Max Backoff value (number of CAD slots to wait before Tx)
 
 
 namespace LoRa_Utils {
