@@ -40,7 +40,6 @@
         "backupDigiMode": false
     },
     "lora": {
-        "cadActive": true,
         "rxActive": true,
         "rxFreq": 433775000,
         "rxSpreadingFactor": 12,
@@ -48,10 +47,11 @@
         "rxSignalBandwidth": 125000,
         "txActive": false,
         "txFreq": 433775000,
-        "txSpreadingFactor": 12,
-        "txCodingRate4": 5,
+        "txSpreadingFactor": 9,
+        "txCodingRate4": 7,
         "txSignalBandwidth": 125000,
-        "power": 20
+        "power": 20,
+        "cadActive": true
     },
     "display": {
         "alwaysOn": true,

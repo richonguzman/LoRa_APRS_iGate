@@ -118,7 +118,7 @@ function loadSettings(settings) {
     document.getElementById("beacon.latitude").value                    = settings.beacon.latitude;
     document.getElementById("beacon.longitude").value                   = settings.beacon.longitude;
     document.getElementById("beacon.interval").value                    = settings.beacon.interval;
-    document.getElementById("other.rememberStationTime").value          = settings.other.rememberStationTime;   
+    document.getElementById("other.rememberStationTime").value          = settings.other.rememberStationTime;
     document.getElementById("beacon.sendViaAPRSIS").checked             = settings.beacon.sendViaAPRSIS;
 
     document.getElementById("beacon.sendViaRF").checked                 = settings.beacon.sendViaRF;
@@ -148,12 +148,26 @@ function loadSettings(settings) {
     document.getElementById("lora.rxSpreadingFactor").value             = settings.lora.rxSpreadingFactor;
     document.getElementById("lora.rxCodingRate4").value                 = settings.lora.rxCodingRate4;
     document.getElementById("lora.rxSignalBandwidth").value             = settings.lora.rxSignalBandwidth;
+    LoRaRxCheckbox.checked = settings.lora.rxActive;
+    LoRaRxFreq.disabled             = !LoRaRxCheckbox.checked;
+    LoRaRxSpreadingFactor.disabled  = !LoRaRxCheckbox.checked;
+    LoRaRxCodingRate.disabled       = !LoRaRxCheckbox.checked;
+    LoRaRxSignalBandwidth.disabled  = !LoRaRxCheckbox.checked;
+
     document.getElementById("lora.txActive").checked                    = settings.lora.txActive;
     document.getElementById("lora.txFreq").value                        = settings.lora.txFreq;
     document.getElementById("lora.txSpreadingFactor").value             = settings.lora.txSpreadingFactor;
     document.getElementById("lora.txCodingRate4").value                 = settings.lora.txCodingRate4;
-    document.getElementById("lora.txSignalBandwidth").value             = settings.lora.txSignalBandwidth;    
+    document.getElementById("lora.txSignalBandwidth").value             = settings.lora.txSignalBandwidth;
     document.getElementById("lora.power").value                         = settings.lora.power;
+    document.getElementById("lora.cadActive").checked                   = settings.lora.cadActive;
+    LoRaTxCheckbox.checked = settings.lora.txActive;
+    LoRaTxFreq.disabled             = !LoRaTxCheckbox.checked;
+    LoRaTxSpreadingFactor.disabled  = !LoRaTxCheckbox.checked;
+    LoRaTxCodingRate.disabled       = !LoRaTxCheckbox.checked;
+    LoRaTxSignalBandwidth.disabled  = !LoRaTxCheckbox.checked;
+    LoRaPower.disabled              = !LoRaTxCheckbox.checked;
+    LoRaCadActive.disabled          = !LoRaTxCheckbox.checked;
 
     // Display
     document.getElementById("display.alwaysOn").checked                 = settings.display.alwaysOn;
@@ -195,7 +209,7 @@ function loadSettings(settings) {
     TelemetryCheckbox.checked           = settings.wxsensor.active;
     TelemetryHeightCorrection.disabled  = !TelemetryCheckbox.checked;
     TelemetryTempCorrection.disabled    = !TelemetryCheckbox.checked;
-    
+
     // SYSLOG
     document.getElementById("syslog.active").checked                    = settings.syslog.active;
     document.getElementById("syslog.server").value                      = settings.syslog.server;
@@ -205,7 +219,7 @@ function loadSettings(settings) {
     SyslogServer.disabled           = !SyslogCheckbox.checked;
     SyslogPort.disabled             = !SyslogCheckbox.checked;
     SyslogBeaconOverTCPIP.disabled  = !SyslogCheckbox.checked;
-    
+
     // TNC
     if (settings.tnc) {
         document.getElementById("tnc.enableServer").checked             = settings.tnc.enableServer;
@@ -390,6 +404,36 @@ TelemetryCheckbox.addEventListener("change", function () {
     TelemetryTempCorrection.disabled    = !this.checked;
 });
 
+// LoRa Rx Switch
+const LoRaRxCheckbox                = document.querySelector('input[name="lora.rxActive"]');
+const LoRaRxFreq                    = document.querySelector('[name="lora.rxFreq"]');
+const LoRaRxSpreadingFactor         = document.querySelector('[name="lora.rxSpreadingFactor"]');
+const LoRaRxCodingRate              = document.querySelector('[name="lora.rxCodingRate4"]');
+const LoRaRxSignalBandwidth         = document.querySelector('[name="lora.rxSignalBandwidth"]');
+LoRaRxCheckbox.addEventListener("change", function () {
+    LoRaRxFreq.disabled             = !this.checked;
+    LoRaRxSpreadingFactor.disabled  = !this.checked;
+    LoRaRxCodingRate.disabled       = !this.checked;
+    LoRaRxSignalBandwidth.disabled  = !this.checked;
+});
+
+// LoRa Tx Switch
+const LoRaTxCheckbox                = document.querySelector('input[name="lora.txActive"]');
+const LoRaTxFreq                    = document.querySelector('[name="lora.txFreq"]');
+const LoRaTxSpreadingFactor         = document.querySelector('[name="lora.txSpreadingFactor"]');
+const LoRaTxCodingRate              = document.querySelector('[name="lora.txCodingRate4"]');
+const LoRaTxSignalBandwidth         = document.querySelector('[name="lora.txSignalBandwidth"]');
+const LoRaPower                     = document.querySelector('[name="lora.power"]');
+const LoRaCadActive                 = document.querySelector('[name="lora.cadActive"]');
+LoRaTxCheckbox.addEventListener("change", function () {
+    LoRaTxFreq.disabled             = !this.checked;
+    LoRaTxSpreadingFactor.disabled  = !this.checked;
+    LoRaTxCodingRate.disabled       = !this.checked;
+    LoRaTxSignalBandwidth.disabled  = !this.checked;
+    LoRaPower.disabled              = !this.checked;
+    LoRaCadActive.disabled          = !this.checked;
+});
+
 // Syslog Switches
 const SyslogCheckbox                = document.querySelector('input[name="syslog.active"]');
 const SyslogServer                  = document.querySelector('input[name="syslog.server"]');
@@ -559,7 +603,7 @@ function loadReceivedPackets(packets) {
 
         packets.forEach((packet) => {
             const element = document.createElement("tr");
-        
+
             element.innerHTML = `
                         <td>${packet.rxTime}</td>
                         <td>${packet.packet}</td>
@@ -592,7 +636,7 @@ document.querySelector('a[href="/received-packets"]').addEventListener('click', 
 
     document.getElementById('received-packets').classList.remove('d-none');
     document.getElementById('configuration').classList.add('d-none');
-    
+
     document.querySelector('button[type=submit]').remove();
 
     fetchReceivedPackets();

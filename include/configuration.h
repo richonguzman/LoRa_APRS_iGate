@@ -75,7 +75,6 @@ public:
 
 class LoraModule {
 public:
-    bool    cadActive;
     bool    rxActive;
     long    rxFreq;
     int     rxSpreadingFactor;
@@ -87,6 +86,7 @@ public:
     int     txCodingRate4;
     long    txSignalBandwidth;
     int     power;
+    bool    cadActive;
 };
 
 class Display {

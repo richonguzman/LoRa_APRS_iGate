@@ -213,6 +213,8 @@ namespace WEB_Utils {
         Config.loramodule.txCodingRate4     = getParamIntSafe("lora.txCodingRate4", Config.loramodule.txCodingRate4);
         Config.loramodule.txSignalBandwidth = getParamIntSafe("lora.txSignalBandwidth", Config.loramodule.txSignalBandwidth);
         Config.loramodule.power             = getParamIntSafe("lora.power", Config.loramodule.power);
+        if (Config.loramodule.txActive)
+            Config.loramodule.cadActive     = request->hasParam("lora.cadActive", true);
 
         Config.display.alwaysOn             = request->hasParam("display.alwaysOn", true);
         if (!Config.display.alwaysOn) {
