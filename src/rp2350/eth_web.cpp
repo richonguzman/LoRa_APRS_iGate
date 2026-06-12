@@ -7,6 +7,9 @@
 // Apply a posted config form (urlencoded or multipart) to Config + persist.
 extern bool applyConfigForm(const String &contentType, const String &body);
 
+// Set by POST /action?type=send-beacon; netTask sends a beacon and clears it.
+extern volatile bool g_beaconNow;
+
 static const int    WEB_PORT        = 80;
 static const size_t MAX_LINE_LEN    = 512;
 static const size_t MAX_HEADER_LINES = 40;
@@ -178,6 +181,21 @@ static void handleClient(EthernetClient &c) {
         if (req.method == "GET") { serveConfig(c); c.flush(); return; }
         if (req.method == "POST") { handleConfigPost(c, req); return; }  // reboots on success
         sendText(c, 405, "Method Not Allowed", "text/plain", "GET or POST");
+        c.flush();
+        return;
+    }
+    if (req.path == "/action") {            // POST /action?type=send-beacon | reboot
+        if (req.query.indexOf("send-beacon") >= 0) {
+            g_beaconNow = true;
+            sendText(c, 200, "OK", "text/plain", "beacon queued");
+        } else if (req.query.indexOf("reboot") >= 0) {
+            sendText(c, 200, "OK", "text/plain", "rebooting");
+            c.flush();
+            delay(300);
+            rp2040.restart();
+        } else {
+            sendText(c, 404, "Not Found", "text/plain", "unknown action");
+        }
         c.flush();
         return;
     }

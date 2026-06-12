@@ -37,6 +37,7 @@ Configuration Config;
 
 static byte mac[6];
 static QueueHandle_t rxQueue;       // heap String* handoff: loraTask -> netTask
+volatile bool g_beaconNow = false;  // set by POST /action?type=send-beacon (eth_web)
 
 // --------------------------------------------------------------- LoRa RX task
 void loraTask(void *) {
@@ -86,8 +87,10 @@ void netTask(void *) {
             // periodic position beacon over APRS-IS (config has sendViaAPRSIS)
             bool locOk = !(Config.beacon.latitude == 0.0 && Config.beacon.longitude == 0.0);
             if (Config.beacon.sendViaAPRSIS && AprsIs::connected() && locOk &&
-                (lastBeacon == 0 || (millis() - lastBeacon >= (uint32_t)Config.beacon.interval * 60000UL))) {
+                (lastBeacon == 0 || g_beaconNow ||
+                 (millis() - lastBeacon >= (uint32_t)Config.beacon.interval * 60000UL))) {
                 lastBeacon = millis();
+                g_beaconNow = false;
                 String b = Beacon::buildAprsisLine();
                 AprsIs::send(b);
                 Serial.println("[beacon] APRS-IS: " + b);
