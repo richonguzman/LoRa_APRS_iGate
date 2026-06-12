@@ -41,6 +41,10 @@ void poll() {
     while (aprsClient.available()) aprsClient.read();
 }
 
+void send(const String &line) {
+    if (aprsClient.connected()) aprsClient.print(line + "\r\n");
+}
+
 void forward(const String &packet) {
     if (!aprsClient.connected()) return;
     if (packet.length() < 5) return;

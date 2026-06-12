@@ -20,6 +20,7 @@
 #include "lora_utils.h"
 #include "eth_web.h"
 #include "aprsis_rp2350.h"
+#include "beacon_rp2350.h"
 
 // Last MAC octet — per build env so two boards never collide on DHCP. We do NOT
 // read the chip unique-ID at runtime (faults under FreeRTOS SMP -> USB hang).
@@ -73,6 +74,7 @@ void netTask(void *) {
     uint32_t lastMaintain = millis();
     uint32_t lastAprsTry  = 0;
     uint32_t lastHb       = 0;
+    uint32_t lastBeacon   = 0;
     for (;;) {
         ethWebPoll();
         if (Config.aprs_is.active) {
@@ -81,6 +83,15 @@ void netTask(void *) {
                 AprsIs::connect();
             }
             AprsIs::poll();
+            // periodic position beacon over APRS-IS (config has sendViaAPRSIS)
+            bool locOk = !(Config.beacon.latitude == 0.0 && Config.beacon.longitude == 0.0);
+            if (Config.beacon.sendViaAPRSIS && AprsIs::connected() && locOk &&
+                (lastBeacon == 0 || (millis() - lastBeacon >= (uint32_t)Config.beacon.interval * 60000UL))) {
+                lastBeacon = millis();
+                String b = Beacon::buildAprsisLine();
+                AprsIs::send(b);
+                Serial.println("[beacon] APRS-IS: " + b);
+            }
         }
         // forward any LoRa packets handed over by loraTask
         String *p;

@@ -9,5 +9,6 @@ namespace AprsIs {
     bool connect();                       // TCP connect + APRS-IS login
     bool connected();
     void poll();                          // drain incoming server lines (keepalive)
+    void send(const String &line);        // send a raw APRS-IS line (e.g. beacon)
     void forward(const String &loraPacket); // RX LoRa packet -> APRS-IS (qAR)
 }
