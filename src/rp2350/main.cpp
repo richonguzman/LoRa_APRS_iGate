@@ -72,6 +72,7 @@ void netTask(void *) {
 
     uint32_t lastMaintain = millis();
     uint32_t lastAprsTry  = 0;
+    uint32_t lastHb       = 0;
     for (;;) {
         ethWebPoll();
         if (Config.aprs_is.active) {
@@ -88,6 +89,14 @@ void netTask(void *) {
             delete p;
         }
         if (millis() - lastMaintain > 5000) { Ethernet.maintain(); lastMaintain = millis(); }
+        // heartbeat printed HERE (netTask owns the W5500 — no SPI race)
+        if (millis() - lastHb > 3000) {
+            lastHb = millis();
+            IPAddress ip = Ethernet.localIP();
+            Serial.printf("[hb] up=%lus  ip=%d.%d.%d.%d  callsign=%s  aprsis=%s\n",
+                          (unsigned long)(millis() / 1000), ip[0], ip[1], ip[2], ip[3],
+                          Config.callsign.c_str(), AprsIs::connected() ? "up" : "down");
+        }
         vTaskDelay(pdMS_TO_TICKS(15));
     }
 }
@@ -108,13 +117,9 @@ void setup() {
 }
 
 void loop() {
+    // LED blink ONLY — no W5500/Ethernet access here (that lives in netTask),
+    // otherwise concurrent SPI0 access corrupts both readers.
     static uint32_t tick = 0;
-    digitalWrite(HB_LED, (tick & 1) ? HIGH : LOW);     // ~2 Hz proof-of-life blink
-    if (++tick % 12 == 0) {
-        IPAddress ip = Ethernet.localIP();
-        Serial.printf("[hb] up=%lus  ip=%d.%d.%d.%d  callsign=%s  aprsis=%s\n",
-                      (unsigned long)(millis() / 1000), ip[0], ip[1], ip[2], ip[3],
-                      Config.callsign.c_str(), AprsIs::connected() ? "up" : "down");
-    }
+    digitalWrite(HB_LED, (tick++ & 1) ? HIGH : LOW);   // ~2 Hz proof-of-life
     vTaskDelay(pdMS_TO_TICKS(250));
 }
