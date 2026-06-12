@@ -21,6 +21,7 @@
 #include "eth_web.h"
 #include "aprsis_rp2350.h"
 #include "beacon_rp2350.h"
+#include "wx_rp2350.h"
 
 // Last MAC octet — per build env so two boards never collide on DHCP. We do NOT
 // read the chip unique-ID at runtime (faults under FreeRTOS SMP -> USB hang).
@@ -36,13 +37,31 @@
 Configuration Config;
 
 static byte mac[6];
-static QueueHandle_t rxQueue;       // heap String* handoff: loraTask -> netTask
-volatile bool g_beaconNow = false;  // set by POST /action?type=send-beacon (eth_web)
+static QueueHandle_t rxQueue;        // heap String* handoff: loraTask -> netTask
+volatile bool g_beaconNow = false;   // set by POST /action?type=send-beacon (eth_web)
+volatile bool g_rfBeaconNow = false; // set by POST /action?type=send-rf-beacon (eth_web)
 
-// --------------------------------------------------------------- LoRa RX task
+// --------------------------------------------------------------- LoRa RX/TX task
+// Owns the radio (SPI1): transmits the RF beacon (when Config.beacon.sendViaRF)
+// and receives LoRa-APRS packets. Both run from THIS task so the radio is never
+// touched concurrently.
 void loraTask(void *) {
     LoRa_Utils::setup();
+    uint32_t lastRfBeacon = 0;
     for (;;) {
+        // --- RF beacon TX (island/RF test) ---
+        if (Config.beacon.sendViaRF) {
+            bool locOk = !(Config.beacon.latitude == 0.0 && Config.beacon.longitude == 0.0);
+            if (locOk && (lastRfBeacon == 0 || g_rfBeaconNow ||
+                (millis() - lastRfBeacon >= (uint32_t)Config.beacon.interval * 60000UL))) {
+                lastRfBeacon = millis();
+                g_rfBeaconNow = false;
+                String rf = Beacon::buildRfLine();
+                Serial.println("[beacon] RF: " + rf);
+                LoRa_Utils::sendNewPacket(rf);     // prepends '<' 0xFF 0x01, TX, back to RX
+            }
+        }
+        // --- RX ---
         String pkt = LoRa_Utils::receivePacket();   // raw packet (with 3-byte hdr), "" if none
         if (pkt.length() > 0) {
             Serial.println("[lora] RX: " + pkt.substring(pkt.length() >= 3 ? 3 : 0));
@@ -124,6 +143,7 @@ void setup() {
 
     pinMode(HB_LED, OUTPUT);
     Config.setup();                          // LittleFS + /igate_conf.json (defaults on first boot)
+    Wx::setup();                             // BMP280 on I2C0 (Wire) — single-threaded init here
 
     rxQueue = xQueueCreate(8, sizeof(String *));
     xTaskCreate(loraTask, "lora", 4096, nullptr, 3, nullptr);

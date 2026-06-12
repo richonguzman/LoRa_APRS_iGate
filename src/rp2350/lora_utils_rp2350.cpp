@@ -72,6 +72,7 @@ void changeFreqRx() { radio.standby(); radio.setFrequency(rxFreqMHz); radio.star
 
 void sendNewPacket(const String& newPacket) {
     changeFreqTx();
+    digitalWrite(RADIO_RXEN, LOW);             // E22 RX path off; DIO2 drives TXEN during transmit
     String tx;
     tx.reserve(newPacket.length() + 3);
     tx += '<';
@@ -80,6 +81,7 @@ void sendNewPacket(const String& newPacket) {
     tx += newPacket;
     int st = radio.transmit(tx);
     Serial.printf("[lora] TX %d B (state %d)\n", (int)tx.length(), st);
+    digitalWrite(RADIO_RXEN, HIGH);            // restore RX path
     changeFreqRx();
 }
 

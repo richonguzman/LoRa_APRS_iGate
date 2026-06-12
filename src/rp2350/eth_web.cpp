@@ -7,8 +7,10 @@
 // Apply a posted config form (urlencoded or multipart) to Config + persist.
 extern bool applyConfigForm(const String &contentType, const String &body);
 
-// Set by POST /action?type=send-beacon; netTask sends a beacon and clears it.
+// Set by POST /action?type=send-beacon; netTask sends an APRS-IS beacon and clears it.
 extern volatile bool g_beaconNow;
+// Set by POST /action?type=send-rf-beacon; loraTask sends an RF beacon and clears it.
+extern volatile bool g_rfBeaconNow;
 
 static const int    WEB_PORT        = 80;
 static const size_t MAX_LINE_LEN    = 512;
@@ -184,8 +186,11 @@ static void handleClient(EthernetClient &c) {
         c.flush();
         return;
     }
-    if (req.path == "/action") {            // POST /action?type=send-beacon | reboot
-        if (req.query.indexOf("send-beacon") >= 0) {
+    if (req.path == "/action") {            // POST /action?type=send-beacon | send-rf-beacon | reboot
+        if (req.query.indexOf("send-rf-beacon") >= 0) {
+            g_rfBeaconNow = true;
+            sendText(c, 200, "OK", "text/plain", "rf beacon queued");
+        } else if (req.query.indexOf("send-beacon") >= 0) {
             g_beaconNow = true;
             sendText(c, 200, "OK", "text/plain", "beacon queued");
         } else if (req.query.indexOf("reboot") >= 0) {
