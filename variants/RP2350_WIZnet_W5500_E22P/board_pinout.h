@@ -7,6 +7,7 @@
 #define HAS_SX1262
 #define HAS_1W_LORA
 #define HAS_TCXO
+#define SX126X_DIO3_TCXO_VOLTAGE 1.8   // E22P TCXO fed from DIO3
 
 // ---- LoRa (E22P / SX1262) on SPI1 ----
 #define RADIO_SCLK_PIN   10
