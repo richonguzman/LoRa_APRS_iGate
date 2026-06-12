@@ -16,6 +16,7 @@
  * along with LoRa APRS iGate. If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <APRSPacketLib.h>
 #include <RadioLib.h>
 #include "configuration.h"
 #include "network_manager.h"
@@ -23,11 +24,10 @@
 #include "station_utils.h"
 #include "board_pinout.h"
 #include "syslog_utils.h"
+#include "map_utils.h"
 #include "ntp_utils.h"
 #include "display.h"
 #include "utils.h"
-
-
 
 
 extern Configuration    Config;
@@ -280,6 +280,11 @@ namespace LoRa_Utils {
                                 receivedPacket.RSSI     = rssi;
                                 receivedPacket.SNR      = snr;
                                 receivedPackets.push_back(receivedPacket);
+
+                                APRSPacket aprsPacket = APRSPacketLib::processReceivedPacket(packet.substring(3), rssi, snr, freqError);
+                                if (aprsPacket.type == 0 || aprsPacket.type == 4) {   // 0 = GPS, 4 = Mic-E (los que traen posición)
+                                    MAP_Utils::upsert(aprsPacket.sender, aprsPacket.latitude, aprsPacket.longitude, aprsPacket.overlay + aprsPacket.symbol, aprsPacket.rssi, aprsPacket.snr);
+                                }
                             }
 
                             if (Config.syslog.active && networkManager->isConnected()) {

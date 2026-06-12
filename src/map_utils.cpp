@@ -20,6 +20,9 @@
 #include "map_utils.h"
 #include "ntp_utils.h"
 
+#define MAX_MAP_STATIONS    50
+#define STATION_TTL_MS      3600000UL   // 1 hora (en milisegundos)
+
 
 std::vector<MapStation> mapStations;
 
@@ -39,7 +42,7 @@ namespace MAP_Utils {
 
     // Inserta una estacion nueva o actualiza la existente (dedup por callsign).
     // Llamar solo cuando el parser ya decodifico una posicion valida.
-    void upsert(const String& callsign, float latitude, float longitude, const String& symbol, int16_t rssi, float snr) {
+    void upsert(const String& callsign, float latitude, float longitude, const String& symbol, int rssi, float snr) {
         for (auto &s : mapStations) {                       // 1) ya existe -> actualizar
             if (callsign.equals(s.callsign)) {
                 s.latitude  = latitude;
@@ -77,7 +80,17 @@ namespace MAP_Utils {
         mapStations.push_back(st);
     }
 
+    void purgeOldStations() {
+        uint32_t now = millis();
+        for (int i = (int)mapStations.size() - 1; i >= 0; i--) {
+            if (now - mapStations[i].lastHeardMillis > STATION_TTL_MS) {
+                mapStations.erase(mapStations.begin() + i);
+            }
+        }
+    }
+
     String getStationsJson() {
+        purgeOldStations();
         JsonDocument data;
 
         for (size_t i = 0; i < mapStations.size(); i++) {

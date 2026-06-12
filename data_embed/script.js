@@ -670,7 +670,13 @@ function loadMapStations(stations) {
             + `<br>RSSI ${s.RSSI} / SNR ${s.SNR}`
             + `<br>Packets: ${s.count}`;
 
-        L.marker([s.lat, s.lon]).bindPopup(popup).addTo(mapMarkers);
+        L.circleMarker([s.lat, s.lon], {
+            radius: 6,
+            color: "#1d6fe0",        // borde
+            weight: 2,
+            fillColor: "#3b8cff",    // relleno
+            fillOpacity: 0.9
+        }).bindPopup(popup).addTo(mapMarkers);
     });
 }
 

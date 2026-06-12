@@ -22,7 +22,6 @@
 #include <Arduino.h>
 #include <vector>
 
-#define MAX_MAP_STATIONS 50
 
 struct MapStation {
     char     callsign[10];      // "XX9XXX-NN" + null  -> clave para deduplicar
@@ -38,7 +37,7 @@ struct MapStation {
 
 namespace MAP_Utils {
 
-    void    upsert(const String& callsign, float latitude, float longitude, const String& symbol, int16_t rssi, float snr);
+    void    upsert(const String& callsign, float latitude, float longitude, const String& symbol, int rssi, float snr);
     String  getStationsJson();
 
 }
