@@ -649,6 +649,8 @@ let mapInstance    = null;
 let mapMarkers     = null;
 let mapTimer       = null;
 let mapTileErrShown = false;
+let iGateLatLng    = null;
+let mapAutoFitDone = false;
 
 function setMapMessage(text) {
     const el = document.getElementById("map");
@@ -662,6 +664,7 @@ function loadMapStations(stations) {
 
     mapMarkers.clearLayers();
 
+    let drawn = 0;
     (stations || []).forEach((s) => {
         if (s.lat === 0 && s.lon === 0) return;     // descartar estaciones sin fix
 
@@ -677,7 +680,30 @@ function loadMapStations(stations) {
             fillColor: "#3b8cff",    // relleno
             fillOpacity: 0.9
         }).bindPopup(popup).addTo(mapMarkers);
+        drawn++;
     });
+
+    if (!mapAutoFitDone && drawn > 0) {             // auto-fit la 1ª vez que hay estaciones tras abrir
+        fitMapToStations();
+        mapAutoFitDone = true;
+    }
+}
+
+// Encuadra el mapa para que entren todas las estaciones (+ el iGate). 100% navegador.
+function fitMapToStations() {
+    if (!mapInstance) return false;
+
+    const pts = [];
+    if (mapMarkers) {
+        mapMarkers.eachLayer((layer) => {
+            if (layer.getLatLng) pts.push(layer.getLatLng());
+        });
+    }
+    if (iGateLatLng) pts.push(iGateLatLng);
+
+    if (!pts.length) return false;
+    mapInstance.fitBounds(L.latLngBounds(pts), { padding: [30, 30], maxZoom: 14 });
+    return true;
 }
 
 function fetchMapStations() {
@@ -699,6 +725,8 @@ window.showMap = function () {
         return;
     }
 
+    mapAutoFitDone = false;                          // re-encuadrar en cada apertura del Map
+
     if (!mapInstance) {
         mapInstance = L.map("map");
 
@@ -716,6 +744,23 @@ window.showMap = function () {
 
         mapMarkers = L.layerGroup().addTo(mapInstance);
 
+        const FitControl = L.Control.extend({       // botón "Fit All Stations" (control nativo de Leaflet)
+            options: { position: "topright" },
+            onAdd: function () {
+                const btn = L.DomUtil.create("button", "");
+                btn.type = "button";
+                btn.title = "Fit all stations";
+                btn.textContent = "Fit All Stations";
+                btn.style.cssText = "background:#fff;color:#333;border:2px solid rgba(0,0,0,.2);border-radius:4px;padding:5px 9px;cursor:pointer;font:600 12px sans-serif;box-shadow:0 1px 4px rgba(0,0,0,.3);";
+                L.DomEvent.on(btn, "click", (e) => {
+                    L.DomEvent.stop(e);
+                    fitMapToStations();
+                });
+                return btn;
+            }
+        });
+        mapInstance.addControl(new FitControl());
+
         fetch("/configuration.json")                // centrar y marcar el iGate
         .then((response) => response.json())
         .then((config) => {
@@ -725,6 +770,7 @@ window.showMap = function () {
             mapInstance.setView([lat, lon], (lat || lon) ? 12 : 2);
 
             if (lat || lon) {                       // rombo rojo en la posición del iGate
+                iGateLatLng = L.latLng(lat, lon);   // guardar para incluirlo en el auto-fit
                 const iGateIcon = L.divIcon({
                     className: "igate-marker",
                     html: '<div style="width:14px;height:14px;background:#e23b3b;border:2px solid #fff;transform:rotate(45deg);box-shadow:0 0 4px rgba(0,0,0,.6);"></div>',
