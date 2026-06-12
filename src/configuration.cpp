@@ -17,7 +17,17 @@
  */
 
 #include <ArduinoJson.h>
+#if defined(ARDUINO_ARCH_RP2040)
+#include <LittleFS.h>
+#define IGATE_FS LittleFS
+#define IGATE_FS_BEGIN() LittleFS.begin()
+#define IGATE_RESTART() rp2040.restart()
+#else
 #include <SPIFFS.h>
+#define IGATE_FS SPIFFS
+#define IGATE_FS_BEGIN() SPIFFS.begin(false)
+#define IGATE_RESTART() ESP.restart()
+#endif
 #include "configuration.h"
 #include "board_pinout.h"
 #include "display.h"
@@ -30,7 +40,7 @@ bool Configuration::writeFile() {
     Serial.println("Saving configuration...");
 
     JsonDocument data;
-    File configFile = SPIFFS.open("/igate_conf.json", "w");
+    File configFile = IGATE_FS.open("/igate_conf.json", "w");
 
     if (!configFile) {
         Serial.println("Error: Could not open config file for writing");
@@ -195,7 +205,7 @@ bool Configuration::writeFile() {
 
 bool Configuration::readFile() {
     Serial.println("Reading config..");
-    File configFile = SPIFFS.open("/igate_conf.json", "r");
+    File configFile = IGATE_FS.open("/igate_conf.json", "r");
 
     if (configFile) {
         bool needsRewrite = false;
@@ -431,7 +441,7 @@ bool Configuration::readFile() {
             Serial.println("Config JSON incomplete, rewriting...");
             writeFile();
             delay(1000);
-            ESP.restart();
+            IGATE_RESTART();
         }
         Serial.println("Config read successfuly");
         return true;
@@ -566,19 +576,19 @@ void Configuration::setDefaultValues() {
 }
 
 void Configuration::setup() {
-    if (!SPIFFS.begin(false)) {
+    if (!IGATE_FS_BEGIN()) {
         Serial.println("SPIFFS Mount Failed");
         return;
     } else {
         Serial.println("SPIFFS Mounted");
     }
 
-    bool exists = SPIFFS.exists("/igate_conf.json");
+    bool exists = IGATE_FS.exists("/igate_conf.json");
     if (!exists) {
         setDefaultValues();
         writeFile();
         delay(1000);
-        ESP.restart();
+        IGATE_RESTART();
     }
 
     readFile();
