@@ -60,10 +60,8 @@ String receivePacket() {
     int st = radio.readData(str);
     radio.startReceive();                       // re-arm
     if (st != RADIOLIB_ERR_NONE) return "";
-    // strip the LoRa-APRS 3-byte header '<' 0xFF 0x01
-    if (str.length() >= 3 && (uint8_t)str.charAt(0) == '<' &&
-        (uint8_t)str.charAt(1) == 0xFF && (uint8_t)str.charAt(2) == 0x01)
-        str.remove(0, 3);
+    // Return the RAW packet WITH its 3-byte LoRa-APRS header ('<' 0xFF 0x01) —
+    // the iGate processing/qAR build does packet.substring(3) to skip it.
     return str;
 }
 
