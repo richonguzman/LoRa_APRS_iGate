@@ -641,3 +641,112 @@ document.querySelector('a[href="/received-packets"]').addEventListener('click', 
 
     fetchReceivedPackets();
 })
+
+
+/* ---------- Stations Map (Leaflet, CDN) ---------- */
+
+let mapInstance    = null;
+let mapMarkers     = null;
+let mapTimer       = null;
+let mapTileErrShown = false;
+
+function setMapMessage(text) {
+    const el = document.getElementById("map");
+    if (el) {
+        el.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--msh-text-dim,#8b949e);text-align:center;padding:20px;">${text}</div>`;
+    }
+}
+
+function loadMapStations(stations) {
+    if (!mapMarkers) return;
+
+    mapMarkers.clearLayers();
+
+    (stations || []).forEach((s) => {
+        if (s.lat === 0 && s.lon === 0) return;     // descartar estaciones sin fix
+
+        const popup = `<b>${s.callsign}</b>`
+            + (s.lastHeard ? `<br>Last: ${s.lastHeard}` : "")
+            + `<br>RSSI ${s.RSSI} / SNR ${s.SNR}`
+            + `<br>Packets: ${s.count}`;
+
+        L.marker([s.lat, s.lon]).bindPopup(popup).addTo(mapMarkers);
+    });
+}
+
+function fetchMapStations() {
+    fetch("/stations.json")
+    .then((response) => response.json())
+    .then((stations) => {
+        loadMapStations(stations);
+    })
+    .catch((err) => {
+        console.error(err);
+
+        console.error(`Failed to load stations`);
+    });
+}
+
+window.showMap = function () {
+    if (typeof L === "undefined") {                 // sin internet el CDN de Leaflet no cargó
+        setMapMessage("Map unavailable &mdash; no internet connection.<br>The map needs internet to load (OpenStreetMap).");
+        return;
+    }
+
+    if (!mapInstance) {
+        mapInstance = L.map("map");
+
+        const tiles = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            maxZoom: 19,
+            attribution: "&copy; OpenStreetMap"
+        }).addTo(mapInstance);
+
+        tiles.on("tileerror", function () {         // tiles no cargan (sin salida a internet)
+            if (!mapTileErrShown) {
+                mapTileErrShown = true;
+                if (window.showToast) showToast("Map tiles could not load — check internet connection.");
+            }
+        });
+
+        mapMarkers = L.layerGroup().addTo(mapInstance);
+
+        fetch("/configuration.json")                // centrar y marcar el iGate
+        .then((response) => response.json())
+        .then((config) => {
+            const lat = (config.beacon && config.beacon.latitude)  || 0;
+            const lon = (config.beacon && config.beacon.longitude) || 0;
+            const callsign = config.callsign || "iGate";
+            mapInstance.setView([lat, lon], (lat || lon) ? 12 : 2);
+
+            if (lat || lon) {                       // rombo rojo en la posición del iGate
+                const iGateIcon = L.divIcon({
+                    className: "igate-marker",
+                    html: '<div style="width:14px;height:14px;background:#e23b3b;border:2px solid #fff;transform:rotate(45deg);box-shadow:0 0 4px rgba(0,0,0,.6);"></div>',
+                    iconSize: [18, 18],
+                    iconAnchor: [9, 9]
+                });
+                L.marker([lat, lon], { icon: iGateIcon })
+                    .bindPopup(`<b>${callsign}</b><br>This station`)
+                    .addTo(mapInstance);        // directo al mapa: no se borra en los refrescos
+            }
+        })
+        .catch(() => {
+            mapInstance.setView([0, 0], 2);
+        });
+    }
+
+    setTimeout(function () {                         // el div estuvo oculto: recalcular tamaño
+        if (mapInstance) mapInstance.invalidateSize();
+    }, 0);
+
+    fetchMapStations();
+
+    if (mapTimer) clearInterval(mapTimer);
+
+    mapTimer = setInterval(function () {            // refrescar solo si la sección está visible
+        const section = document.getElementById("sec-maps");
+        if (section && section.classList.contains("active")) {
+            fetchMapStations();
+        }
+    }, 15000);
+}

@@ -7,6 +7,7 @@
         <title>LoRa iGate & Digi software &minus; Ricardo Guzman CA2RXU</title>
         <link rel="stylesheet" href="/bootstrap.css" />
         <link rel="stylesheet" href="/style.css" />
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
         <link rel="icon" href="/favicon.png" type="image/x-icon">
     <script>(function(){try{var t=localStorage.getItem("igateTheme");if(!t)t=window.matchMedia&&window.matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";var r=document.documentElement;if(t==="night"){r.setAttribute("data-bs-theme","dark");r.setAttribute("data-variant","night");}else{r.setAttribute("data-bs-theme",t);}}catch(e){}})();</script>
 <style>
@@ -95,6 +96,7 @@ body{background:var(--msh-bg);color:var(--msh-text);font-family:"Inter",system-u
                                             d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"
                                         />
                                     </svg></span><span class="label">Station</span></button>
+<button class="side-link" type="button" data-target="sec-maps"><span class="side-ico"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16"><path d="M15.817.113A.5.5 0 0 1 16 .5v14a.5.5 0 0 1-.402.49l-5 1a.5.5 0 0 1-.196 0L5.5 15.01l-4.902.98A.5.5 0 0 1 0 15.5v-14a.5.5 0 0 1 .402-.49l5-1a.5.5 0 0 1 .196 0L10.5.99l4.902-.98a.5.5 0 0 1 .415.103M10 1.91l-4-.8v12.98l4 .8zm1 12.98 4-.8V1.11l-4 .8zm-6-.8V1.11l-4 .8v12.98z"/></svg></span><span class="label">Maps</span></button>
 <button class="side-link" type="button" data-target="sec-beaconing"><span class="side-ico"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16"><path d="M15.964.686a.5.5 0 0 0-.65-.65L.767 5.855H.766l-.452.18a.5.5 0 0 0-.082.887l.41.26.001.002 4.995 3.178 3.178 4.995.002.002.26.41a.5.5 0 0 0 .886-.083zm-1.833 1.89L6.637 10.07l-.215-.338a.5.5 0 0 0-.154-.154l-.338-.215 7.494-7.494 1.178-.471z"/></svg></span><span class="label">Beaconing</span></button>
 <button class="side-link" type="button" data-target="sec-connectivity"><span class="side-ico"><svg
                                         xmlns="http://www.w3.org/2000/svg"
@@ -211,6 +213,15 @@ body{background:var(--msh-bg);color:var(--msh-text);font-family:"Inter",system-u
                 <hr>
             </div>
     <div id="configuration">
+<section class="panel-section" id="sec-maps">
+                        <div class="row my-5">
+                            <div class="col-12">
+                                <h3>Stations Map</h3>
+                                <div id="map" style="height:70vh;border-radius:14px;"></div>
+                                <small>Needs internet (OpenStreetMap tiles). Updates every 15 seconds.</small>
+                            </div>
+                        </div>
+</section>
 <section class="panel-section active" id="sec-station">
 
                         <div class="row my-5 d-flex align-items-top">
@@ -2371,6 +2382,7 @@ body{background:var(--msh-bg);color:var(--msh-text);font-family:"Inter",system-u
         </div>
     </body>
     <script src="/bootstrap.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script src="/script.js"></script>
 </html>
 <script>
@@ -2391,6 +2403,7 @@ body{background:var(--msh-bg);color:var(--msh-text);font-family:"Inter",system-u
       document.querySelectorAll(".panel-section").forEach(function(s){s.classList.remove("active");});
       b.classList.add("active");var el=document.getElementById(b.dataset.target);if(el)el.classList.add("active");
       showConfig();
+      if(b.dataset.target==="sec-maps"&&window.showMap)window.showMap();
     });
   });
   var rpBtn=document.getElementById("rpToggle");

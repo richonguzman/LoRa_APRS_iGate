@@ -20,6 +20,7 @@
 #include "configuration.h"
 #include "ota_utils.h"
 #include "web_utils.h"
+#include "map_utils.h"
 #include "display.h"
 #include "utils.h"
 
@@ -112,6 +113,10 @@ namespace WEB_Utils {
         serializeJson(data, buffer);
 
         request->send(200, "application/json", buffer);
+    }
+
+    void handleStations(AsyncWebServerRequest *request) {
+        request->send(200, "application/json", MAP_Utils::getStationsJson());
     }
 
     void handleWriteConfiguration(AsyncWebServerRequest *request) {
@@ -363,6 +368,7 @@ namespace WEB_Utils {
             server.on("/", HTTP_GET, handleHome);
             server.on("/status", HTTP_GET, handleStatus);
             server.on("/received-packets.json", HTTP_GET, handleReceivedPackets);
+            server.on("/stations.json", HTTP_GET, handleStations);
             server.on("/configuration.json", HTTP_GET, handleReadConfiguration);
             server.on("/configuration.json", HTTP_POST, handleWriteConfiguration);
             server.on("/action", HTTP_POST, handleAction);
