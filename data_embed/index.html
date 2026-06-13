@@ -151,6 +151,43 @@
                 <hr>
             </div>
 
+            <div class="container d-none" id="ota-view">
+                <div class="row my-5 d-flex align-items-top">
+                    <div class="col-lg-8 col-sm-12 mx-auto">
+                        <h3>Firmware Update (OTA)</h3>
+                        <small>Upload a new <code>firmware.bin</code> over the network. The device flashes it and reboots into the new firmware automatically.</small>
+                        <div class="alert alert-secondary mt-3 mb-0" id="ota.current">Current firmware: …</div>
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <label for="ota.file" class="form-label">Firmware file (firmware.bin)</label>
+                                <input type="file" class="form-control" id="ota.file" accept=".bin" />
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-lg-6 col-sm-12">
+                                <label for="ota.user" class="form-label">OTA user <small>(only if configured)</small></label>
+                                <input type="text" class="form-control" id="ota.user" placeholder="(optional)" />
+                            </div>
+                            <div class="col-lg-6 col-sm-12">
+                                <label for="ota.pass" class="form-label">OTA password</label>
+                                <input type="password" class="form-control" id="ota.pass" placeholder="(optional)" />
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-lg-4 col-sm-12">
+                                <button class="btn btn-primary form-control" id="ota.upload">Upload firmware</button>
+                            </div>
+                        </div>
+                        <div class="progress mt-4 d-none" id="ota.progresswrap" style="height: 1.6rem;">
+                            <div class="progress-bar" id="ota.progress" role="progressbar" style="width: 0%;">0%</div>
+                        </div>
+                        <div id="ota.status" class="mt-3"></div>
+                        <small class="d-block mt-2 text-muted">Do not power off during the update. The connection will drop when the device reboots — that is normal.</small>
+                    </div>
+                </div>
+                <hr>
+            </div>
+
             <div class="container" id="configuration">
                 <main>
                     <div class="col-10 my-5 mx-auto">

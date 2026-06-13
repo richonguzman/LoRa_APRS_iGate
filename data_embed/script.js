@@ -638,6 +638,7 @@ document.querySelector('a[href="/received-packets"]').addEventListener('click', 
     document.getElementById('received-packets').classList.remove('d-none');
     document.getElementById('configuration').classList.add('d-none');
     document.getElementById('send-message-view').classList.add('d-none');
+    document.getElementById('ota-view').classList.add('d-none');
 
     const saveBtn = document.querySelector('button[type=submit]');
     if (saveBtn) saveBtn.remove();
@@ -651,6 +652,7 @@ document.querySelector('a[href="/send-message"]').addEventListener('click', func
     document.getElementById('send-message-view').classList.remove('d-none');
     document.getElementById('configuration').classList.add('d-none');
     document.getElementById('received-packets').classList.add('d-none');
+    document.getElementById('ota-view').classList.add('d-none');
 
     const saveBtn = document.querySelector('button[type=submit]');
     if (saveBtn) saveBtn.remove();
@@ -659,4 +661,110 @@ document.querySelector('a[href="/send-message"]').addEventListener('click', func
     if (!receivedMessagesTimer) {
         receivedMessagesTimer = setInterval(loadReceivedMessages, 10000);
     }
+})
+
+let otaPrevBuild = '';
+
+function loadOtaStatus() {
+    const el = document.getElementById('ota.current');
+    fetch('/status', { cache: 'no-store' })
+        .then((r) => r.text())
+        .then((text) => { otaPrevBuild = text.trim(); el.innerHTML = 'Current firmware: <b>' + otaPrevBuild + '</b>'; })
+        .catch(() => { el.textContent = 'Current firmware: (could not read /status)'; });
+}
+
+// after an update: poll /status until the device is back, then confirm + refresh
+function waitForReboot(prev, attempt) {
+    attempt = attempt || 0;
+    const status = document.getElementById('ota.status');
+    const el = document.getElementById('ota.current');
+    if (attempt > 25) {
+        status.innerHTML = '<span class="text-warning">Device did not respond after the update — please check it manually.</span>';
+        return;
+    }
+    const controller = new AbortController();
+    const t = setTimeout(() => controller.abort(), 1500);
+    fetch('/status', { cache: 'no-store', signal: controller.signal })
+        .then((r) => r.text())
+        .then((text) => {
+            clearTimeout(t);
+            const now = text.trim();
+            el.innerHTML = 'Current firmware: <b>' + now + '</b>';
+            if (now !== prev) {
+                status.innerHTML = '<span class="text-success"><b>✓ Update complete.</b> Now running the new firmware.</span>';
+            } else {
+                status.innerHTML = '<span class="text-success"><b>✓ Device is back online</b> (firmware version unchanged).</span>';
+            }
+        })
+        .catch(() => {
+            clearTimeout(t);
+            status.textContent = 'Waiting for the device to reboot… (' + (attempt + 1) + ')';
+            setTimeout(() => waitForReboot(prev, attempt + 1), 2000);
+        });
+}
+
+document.querySelector('a[href="/update"]').addEventListener('click', function (e) {
+    e.preventDefault();
+
+    document.getElementById('ota-view').classList.remove('d-none');
+    document.getElementById('configuration').classList.add('d-none');
+    document.getElementById('received-packets').classList.add('d-none');
+    document.getElementById('send-message-view').classList.add('d-none');
+
+    const saveBtn = document.querySelector('button[type=submit]');
+    if (saveBtn) saveBtn.remove();
+
+    loadOtaStatus();
+})
+
+document.getElementById('ota.upload').addEventListener('click', function (e) {
+    e.preventDefault();
+
+    const file = document.getElementById('ota.file').files[0];
+    if (!file) { showToast('Pick a firmware.bin file first.'); return; }
+
+    const user = document.getElementById('ota.user').value.trim();
+    const pass = document.getElementById('ota.pass').value;
+    const wrap = document.getElementById('ota.progresswrap');
+    const bar = document.getElementById('ota.progress');
+    const status = document.getElementById('ota.status');
+
+    wrap.classList.remove('d-none');
+    bar.style.width = '0%'; bar.textContent = '0%';
+    status.textContent = 'Uploading ' + file.name + ' (' + file.size + ' bytes)…';
+
+    let bodySent = false;
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', '/update', true);
+    if (user) xhr.setRequestHeader('Authorization', 'Basic ' + btoa(user + ':' + pass));
+
+    xhr.upload.onprogress = function (ev) {
+        if (ev.lengthComputable) {
+            const pct = Math.round(ev.loaded * 100 / ev.total);
+            bar.style.width = pct + '%'; bar.textContent = pct + '%';
+        }
+    };
+    xhr.upload.onload = function () { bodySent = true; };
+
+    xhr.onload = function () {
+        if (xhr.status === 200) {
+            bar.style.width = '100%'; bar.textContent = '100%';
+            status.innerHTML = 'Update staged — waiting for the device to reboot…';
+            setTimeout(() => waitForReboot(otaPrevBuild, 0), 4000);
+        } else if (xhr.status === 401) {
+            status.innerHTML = '<span class="text-danger">Unauthorized — check the OTA user/password.</span>';
+        } else {
+            status.innerHTML = '<span class="text-danger">Update failed: ' + xhr.status + ' ' + xhr.responseText + '</span>';
+        }
+    };
+    xhr.onerror = function () {
+        if (bodySent) {   // socket dropped after the full upload = device rebooting
+            bar.style.width = '100%'; bar.textContent = '100%';
+            status.innerHTML = 'Update sent — waiting for the device to reboot…';
+            setTimeout(() => waitForReboot(otaPrevBuild, 0), 4000);
+        } else {
+            status.innerHTML = '<span class="text-danger">Upload failed (connection error before the firmware was fully sent).</span>';
+        }
+    };
+    xhr.send(file);
 })
