@@ -314,13 +314,13 @@ function loadReceivedMessages() {
         .then((msgs) => {
             const tbody = document.getElementById('received-messages');
             if (!msgs.length) {
-                tbody.innerHTML = '<tr><td colspan="3" class="text-muted">No messages received yet.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="4" class="text-muted">No messages received yet.</td></tr>';
                 return;
             }
             tbody.innerHTML = msgs.map((m) => {
                 const ago = m.age < 60 ? m.age + "s" : Math.floor(m.age / 60) + "m";
                 const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-                return "<tr><td>" + ago + "</td><td>" + esc(m.from) + "</td><td>" + esc(m.text) + "</td></tr>";
+                return "<tr><td>" + ago + "</td><td>" + esc(m.from) + "</td><td>" + esc(m.via || "") + "</td><td>" + esc(m.text) + "</td></tr>";
             }).join("");
         })
         .catch((err) => console.error("Failed to load messages", err));

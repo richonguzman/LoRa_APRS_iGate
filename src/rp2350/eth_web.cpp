@@ -23,15 +23,25 @@ static const char  *CONFIG_PATH     = "/igate_conf.json";
 static EthernetServer webServer(WEB_PORT);
 static bool webStarted = false;
 
-// --- incoming APRS messages addressed to us (shown in the Send Message view) ---
-struct RxMsg { String from; String text; uint32_t when; };
+// --- incoming APRS messages addressed to us (shown in the Messages view) ---
+struct RxMsg { String from; String text; String via; uint32_t when; };
 static std::vector<RxMsg> rxMessages;          // netTask-owned, newest pushed to back
 static const size_t RXMSG_MAX = 20;
 
-void ethWebAddMessage(const String &from, const String &text) {
+void ethWebAddMessage(const String &from, const String &text, const String &via) {
     if (rxMessages.size() >= RXMSG_MAX) rxMessages.erase(rxMessages.begin());
-    rxMessages.push_back({from, text, millis()});
-    Serial.println("[msg] from " + from + ": " + text);
+    rxMessages.push_back({from, text, via, millis()});
+    Serial.println("[msg] from " + from + " (" + via + "): " + text);
+}
+
+// --- received LoRa packets log (shown in the Received packets view) ---
+struct RxPkt { String frame; int rssi; float snr; uint32_t when; };
+static std::vector<RxPkt> rxPackets;           // netTask-owned, newest pushed to back
+static const size_t RXPKT_MAX = 10;
+
+void ethWebAddPacket(const String &frame, int rssi, float snr) {
+    if (rxPackets.size() >= RXPKT_MAX) rxPackets.erase(rxPackets.begin());
+    rxPackets.push_back({frame, rssi, snr, millis()});
 }
 
 struct Request {
@@ -244,7 +254,27 @@ static void handleClient(EthernetClient &c) {
             const RxMsg &m = rxMessages[i];
             body += "{\"from\":\"";  body += jsonEscape(m.from);
             body += "\",\"text\":\""; body += jsonEscape(m.text);
+            body += "\",\"via\":\"";  body += jsonEscape(m.via);
             body += "\",\"age\":";    body += String((now - m.when) / 1000);
+            body += "}";
+            if (i != 0) body += ",";
+        }
+        body += "]";
+        sendText(c, 200, "OK", "application/json", body);
+        c.flush();
+        return;
+    }
+    if (req.path == "/received-packets.json") {
+        String body = "[";
+        uint32_t now = millis();
+        for (size_t i = rxPackets.size(); i-- > 0; ) {         // newest first
+            const RxPkt &p = rxPackets[i];
+            uint32_t age = (now - p.when) / 1000;
+            String ago = age < 60 ? String(age) + "s" : String(age / 60) + "m";
+            body += "{\"rxTime\":\""; body += ago;
+            body += "\",\"packet\":\""; body += jsonEscape(p.frame);
+            body += "\",\"RSSI\":";     body += String(p.rssi);
+            body += ",\"SNR\":";        body += String(p.snr, 1);
             body += "}";
             if (i != 0) body += ",";
         }

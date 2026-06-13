@@ -40,6 +40,11 @@ static byte mac[6];
 static QueueHandle_t rxQueue;        // heap String* handoff: loraTask -> netTask
 static QueueHandle_t txMsgQueue;     // heap String* handoff: netTask -> loraTask (outgoing msgs)
 static QueueHandle_t rxMsgQueue;     // heap String* handoff: loraTask -> netTask (incoming msgs for us)
+static QueueHandle_t rxPktQueue;     // heap String* handoff: loraTask -> netTask (RX packets log)
+
+// Signal stats of the last RX (set in lora_utils_rp2350.cpp's receivePacket()).
+extern int   rssi;
+extern float snr;
 volatile bool g_beaconNow = false;   // set by POST /action?type=send-beacon (eth_web)
 volatile bool g_rfBeaconNow = false; // set by POST /action?type=send-rf-beacon (eth_web)
 
@@ -96,6 +101,11 @@ void loraTask(void *) {
             Station::noteRx();
             String body = pkt.length() > 3 ? pkt.substring(3) : pkt;   // strip LoRa-APRS header
             Serial.println("[lora] RX: " + body);
+
+            // log every RX packet for the web "Received packets" view (frame +
+            // signal stats captured together, before policy filtering)
+            String *lp = new String(String(rssi) + "\t" + String(snr, 1) + "\t" + body);
+            if (xQueueSend(rxPktQueue, &lp, 0) != pdTRUE) delete lp;
 
             // packet policy (shared by gate + digi): parse SENDER + payload
             int gt    = body.indexOf('>');
@@ -201,8 +211,20 @@ void netTask(void *) {
         String *m;
         while (xQueueReceive(rxMsgQueue, &m, 0) == pdTRUE) {
             int tab = m->indexOf('\t');
-            if (tab > 0) ethWebAddMessage(m->substring(0, tab), m->substring(tab + 1));
+            if (tab > 0) ethWebAddMessage(m->substring(0, tab), m->substring(tab + 1), "RF");
             delete m;
+        }
+        // store RX packets log (for GET /received-packets.json): "rssi\tsnr\tframe"
+        String *lp;
+        while (xQueueReceive(rxPktQueue, &lp, 0) == pdTRUE) {
+            int t1 = lp->indexOf('\t');
+            int t2 = lp->indexOf('\t', t1 + 1);
+            if (t1 > 0 && t2 > t1) {
+                ethWebAddPacket(lp->substring(t2 + 1),
+                                lp->substring(0, t1).toInt(),
+                                lp->substring(t1 + 1, t2).toFloat());
+            }
+            delete lp;
         }
         if (millis() - lastMaintain > 5000) { Ethernet.maintain(); lastMaintain = millis(); }
         // heartbeat printed HERE (netTask owns the W5500 — no SPI race)
@@ -233,6 +255,7 @@ void setup() {
     rxQueue    = xQueueCreate(8, sizeof(String *));
     txMsgQueue = xQueueCreate(4, sizeof(String *));
     rxMsgQueue = xQueueCreate(8, sizeof(String *));
+    rxPktQueue = xQueueCreate(8, sizeof(String *));
     xTaskCreate(loraTask, "lora", 4096, nullptr, 3, nullptr);
     xTaskCreate(netTask,  "net",  4096, nullptr, 2, nullptr);
 }
