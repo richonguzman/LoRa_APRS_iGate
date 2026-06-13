@@ -4,6 +4,7 @@
 #include <LittleFS.h>
 #include <vector>
 #include "web_assets.h"   // gzipped SPA assets embedded in flash
+#include "ntp_rp2350.h"
 
 // Apply a posted config form (urlencoded or multipart) to Config + persist.
 extern bool applyConfigForm(const String &contentType, const String &body);
@@ -271,7 +272,10 @@ static void handleClient(EthernetClient &c) {
             const RxPkt &p = rxPackets[i];
             uint32_t age = (now - p.when) / 1000;
             String ago = age < 60 ? String(age) + "s" : String(age / 60) + "m";
-            body += "{\"rxTime\":\""; body += ago;
+            // real wall-clock = NTP-now minus this packet's age (works even for
+            // packets received before the NTP sync); fall back to "ago" if no NTP
+            String rxTime = Ntp::synced() ? Ntp::hms(Ntp::nowEpoch() - age) : ago;
+            body += "{\"rxTime\":\""; body += rxTime;
             body += "\",\"packet\":\""; body += jsonEscape(p.frame);
             body += "\",\"RSSI\":";     body += String(p.rssi);
             body += ",\"SNR\":";        body += String(p.snr, 1);

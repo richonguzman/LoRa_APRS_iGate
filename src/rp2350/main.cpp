@@ -28,6 +28,7 @@
 #include "message_rp2350.h"
 #include "tnc_rp2350.h"
 #include "telemetry_rp2350.h"
+#include "ntp_rp2350.h"
 #include "pico/unique_id.h"   // pico_get_unique_board_id (cached at boot — SMP-safe)
 
 #ifndef HB_LED
@@ -201,6 +202,7 @@ void netTask(void *) {
     for (;;) {
         ethWebPoll();
         Tnc::poll();                         // accept KISS clients + read their frames
+        Ntp::poll();                         // SNTP time sync (real timestamps)
         if (Config.aprs_is.active) {
             if (!AprsIs::connected() && (millis() - lastAprsTry > 10000)) {
                 lastAprsTry = millis();
@@ -255,8 +257,9 @@ void netTask(void *) {
         if (millis() - lastHb > 3000) {
             lastHb = millis();
             IPAddress ip = Ethernet.localIP();
-            Serial.printf("[hb] up=%lus  ip=%d.%d.%d.%d  callsign=%s  aprsis=%s  stations=%u\n",
-                          (unsigned long)(millis() / 1000), ip[0], ip[1], ip[2], ip[3],
+            String clock = Ntp::synced() ? Ntp::hms(Ntp::nowEpoch()) : "--:--:--";
+            Serial.printf("[hb] up=%lus  %s  ip=%d.%d.%d.%d  callsign=%s  aprsis=%s  stations=%u\n",
+                          (unsigned long)(millis() / 1000), clock.c_str(), ip[0], ip[1], ip[2], ip[3],
                           Config.callsign.c_str(), AprsIs::connected() ? "up" : "down",
                           (unsigned)Station::activeCount());
         }
