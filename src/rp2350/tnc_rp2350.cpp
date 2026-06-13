@@ -2,7 +2,7 @@
  * RP2350 KISS TNC server — replaces the ESP32 tnc_utils.cpp (WiFiServer/mDNS)
  * with an EthernetServer on the W5500. The KISS framing/codec is reused as-is
  * from src/kiss_utils.cpp. Runs entirely in netTask (W5500 owner); frames bound
- * for RF are handed to loraTask via tncSendRF() (txMsgQueue -> Station buffer).
+ * for RF are handed to loraTask via enqueueRfFrame() (txMsgQueue -> Station buffer).
  */
 #include "tnc_rp2350.h"
 #include <Ethernet.h>
@@ -12,7 +12,7 @@
 #include "aprsis_rp2350.h"
 
 extern Configuration Config;
-extern void tncSendRF(const String &frame);   // main.cpp: push to txMsgQueue -> loraTask
+extern void enqueueRfFrame(const String &frame);   // main.cpp: push to txMsgQueue -> loraTask
 
 #define TNC_PORT        8001
 #define TNC_MAX_CLIENTS 2
@@ -45,7 +45,7 @@ void handleByte(int idx, char ch) {
             return;
         }
         Serial.println("[tnc] <- " + frame);
-        if (Config.loramodule.txActive) tncSendRF(frame);  // -> loraTask -> RF
+        if (Config.loramodule.txActive) enqueueRfFrame(frame);  // -> loraTask -> RF
 
         if (Config.tnc.aprsBridgeActive && Config.aprs_is.active && AprsIs::connected()) {
             int colon = frame.indexOf(':');

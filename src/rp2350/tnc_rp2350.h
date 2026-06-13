@@ -6,7 +6,7 @@
 //   client -> KISS frame -> decode -> RF TX (and optional APRS-IS bridge)
 //   RF RX  -> KISS-encode -> all connected clients
 // Reuses the validated KISS codec (src/kiss_utils.cpp). All calls run from
-// netTask (the W5500 owner); RF TX is handed to loraTask via tncSendRF().
+// netTask (the W5500 owner); RF TX is handed to loraTask via enqueueRfFrame().
 namespace Tnc {
     void setup();                          // start the server if Config.tnc.enableServer
     void poll();                           // accept clients + read their KISS frames

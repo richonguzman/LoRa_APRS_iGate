@@ -29,6 +29,7 @@
 #include "tnc_rp2350.h"
 #include "telemetry_rp2350.h"
 #include "ntp_rp2350.h"
+#include "mqtt_rp2350.h"
 #include "pico/unique_id.h"   // pico_get_unique_board_id (cached at boot — SMP-safe)
 
 #ifndef HB_LED
@@ -82,9 +83,9 @@ void onIncomingMessage(const String &from, const String &text) {
     if (xQueueSend(rxMsgQueue, &p, 0) != pdTRUE) delete p;
 }
 
-// Called from netTask (TNC KISS client) to transmit a frame over RF. Hands it to
-// loraTask via txMsgQueue (Station output buffer owner) — same path as messages.
-void tncSendRF(const String &frame) {
+// Called from netTask (TNC KISS client, MQTT downlink) to transmit a frame over
+// RF. Hands it to loraTask via txMsgQueue (Station output buffer owner).
+void enqueueRfFrame(const String &frame) {
     if (frame.length() == 0) return;
     String *p = new String(frame);
     if (xQueueSend(txMsgQueue, &p, 0) != pdTRUE) delete p;
@@ -198,6 +199,7 @@ void netTask(void *) {
 
     ethWebSetup();
     Tnc::setup();                            // KISS TNC server on :8001 (if enabled)
+    Mqtt::setup();                           // MQTT bridge (if Config.mqtt.active)
 
     uint32_t lastMaintain = millis();
     uint32_t lastAprsTry  = 0;
@@ -207,6 +209,7 @@ void netTask(void *) {
         ethWebPoll();
         Tnc::poll();                         // accept KISS clients + read their frames
         Ntp::poll();                         // SNTP time sync (real timestamps)
+        Mqtt::loop();                        // MQTT (re)connect + service
         if (Config.aprs_is.active) {
             if (!AprsIs::connected() && (millis() - lastAprsTry > 10000)) {
                 lastAprsTry = millis();
@@ -228,6 +231,7 @@ void netTask(void *) {
                 String t = Telemetry::dataPacket();  // classic T# telemetry packet
                 AprsIs::send(t);
                 Serial.println("[telemetry] " + t);
+                Mqtt::publishBeacon(b);              // mirror beacon to MQTT (if beaconOverMqtt)
             }
         }
         // forward any LoRa packets handed over by loraTask
@@ -253,6 +257,7 @@ void netTask(void *) {
                 String frame = lp->substring(t2 + 1);
                 ethWebAddPacket(frame, lp->substring(0, t1).toInt(), lp->substring(t1 + 1, t2).toFloat());
                 Tnc::broadcast(frame);
+                Mqtt::publishRx(frame);
             }
             delete lp;
         }
