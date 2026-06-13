@@ -278,6 +278,13 @@ void netTask(void *) {
                           Config.callsign.c_str(), AprsIs::connected() ? "up" : "down",
                           (unsigned)Station::activeCount());
         }
+        // scheduled auto-reboot (Config "Reboot Time", in hours of uptime)
+        if (Config.rebootMode && Config.rebootModeTime > 0 &&
+            millis() > (uint32_t)Config.rebootModeTime * 3600UL * 1000UL) {
+            Serial.println("[reboot] scheduled reboot time reached, restarting...");
+            delay(100);
+            rp2040.restart();
+        }
         vTaskDelay(pdMS_TO_TICKS(15));
     }
 }
@@ -291,6 +298,8 @@ void setup() {
 
     pinMode(HB_LED, OUTPUT);
     Config.setup();                          // LittleFS + /igate_conf.json (defaults on first boot)
+    if (Config.rebootMode && Config.rebootModeTime > 0)
+        Serial.printf("[reboot] auto-reboot every %d h\n", Config.rebootModeTime);
     Station::setup();                        // load blacklist/managers from Config
     Wx::setup();                             // BMP280 on I2C0 (Wire) — single-threaded init here
 
