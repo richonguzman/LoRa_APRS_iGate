@@ -262,8 +262,21 @@ function loadSettings(settings) {
     document.getElementById("ntp.server").value                         = settings.ntp.server;
     document.getElementById("ntp.gmtCorrection").value                  = settings.ntp.gmtCorrection;
 
+    // IP Config
+    const net = settings.network || { dhcp: true, ip: "", gateway: "", subnet: "255.255.255.0", dns: "" };
+    document.getElementById("network.dhcp").checked                     = net.dhcp;
+    document.getElementById("network.ip").value                         = net.ip || "";
+    document.getElementById("network.gateway").value                   = net.gateway || "";
+    document.getElementById("network.subnet").value                    = net.subnet || "255.255.255.0";
+    document.getElementById("network.dns").value                       = net.dns || "";
+    document.getElementById("static-ip-config").style.display          = net.dhcp ? "none" : "";
+
     updateImage();
 }
+
+document.getElementById("network.dhcp").addEventListener("change", function () {
+    document.getElementById("static-ip-config").style.display = this.checked ? "none" : "";
+});
 
 function showToast(message) {
     const el = document.querySelector('#toast');

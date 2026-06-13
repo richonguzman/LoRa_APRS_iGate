@@ -188,6 +188,12 @@ bool Configuration::writeFile() {
         data["ntp"]["server"]                       = ntp.server;
         data["ntp"]["gmtCorrection"]                = ntp.gmtCorrection;
 
+        data["network"]["dhcp"]                     = network.dhcp;
+        data["network"]["ip"]                       = network.ip;
+        data["network"]["gateway"]                  = network.gateway;
+        data["network"]["subnet"]                   = network.subnet;
+        data["network"]["dns"]                      = network.dns;
+
         data["other"]["rebootMode"]                 = rebootMode;
         data["other"]["rebootModeTime"]             = rebootModeTime;
 
@@ -420,6 +426,13 @@ bool Configuration::readFile() {
         ntp.server                      = data["ntp"]["server"] | "pool.ntp.org";
         ntp.gmtCorrection               = data["ntp"]["gmtCorrection"] | 0.0;
 
+        if (data["network"]["dhcp"].isNull()) needsRewrite = true;
+        network.dhcp                    = data["network"]["dhcp"] | true;
+        network.ip                      = data["network"]["ip"] | "";
+        network.gateway                 = data["network"]["gateway"] | "";
+        network.subnet                  = data["network"]["subnet"] | "255.255.255.0";
+        network.dns                     = data["network"]["dns"] | "";
+
         if (data["other"]["rebootMode"].isNull() ||
             data["other"]["rebootModeTime"].isNull()) needsRewrite = true;
         rebootMode                      = data["other"]["rebootMode"] | false;
@@ -566,6 +579,12 @@ void Configuration::setDefaultValues() {
 
     ntp.server                      = "pool.ntp.org";
     ntp.gmtCorrection               = 0.0;
+
+    network.dhcp                    = true;
+    network.ip                      = "";
+    network.gateway                 = "";
+    network.subnet                  = "255.255.255.0";
+    network.dns                     = "";
 
     rebootMode                      = false;
     rebootModeTime                  = 0;

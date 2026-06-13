@@ -232,6 +232,14 @@ bool applyConfigForm(const String &contentType, const String &body) {
         Config.ntp.server                   = getParamStringSafe("ntp.server", Config.ntp.server);
         Config.ntp.gmtCorrection            = getParamFloatSafe("ntp.gmtCorrection", Config.ntp.gmtCorrection);
 
+        Config.network.dhcp                 = fHas("network.dhcp");
+        if (!Config.network.dhcp) {
+            Config.network.ip               = getParamStringSafe("network.ip", Config.network.ip);
+            Config.network.gateway          = getParamStringSafe("network.gateway", Config.network.gateway);
+            Config.network.subnet           = getParamStringSafe("network.subnet", Config.network.subnet);
+            Config.network.dns              = getParamStringSafe("network.dns", Config.network.dns);
+        }
+
         Config.rememberStationTime          = getParamIntSafe("other.rememberStationTime", Config.rememberStationTime);
 
     Serial.printf("[cfg] applied %d form fields\n", (int)kv.size());

@@ -194,9 +194,22 @@ void netTask(void *) {
     mac[2] = uid.id[4]; mac[3] = uid.id[5]; mac[4] = uid.id[6]; mac[5] = uid.id[7];
     Serial.printf("[ETH] MAC %02X:%02X:%02X:%02X:%02X:%02X\n",
                   mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
-    Serial.println("[ETH] DHCP...");
-    if (Ethernet.begin(mac) == 0) Serial.println("[ETH] DHCP FAILED (check link/cable)");
-    else { Serial.print("[ETH] IP: "); Serial.println(Ethernet.localIP()); }
+    if (!Config.network.dhcp) {
+        // static IP — parse the strings; first DNS of the list goes to the stack
+        IPAddress ip, gw, sn, dns;
+        ip.fromString(Config.network.ip);
+        gw.fromString(Config.network.gateway);
+        sn.fromString(Config.network.subnet.length() ? Config.network.subnet : String("255.255.255.0"));
+        String d = Config.network.dns; d.trim();
+        int sep = d.indexOf(' '); if (sep < 0) sep = d.indexOf(',');
+        dns.fromString(sep > 0 ? d.substring(0, sep) : d);
+        Ethernet.begin(mac, ip, dns, gw, sn);     // synchronous, no DHCP wait
+        Serial.print("[ETH] static IP: "); Serial.println(Ethernet.localIP());
+    } else {
+        Serial.println("[ETH] DHCP...");
+        if (Ethernet.begin(mac) == 0) Serial.println("[ETH] DHCP FAILED (check link/cable)");
+        else { Serial.print("[ETH] IP: "); Serial.println(Ethernet.localIP()); }
+    }
 
     ethWebSetup();
     Tnc::setup();                            // KISS TNC server on :8001 (if enabled)
