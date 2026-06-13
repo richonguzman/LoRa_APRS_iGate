@@ -30,6 +30,7 @@
 #include "telemetry_rp2350.h"
 #include "ntp_rp2350.h"
 #include "mqtt_rp2350.h"
+#include "syslog_rp2350.h"
 #include "pico/unique_id.h"   // pico_get_unique_board_id (cached at boot — SMP-safe)
 
 #ifndef HB_LED
@@ -200,6 +201,7 @@ void netTask(void *) {
     ethWebSetup();
     Tnc::setup();                            // KISS TNC server on :8001 (if enabled)
     Mqtt::setup();                           // MQTT bridge (if Config.mqtt.active)
+    Syslog::setup();                         // remote syslog (if Config.syslog.active)
 
     uint32_t lastMaintain = millis();
     uint32_t lastAprsTry  = 0;
@@ -232,6 +234,7 @@ void netTask(void *) {
                 AprsIs::send(t);
                 Serial.println("[telemetry] " + t);
                 Mqtt::publishBeacon(b);              // mirror beacon to MQTT (if beaconOverMqtt)
+                if (Config.syslog.logBeaconOverTCPIP) Syslog::logTx("APRSIS BEACON / " + b);
             }
         }
         // forward any LoRa packets handed over by loraTask
@@ -255,9 +258,12 @@ void netTask(void *) {
             int t2 = lp->indexOf('\t', t1 + 1);
             if (t1 > 0 && t2 > t1) {
                 String frame = lp->substring(t2 + 1);
-                ethWebAddPacket(frame, lp->substring(0, t1).toInt(), lp->substring(t1 + 1, t2).toFloat());
+                int prssi = lp->substring(0, t1).toInt();
+                float psnr = lp->substring(t1 + 1, t2).toFloat();
+                ethWebAddPacket(frame, prssi, psnr);
                 Tnc::broadcast(frame);
                 Mqtt::publishRx(frame);
+                Syslog::logRx(frame, prssi, psnr);
             }
             delete lp;
         }
