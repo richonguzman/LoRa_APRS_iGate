@@ -26,12 +26,8 @@
 #include "station_rp2350.h"
 #include "query_rp2350.h"
 #include "message_rp2350.h"
+#include "pico/unique_id.h"   // pico_get_unique_board_id (cached at boot — SMP-safe)
 
-// Last MAC octet — per build env so two boards never collide on DHCP. We do NOT
-// read the chip unique-ID at runtime (faults under FreeRTOS SMP -> USB hang).
-#ifndef MAC_ID
-#define MAC_ID 0x10
-#endif
 #ifndef HB_LED
 #define HB_LED 25          // onboard LED (GP25 on the WIZnet W5500-EVB-Pico2)
 #endif
@@ -136,7 +132,15 @@ void netTask(void *) {
     SPI.setTX(PIN_ETH_MOSI);
     Ethernet.init(PIN_ETH_CS);
 
-    mac[0] = 0x02; mac[1] = 0x00; mac[2] = 0x4C; mac[3] = 0x47; mac[4] = 0x00; mac[5] = MAC_ID;
+    // MAC derived from the chip's unique board ID (like Meshtastic's getMacAddr).
+    // pico_get_unique_board_id() returns a value cached at boot by an SDK ctor
+    // (single-core, before the scheduler) — it does NOT touch flash here, so it's
+    // safe under FreeRTOS SMP. mac[0]=0x02 => locally administered + unicast; the
+    // 4 chip bytes make two identical boards differ on the LAN (no DHCP clash).
+    pico_unique_board_id_t uid;
+    pico_get_unique_board_id(&uid);
+    mac[0] = 0x02; mac[1] = 0x00;
+    mac[2] = uid.id[4]; mac[3] = uid.id[5]; mac[4] = uid.id[6]; mac[5] = uid.id[7];
     Serial.printf("[ETH] MAC %02X:%02X:%02X:%02X:%02X:%02X\n",
                   mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
     Serial.println("[ETH] DHCP...");
