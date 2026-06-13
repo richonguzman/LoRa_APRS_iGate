@@ -2,10 +2,22 @@
 #include <APRSPacketLib.h>
 #include "configuration.h"
 #include "wx_rp2350.h"
+#include "battery_rp2350.h"
 
 extern Configuration Config;
 
 namespace Beacon {
+
+// " Batt=X.XXV" appended to the comment when supply-voltage reporting goes in the
+// beacon (not as telemetry). Empty otherwise.
+static String battField() {
+    if (Config.battery.sendInternalVoltage && !Config.battery.sendVoltageAsTelemetry) {
+        char b[12];
+        snprintf(b, sizeof(b), " Batt=%.2fV", (double)Battery::vsys());
+        return String(b);
+    }
+    return "";
+}
 
 // Base91-compressed position payload: =<overlay><base91>  (mirrors gps_utils.cpp)
 static String encodedPosition() {
@@ -29,6 +41,7 @@ String buildAprsisLine() {
     line += encodedPosition();
     line += wxField();
     line += Config.beacon.comment;
+    line += battField();
     return line;
 }
 
@@ -40,6 +53,7 @@ String buildRfLine() {
     line += Config.beacon.overlay;
     line += encodedPosition();
     line += Config.beacon.comment;
+    line += battField();
     return line;
 }
 

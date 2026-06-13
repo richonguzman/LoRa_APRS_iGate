@@ -31,6 +31,7 @@
 #include "ntp_rp2350.h"
 #include "mqtt_rp2350.h"
 #include "syslog_rp2350.h"
+#include "battery_rp2350.h"
 #include "pico/unique_id.h"   // pico_get_unique_board_id (cached at boot — SMP-safe)
 
 #ifndef HB_LED
@@ -286,10 +287,10 @@ void netTask(void *) {
             lastHb = millis();
             IPAddress ip = Ethernet.localIP();
             String clock = Ntp::synced() ? Ntp::hms(Ntp::nowEpoch()) : "--:--:--";
-            Serial.printf("[hb] up=%lus  %s  ip=%d.%d.%d.%d  callsign=%s  aprsis=%s  stations=%u\n",
+            Serial.printf("[hb] up=%lus  %s  ip=%d.%d.%d.%d  callsign=%s  aprsis=%s  stations=%u  vsys=%.2fV\n",
                           (unsigned long)(millis() / 1000), clock.c_str(), ip[0], ip[1], ip[2], ip[3],
                           Config.callsign.c_str(), AprsIs::connected() ? "up" : "down",
-                          (unsigned)Station::activeCount());
+                          (unsigned)Station::activeCount(), Battery::vsys());
         }
         // scheduled auto-reboot (Config "Reboot Time", in hours of uptime)
         if (Config.rebootMode && Config.rebootModeTime > 0 &&
@@ -314,6 +315,7 @@ void setup() {
     if (Config.rebootMode && Config.rebootModeTime > 0)
         Serial.printf("[reboot] auto-reboot every %d h\n", Config.rebootModeTime);
     Station::setup();                        // load blacklist/managers from Config
+    Battery::setup();                        // VSYS ADC
     Wx::setup();                             // BMP280 on I2C0 (Wire) — single-threaded init here
 
     rxQueue    = xQueueCreate(8, sizeof(String *));

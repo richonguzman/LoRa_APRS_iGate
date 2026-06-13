@@ -9,6 +9,7 @@
 #include "configuration.h"
 #include "station_rp2350.h"
 #include "aprsis_rp2350.h"
+#include "battery_rp2350.h"
 
 extern Configuration Config;
 extern int   rssi;          // last RX signal stats (lora_utils_rp2350.cpp)
@@ -52,7 +53,8 @@ String dataPacket() {
     int a2 = clamp255(Station::activeCount());           // Heard    EQNS 0,1,0
     int a3 = clamp255(rssi + 150);                       // RSSI     EQNS 0,1,-150  -> dBm
     int a4 = clamp255((long)((snr + 20.0f) * 5.0f));     // SNR      EQNS 0,0.2,-20 -> dB
-    int a5 = 0;                                           // spare
+    int a5 = Config.battery.sendVoltageAsTelemetry       // Vbat     EQNS 0,0.1,0   -> V (VSYS)
+                 ? clamp255((long)(Battery::vsys() * 10.0f)) : 0;
 
     char seq[4];
     snprintf(seq, sizeof(seq), "%03u", sequence);
@@ -75,9 +77,9 @@ bool dueDefinitions() {
 
 void sendDefinitions() {
     String call = selfCall();
-    AprsIs::send(defEnvelope(call, "PARM.RxPkts,Heard,RSSI,SNR,Aux"));
-    AprsIs::send(defEnvelope(call, "UNIT.Pkt,Stn,dBm,dB,-"));
-    AprsIs::send(defEnvelope(call, "EQNS.0,1,0,0,1,0,0,1,-150,0,0.2,-20,0,0,0"));
+    AprsIs::send(defEnvelope(call, "PARM.RxPkts,Heard,RSSI,SNR,Vbat"));
+    AprsIs::send(defEnvelope(call, "UNIT.Pkt,Stn,dBm,dB,V"));
+    AprsIs::send(defEnvelope(call, "EQNS.0,1,0,0,1,0,0,1,-150,0,0.2,-20,0,0.1,0"));
     lastDefs = millis() ? millis() : 1;
     Serial.println("[telemetry] sent EQNS/UNIT/PARM definitions");
 }
