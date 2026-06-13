@@ -22,6 +22,7 @@
 #include "aprsis_rp2350.h"
 #include "beacon_rp2350.h"
 #include "wx_rp2350.h"
+#include "digi_rp2350.h"
 
 // Last MAC octet — per build env so two boards never collide on DHCP. We do NOT
 // read the chip unique-ID at runtime (faults under FreeRTOS SMP -> USB hang).
@@ -66,7 +67,20 @@ void loraTask(void *) {
         if (pkt.length() > 0) {
             Serial.println("[lora] RX: " + pkt.substring(pkt.length() >= 3 ? 3 : 0));
             String *p = new String(pkt);
-            if (xQueueSend(rxQueue, &p, 0) != pdTRUE) delete p;   // drop if full
+            if (xQueueSend(rxQueue, &p, 0) != pdTRUE) delete p;   // drop if full (-> APRS-IS)
+
+            // --- Digipeater: re-TX over RF with the WIDEn-N path rewritten ---
+            // Done from THIS task (it owns the radio). Independent of gating.
+            if (Digi::enabled()) {
+                String repeat = Digi::process(pkt);
+                if (repeat.length() > 0) {
+                    // small randomised delay to avoid colliding with the source's
+                    // other hearers re-transmitting at the same instant
+                    vTaskDelay(pdMS_TO_TICKS(250 + (millis() & 0x1FF)));
+                    Serial.println("[digi] RF: " + repeat);
+                    LoRa_Utils::sendNewPacket(repeat);
+                }
+            }
         }
         vTaskDelay(pdMS_TO_TICKS(10));
     }

@@ -83,6 +83,10 @@ void sendNewPacket(const String& newPacket) {
     Serial.printf("[lora] TX %d B (state %d)\n", (int)tx.length(), st);
     digitalWrite(RADIO_RXEN, HIGH);            // restore RX path
     changeFreqRx();
+    // DIO1 fires on TxDone as well as RxDone, so transmit() just set rxFlag.
+    // Clear it (after re-arming RX) so the next receivePacket() doesn't read the
+    // stale TX FIFO back as a bogus "received" packet (self-RX -> duplicate gate).
+    rxFlag = false;
 }
 
 void wakeRadio()  { radio.standby(); radio.startReceive(); }
