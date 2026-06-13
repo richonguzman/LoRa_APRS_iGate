@@ -6,6 +6,9 @@
 #include "web_assets.h"   // gzipped SPA assets embedded in flash
 #include "ntp_rp2350.h"
 #include "ota_rp2350.h"
+#include "configuration.h"
+
+extern Configuration Config;
 
 // Apply a posted config form (urlencoded or multipart) to Config + persist.
 extern bool applyConfigForm(const String &contentType, const String &body);
@@ -82,6 +85,32 @@ static String getQueryParam(const String &query, const char *key) {
     int amp = query.indexOf('&', i);
     if (amp < 0) amp = query.length();
     return urlDecodeQ(query.substring(i, amp));
+}
+
+// standard base64 of a string (for HTTP Basic auth comparison)
+static String b64(const String &data) {
+    static const char *T = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    String r;
+    int v = 0, c = 0;
+    for (size_t i = 0; i < data.length(); i++) {
+        v = (v << 8) | (uint8_t)data[i];
+        c += 8;
+        while (c >= 6) { c -= 6; r += T[(v >> c) & 0x3F]; }
+    }
+    if (c > 0) r += T[(v << (6 - c)) & 0x3F];
+    while (r.length() % 4) r += '=';
+    return r;
+}
+
+// web-interface HTTP Basic auth: allowed unless webadmin is active with creds and
+// the request lacks the matching "Authorization: Basic <base64(user:pass)>".
+static bool webAuthOk(const String &authHeader) {
+    if (!Config.webadmin.active) return true;
+    if (Config.webadmin.username.length() == 0 && Config.webadmin.password.length() == 0) return true;
+    if (!authHeader.startsWith("Basic ")) return false;
+    String token = authHeader.substring(6);
+    token.trim();
+    return token == b64(Config.webadmin.username + ":" + Config.webadmin.password);
 }
 
 // escape a string for embedding in a JSON string literal
@@ -241,6 +270,16 @@ static void handleClient(EthernetClient &c) {
 
     if (req.method == "OPTIONS") {
         sendStatus(c, 204, "No Content");
+        cors(c);
+        c.print("Content-Length: 0\r\nConnection: close\r\n\r\n");
+        c.flush();
+        return;
+    }
+    // web-interface auth (HTTP Basic) when enabled. /status (version probe) and
+    // /update (its own OTA auth) are exempt to avoid breaking probes / double-auth.
+    if (req.path != "/status" && req.path != "/update" && !webAuthOk(req.authorization)) {
+        sendStatus(c, 401, "Unauthorized");
+        c.print("WWW-Authenticate: Basic realm=\"iGate Admin\"\r\n");
         cors(c);
         c.print("Content-Length: 0\r\nConnection: close\r\n\r\n");
         c.flush();
