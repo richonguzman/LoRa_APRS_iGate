@@ -80,6 +80,7 @@ void changeFreqTx() { radio.standby(); radio.setFrequency(txFreqMHz); }
 void changeFreqRx() { radio.standby(); radio.setFrequency(rxFreqMHz); radio.startReceive(); }
 
 void sendNewPacket(const String& newPacket) {
+    if (!Config.loramodule.txActive) return;   // RF TX disabled (RX-only iGate / ?TX=OFF)
     changeFreqTx();
     digitalWrite(RADIO_RXEN, LOW);             // E22 RX path off; DIO2 drives TXEN during transmit
     String tx;

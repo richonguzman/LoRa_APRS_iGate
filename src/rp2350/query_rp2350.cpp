@@ -37,10 +37,13 @@ String envelope(const String& station) {
     return s;
 }
 
-// Compose the answer text for a query, or "" if unsupported.
-String answerFor(const String& query) {
+// Compose the answer text for a query, or "" if unsupported. Manager-only remote
+// management commands (Config.remoteManagement managers) are honored when `sender`
+// is a manager. Our queries arrive over RF only, so rfOnly is always satisfied.
+String answerFor(const String& query, const String& sender) {
     String q = query;
     q.toUpperCase();
+    // --- public queries ---
     if (q == "?APRS?" || q == "H" || q == "HELP" || q == "?")
         return "?APRSV ?APRSP ?APRSL ?APRSSR";
     if (q == "?APRSV")
@@ -57,6 +60,25 @@ String answerFor(const String& query) {
         char buf[40];
         snprintf(buf, sizeof(buf), " %ddBm / %.2fdB / %dHz", rssi, (double)snr, freqError);
         return String(buf);
+    }
+    // --- manager-only remote management ---
+    if (Station::isManager(sender)) {
+        if (q.startsWith("?TX=ON")) {
+            if (Config.loramodule.txActive) return "TX was ON";
+            Config.loramodule.txActive = true;
+            return "TX=ON";
+        }
+        if (q.startsWith("?TX=OFF")) {
+            if (!Config.loramodule.txActive) return "TX was OFF";
+            Config.loramodule.txActive = false;
+            return "TX=OFF";
+        }
+        if (q.startsWith("?TX=?"))
+            return Config.loramodule.txActive ? "TX=ON" : "TX=OFF";
+        if (q.startsWith("?COMMIT")) {
+            Config.writeFile();
+            return "New Config Saved";
+        }
     }
     return "";
 }
@@ -94,7 +116,7 @@ bool handleMessage(const String& body, const String& sender) {
     }
 
     if (msgText.indexOf('?') == 0) {                         // it's a query
-        String answer = answerFor(msgText);
+        String answer = answerFor(msgText, sender);
         if (answer.length()) {
             String reply = envelope(sender);
             reply += answer;
