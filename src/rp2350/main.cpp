@@ -123,11 +123,17 @@ void loraTask(void *) {
             String sender  = (gt > 0) ? body.substring(0, gt) : "";
             String payload = (colon >= 0) ? body.substring(colon) : body;
 
+            // our own packet heard back (e.g. digipeated by another station): do
+            // not gate/digi it, nor count it as a heard station (matches upstream).
+            String selfCall = Config.tacticalCallsign.length() ? Config.tacticalCallsign : Config.callsign;
+            bool isSelf      = sender.length() && sender == selfCall;
             bool blacklisted = sender.length() && Station::isBlacklisted(sender);
-            bool dup         = sender.length() && Station::isDuplicate(sender, payload);
-            if (sender.length()) Station::updateLastHeard(sender);
+            bool dup         = !isSelf && sender.length() && Station::isDuplicate(sender, payload);
+            if (sender.length() && !isSelf) Station::updateLastHeard(sender);
 
-            if (blacklisted) {
+            if (isSelf) {
+                Serial.println("[lora] ignored own packet heard back: " + sender);
+            } else if (blacklisted) {
                 Serial.println("[lora] dropped (blacklist): " + sender);
             } else if (dup) {
                 Serial.println("[lora] dropped (dup <25s): " + sender);
