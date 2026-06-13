@@ -39,17 +39,35 @@ Configuration Config;
 static byte mac[6];
 static QueueHandle_t rxQueue;        // heap String* handoff: loraTask -> netTask
 static QueueHandle_t txMsgQueue;     // heap String* handoff: netTask -> loraTask (outgoing msgs)
+static QueueHandle_t rxMsgQueue;     // heap String* handoff: loraTask -> netTask (incoming msgs for us)
 volatile bool g_beaconNow = false;   // set by POST /action?type=send-beacon (eth_web)
 volatile bool g_rfBeaconNow = false; // set by POST /action?type=send-rf-beacon (eth_web)
 
 // Called from netTask (eth_web /action handler) to originate an APRS message.
 // We build here (Config is read-only) and hand the packet to loraTask, the sole
 // owner of the Station output buffer (no cross-task race on outBuffer).
-void webSendMessage(const String &to, const String &text) {
-    String pkt = Message::buildRF(to, text);
-    if (pkt.length() == 0) return;
-    String *p = new String(pkt);
-    if (xQueueSend(txMsgQueue, &p, 0) != pdTRUE) delete p;
+// Called from netTask (eth_web /action). RF goes via the queue to loraTask; the
+// APRS-IS copy is sent right here (netTask owns the socket).
+void webSendMessage(const String &to, const String &text, bool viaRF, bool viaTCP) {
+    if (viaRF) {
+        String pkt = Message::buildRF(to, text);
+        if (pkt.length()) {
+            String *p = new String(pkt);
+            if (xQueueSend(txMsgQueue, &p, 0) != pdTRUE) delete p;
+        }
+    }
+    if (viaTCP && AprsIs::connected()) {
+        String line = Message::buildAprsis(to, text);
+        if (line.length()) { AprsIs::send(line); Serial.println("[msg] APRS-IS: " + line); }
+    }
+}
+
+// Called from loraTask (Query::handleMessage) when an APRS message addressed to
+// us is received. Hand it to netTask (the W5500 owner) for the /messages.json
+// store via a queue — no cross-task race on the message list.
+void onIncomingMessage(const String &from, const String &text) {
+    String *p = new String(from + "\t" + text);
+    if (xQueueSend(rxMsgQueue, &p, 0) != pdTRUE) delete p;
 }
 
 // --------------------------------------------------------------- LoRa RX/TX task
@@ -179,6 +197,13 @@ void netTask(void *) {
             if (Config.aprs_is.active) AprsIs::forward(*p);
             delete p;
         }
+        // store any incoming messages addressed to us (for GET /messages.json)
+        String *m;
+        while (xQueueReceive(rxMsgQueue, &m, 0) == pdTRUE) {
+            int tab = m->indexOf('\t');
+            if (tab > 0) ethWebAddMessage(m->substring(0, tab), m->substring(tab + 1));
+            delete m;
+        }
         if (millis() - lastMaintain > 5000) { Ethernet.maintain(); lastMaintain = millis(); }
         // heartbeat printed HERE (netTask owns the W5500 — no SPI race)
         if (millis() - lastHb > 3000) {
@@ -207,6 +232,7 @@ void setup() {
 
     rxQueue    = xQueueCreate(8, sizeof(String *));
     txMsgQueue = xQueueCreate(4, sizeof(String *));
+    rxMsgQueue = xQueueCreate(8, sizeof(String *));
     xTaskCreate(loraTask, "lora", 4096, nullptr, 3, nullptr);
     xTaskCreate(netTask,  "net",  4096, nullptr, 2, nullptr);
 }

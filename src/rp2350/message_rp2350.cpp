@@ -10,11 +10,10 @@ extern Configuration Config;
 
 namespace Message {
 
-String buildRF(const String& to, const String& text) {
-    if (to.length() == 0 || text.length() == 0) return "";
+static String envelope(const String& tocallPath, const String& to, const String& text) {
     String pkt = Config.callsign;
     pkt += ">APLRG1";
-    if (Config.beacon.path.length()) { pkt += ','; pkt += Config.beacon.path; }
+    pkt += tocallPath;                                      // ",PATH" (RF) or ",TCPIP*" (APRS-IS)
     pkt += "::";
     String padded = to;
     for (int i = to.length(); i < 9; i++) padded += ' ';   // APRS addressee is 9 chars
@@ -22,6 +21,17 @@ String buildRF(const String& to, const String& text) {
     pkt += ':';
     pkt += text;
     return pkt;
+}
+
+String buildRF(const String& to, const String& text) {
+    if (to.length() == 0 || text.length() == 0) return "";
+    String path = Config.beacon.path.length() ? ("," + Config.beacon.path) : "";
+    return envelope(path, to, text);
+}
+
+String buildAprsis(const String& to, const String& text) {
+    if (to.length() == 0 || text.length() == 0) return "";
+    return envelope(",TCPIP*", to, text);
 }
 
 }  // namespace Message

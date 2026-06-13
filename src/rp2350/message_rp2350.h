@@ -8,8 +8,11 @@
 // The text is sent verbatim; append a "{id" suffix if you want the recipient to
 // ack it.
 namespace Message {
-    // Pure builder (read-only on Config) — safe to call from any task. Returns
-    // the headerless packet to hand to Station::enqueueTx (LoRa_Utils prepends
-    // the 3-byte LoRa-APRS header at TX). Returns "" on empty to/text.
+    // Pure builders (read-only on Config) — safe to call from any task. Return ""
+    // on empty to/text.
+    //   buildRF    : headerless packet for Station::enqueueTx (RF; LoRa_Utils
+    //                prepends the 3-byte LoRa-APRS header at TX).
+    //   buildAprsis: line for AprsIs::send (APRS-IS over TCP, TCPIP* q-construct).
     String buildRF(const String& to, const String& text);
+    String buildAprsis(const String& to, const String& text);
 }

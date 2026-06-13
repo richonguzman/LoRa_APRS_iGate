@@ -14,6 +14,10 @@ extern int   rssi;
 extern float snr;
 extern int   freqError;
 
+// Records an incoming APRS message addressed to us (main.cpp -> netTask store,
+// served at GET /messages.json). Called from loraTask.
+extern void onIncomingMessage(const String &from, const String &text);
+
 static const char *IGATE_VERSION = "RP2350 LoRa iGate v0.1";
 
 namespace {
@@ -77,6 +81,8 @@ bool handleMessage(const String& body, const String& sender) {
     // ack any message that carries a {msgid}
     int brace = text.indexOf('{');
     String msgText = (brace > 0) ? text.substring(0, brace) : text;
+
+    onIncomingMessage(sender, msgText);                      // log it for the web UI
     if (brace > 0) {
         String ackId = text.substring(brace + 1);
         ackId.trim();
@@ -101,7 +107,12 @@ bool handleMessage(const String& body, const String& sender) {
         }
         return true;                                        // query handled: don't gate/digipeat
     }
-    return false;                                           // plain message: acked, let it gate
+    // Plain message addressed to us: consumed locally (recorded + acked above).
+    // Return true so it is NOT gated to APRS-IS nor digipeated — a message "for
+    // me" is not pass-through traffic. Messages to OTHER stations still gate/digi
+    // normally (this function returns false early for them). To put a message on
+    // APRS-IS, the sender uses the "Send via APRS-IS (TCP)" path explicitly.
+    return true;
 }
 
 }  // namespace Query

@@ -2,6 +2,7 @@
 #include <Arduino.h>
 #include <Ethernet.h>
 #include <LittleFS.h>
+#include <vector>
 #include "web_assets.h"   // gzipped SPA assets embedded in flash
 
 // Apply a posted config form (urlencoded or multipart) to Config + persist.
@@ -11,8 +12,8 @@ extern bool applyConfigForm(const String &contentType, const String &body);
 extern volatile bool g_beaconNow;
 // Set by POST /action?type=send-rf-beacon; loraTask sends an RF beacon and clears it.
 extern volatile bool g_rfBeaconNow;
-// Originate an APRS message (built + handed to loraTask in main.cpp).
-extern void webSendMessage(const String &to, const String &text);
+// Originate an APRS message (RF via loraTask and/or APRS-IS via the socket).
+extern void webSendMessage(const String &to, const String &text, bool viaRF, bool viaTCP);
 
 static const int    WEB_PORT        = 80;
 static const size_t MAX_LINE_LEN    = 512;
@@ -21,6 +22,17 @@ static const char  *CONFIG_PATH     = "/igate_conf.json";
 
 static EthernetServer webServer(WEB_PORT);
 static bool webStarted = false;
+
+// --- incoming APRS messages addressed to us (shown in the Send Message view) ---
+struct RxMsg { String from; String text; uint32_t when; };
+static std::vector<RxMsg> rxMessages;          // netTask-owned, newest pushed to back
+static const size_t RXMSG_MAX = 20;
+
+void ethWebAddMessage(const String &from, const String &text) {
+    if (rxMessages.size() >= RXMSG_MAX) rxMessages.erase(rxMessages.begin());
+    rxMessages.push_back({from, text, millis()});
+    Serial.println("[msg] from " + from + ": " + text);
+}
 
 struct Request {
     String method;
@@ -57,6 +69,21 @@ static String getQueryParam(const String &query, const char *key) {
     int amp = query.indexOf('&', i);
     if (amp < 0) amp = query.length();
     return urlDecodeQ(query.substring(i, amp));
+}
+
+// escape a string for embedding in a JSON string literal
+static String jsonEscape(const String &s) {
+    String out; out.reserve(s.length() + 4);
+    for (size_t i = 0; i < s.length(); i++) {
+        char ch = s[i];
+        if (ch == '"' || ch == '\\') { out += '\\'; out += ch; }
+        else if (ch == '\n') out += "\\n";
+        else if (ch == '\r') out += "\\r";
+        else if (ch == '\t') out += "\\t";
+        else if ((uint8_t)ch < 0x20) { /* drop other control chars */ }
+        else out += ch;
+    }
+    return out;
 }
 
 // ---- HTTP request parsing (adapted from mesh/eth/ethApiHandlers.cpp) ----
@@ -210,6 +237,22 @@ static void handleClient(EthernetClient &c) {
         c.flush();
         return;
     }
+    if (req.path == "/messages.json") {
+        String body = "[";
+        uint32_t now = millis();
+        for (size_t i = rxMessages.size(); i-- > 0; ) {        // newest first
+            const RxMsg &m = rxMessages[i];
+            body += "{\"from\":\"";  body += jsonEscape(m.from);
+            body += "\",\"text\":\""; body += jsonEscape(m.text);
+            body += "\",\"age\":";    body += String((now - m.when) / 1000);
+            body += "}";
+            if (i != 0) body += ",";
+        }
+        body += "]";
+        sendText(c, 200, "OK", "application/json", body);
+        c.flush();
+        return;
+    }
     if (req.path == "/configuration.json") {
         if (req.method == "GET") { serveConfig(c); c.flush(); return; }
         if (req.method == "POST") { handleConfigPost(c, req); return; }  // reboots on success
@@ -221,10 +264,13 @@ static void handleClient(EthernetClient &c) {
         if (req.query.indexOf("send-message") >= 0) {
             String to   = getQueryParam(req.query, "to");
             String text = getQueryParam(req.query, "text");
+            bool viaRF  = req.query.indexOf("rf=1") >= 0;
+            bool viaTCP = req.query.indexOf("tcp=1") >= 0;
+            if (!viaRF && !viaTCP) viaRF = true;               // default to RF if unspecified
             if (to.length() == 0 || text.length() == 0) {
                 sendText(c, 400, "Bad Request", "text/plain", "need to= and text=");
             } else {
-                webSendMessage(to, text);
+                webSendMessage(to, text, viaRF, viaTCP);
                 sendText(c, 200, "OK", "text/plain", "message queued");
             }
         } else if (req.query.indexOf("send-rf-beacon") >= 0) {

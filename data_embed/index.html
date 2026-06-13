@@ -51,6 +51,11 @@
                                     Received packets
                                 </a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/send-message">
+                                    Messages
+                                </a>
+                            </li>
                         </ul>
                         <div class="d-flex">
                             <button class="btn btn-success my-2 my-sm-0" type="submit">Save</button>
@@ -82,7 +87,69 @@
                 </div>
                 <hr>
             </div>
-        
+
+            <div class="container d-none" id="send-message-view">
+                <div class="row my-5 d-flex align-items-top">
+                    <div class="col-lg-8 col-sm-12 mx-auto">
+                        <h3>Send APRS Message</h3>
+                        <small>Send an APRS text message to another station. Tip: send <code>?APRSV</code>, <code>?APRSP</code>, <code>?APRSL</code> or <code>?APRSSR</code> to query another iGate.</small>
+                        <div class="row mt-4">
+                            <div class="col-lg-4 col-sm-12">
+                                <label for="message.to" class="form-label">To (callsign)</label>
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="message.to"
+                                    placeholder="EA4XXX-7"
+                                    oninput="this.value = this.value.toUpperCase();"
+                                />
+                            </div>
+                            <div class="col-lg-8 col-sm-12">
+                                <label for="message.text" class="form-label">Message</label>
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="message.text"
+                                    placeholder="Hello world"
+                                    maxlength="67"
+                                />
+                            </div>
+                        </div>
+                        <div class="row mt-3 align-items-center">
+                            <div class="col-lg-3 col-6">
+                                <div class="form-check form-switch">
+                                    <input type="checkbox" class="form-check-input" id="message.viaRF" checked />
+                                    <label class="form-check-label" for="message.viaRF">Send via RF</label>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-6">
+                                <div class="form-check form-switch">
+                                    <input type="checkbox" class="form-check-input" id="message.viaTCP" />
+                                    <label class="form-check-label" for="message.viaTCP">Send via APRS-IS (TCP)</label>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-sm-12 mt-2 mt-lg-0">
+                                <button class="btn btn-primary form-control" id="send-message">Send message now</button>
+                            </div>
+                        </div>
+
+                        <h5 class="mt-5">Received messages</h5>
+                        <small>Messages addressed to this iGate's callsign. Refreshes every 10 seconds.</small>
+                        <table class="table mt-3">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Ago</th>
+                                    <th scope="col">From</th>
+                                    <th scope="col">Message</th>
+                                </tr>
+                            </thead>
+                            <tbody id="received-messages"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <hr>
+            </div>
+
             <div class="container" id="configuration">
                 <main>
                     <div class="col-10 my-5 mx-auto">

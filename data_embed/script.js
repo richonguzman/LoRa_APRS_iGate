@@ -281,6 +281,51 @@ document.getElementById('send-beacon').addEventListener('click', function (e) {
     showToast("Your beacon will be sent in a moment. <br> <u>This action will be ignored if you have APRSIS and LoRa TX disabled!</u>");
 });
 
+document.getElementById('send-message').addEventListener('click', function (e) {
+    e.preventDefault();
+
+    const to = document.getElementById('message.to').value.trim();
+    const text = document.getElementById('message.text').value.trim();
+    const viaRF = document.getElementById('message.viaRF').checked;
+    const viaTCP = document.getElementById('message.viaTCP').checked;
+    if (!to || !text) {
+        showToast("Enter both a destination callsign and a message.");
+        return;
+    }
+    if (!viaRF && !viaTCP) {
+        showToast("Pick at least one path: RF and/or APRS-IS.");
+        return;
+    }
+
+    const params = "to=" + encodeURIComponent(to) + "&text=" + encodeURIComponent(text)
+        + "&rf=" + (viaRF ? "1" : "0") + "&tcp=" + (viaTCP ? "1" : "0");
+    fetch("/action?type=send-message&" + params, { method: "POST" });
+
+    const via = [viaRF ? "RF" : null, viaTCP ? "APRS-IS" : null].filter(Boolean).join(" + ");
+    showToast("Message to <b>" + to + "</b> queued (" + via + ").");
+    document.getElementById('message.text').value = "";
+});
+
+let receivedMessagesTimer = null;
+
+function loadReceivedMessages() {
+    fetch("/messages.json")
+        .then((r) => r.json())
+        .then((msgs) => {
+            const tbody = document.getElementById('received-messages');
+            if (!msgs.length) {
+                tbody.innerHTML = '<tr><td colspan="3" class="text-muted">No messages received yet.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = msgs.map((m) => {
+                const ago = m.age < 60 ? m.age + "s" : Math.floor(m.age / 60) + "m";
+                const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                return "<tr><td>" + ago + "</td><td>" + esc(m.from) + "</td><td>" + esc(m.text) + "</td></tr>";
+            }).join("");
+        })
+        .catch((err) => console.error("Failed to load messages", err));
+}
+
 document.getElementById('reboot').addEventListener('click', function (e) {
     e.preventDefault();
 
@@ -592,8 +637,24 @@ document.querySelector('a[href="/received-packets"]').addEventListener('click', 
 
     document.getElementById('received-packets').classList.remove('d-none');
     document.getElementById('configuration').classList.add('d-none');
-    
+
     document.querySelector('button[type=submit]').remove();
 
     fetchReceivedPackets();
+})
+
+document.querySelector('a[href="/send-message"]').addEventListener('click', function (e) {
+    e.preventDefault();
+
+    document.getElementById('send-message-view').classList.remove('d-none');
+    document.getElementById('configuration').classList.add('d-none');
+    document.getElementById('received-packets').classList.add('d-none');
+
+    const saveBtn = document.querySelector('button[type=submit]');
+    if (saveBtn) saveBtn.remove();
+
+    loadReceivedMessages();
+    if (!receivedMessagesTimer) {
+        receivedMessagesTimer = setInterval(loadReceivedMessages, 10000);
+    }
 })
