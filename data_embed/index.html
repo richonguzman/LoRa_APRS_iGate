@@ -1310,13 +1310,13 @@
                                     Battery
                                 </h5>
                                 <small>
-                                    Battery Monitor & Health
+                                    Supply-voltage (VSYS) monitor.
                                     <br>
                                     <br>
-                                    Max Voltage on input pin is 3.3V.
-                                    <br>
-                                    <br>
-                                    Calculate voltage divider accordingly.
+                                    Only <b>Send Internal Voltage</b> (adds <code>Batt=</code> to the
+                                    beacon) and <b>Send Voltage As Telemetry</b> are available — the
+                                    external-voltage / health-sleep options need hardware this iGate
+                                    doesn't have and are disabled.
                                 </small>
                             </div>
                             <div class="col-9">
@@ -1355,6 +1355,7 @@
                                                 name="battery.monitorInternalVoltage"
                                                 id="battery.monitorInternalVoltage"
                                                 class="form-check-input"
+                                                disabled
                                             />
                                             <label
                                                 for="battery.monitorInternalVoltage"
@@ -1376,6 +1377,7 @@
                                                     step="0.1"
                                                     min="2.9"
                                                     max="3.7"
+                                                    disabled
                                                 />
                                                 <span class="input-group-text"
                                                     >volts</span
@@ -1390,6 +1392,7 @@
                                                 name="battery.sendExternalVoltage"
                                                 id="battery.sendExternalVoltage"
                                                 class="form-check-input"
+                                                disabled
                                             />
                                             <label
                                                 for="battery.sendExternalVoltage"
@@ -1403,6 +1406,7 @@
                                                 name="battery.useExternalI2CSensor"
                                                 id="battery.useExternalI2CSensor"
                                                 class="form-check-input"
+                                                disabled
                                             />
                                             <label
                                                 for="battery.useExternalI2CSensor"
@@ -1416,6 +1420,7 @@
                                                 name="battery.monitorExternalVoltage"
                                                 id="battery.monitorExternalVoltage"
                                                 class="form-check-input"
+                                                disabled
                                             />
                                             <label
                                                 for="battery.monitorExternalVoltage"
@@ -1437,6 +1442,7 @@
                                                     step="0.1"
                                                     min="3.0"
                                                     max="24.0"
+                                                    disabled
                                                 />
                                                 <span class="input-group-text"
                                                     >volts</span
@@ -1450,6 +1456,7 @@
                                                 id="battery.externalVoltagePin"
                                                 value="34"
                                                 class="form-control"
+                                                disabled
                                             />
                                             <label
                                                 for="battery.externalVoltagePin"
@@ -1469,6 +1476,7 @@
                                                     step="0.1"
                                                     min="1"
                                                     max="1000"
+                                                    disabled
                                                 />
                                                 <span class="input-group-text">kOhm</span>
                                             </div>
@@ -1485,6 +1493,7 @@
                                                     step="0.1"
                                                     min="1"
                                                     max="1000"
+                                                    disabled
                                                 />
                                                 <span class="input-group-text">kOhm</span>
                                             </div>
