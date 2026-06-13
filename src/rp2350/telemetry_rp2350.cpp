@@ -1,8 +1,9 @@
 /*
- * RP2350 APRS structured telemetry. Operational channels (RxPkts/Heard/RSSI/SNR)
- * encoded Base91 and appended to the APRS-IS beacon, plus EQNS/UNIT/PARM
- * definition messages addressed to self. netTask only (reads the APRS-IS socket
- * via AprsIs and the netTask-owned counters).
+ * RP2350 APRS structured telemetry — classic "T#seq,a1..a5,bits" data packets
+ * plus EQNS/UNIT/PARM definitions addressed to self. Operational channels
+ * (RxPkts/Heard/RSSI/SNR). netTask only (reads netTask-owned counters + the
+ * APRS-IS socket via AprsIs). Values are 3-digit 0..255 with the EQNS below
+ * mapping them back to engineering units.
  */
 #include "telemetry_rp2350.h"
 #include "configuration.h"
@@ -15,20 +16,22 @@ extern float snr;
 
 namespace {
 
-uint16_t sequence = 0;
+uint16_t sequence = 0;      // 000..999
 uint32_t lastDefs = 0;      // millis() of last EQNS/UNIT/PARM (0 = never)
 
-// Base91 2-char encoding of a value clamped to [0, 8280] (= 91*91 - 1).
-String b91(int raw) {
-    if (raw < 0) raw = 0;
-    if (raw > 8280) raw = 8280;
-    String s;
-    s += char(raw / 91 + 33);
-    s += char(raw % 91 + 33);
-    return s;
+int clamp255(long v) { return v < 0 ? 0 : (v > 255 ? 255 : (int)v); }
+
+String pad3(int v) {
+    char b[4];
+    snprintf(b, sizeof(b), "%03d", clamp255(v));
+    return String(b);
 }
 
-// the self-addressed message envelope used for EQNS/UNIT/PARM (TCPIP*, qAC)
+String selfCall() {
+    return Config.tacticalCallsign.length() ? Config.tacticalCallsign : Config.callsign;
+}
+
+// self-addressed message envelope for EQNS/UNIT/PARM (TCPIP, qAC)
 String defEnvelope(const String &call, const String &payload) {
     String s = call;
     s += ">APLRG1,TCPIP,qAC::";
@@ -44,19 +47,26 @@ String defEnvelope(const String &call, const String &payload) {
 
 namespace Telemetry {
 
-String compressed() {
-    int rxPkts = (int)Station::takeRxCount();
-    int heard  = (int)Station::activeCount();
-    String t = "|";
-    t += b91(sequence);
-    t += b91(rxPkts);                 // A1 EQNS 0,1,0
-    t += b91(heard);                  // A2 EQNS 0,1,0
-    t += b91(rssi + 150);             // A3 EQNS 0,1,-150  (dBm)
-    t += b91((int)(snr * 10) + 200);  // A4 EQNS 0,0.1,-20 (dB)
-    t += "|";
-    sequence++;
-    if (sequence >= 8281) sequence = 0;
-    return t;
+String dataPacket() {
+    int a1 = clamp255(Station::takeRxCount());          // RxPkts   EQNS 0,1,0
+    int a2 = clamp255(Station::activeCount());           // Heard    EQNS 0,1,0
+    int a3 = clamp255(rssi + 150);                       // RSSI     EQNS 0,1,-150  -> dBm
+    int a4 = clamp255((long)((snr + 20.0f) * 5.0f));     // SNR      EQNS 0,0.2,-20 -> dB
+    int a5 = 0;                                           // spare
+
+    char seq[4];
+    snprintf(seq, sizeof(seq), "%03u", sequence);
+    sequence = (sequence + 1) % 1000;
+
+    String line = selfCall();
+    line += ">APLRG1,TCPIP,qAC:T#";
+    line += seq;  line += ',';
+    line += pad3(a1); line += ',';
+    line += pad3(a2); line += ',';
+    line += pad3(a3); line += ',';
+    line += pad3(a4); line += ',';
+    line += pad3(a5); line += ",00000000";
+    return line;
 }
 
 bool dueDefinitions() {
@@ -64,10 +74,10 @@ bool dueDefinitions() {
 }
 
 void sendDefinitions() {
-    String call = Config.tacticalCallsign.length() ? Config.tacticalCallsign : Config.callsign;
-    AprsIs::send(defEnvelope(call, "PARM.RxPkts,Heard,RSSI,SNR"));
-    AprsIs::send(defEnvelope(call, "UNIT.Pkt,Stn,dBm,dB"));
-    AprsIs::send(defEnvelope(call, "EQNS.0,1,0,0,1,0,0,1,-150,0,0.1,-20"));
+    String call = selfCall();
+    AprsIs::send(defEnvelope(call, "PARM.RxPkts,Heard,RSSI,SNR,Aux"));
+    AprsIs::send(defEnvelope(call, "UNIT.Pkt,Stn,dBm,dB,-"));
+    AprsIs::send(defEnvelope(call, "EQNS.0,1,0,0,1,0,0,1,-150,0,0.2,-20,0,0,0"));
     lastDefs = millis() ? millis() : 1;
     Serial.println("[telemetry] sent EQNS/UNIT/PARM definitions");
 }

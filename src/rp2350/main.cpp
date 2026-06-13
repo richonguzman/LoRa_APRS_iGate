@@ -211,9 +211,11 @@ void netTask(void *) {
                 lastBeacon = millis();
                 g_beaconNow = false;
                 String b = Beacon::buildAprsisLine();
-                b += Telemetry::compressed();        // append Base91 telemetry to the beacon
                 AprsIs::send(b);
                 Serial.println("[beacon] APRS-IS: " + b);
+                String t = Telemetry::dataPacket();  // classic T# telemetry packet
+                AprsIs::send(t);
+                Serial.println("[telemetry] " + t);
             }
         }
         // forward any LoRa packets handed over by loraTask
