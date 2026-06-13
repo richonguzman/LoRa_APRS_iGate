@@ -27,7 +27,8 @@ std::vector<DedupEntry> dedup;
 
 uint32_t lastRxTime = 0;
 uint32_t lastTxTime = 0;
-volatile size_t activeStations = 0;
+volatile size_t   activeStations = 0;
+volatile uint32_t rxCounter      = 0;   // RX packets since last telemetry (benign cross-task read-reset)
 
 std::vector<String> loadCallsignList(const String& list) {
     std::vector<String> out;
@@ -133,7 +134,9 @@ void enqueueTx(const String& packet, bool isBeacon) {
     outBuffer.push_back({packet, isBeacon});
 }
 
-void noteRx() { lastRxTime = millis(); }
+void noteRx() { lastRxTime = millis(); rxCounter++; }
+
+uint32_t takeRxCount() { uint32_t n = rxCounter; rxCounter = 0; return n; }
 
 size_t txPending() { return outBuffer.size(); }
 

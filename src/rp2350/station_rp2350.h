@@ -30,6 +30,7 @@ namespace Station {
     // channel has been idle (no RX/TX) for SECS_TO_WAIT seconds.
     void   enqueueTx(const String& packet, bool isBeacon = false);
     void   noteRx();                                   // call on every RX (feeds the TX backoff)
+    uint32_t takeRxCount();                            // RX packets since last call, then resets (for telemetry)
     void   processTxBuffer();                          // call each loraTask iteration
     size_t txPending();
 }

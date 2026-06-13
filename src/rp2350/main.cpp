@@ -27,6 +27,7 @@
 #include "query_rp2350.h"
 #include "message_rp2350.h"
 #include "tnc_rp2350.h"
+#include "telemetry_rp2350.h"
 #include "pico/unique_id.h"   // pico_get_unique_board_id (cached at boot — SMP-safe)
 
 #ifndef HB_LED
@@ -200,6 +201,8 @@ void netTask(void *) {
                 AprsIs::connect();
             }
             AprsIs::poll();
+            // telemetry channel definitions (EQNS/UNIT/PARM) at boot + ~daily
+            if (AprsIs::connected() && Telemetry::dueDefinitions()) Telemetry::sendDefinitions();
             // periodic position beacon over APRS-IS (config has sendViaAPRSIS)
             bool locOk = !(Config.beacon.latitude == 0.0 && Config.beacon.longitude == 0.0);
             if (Config.beacon.sendViaAPRSIS && AprsIs::connected() && locOk &&
@@ -208,6 +211,7 @@ void netTask(void *) {
                 lastBeacon = millis();
                 g_beaconNow = false;
                 String b = Beacon::buildAprsisLine();
+                b += Telemetry::compressed();        // append Base91 telemetry to the beacon
                 AprsIs::send(b);
                 Serial.println("[beacon] APRS-IS: " + b);
             }
