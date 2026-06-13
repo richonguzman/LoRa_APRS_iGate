@@ -26,6 +26,7 @@
 #include "station_rp2350.h"
 #include "query_rp2350.h"
 #include "message_rp2350.h"
+#include "tnc_rp2350.h"
 #include "pico/unique_id.h"   // pico_get_unique_board_id (cached at boot — SMP-safe)
 
 #ifndef HB_LED
@@ -73,6 +74,14 @@ void webSendMessage(const String &to, const String &text, bool viaRF, bool viaTC
 void onIncomingMessage(const String &from, const String &text) {
     String *p = new String(from + "\t" + text);
     if (xQueueSend(rxMsgQueue, &p, 0) != pdTRUE) delete p;
+}
+
+// Called from netTask (TNC KISS client) to transmit a frame over RF. Hands it to
+// loraTask via txMsgQueue (Station output buffer owner) — same path as messages.
+void tncSendRF(const String &frame) {
+    if (frame.length() == 0) return;
+    String *p = new String(frame);
+    if (xQueueSend(txMsgQueue, &p, 0) != pdTRUE) delete p;
 }
 
 // --------------------------------------------------------------- LoRa RX/TX task
@@ -176,6 +185,7 @@ void netTask(void *) {
     else { Serial.print("[ETH] IP: "); Serial.println(Ethernet.localIP()); }
 
     ethWebSetup();
+    Tnc::setup();                            // KISS TNC server on :8001 (if enabled)
 
     uint32_t lastMaintain = millis();
     uint32_t lastAprsTry  = 0;
@@ -183,6 +193,7 @@ void netTask(void *) {
     uint32_t lastBeacon   = 0;
     for (;;) {
         ethWebPoll();
+        Tnc::poll();                         // accept KISS clients + read their frames
         if (Config.aprs_is.active) {
             if (!AprsIs::connected() && (millis() - lastAprsTry > 10000)) {
                 lastAprsTry = millis();
@@ -215,14 +226,15 @@ void netTask(void *) {
             delete m;
         }
         // store RX packets log (for GET /received-packets.json): "rssi\tsnr\tframe"
+        // and forward each received frame to any connected KISS TNC clients.
         String *lp;
         while (xQueueReceive(rxPktQueue, &lp, 0) == pdTRUE) {
             int t1 = lp->indexOf('\t');
             int t2 = lp->indexOf('\t', t1 + 1);
             if (t1 > 0 && t2 > t1) {
-                ethWebAddPacket(lp->substring(t2 + 1),
-                                lp->substring(0, t1).toInt(),
-                                lp->substring(t1 + 1, t2).toFloat());
+                String frame = lp->substring(t2 + 1);
+                ethWebAddPacket(frame, lp->substring(0, t1).toInt(), lp->substring(t1 + 1, t2).toFloat());
+                Tnc::broadcast(frame);
             }
             delete lp;
         }
