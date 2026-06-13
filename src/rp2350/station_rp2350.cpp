@@ -112,6 +112,14 @@ bool wasHeard(const String& station) {
 
 size_t activeCount() { return activeStations; }
 
+String heardListString() {
+    deleteNotHeard();
+    String out;
+    for (const auto& s : lastHeard) { out += s.station; out += ' '; }
+    out.trim();
+    return out;
+}
+
 bool isDuplicate(const String& station, const String& payload) {
     cleanDedup();
     uint32_t h = djb2(station, payload);

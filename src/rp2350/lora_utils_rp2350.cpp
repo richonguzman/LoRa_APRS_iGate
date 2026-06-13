@@ -17,6 +17,12 @@ extern Configuration Config;
 // rp2350/main.cpp until the iGate loop replaces it.
 static SX1262 radio = new Module(RADIO_CS_PIN, RADIO_DIO1_PIN, RADIO_RST_PIN, RADIO_BUSY_PIN, SPI1);
 static volatile bool rxFlag = false;
+
+// Signal stats of the last received packet (read by the ?APRSSR query; the
+// original firmware keeps these as globals, so the query module externs them).
+int   rssi      = 0;
+float snr       = 0;
+int   freqError = 0;
 static float rxFreqMHz = 433.775f;
 static float txFreqMHz = 433.775f;
 
@@ -58,6 +64,9 @@ String receivePacket() {
     rxFlag = false;
     String str;
     int st = radio.readData(str);
+    rssi      = (int)radio.getRSSI();
+    snr       = radio.getSNR();
+    freqError = (int)radio.getFrequencyError();
     radio.startReceive();                       // re-arm
     if (st != RADIOLIB_ERR_NONE) return "";
     // Return the RAW packet WITH its 3-byte LoRa-APRS header ('<' 0xFF 0x01) —

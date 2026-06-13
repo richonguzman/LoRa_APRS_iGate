@@ -11,6 +11,8 @@ extern bool applyConfigForm(const String &contentType, const String &body);
 extern volatile bool g_beaconNow;
 // Set by POST /action?type=send-rf-beacon; loraTask sends an RF beacon and clears it.
 extern volatile bool g_rfBeaconNow;
+// Originate an APRS message (built + handed to loraTask in main.cpp).
+extern void webSendMessage(const String &to, const String &text);
 
 static const int    WEB_PORT        = 80;
 static const size_t MAX_LINE_LEN    = 512;
@@ -27,6 +29,35 @@ struct Request {
     String contentType;
     long   contentLength = 0;
 };
+
+// minimal percent-decoder for query-string values
+static String urlDecodeQ(const String &s) {
+    String out; out.reserve(s.length());
+    for (size_t i = 0; i < s.length(); i++) {
+        char ch = s[i];
+        if (ch == '+') out += ' ';
+        else if (ch == '%' && i + 2 < s.length()) {
+            auto hx = [](char h) -> int {
+                if (h >= '0' && h <= '9') return h - '0';
+                if (h >= 'a' && h <= 'f') return h - 'a' + 10;
+                if (h >= 'A' && h <= 'F') return h - 'A' + 10;
+                return 0; };
+            out += (char)((hx(s[i + 1]) << 4) | hx(s[i + 2])); i += 2;
+        } else out += ch;
+    }
+    return out;
+}
+
+// extract a query-string parameter ("key=value", value up to '&'), url-decoded
+static String getQueryParam(const String &query, const char *key) {
+    String needle = String(key) + "=";
+    int i = query.indexOf(needle);
+    if (i < 0) return "";
+    i += needle.length();
+    int amp = query.indexOf('&', i);
+    if (amp < 0) amp = query.length();
+    return urlDecodeQ(query.substring(i, amp));
+}
 
 // ---- HTTP request parsing (adapted from mesh/eth/ethApiHandlers.cpp) ----
 static bool readLine(EthernetClient &c, String &out, uint32_t deadlineMs) {
@@ -186,8 +217,17 @@ static void handleClient(EthernetClient &c) {
         c.flush();
         return;
     }
-    if (req.path == "/action") {            // POST /action?type=send-beacon | send-rf-beacon | reboot
-        if (req.query.indexOf("send-rf-beacon") >= 0) {
+    if (req.path == "/action") {            // POST /action?type=send-beacon | send-rf-beacon | send-message | reboot
+        if (req.query.indexOf("send-message") >= 0) {
+            String to   = getQueryParam(req.query, "to");
+            String text = getQueryParam(req.query, "text");
+            if (to.length() == 0 || text.length() == 0) {
+                sendText(c, 400, "Bad Request", "text/plain", "need to= and text=");
+            } else {
+                webSendMessage(to, text);
+                sendText(c, 200, "OK", "text/plain", "message queued");
+            }
+        } else if (req.query.indexOf("send-rf-beacon") >= 0) {
             g_rfBeaconNow = true;
             sendText(c, 200, "OK", "text/plain", "rf beacon queued");
         } else if (req.query.indexOf("send-beacon") >= 0) {

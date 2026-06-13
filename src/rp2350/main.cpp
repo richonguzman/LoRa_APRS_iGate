@@ -24,6 +24,8 @@
 #include "wx_rp2350.h"
 #include "digi_rp2350.h"
 #include "station_rp2350.h"
+#include "query_rp2350.h"
+#include "message_rp2350.h"
 
 // Last MAC octet — per build env so two boards never collide on DHCP. We do NOT
 // read the chip unique-ID at runtime (faults under FreeRTOS SMP -> USB hang).
@@ -40,8 +42,19 @@ Configuration Config;
 
 static byte mac[6];
 static QueueHandle_t rxQueue;        // heap String* handoff: loraTask -> netTask
+static QueueHandle_t txMsgQueue;     // heap String* handoff: netTask -> loraTask (outgoing msgs)
 volatile bool g_beaconNow = false;   // set by POST /action?type=send-beacon (eth_web)
 volatile bool g_rfBeaconNow = false; // set by POST /action?type=send-rf-beacon (eth_web)
+
+// Called from netTask (eth_web /action handler) to originate an APRS message.
+// We build here (Config is read-only) and hand the packet to loraTask, the sole
+// owner of the Station output buffer (no cross-task race on outBuffer).
+void webSendMessage(const String &to, const String &text) {
+    String pkt = Message::buildRF(to, text);
+    if (pkt.length() == 0) return;
+    String *p = new String(pkt);
+    if (xQueueSend(txMsgQueue, &p, 0) != pdTRUE) delete p;
+}
 
 // --------------------------------------------------------------- LoRa RX/TX task
 // Owns the radio (SPI1): transmits the RF beacon (when Config.beacon.sendViaRF)
@@ -84,6 +97,8 @@ void loraTask(void *) {
                 Serial.println("[lora] dropped (blacklist): " + sender);
             } else if (dup) {
                 Serial.println("[lora] dropped (dup <25s): " + sender);
+            } else if (sender.length() && Query::handleMessage(body, sender)) {
+                // it was a query addressed to us — answered over RF, don't gate/digi
             } else {
                 // gate to APRS-IS (handed to netTask, the W5500 owner)
                 String *p = new String(pkt);
@@ -97,6 +112,13 @@ void loraTask(void *) {
                     }
                 }
             }
+        }
+        // --- outgoing messages handed over by netTask (web /action) ---
+        String *m;
+        while (xQueueReceive(txMsgQueue, &m, 0) == pdTRUE) {
+            Serial.println("[msg] queued: " + *m);
+            Station::enqueueTx(*m, false);
+            delete m;
         }
         // --- pump the RF output buffer (spaces TX, backs off after RX) ---
         Station::processTxBuffer();
@@ -179,7 +201,8 @@ void setup() {
     Station::setup();                        // load blacklist/managers from Config
     Wx::setup();                             // BMP280 on I2C0 (Wire) — single-threaded init here
 
-    rxQueue = xQueueCreate(8, sizeof(String *));
+    rxQueue    = xQueueCreate(8, sizeof(String *));
+    txMsgQueue = xQueueCreate(4, sizeof(String *));
     xTaskCreate(loraTask, "lora", 4096, nullptr, 3, nullptr);
     xTaskCreate(netTask,  "net",  4096, nullptr, 2, nullptr);
 }

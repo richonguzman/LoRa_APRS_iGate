@@ -19,6 +19,7 @@ namespace Station {
     void   updateLastHeard(const String& station);    // record/refresh a heard station
     bool   wasHeard(const String& station);           // heard within rememberStationTime?
     size_t activeCount();                             // # stations currently tracked (volatile snapshot)
+    String heardListString();                        // space-separated heard callsigns (for ?APRSL)
 
     // 25 s duplicate filter on (station, payload). True if the same packet was
     // seen within the window (caller should neither gate nor digipeat it).
