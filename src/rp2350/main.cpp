@@ -35,6 +35,10 @@
 #define HB_LED 25          // onboard LED (GP25 on the WIZnet W5500-EVB-Pico2)
 #endif
 
+// Firmware build timestamp — shown in the boot banner and served at GET /status
+// (lets you confirm which build is running, e.g. after an OTA).
+const char *FW_BUILD = __DATE__ " " __TIME__;
+
 // Global iGate config instance (lives in LoRa_APRS_iGate.cpp on ESP32, excluded
 // from the RP2350 build; the modules extern it).
 Configuration Config;
@@ -272,7 +276,7 @@ void setup() {
     Serial.begin(115200);
     uint32_t t0 = millis();
     while (!Serial && (millis() - t0 < 3000)) {}
-    Serial.println("\n=== LoRa APRS iGate — RP2350 ===");
+    Serial.println(String("\n=== LoRa APRS iGate — RP2350 (built ") + FW_BUILD + ") ===");
 
     pinMode(HB_LED, OUTPUT);
     Config.setup();                          // LittleFS + /igate_conf.json (defaults on first boot)

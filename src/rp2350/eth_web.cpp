@@ -5,6 +5,7 @@
 #include <vector>
 #include "web_assets.h"   // gzipped SPA assets embedded in flash
 #include "ntp_rp2350.h"
+#include "ota_rp2350.h"
 
 // Apply a posted config form (urlencoded or multipart) to Config + persist.
 extern bool applyConfigForm(const String &contentType, const String &body);
@@ -50,6 +51,7 @@ struct Request {
     String path;
     String query;
     String contentType;
+    String authorization;
     long   contentLength = 0;
 };
 
@@ -145,6 +147,7 @@ static bool parseRequest(EthernetClient &c, Request &req, uint32_t deadlineMs) {
         if (line.length() == 0) return true;  // end of headers
         if (headerIs(line, "Content-Length", val)) req.contentLength = val.toInt();
         else if (headerIs(line, "Content-Type", val)) req.contentType = val;
+        else if (headerIs(line, "Authorization", val)) req.authorization = val;
     }
     return false;
 }
@@ -244,7 +247,8 @@ static void handleClient(EthernetClient &c) {
         return;
     }
     if (req.path == "/status") {
-        sendText(c, 200, "OK", "text/plain", "OK");
+        extern const char *FW_BUILD;
+        sendText(c, 200, "OK", "text/plain", String("LoRa APRS iGate RP2350 — built ") + FW_BUILD);
         c.flush();
         return;
     }
@@ -284,6 +288,12 @@ static void handleClient(EthernetClient &c) {
         }
         body += "]";
         sendText(c, 200, "OK", "application/json", body);
+        c.flush();
+        return;
+    }
+    if (req.path == "/update") {            // POST raw firmware.bin -> arduino-pico Updater
+        if (req.method == "POST") { Ota::handleUpdate(c, req.authorization, req.contentLength); return; }
+        sendText(c, 405, "Method Not Allowed", "text/plain", "POST firmware.bin");
         c.flush();
         return;
     }
