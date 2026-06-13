@@ -23,6 +23,7 @@
 #include "beacon_rp2350.h"
 #include "wx_rp2350.h"
 #include "digi_rp2350.h"
+#include "station_rp2350.h"
 
 // Last MAC octet — per build env so two boards never collide on DHCP. We do NOT
 // read the chip unique-ID at runtime (faults under FreeRTOS SMP -> USB hang).
@@ -50,7 +51,7 @@ void loraTask(void *) {
     LoRa_Utils::setup();
     uint32_t lastRfBeacon = 0;
     for (;;) {
-        // --- RF beacon TX (island/RF test) ---
+        // --- RF beacon TX: enqueue into the anti-collision output buffer ---
         if (Config.beacon.sendViaRF) {
             bool locOk = !(Config.beacon.latitude == 0.0 && Config.beacon.longitude == 0.0);
             if (locOk && (lastRfBeacon == 0 || g_rfBeaconNow ||
@@ -58,30 +59,47 @@ void loraTask(void *) {
                 lastRfBeacon = millis();
                 g_rfBeaconNow = false;
                 String rf = Beacon::buildRfLine();
-                Serial.println("[beacon] RF: " + rf);
-                LoRa_Utils::sendNewPacket(rf);     // prepends '<' 0xFF 0x01, TX, back to RX
+                Serial.println("[beacon] RF queued: " + rf);
+                Station::enqueueTx(rf, true);
             }
         }
         // --- RX ---
         String pkt = LoRa_Utils::receivePacket();   // raw packet (with 3-byte hdr), "" if none
         if (pkt.length() > 0) {
-            Serial.println("[lora] RX: " + pkt.substring(pkt.length() >= 3 ? 3 : 0));
-            String *p = new String(pkt);
-            if (xQueueSend(rxQueue, &p, 0) != pdTRUE) delete p;   // drop if full (-> APRS-IS)
+            Station::noteRx();
+            String body = pkt.length() > 3 ? pkt.substring(3) : pkt;   // strip LoRa-APRS header
+            Serial.println("[lora] RX: " + body);
 
-            // --- Digipeater: re-TX over RF with the WIDEn-N path rewritten ---
-            // Done from THIS task (it owns the radio). Independent of gating.
-            if (Digi::enabled()) {
-                String repeat = Digi::process(pkt);
-                if (repeat.length() > 0) {
-                    // small randomised delay to avoid colliding with the source's
-                    // other hearers re-transmitting at the same instant
-                    vTaskDelay(pdMS_TO_TICKS(250 + (millis() & 0x1FF)));
-                    Serial.println("[digi] RF: " + repeat);
-                    LoRa_Utils::sendNewPacket(repeat);
+            // packet policy (shared by gate + digi): parse SENDER + payload
+            int gt    = body.indexOf('>');
+            int colon = body.indexOf(':');
+            String sender  = (gt > 0) ? body.substring(0, gt) : "";
+            String payload = (colon >= 0) ? body.substring(colon) : body;
+
+            bool blacklisted = sender.length() && Station::isBlacklisted(sender);
+            bool dup         = sender.length() && Station::isDuplicate(sender, payload);
+            if (sender.length()) Station::updateLastHeard(sender);
+
+            if (blacklisted) {
+                Serial.println("[lora] dropped (blacklist): " + sender);
+            } else if (dup) {
+                Serial.println("[lora] dropped (dup <25s): " + sender);
+            } else {
+                // gate to APRS-IS (handed to netTask, the W5500 owner)
+                String *p = new String(pkt);
+                if (xQueueSend(rxQueue, &p, 0) != pdTRUE) delete p;   // drop if full
+                // digipeat: rewrite WIDEn-N and enqueue for anti-collision TX
+                if (Digi::enabled()) {
+                    String repeat = Digi::process(pkt);
+                    if (repeat.length() > 0) {
+                        Serial.println("[digi] queued: " + repeat);
+                        Station::enqueueTx(repeat, false);
+                    }
                 }
             }
         }
+        // --- pump the RF output buffer (spaces TX, backs off after RX) ---
+        Station::processTxBuffer();
         vTaskDelay(pdMS_TO_TICKS(10));
     }
 }
@@ -140,9 +158,10 @@ void netTask(void *) {
         if (millis() - lastHb > 3000) {
             lastHb = millis();
             IPAddress ip = Ethernet.localIP();
-            Serial.printf("[hb] up=%lus  ip=%d.%d.%d.%d  callsign=%s  aprsis=%s\n",
+            Serial.printf("[hb] up=%lus  ip=%d.%d.%d.%d  callsign=%s  aprsis=%s  stations=%u\n",
                           (unsigned long)(millis() / 1000), ip[0], ip[1], ip[2], ip[3],
-                          Config.callsign.c_str(), AprsIs::connected() ? "up" : "down");
+                          Config.callsign.c_str(), AprsIs::connected() ? "up" : "down",
+                          (unsigned)Station::activeCount());
         }
         vTaskDelay(pdMS_TO_TICKS(15));
     }
@@ -157,6 +176,7 @@ void setup() {
 
     pinMode(HB_LED, OUTPUT);
     Config.setup();                          // LittleFS + /igate_conf.json (defaults on first boot)
+    Station::setup();                        // load blacklist/managers from Config
     Wx::setup();                             // BMP280 on I2C0 (Wire) — single-threaded init here
 
     rxQueue = xQueueCreate(8, sizeof(String *));

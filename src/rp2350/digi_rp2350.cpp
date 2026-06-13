@@ -36,44 +36,6 @@ bool callsignIsValid(const String& callsign) {
     return true;
 }
 
-// --- dedup ring buffer: break repeater loops / multi-path echoes ---
-constexpr int      DEDUP_SLOTS  = 24;
-constexpr uint32_t DEDUP_WINDOW = 30000;   // ms (the original "25-seg" buffer)
-struct Seen { uint32_t hash; uint32_t when; };
-Seen dedup[DEDUP_SLOTS];
-
-uint32_t fnv1a(const String& s) {
-    uint32_t h = 2166136261UL;
-    for (size_t i = 0; i < s.length(); i++) { h ^= (uint8_t)s[i]; h *= 16777619UL; }
-    return h;
-}
-
-// Returns true if key was seen within the window (a duplicate). Otherwise records
-// it (reusing an empty or the oldest slot) and returns false. when==0 marks an
-// empty slot, so a real timestamp of 0 is bumped to 1.
-bool seenRecently(const String& key) {
-    uint32_t now = millis();
-    uint32_t h   = fnv1a(key);
-
-    int      victim   = 0;       // slot to overwrite if not a duplicate
-    uint32_t maxAge   = 0;
-    bool     haveEmpty = false;
-
-    for (int i = 0; i < DEDUP_SLOTS; i++) {
-        if (dedup[i].when != 0 && dedup[i].hash == h && (now - dedup[i].when) < DEDUP_WINDOW)
-            return true;                                  // duplicate within window
-        if (dedup[i].when == 0) {                         // empty slot — prefer it
-            if (!haveEmpty) { victim = i; haveEmpty = true; }
-        } else if (!haveEmpty) {                          // else track the oldest
-            uint32_t age = now - dedup[i].when;
-            if (age >= maxAge) { maxAge = age; victim = i; }
-        }
-    }
-    dedup[victim].hash = h;
-    dedup[victim].when = now ? now : 1;
-    return false;
-}
-
 String stationCall() {
     return Config.tacticalCallsign.length() ? Config.tacticalCallsign : Config.callsign;
 }
@@ -174,10 +136,9 @@ String process(const String& rawPacket) {
     if (sender == call) return "";                          // never repeat ourselves
     if (Config.tacticalCallsign.length() == 0 && !callsignIsValid(sender)) return "";
 
-    // dedup on sender + payload (after the first ':')
-    int colon = packet.indexOf(':');
-    if (colon < 0) return "";
-    if (seenRecently(sender + packet.substring(colon))) return "";
+    // NOTE: duplicate filtering + blacklist are applied upstream in loraTask
+    // (Station::isDuplicate / isBlacklisted), shared with the gate path.
+    if (packet.indexOf(':') < 0) return "";
 
     return generateDigipeatedPacket(packet);
 }
