@@ -637,8 +637,10 @@ document.querySelector('a[href="/received-packets"]').addEventListener('click', 
 
     document.getElementById('received-packets').classList.remove('d-none');
     document.getElementById('configuration').classList.add('d-none');
+    document.getElementById('send-message-view').classList.add('d-none');
 
-    document.querySelector('button[type=submit]').remove();
+    const saveBtn = document.querySelector('button[type=submit]');
+    if (saveBtn) saveBtn.remove();
 
     fetchReceivedPackets();
 })
