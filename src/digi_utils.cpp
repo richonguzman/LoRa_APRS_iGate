@@ -60,10 +60,10 @@ namespace DIGI_Utils {
             int digiMode        = Config.digi.mode;
             String tempPath     = path;
 
-            if (tempPath.indexOf("WIDE1-1") != -1 && (digiMode == 2 || digiMode == 3)) {    // WIDE1-1
+            if (tempPath.indexOf("WIDE1-1") != -1 && (digiMode == 1 || digiMode == 2)) {    // WIDE1-1
                 if (tempPath.indexOf("*") != -1 ) return "";                                // "*" shouldn't be in WIDE1-1 (only) type of packet
                 tempPath.replace("WIDE1-1", stationCallsign + "*");
-            } else if (tempPath.indexOf("WIDE2-") != -1 && digiMode == 3) {                 // WIDE2-n Digipeater
+            } else if (tempPath.indexOf("WIDE2-") != -1 && digiMode == 2) {                 // WIDE2-n Digipeater
                 tempPath = cleanPathAsterisks(path);
                 if (tempPath.indexOf("WIDE2-1") != -1) {
                     tempPath.replace("WIDE2-1", stationCallsign + "*");
@@ -100,14 +100,14 @@ namespace DIGI_Utils {
 
         if (commaIndex > 2) {   // "path" found
             const String& path  = temp.substring(commaIndex + 1);
-            if (digiMode == 2 || backupDigiMode) {
+            if (digiMode == 1 || backupDigiMode) {
                 bool hasWide = path.indexOf("WIDE1-1") != -1;
                 if (hasWide || crossFreq) {
                     return buildPacket(path, packet, thirdParty, !hasWide);
                 }
                 return "";
             }
-            if (digiMode == 3) {
+            if (digiMode == 2) {
                 int wide1Index = path.indexOf("WIDE1-1");
                 int wide2Index = path.indexOf("WIDE2-");
                 bool hasWide1 = wide1Index != -1;
@@ -124,7 +124,7 @@ namespace DIGI_Utils {
             return "";
         }
 
-        if (commaIndex == -1 && (digiMode == 2 || backupDigiMode || digiMode == 3) && crossFreq) return buildPacket("", packet, thirdParty, true);  // no "path" but is CrossFreq Digi
+        if (commaIndex == -1 && (digiMode == 1 || backupDigiMode || digiMode == 2) && crossFreq) return buildPacket("", packet, thirdParty, true);  // no "path" but is CrossFreq Digi
 
         return "";
     }
