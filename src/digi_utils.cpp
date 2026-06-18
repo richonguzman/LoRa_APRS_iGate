@@ -42,13 +42,41 @@ extern bool             backupDigiMode;
 
 namespace DIGI_Utils {
 
-    String cleanPathAsterisks(String path) {
-        String terms[] = {",WIDE1*", ",WIDE2*", "*"};
+    String cleanPath(String path) {
+        String terms[] = {"WIDE1*,", "WIDE2*,"};
         for (String term : terms) {
             int index = path.indexOf(term);
             if (index != -1) path.remove(index, term.length());     // less memory than: tempPath.replace("*", "");
         }
         return path;
+    }
+
+    String processMode3Path(const String& path, const String& stationCallsign) {
+        int start = 0;
+        bool prevTokensAllStar = true;
+        int ownTokenEnd = -1;
+
+        while (start < path.length()) {
+            int delim = path.indexOf(',', start);
+            if (delim == -1) delim = path.length();         // busca todo hasta lograr encontra una coma o el final del string
+
+            String token = path.substring(start, delim);
+            bool tokenIsOwn = (token == stationCallsign) || (token == stationCallsign + "*");
+            bool tokenStar = token.endsWith("*");
+
+            if (tokenIsOwn) {
+                if (tokenStar) return "";                   // already digipeated
+                if (!prevTokensAllStar) return "";          // earlier tokens must be marked
+                ownTokenEnd = delim;
+                break;
+            }
+
+            if (!tokenStar) prevTokensAllStar = false;
+            start = delim + 1;
+        }
+
+        if (ownTokenEnd == -1) return "";
+        return path.substring(0, ownTokenEnd) + "*" + path.substring(ownTokenEnd);
     }
 
     String buildPacket(const String& path, const String& packet, bool thirdParty, bool crossFreq) {
@@ -64,7 +92,7 @@ namespace DIGI_Utils {
                 if (tempPath.indexOf("*") != -1 ) return "";                                // "*" shouldn't be in WIDE1-1 (only) type of packet
                 tempPath.replace("WIDE1-1", stationCallsign + "*");
             } else if (tempPath.indexOf("WIDE2-") != -1 && digiMode == 2) {                 // WIDE2-n Digipeater
-                tempPath = cleanPathAsterisks(path);
+                tempPath = cleanPath(path);
                 if (tempPath.indexOf("WIDE2-1") != -1) {
                     tempPath.replace("WIDE2-1", stationCallsign + "*");
                 } else if (tempPath.indexOf("WIDE2-2") != -1) {
@@ -72,11 +100,14 @@ namespace DIGI_Utils {
                 } else {
                     return "";
                 }
+            } else if (digiMode == 3) {                                                     // Repeat if station callsign is in path (free to repeat).
+                tempPath = processMode3Path(tempPath, stationCallsign);
+                if (tempPath == "") return "";
             }
             packetToRepeat = packet.substring(0, packet.indexOf(",") + 1);
             packetToRepeat += tempPath;
         } else {   // CrossFreq Digipeater
-            packetToRepeat = cleanPathAsterisks(packet.substring(0, suffixIndex));
+            packetToRepeat = cleanPath(packet.substring(0, suffixIndex));
             if (packetToRepeat.indexOf(stationCallsign) != -1) return "";                   // stationCallsign shouldn't be in path
             packetToRepeat += ",";
             packetToRepeat += stationCallsign;
@@ -119,6 +150,12 @@ namespace DIGI_Utils {
 
                 if (crossFreq) return buildPacket(path, packet, thirdParty, true);                  // CrossFreq (without WIDE)
 
+                return "";
+            }
+            if (digiMode == 3) {
+                String stationCallsign  = (Config.tacticalCallsign == "" ? Config.callsign : Config.tacticalCallsign);
+                bool containsOwnCall    = path.indexOf(stationCallsign) != -1;
+                if (containsOwnCall) return buildPacket(path, packet, thirdParty, false);
                 return "";
             }
             return "";
