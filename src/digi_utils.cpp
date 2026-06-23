@@ -43,7 +43,7 @@ extern bool             backupDigiMode;
 namespace DIGI_Utils {
 
     String cleanPath(String path) {
-        String terms[] = {"WIDE1*,", "WIDE2*,"};
+        String terms[] = {"WIDE1*,", "WIDE2*,", "*"};
         for (String term : terms) {
             int index = path.indexOf(term);
             if (index != -1) path.remove(index, term.length());     // less memory than: tempPath.replace("*", "");
@@ -76,7 +76,8 @@ namespace DIGI_Utils {
         }
 
         if (ownTokenEnd == -1) return "";
-        return path.substring(0, ownTokenEnd) + "*" + path.substring(ownTokenEnd);
+        String tempPacket = cleanPath(path.substring(0, ownTokenEnd));
+        return tempPacket + "*" + path.substring(ownTokenEnd);
     }
 
     String buildPacket(const String& path, const String& packet, bool thirdParty, bool crossFreq) {
