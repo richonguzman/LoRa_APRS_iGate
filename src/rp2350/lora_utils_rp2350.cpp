@@ -15,7 +15,14 @@ extern Configuration Config;
 
 // File-scope (static) so it doesn't clash with the inline radio still in
 // rp2350/main.cpp until the iGate loop replaces it.
+// HAS_SX1268 selects the EBYTE E22-400M30S (433 MHz, SX1268 silicon); the
+// default is the SX1262 used by the E22(P)-868/900M30S modules. Both RadioLib
+// classes share the SX126x command set, so the rest of this file is identical.
+#if defined(HAS_SX1268)
+static SX1268 radio = new Module(RADIO_CS_PIN, RADIO_DIO1_PIN, RADIO_RST_PIN, RADIO_BUSY_PIN, SPI1);
+#else
 static SX1262 radio = new Module(RADIO_CS_PIN, RADIO_DIO1_PIN, RADIO_RST_PIN, RADIO_BUSY_PIN, SPI1);
+#endif
 static volatile bool rxFlag = false;
 
 // Signal stats of the last received packet (read by the ?APRSSR query; the
@@ -37,6 +44,53 @@ void setup() {
     SPI1.setTX(RADIO_MOSI_PIN);
     SPI1.setRX(RADIO_MISO_PIN);
     SPI1.begin(false);
+
+#ifdef LORA_DIAG
+    // Low-level reach-the-chip probe (separates "dead/stuck chip" from "bad MISO/SPI").
+    pinMode(RADIO_BUSY_PIN, INPUT);
+    pinMode(RADIO_RST_PIN, OUTPUT);
+    pinMode(RADIO_CS_PIN, OUTPUT);
+    digitalWrite(RADIO_CS_PIN, HIGH);
+    Serial.printf("[diag] pins CS=%d SCK=%d MOSI=%d MISO=%d RST=%d BUSY=%d DIO1=%d\n", RADIO_CS_PIN,
+                  RADIO_SCLK_PIN, RADIO_MOSI_PIN, RADIO_MISO_PIN, RADIO_RST_PIN, RADIO_BUSY_PIN, RADIO_DIO1_PIN);
+    Serial.printf("[diag] BUSY before reset = %d\n", digitalRead(RADIO_BUSY_PIN));
+    digitalWrite(RADIO_RST_PIN, LOW);
+    delay(2);
+    Serial.printf("[diag] BUSY while NRST low = %d\n", digitalRead(RADIO_BUSY_PIN));
+    digitalWrite(RADIO_RST_PIN, HIGH);
+    delay(1);
+    int bA = digitalRead(RADIO_BUSY_PIN);
+    delay(10);
+    int bB = digitalRead(RADIO_BUSY_PIN);
+    // A live SX126x pulses BUSY high during boot then drops it LOW (ready) ~1-2 ms
+    // after NRST is released. BUSY stuck HIGH => chip not running (dead/power/clock).
+    Serial.printf("[diag] BUSY after reset: +1ms=%d +11ms=%d  (expect ->0 if chip alive)\n", bA, bB);
+    // Raw GetStatus (opcode 0xC0): clock out the status byte. 0x00 or 0xFF on MISO
+    // = no chip / dead MISO path; anything else = SPI link to the die is alive.
+    SPI1.beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE0));
+    digitalWrite(RADIO_CS_PIN, LOW);
+    uint8_t op = SPI1.transfer(0xC0);
+    uint8_t stbyte = SPI1.transfer(0x00);
+    digitalWrite(RADIO_CS_PIN, HIGH);
+    SPI1.endTransaction();
+    Serial.printf("[diag] SX126x GetStatus raw: op=%02X status=%02X  (00/FF = mudo)\n", op, stbyte);
+    // Version string (REG 0x0320, 16 bytes). RadioLib findChip() strncmp's the
+    // first 6 chars vs the class name -> a "SX1262" here is why the SX1268 class
+    // rejected this E22-400M30S with -2.
+    {
+        uint8_t ver[17] = {0};
+        SPI1.beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE0));
+        digitalWrite(RADIO_CS_PIN, LOW);
+        SPI1.transfer(0x1D);  // ReadRegister opcode
+        SPI1.transfer(0x03);  // addr hi (0x0320)
+        SPI1.transfer(0x20);  // addr lo
+        SPI1.transfer(0x00);  // status NOP
+        for (int k = 0; k < 16; k++) ver[k] = SPI1.transfer(0x00);
+        digitalWrite(RADIO_CS_PIN, HIGH);
+        SPI1.endTransaction();
+        Serial.printf("[diag] chip version string = '%s'\n", (char *)ver);
+    }
+#endif
 
     rxFreqMHz = (float)Config.loramodule.rxFreq / 1000000.0f;
     txFreqMHz = (float)Config.loramodule.txFreq / 1000000.0f;
