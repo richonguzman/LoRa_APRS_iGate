@@ -51,6 +51,7 @@ ____________________________________________________
 <br />
 
 # Timeline (Versions):
+- 2026-06-29 New UI (Web) and also Live View over a Map to see Rx stations.
 - 2026-06-10 CAD (Channel Activity Detection) and DIFS (Distributed Inter-Frame Space) added.
 - 2026-03-25 More Boards, SDK update, OTA fix, GPS process update.
 - 2026-02-26 9M2IBR ESP32 1W (400M30S) + GPS board added.
