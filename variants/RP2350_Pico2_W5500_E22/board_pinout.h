@@ -1,15 +1,14 @@
 #ifndef BOARD_PINOUT_H_
 #define BOARD_PINOUT_H_
 
-// Raspberry Pi Pico 2 + external W5500 Ethernet on SPI0 (pins fully RELOCATED)
-// + EBYTE E22-400M30S (SX1268) on SPI1. RP2350 iGate "-2" board for 433 MHz.
+// Raspberry Pi Pico 2 (RP2350) + external WIZnet W5500 Ethernet on SPI0
+// + EBYTE E22-400M30S (SX1268) on SPI1. RP2350 iGate carrier board for the
+// 433 MHz LoRa-APRS network.
 //
-// This board is the Meshtastic `pico2_w5500_e22-2` variant: GP16-20 were
-// suspected damaged, so the W5500 SPI0 lines were moved to alternate
-// SPI0-capable GPIOs (MISO=GP20, SCK=GP22, MOSI=GP7, CS=GP21, RST=GP6).
-// Those W5500 pins are configured via the PIN_ETH_* build flags in
-// platformio.ini; this header only carries the radio (SPI1) wiring, which is
-// IDENTICAL to the standard E22P variant — only the silicon (SX1268) differs.
+// The W5500 SPI0 lines (MISO=GP16, CS=GP17, SCK=GP18, MOSI=GP19, RST=GP20) are
+// configured via the PIN_ETH_* build flags in platformio.ini; this header only
+// carries the radio (SPI1) wiring, which is identical to the W5500-EVB-Pico2
+// variant — only the radio silicon (SX1268) differs.
 
 // NOTE: the E22-400M30S is marketed as SX1268, but its die reports "SX1262" in
 // the version-string register (REG 0x0320). RadioLib's findChip() does a

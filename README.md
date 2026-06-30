@@ -48,6 +48,60 @@ ____________________________________________________
 
 - Wemos Lolin32 Oled + SX1278 DIY Version.
 
+- **RP2350 (Raspberry Pi Pico 2) + WIZnet W5500 Ethernet + Ebyte E22 1W LoRa Module** — wired, headless DIY version (see the section below).
+
+<br />
+
+____________________________________________________
+
+## RP2350 + Ethernet (WIZnet W5500) port
+
+A wired, headless iGate variant for the **Raspberry Pi RP2350 (Pico 2)** with a
+**WIZnet W5500 hardwired-TCP/IP Ethernet** front-end and an **Ebyte E22 (SX1262)**
+1 W LoRa module. Aimed at fixed-site / always-on installations on the 433.775 MHz
+LoRa-APRS network — no WiFi, no display, just Ethernet.
+
+**Why RP2350 + W5500:** the W5500 runs the full TCP/IP stack in silicon (8 hardware
+sockets), so the two Cortex-M33 cores and 520 KB of RAM stay free for LoRa
+timing/decode instead of a software IP stack. Runs on the Earle Philhower
+arduino-pico core with FreeRTOS SMP; radio on SPI1, W5500 on SPI0 (no bus
+contention).
+
+**The port is additive and isolated:** all new code lives under `src/rp2350/` and
+is selected by `build_src_filter` in dedicated PlatformIO envs — existing ESP32
+boards are untouched. Hardware-agnostic logic (KISS codec, APRSPacketLib usage) is
+shared; the ESP32-specific WiFi/ESPAsyncWebServer/Update.h paths are replaced with
+lean equivalents over `EthernetClient`/`EthernetServer`/`EthernetUDP`.
+
+**Features:** iGate RX→APRS-IS (qAR), position beacon (RF + APRS-IS), digipeater
+(WIDEn-N + anti-loop), station blacklist/dedup/last-heard, APRS queries + bidirectional
+messaging, KISS TNC server (TCP :8001), structured T# telemetry, WX (BMP280),
+SNTP time, remote syslog, MQTT bridge, DHCP or static IP, HTTP Basic web auth,
+scheduled auto-reboot, VSYS monitor, and network OTA (web UI with progress). Config
+is the same web SPA served from flash, persisted to LittleFS.
+
+**Boards / build:**
+
+| Env | Board | Ethernet |
+| --- | --- | --- |
+| `rp2350_igate` | WIZnet W5500-EVB-Pico2 (on-board W5500) + E22P-433M30S | integrated |
+| `rp2350_igate_e22` | Raspberry Pi Pico 2 + external W5500 carrier + E22-400M30S | external (carrier) |
+
+```
+pio run -e rp2350_igate          # WIZnet W5500-EVB-Pico2
+pio run -e rp2350_igate_e22      # Pico 2 + W5500 carrier
+```
+
+Pinout per variant under `variants/RP2350_*/board_pinout.h` (radio SPI1:
+SCK10/MOSI11/MISO12/CS13/RST15/DIO1 14/BUSY2, RFEN GP3, DIO2→TXEN bridge, TCXO on
+DIO3; W5500 SPI0: MISO16/SCK18/MOSI19/CS17/RST20). Web assets are regenerated with
+`tools/gen_web_assets_rp2350.py` after editing `data_embed/*`.
+
+> Note: the E22-400M30S is marketed as SX1268 but its die reports "SX1262" in the
+> version-string register, so RadioLib must use the **SX1262** class for it (the
+> SX1268 class rejects it with `-2`). The SX1262 class drives the same command set
+> and covers 433 MHz.
+
 <br />
 
 # Timeline (Versions):
