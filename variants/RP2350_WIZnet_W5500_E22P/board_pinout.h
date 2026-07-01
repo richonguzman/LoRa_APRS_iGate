@@ -17,9 +17,15 @@
 #define RADIO_RST_PIN    15
 #define RADIO_DIO1_PIN   14
 #define RADIO_BUSY_PIN    2
-// E22P has a single combined RF-enable (RFEN) on GP3, held HIGH while active.
-// PA keying (TXEN) is done on-module by the SX1262 DIO2->TXEN bridge.
+// E22P RF front-end. Default (bridged): single combined RF-enable (RFEN) on GP3
+// held HIGH, and PA keying (TXEN) done on-module by the SX1262 DIO2->TXEN bridge
+// (RADIO_TXEN = -1). A board that cuts the DIO2->TXEN bridge and wires TXEN to
+// its own GPIO can override RADIO_TXEN with a -D build flag (e.g. the rewired
+// W5100S carrier passes -D RADIO_TXEN=28) to use the canonical separate TXEN/RXEN
+// RF switch (RadioLib setRfSwitchPins: LNA off in TX, PA off in RX).
 #define RADIO_RXEN        3
+#ifndef RADIO_TXEN
 #define RADIO_TXEN       -1
+#endif
 
 #endif
