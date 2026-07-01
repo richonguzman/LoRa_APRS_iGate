@@ -1166,9 +1166,9 @@
                                                 type="number"
                                                 name="lora.power"
                                                 id="lora.power"
-                                                placeholder="20"
+                                                placeholder="22"
                                                 min="0"
-                                                max="20"
+                                                max="22"
                                                 step="1"
                                                 class="form-control"
                                                 required=""
@@ -1177,7 +1177,12 @@
                                                 >dBm</span
                                             >
                                         </div>
-                                    </div>                                    
+                                        <small class="d-block mt-2 text-muted">
+                                            SX126x chip output (max 22&nbsp;dBm). On
+                                            E22&hellip;M30S modules an external PA
+                                            raises this to ~30&nbsp;dBm at the antenna.
+                                        </small>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -2400,6 +2405,28 @@
                                 >CA3EAP</a
                             ></b
                         >: Settings Page.
+                    </p>
+                    <p class="mb-1 small">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="16"
+                            height="16"
+                            fill="currentColor"
+                            class="bi bi-cc-circle-fill"
+                            viewBox="0 0 16 16"
+                        >
+                            <path
+                                d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M5.408 5.89c.681 0 1.138.47 1.187 1.107h1.147v-.11c-.053-1.187-1.024-2-2.343-2-1.604 0-2.518 1.05-2.518 2.751v.747c0 1.7.906 2.73 2.518 2.73 1.314 0 2.285-.792 2.343-1.939v-.114H6.595c-.049.615-.497 1.05-1.187 1.05-.84 0-1.318-.62-1.318-1.727v-.742c0-1.112.488-1.754 1.318-1.754Zm5.404 0c.68 0 1.138.47 1.186 1.107h1.147v-.11c-.053-1.187-1.024-2-2.342-2-1.604 0-2.518 1.05-2.518 2.751v.747c0 1.7.905 2.73 2.518 2.73 1.314 0 2.285-.792 2.342-1.939v-.114h-1.147c-.048.615-.496 1.05-1.186 1.05-.84 0-1.319-.62-1.319-1.727v-.742c0-1.112.488-1.754 1.319-1.754Z"
+                            />
+                        </svg>
+                        2026
+                        <b
+                            ><a
+                                href="https://ea4glo.cvaldess.com"
+                                target="_blank"
+                                >EA4GLO</a
+                            ></b
+                        >: RP2350 port.
                     </p>
                     <p class="mt-4 small">
                         Support this project<br />
