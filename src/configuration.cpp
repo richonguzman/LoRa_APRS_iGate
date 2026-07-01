@@ -596,18 +596,51 @@ void Configuration::setDefaultValues() {
 
 void Configuration::setup() {
     if (!IGATE_FS_BEGIN()) {
+#if defined(ARDUINO_ARCH_RP2040)
+        // A stale/incompatible LittleFS (e.g. this board previously ran a
+        // firmware with a different filesystem_size, leaving the FS region with
+        // data that mounts but can't be written) fails to mount cleanly — format
+        // once and retry rather than giving up.
+        Serial.println("File system mount failed — formatting...");
+        LittleFS.format();
+        if (!IGATE_FS_BEGIN()) {
+            Serial.println("File system unusable after format");
+            return;
+        }
+        Serial.println("File system formatted and mounted");
+#else
         Serial.println("SPIFFS Mount Failed");
         return;
+#endif
     } else {
-        Serial.println("SPIFFS Mounted");
+        Serial.println("File system mounted");
     }
 
     bool exists = IGATE_FS.exists("/igate_conf.json");
     if (!exists) {
         setDefaultValues();
-        writeFile();
+        bool ok = writeFile();
+#if defined(ARDUINO_ARCH_RP2040)
+        if (!ok) {
+            // Mounted but the write was rejected (stale FS from a different
+            // layout). Format once, remount and retry so we never reboot-loop
+            // here on a config that can't be created.
+            Serial.println("Config write failed — formatting file system and retrying...");
+            LittleFS.format();
+            IGATE_FS_BEGIN();
+            ok = writeFile();
+        }
+        if (ok) {
+            delay(1000);
+            IGATE_RESTART();
+        } else {
+            Serial.println("Config could not be persisted — continuing with defaults");
+        }
+#else
+        (void)ok;
         delay(1000);
         IGATE_RESTART();
+#endif
     }
 
     readFile();
