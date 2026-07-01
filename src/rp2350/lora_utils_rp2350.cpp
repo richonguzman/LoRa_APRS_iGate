@@ -46,6 +46,7 @@ void setup() {
     SPI1.begin(false);
 
 #ifdef LORA_DIAG
+    Serial.println("[diag] ==== LoRa bring-up diagnostic ====");
     // Low-level reach-the-chip probe (separates "dead/stuck chip" from "bad MISO/SPI").
     pinMode(RADIO_BUSY_PIN, INPUT);
     pinMode(RADIO_RST_PIN, OUTPUT);
