@@ -182,7 +182,13 @@ void netTask(void *) {
     SPI.setRX(PIN_ETH_MISO);
     SPI.setSCK(PIN_ETH_SCK);
     SPI.setTX(PIN_ETH_MOSI);
+#ifdef USE_W5100S
+    // The RAK13800_W5100S driver defines only the two-arg init(SPIClass&, cs);
+    // pass the SPI0 port configured just above.
+    Ethernet.init(SPI, PIN_ETH_CS);
+#else
     Ethernet.init(PIN_ETH_CS);
+#endif
 
     // MAC derived from the chip's unique board ID (like Meshtastic's getMacAddr).
     // pico_get_unique_board_id() returns a value cached at boot by an SDK ctor
