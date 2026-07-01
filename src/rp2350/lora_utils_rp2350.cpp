@@ -115,7 +115,15 @@ void setup() {
 }
 
 String receivePacket() {
+#ifdef LORA_RX_POLL
+    // Some carriers don't deliver the SX126x DIO1 RxDone interrupt to the MCU
+    // (DIO1 not routed, or an unreliable edge — verified on the W5100S carrier,
+    // where the chip receives fine but the GP14 IRQ never fires). Poll the IRQ
+    // register over SPI instead of relying on the DIO1 interrupt / rxFlag.
+    if (!(radio.getIrqFlags() & RADIOLIB_SX126X_IRQ_RX_DONE)) return "";
+#else
     if (!rxFlag) return "";
+#endif
     rxFlag = false;
     String str;
     int st = radio.readData(str);
