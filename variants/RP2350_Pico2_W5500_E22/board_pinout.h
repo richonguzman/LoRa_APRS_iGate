@@ -29,9 +29,12 @@
 #define RADIO_RST_PIN    15
 #define RADIO_DIO1_PIN   14
 #define RADIO_BUSY_PIN    2
-// E22 single combined RF-enable (RFEN) on GP3, held HIGH while active.
-// PA keying (TXEN) is done on-module by the SX1268 DIO2->TXEN bridge.
+// Canonical E22-400M30S front-end (datasheet §4.1): TXEN and RXEN are separate
+// MCU-driven lines, mutually exclusive (LNA off during TX, PA off during RX).
+// RadioLib toggles both; DIO2 is left FLOATING (the on-module DIO2->TXEN bridge
+// must be removed and TXEN wired to GP28). GP28 is otherwise free on this carrier
+// (not an ETH/W5500 pin, not the VSYS ADC on GP29).
 #define RADIO_RXEN        3
-#define RADIO_TXEN       -1
+#define RADIO_TXEN       28
 
 #endif

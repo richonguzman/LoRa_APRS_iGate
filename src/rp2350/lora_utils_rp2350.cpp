@@ -38,8 +38,19 @@ static void onLoraDio1() { rxFlag = true; }
 namespace LoRa_Utils {
 
 void setup() {
+    // RF front-end control depends on how TXEN is wired (see board_pinout.h):
+    //   RADIO_TXEN >= 0  -> canonical E22-400M30S / E22P-433M30S design (datasheet
+    //                       §4.1/§5.2): TXEN and RXEN are separate MCU-driven lines,
+    //                       DIO2 floating. RadioLib toggles both switch pins around
+    //                       every RX/TX transition (LNA off in TX, PA off in RX).
+    //   RADIO_TXEN <  0  -> bridged front-end (on-module DIO2->TXEN): a single RFEN
+    //                       (RXEN) line held HIGH, dropped by hand during transmit.
+    //                       Used on carriers where TXEN can't get its own MCU pin
+    //                       (e.g. the W5100S-EVB carrier, which can't be rewired).
+#if RADIO_TXEN < 0
     pinMode(RADIO_RXEN, OUTPUT);
-    digitalWrite(RADIO_RXEN, HIGH);            // E22P RFEN: held HIGH while active
+    digitalWrite(RADIO_RXEN, HIGH);            // bridged: RFEN held HIGH while active
+#endif
     SPI1.setSCK(RADIO_SCLK_PIN);
     SPI1.setTX(RADIO_MOSI_PIN);
     SPI1.setRX(RADIO_MISO_PIN);
@@ -106,7 +117,13 @@ void setup() {
                          Config.loramodule.rxCodingRate4, 0x12, Config.loramodule.power,
                          8, SX126X_DIO3_TCXO_VOLTAGE, true);
     }
-    radio.setDio2AsRfSwitch(true);             // E22P DIO2 -> TXEN bridge
+#if RADIO_TXEN < 0
+    radio.setDio2AsRfSwitch(true);             // bridged: DIO2 -> TXEN on-module (DIO2 wired)
+#else
+    // Canonical front-end: DIO2 is left floating; RadioLib drives the external
+    // TXEN/RXEN switch pins itself (mutually exclusive) on every RX/TX transition.
+    radio.setRfSwitchPins(RADIO_RXEN, RADIO_TXEN);
+#endif
     radio.setDio1Action(onLoraDio1);
     radio.startReceive();
     Serial.printf("[lora] %s @%.4f MHz SF%d BW%.0f CR4:%d (state %d)\n",
@@ -145,7 +162,9 @@ void changeFreqRx() { radio.standby(); radio.setFrequency(rxFreqMHz); radio.star
 void sendNewPacket(const String& newPacket) {
     if (!Config.loramodule.txActive) return;   // RF TX disabled (RX-only iGate / ?TX=OFF)
     changeFreqTx();
-    digitalWrite(RADIO_RXEN, LOW);             // E22 RX path off; DIO2 drives TXEN during transmit
+#if RADIO_TXEN < 0
+    digitalWrite(RADIO_RXEN, LOW);             // bridged: RX path off; DIO2 drives TXEN during transmit
+#endif
     String tx;
     tx.reserve(newPacket.length() + 3);
     tx += '<';
@@ -154,7 +173,9 @@ void sendNewPacket(const String& newPacket) {
     tx += newPacket;
     int st = radio.transmit(tx);
     Serial.printf("[lora] TX %d B (state %d)\n", (int)tx.length(), st);
-    digitalWrite(RADIO_RXEN, HIGH);            // restore RX path
+#if RADIO_TXEN < 0
+    digitalWrite(RADIO_RXEN, HIGH);            // bridged: restore RX path
+#endif
     changeFreqRx();
     // DIO1 fires on TxDone as well as RxDone, so transmit() just set rxFlag.
     // Clear it (after re-arming RX) so the next receivePacket() doesn't read the
