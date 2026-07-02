@@ -71,8 +71,10 @@ void poll() {
         fix.sats  = tinyGps.satellites.isValid() ? tinyGps.satellites.value() : 0;
     }
 
-    // Bring-up diagnostic: charsProcessed()==0 means no NMEA is arriving (wiring
-    // or baud); otherwise shows fix progress (sats climb, then a valid position).
+#ifdef GPS_DEBUG
+    // Bring-up diagnostic (opt-in, -D GPS_DEBUG): charsProcessed()==0 means no
+    // NMEA is arriving (wiring or baud); otherwise shows fix progress (sats climb,
+    // then a valid position). Off in release images to keep the serial log clean.
     static uint32_t lastLog = 0;
     if (millis() - lastLog > 15000) {
         lastLog = millis();
@@ -83,6 +85,7 @@ void poll() {
                       tinyGps.satellites.isValid() ? (int)tinyGps.satellites.value() : 0,
                       (int)fix.valid, fix.lat, fix.lng, fix.alt);
     }
+#endif
 #endif
 }
 
