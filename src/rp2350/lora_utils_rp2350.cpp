@@ -133,10 +133,12 @@ void setup() {
 
 String receivePacket() {
 #ifdef LORA_RX_POLL
-    // Some carriers don't deliver the SX126x DIO1 RxDone interrupt to the MCU
-    // (DIO1 not routed, or an unreliable edge — verified on the W5100S carrier,
-    // where the chip receives fine but the GP14 IRQ never fires). Poll the IRQ
-    // register over SPI instead of relying on the DIO1 interrupt / rxFlag.
+    // Optional fallback for a carrier that genuinely doesn't route the SX126x
+    // DIO1 RxDone interrupt to the MCU: poll the IRQ register over SPI instead of
+    // relying on the DIO1 interrupt / rxFlag. Not needed on the current boards —
+    // the W5100S carrier was verified (isr fires on TxDone and RxDone, GP14 goes
+    // high) to deliver the DIO1 IRQ once the DIO2->TXEN bridge was cut and the
+    // canonical RF switch (setRfSwitchPins) is used.
     if (!(radio.getIrqFlags() & RADIOLIB_SX126X_IRQ_RX_DONE)) return "";
 #else
     if (!rxFlag) return "";
