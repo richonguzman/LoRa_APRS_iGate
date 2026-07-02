@@ -3,6 +3,7 @@
 #include "configuration.h"
 #include "wx_rp2350.h"
 #include "battery_rp2350.h"
+#include "gps_rp2350.h"
 
 extern Configuration Config;
 
@@ -19,11 +20,20 @@ static String battField() {
     return "";
 }
 
-// Base91-compressed position payload: =<overlay><base91>  (mirrors gps_utils.cpp)
+// Base91-compressed position payload: =<overlay><base91>  (mirrors gps_utils.cpp).
+// Uses the live GPS fix when GPS is active and locked, else the fixed config
+// coordinates (a stationary iGate keeps its saved position until a fix arrives).
 static String encodedPosition() {
-    return APRSPacketLib::encodeGPSIntoBase91(Config.beacon.latitude, Config.beacon.longitude,
-                                              0, 0, Config.beacon.symbol, false, 0, true,
-                                              Config.beacon.ambiguityLevel);
+    double lat = Config.beacon.latitude;
+    double lng = Config.beacon.longitude;
+#ifdef HAS_GPS
+    if (Config.beacon.gpsActive && Gps::hasFix()) {
+        lat = Gps::lat();
+        lng = Gps::lng();
+    }
+#endif
+    return APRSPacketLib::encodeGPSIntoBase91(lat, lng, 0, 0, Config.beacon.symbol,
+                                              false, 0, true, Config.beacon.ambiguityLevel);
 }
 
 // Weather field appended after the position when a sensor is active (matches

@@ -32,6 +32,7 @@
 #include "mqtt_rp2350.h"
 #include "syslog_rp2350.h"
 #include "battery_rp2350.h"
+#include "gps_rp2350.h"
 #include "pico/unique_id.h"   // pico_get_unique_board_id (cached at boot — SMP-safe)
 
 #ifndef HB_LED
@@ -104,6 +105,9 @@ void loraTask(void *) {
         // --- RF beacon TX: enqueue into the anti-collision output buffer ---
         if (Config.beacon.sendViaRF) {
             bool locOk = !(Config.beacon.latitude == 0.0 && Config.beacon.longitude == 0.0);
+#ifdef HAS_GPS
+            if (Config.beacon.gpsActive && Gps::hasFix()) locOk = true;   // GPS fix supplies the position
+#endif
             if (locOk && (lastRfBeacon == 0 || g_rfBeaconNow ||
                 (millis() - lastRfBeacon >= (uint32_t)Config.beacon.interval * 60000UL))) {
                 lastRfBeacon = millis();
@@ -229,6 +233,7 @@ void netTask(void *) {
     uint32_t lastBeacon   = 0;
     for (;;) {
         ethWebPoll();
+        Gps::poll();                         // feed GPS NMEA -> TinyGPS++ (HAS_GPS only)
         Tnc::poll();                         // accept KISS clients + read their frames
         Ntp::poll();                         // SNTP time sync (real timestamps)
         Mqtt::loop();                        // MQTT (re)connect + service
@@ -242,6 +247,9 @@ void netTask(void *) {
             if (AprsIs::connected() && Telemetry::dueDefinitions()) Telemetry::sendDefinitions();
             // periodic position beacon over APRS-IS (config has sendViaAPRSIS)
             bool locOk = !(Config.beacon.latitude == 0.0 && Config.beacon.longitude == 0.0);
+#ifdef HAS_GPS
+            if (Config.beacon.gpsActive && Gps::hasFix()) locOk = true;   // GPS fix supplies the position
+#endif
             if (Config.beacon.sendViaAPRSIS && AprsIs::connected() && locOk &&
                 (lastBeacon == 0 || g_beaconNow ||
                  (millis() - lastBeacon >= (uint32_t)Config.beacon.interval * 60000UL))) {
@@ -323,6 +331,7 @@ void setup() {
     Station::setup();                        // load blacklist/managers from Config
     Battery::setup();                        // VSYS ADC
     Wx::setup();                             // BMP280 on I2C0 (Wire) — single-threaded init here
+    Gps::setup();                            // GPS UART (UART1 / Serial2) — HAS_GPS only
 
     rxQueue    = xQueueCreate(8, sizeof(String *));
     txMsgQueue = xQueueCreate(4, sizeof(String *));
