@@ -1,7 +1,6 @@
 #include "wx_rp2350.h"
 #include <Wire.h>
 #include <Adafruit_BMP280.h>
-#include <hardware/gpio.h>
 #include "configuration.h"
 
 extern Configuration Config;
@@ -86,11 +85,8 @@ void setup() {
     WX_WIRE.setSDA(PIN_WX_SDA);
     WX_WIRE.setSCL(PIN_WX_SCL);
     WX_WIRE.begin();
-    // Weak (~50k) internal pull-ups so the bus works even if the board lacks
-    // external I2C pull-ups (a bare SHT40 provides none). Real pull-ups (4.7k)
-    // are still recommended for reliability.
-    gpio_pull_up(PIN_WX_SDA);
-    gpio_pull_up(PIN_WX_SCL);
+    // The board carries dedicated 4.7k external I2C pull-ups, so no internal
+    // pull-ups are enabled here.
 
     // I2C scan (diagnostic): list everything answering on PIN_WX_SDA/SCL.
     Serial.printf("[wx] I2C scan on SDA=%d SCL=%d:", PIN_WX_SDA, PIN_WX_SCL);
