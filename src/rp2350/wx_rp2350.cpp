@@ -1,6 +1,7 @@
 #include "wx_rp2350.h"
 #include <Wire.h>
 #include <Adafruit_BMP280.h>
+#include <Adafruit_BME680.h>
 #include "configuration.h"
 
 extern Configuration Config;
@@ -25,9 +26,11 @@ extern Configuration Config;
 namespace Wx {
 
 static Adafruit_BMP280 bmp280(&WX_WIRE);
-static bool bmpPresent = false;   // temperature + barometric pressure
-static bool shtPresent = false;   // temperature + relative humidity (SHT40)
-static uint8_t sht40Addr = 0;     // 0x44 (AD1B) or 0x45 (BD1B)
+static Adafruit_BME680 bme680(&WX_WIRE);
+static bool bmpPresent    = false;   // BMP280: temperature + barometric pressure
+static bool bme680Present = false;   // BME680: temp + humidity + pressure + gas/VOC
+static bool shtPresent    = false;   // SHT40: temperature + relative humidity
+static uint8_t sht40Addr  = 0;       // 0x44 (AD1B) or 0x45 (BD1B)
 
 // --- APRS field formatters (byte-for-byte the ESP32 wx_utils.cpp output) ---
 static String tempString(float degF) {       // temperature in Fahrenheit, 3 digits
@@ -97,8 +100,19 @@ void setup() {
     }
     Serial.println(found ? "" : " (none)");
 
-    // BMP280 ships at 0x76 or 0x77 depending on the SDO strap.
-    if (bmp280.begin(0x76) || bmp280.begin(0x77)) {
+    // 0x76/0x77 (SDO strap) hosts either a BMP280 (temp + pressure) or a BME680
+    // (temp + humidity + pressure + gas/VOC) — they share the address. Each
+    // Adafruit .begin() validates its own chip ID (BMP280 = 0x58, BME680 = 0x61),
+    // so probe the BME680 first and fall back to the BMP280: no false positives.
+    if (bme680.begin(0x76) || bme680.begin(0x77)) {
+        bme680.setTemperatureOversampling(BME680_OS_8X);
+        bme680.setHumidityOversampling(BME680_OS_2X);
+        bme680.setPressureOversampling(BME680_OS_4X);
+        bme680.setIIRFilterSize(BME680_FILTER_SIZE_3);
+        bme680.setGasHeater(320, 150);           // 320 C for 150 ms -> gas resistance
+        bme680Present = true;
+        Serial.println("[wx] BME680 found (temp + humidity + pressure + gas)");
+    } else if (bmp280.begin(0x76) || bmp280.begin(0x77)) {
         bmp280.setSampling(Adafruit_BMP280::MODE_FORCED,
                            Adafruit_BMP280::SAMPLING_X2,    // temperature
                            Adafruit_BMP280::SAMPLING_X16,   // pressure
@@ -119,25 +133,34 @@ void setup() {
         }
     }
 
-    if (!bmpPresent && !shtPresent)
-        Serial.println("[wx] no BMP280/SHT40 on I2C (weather disabled)");
+    if (!bmpPresent && !bme680Present && !shtPresent)
+        Serial.println("[wx] no BME680/BMP280/SHT40 on I2C (weather disabled)");
 }
 
-bool present() { return bmpPresent || shtPresent; }
+bool present() { return bmpPresent || bme680Present || shtPresent; }
 
 // APRS weather payload: ".../...g...t<TTT>[h<HH>][b<PPPPP>]". Temperature comes
-// from whichever sensor is present (SHT40 preferred); humidity from the SHT40,
-// pressure from the BMP280. Fields for absent sensors are omitted.
+// from whichever sensor is present (SHT40 preferred); humidity from the SHT40 or
+// BME680, pressure from the BME680 or BMP280. A BME680 also appends its gas/VOC
+// resistance ("Gas: <k>Kohms", matching the ESP32 wx_utils.cpp). Absent fields
+// are omitted.
 String readAprs() {
-    if (!bmpPresent && !shtPresent) return "";
+    if (!bmpPresent && !bme680Present && !shtPresent) return "";
 
-    float tC = NAN, rh = NAN, p = NAN;
+    float tC = NAN, rh = NAN, p = NAN, gasKohm = NAN;
 
     if (shtPresent) {
         float t, h;
         if (sht40Read(t, h)) { tC = t; rh = h; }
     }
-    if (bmpPresent) {
+    if (bme680Present) {
+        if (bme680.performReading()) {                 // blocking read (temp/hum/pres/gas)
+            p       = bme680.pressure / 100.0f;        // hPa
+            gasKohm = bme680.gas_resistance / 1000.0f; // kOhms
+            if (isnan(tC)) tC = bme680.temperature;    // SHT40 temp preferred if present
+            if (isnan(rh)) rh = bme680.humidity;       // SHT40 humidity preferred if present
+        }
+    } else if (bmpPresent) {
         bmp280.takeForcedMeasurement();
         float bt = bmp280.readTemperature();          // degC
         float bp = bmp280.readPressure() / 100.0f;    // hPa
@@ -154,6 +177,11 @@ String readAprs() {
     if (!isnan(p)) {
         wx += "b";
         wx += presString(p + Config.wxsensor.heightCorrection / WX_CORRECTION_FACTOR);
+    }
+    if (bme680Present && !isnan(gasKohm)) {
+        wx += "Gas: ";
+        wx += String(gasKohm);
+        wx += "Kohms";
     }
     return wx;
 }
