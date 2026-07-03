@@ -56,6 +56,19 @@ void setup() {
     SPI1.setRX(RADIO_MISO_PIN);
     SPI1.begin(false);
 
+    // Deliberate E22 reset with the RF front-end held OFF (PA + LNA), so a *software*
+    // reboot (config save -> rp2040.restart, which does NOT power-cycle the module)
+    // recovers a module left in a bad state instead of needing a physical power
+    // cycle. RadioLib's begin() also resets, but a longer, front-end-safe pulse here
+    // is more reliable after a glitchy restart.
+#if RADIO_TXEN >= 0
+    pinMode(RADIO_TXEN, OUTPUT); digitalWrite(RADIO_TXEN, LOW);   // PA off during reset
+    pinMode(RADIO_RXEN, OUTPUT); digitalWrite(RADIO_RXEN, LOW);   // LNA off during reset
+#endif
+    pinMode(RADIO_RST_PIN, OUTPUT);
+    digitalWrite(RADIO_RST_PIN, LOW);  delay(5);
+    digitalWrite(RADIO_RST_PIN, HIGH); delay(5);
+
 #ifdef LORA_DIAG
     Serial.println("[diag] ==== LoRa bring-up diagnostic ====");
     // Low-level reach-the-chip probe (separates "dead/stuck chip" from "bad MISO/SPI").
@@ -107,6 +120,13 @@ void setup() {
     rxFreqMHz = (float)Config.loramodule.rxFreq / 1000000.0f;
     txFreqMHz = (float)Config.loramodule.txFreq / 1000000.0f;
     float bw  = (float)Config.loramodule.rxSignalBandwidth / 1000.0f;
+
+    // The E22(P)-xxxM30S carries its own 30 dBm PA; driving the SX126x above 20 dBm
+    // overdrives it -> ~690 mA current spike -> supply brownout that wedges the
+    // module in a low-sensitivity state until a physical power cycle (verified on
+    // the .243 W5100S: power=22 went deaf, cold-boot recovered ~10 dB). Cap the
+    // SX126x drive at 20 dBm — no useful range is gained above it on this front-end.
+    if (Config.loramodule.power > 20) Config.loramodule.power = 20;
 
     int st = radio.begin(rxFreqMHz, bw, Config.loramodule.rxSpreadingFactor,
                          Config.loramodule.rxCodingRate4, 0x12, Config.loramodule.power,
