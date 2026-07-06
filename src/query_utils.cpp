@@ -139,7 +139,7 @@ namespace QUERY_Utils {
 
         if (answer == "") return "";
 
-        String queryAnswer = Config.callsign;
+        String queryAnswer = (Config.tacticalCallsign == "" ? Config.callsign : Config.tacticalCallsign);
         queryAnswer += ">APLRG1";
         if (queryFromAPRSIS) {
             queryAnswer += ",TCPIP,qAC";
