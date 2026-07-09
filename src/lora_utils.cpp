@@ -65,6 +65,22 @@ float snr;
 
 namespace LoRa_Utils {
 
+    // Sanitizer for the WebUI copy of a received packet. Mic-E payloads
+    // legitimately contain control bytes (e.g. 0x1C encoding low speed); raw
+    // control characters are invalid inside JSON strings (RFC 8259) and can
+    // break JSON.parse on the Received Packets page. Replaces 0x00-0x1F and
+    // 0x7F with '.' (hexdump convention). Comparison is on the UNSIGNED byte
+    // so UTF-8 comment bytes (>= 0x80, spec-legal) pass through untouched.
+    // Display copy only - syslog / APRS-IS / digi all use the original packet.
+    static String sanitizeForWeb(const String& s) {
+        String out = s;
+        for (int i = 0; i < (int)out.length(); i++) {
+            uint8_t c = (uint8_t)out[i];
+            if (c < 32 || c == 127) out.setCharAt(i, '.');
+        }
+        return out;
+    }
+
     void setFlag(void) {
         operationDone = true;
     }
@@ -238,7 +254,7 @@ namespace LoRa_Utils {
                                 }
                                 ReceivedPacket receivedPacket;
                                 receivedPacket.rxTime   = NTP_Utils::getFormatedTime();
-                                receivedPacket.packet   = packet.substring(3);
+                                receivedPacket.packet   = sanitizeForWeb(packet.substring(3));
                                 receivedPacket.RSSI     = rssi;
                                 receivedPacket.SNR      = snr;
                                 receivedPackets.push_back(receivedPacket);
