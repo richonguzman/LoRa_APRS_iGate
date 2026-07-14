@@ -7,7 +7,6 @@
         <title>LoRa iGate & Digi software &minus; Ricardo Guzman CA2RXU</title>
         <link rel="stylesheet" href="/bootstrap.css" />
         <link rel="stylesheet" href="/style.css" />
-        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
         <link rel="icon" href="/favicon.png" type="image/x-icon">
     <script>(function(){try{var t=localStorage.getItem("igateTheme");if(!t)t=window.matchMedia&&window.matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";var r=document.documentElement;if(t==="night"){r.setAttribute("data-bs-theme","dark");r.setAttribute("data-variant","night");}else{r.setAttribute("data-bs-theme",t);}}catch(e){}})();</script>
 <style>
@@ -2386,7 +2385,25 @@ body{background:var(--msh-bg);color:var(--msh-text);font-family:"Inter",system-u
         </div>
     </body>
     <script src="/bootstrap.js"></script>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script>
+    // Leaflet se carga desde un CDN externo (internet). En modo AP la IP es siempre 192.168.4.1
+    // y NO hay internet, asi que los tags externos bloqueaban la carga de toda la pagina.
+    // Solucion: cargar Leaflet dinamicamente solo cuando NO estamos en modo AP.
+    (function () {
+        if (location.hostname === "192.168.4.1") return;   // modo AP: no cargar Leaflet
+        var css = document.createElement("link");
+        css.rel = "stylesheet";
+        css.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
+        css.integrity = "sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=";
+        css.crossOrigin = "";
+        document.head.appendChild(css);
+        var js = document.createElement("script");
+        js.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
+        js.integrity = "sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=";
+        js.crossOrigin = "";
+        document.head.appendChild(js);
+    })();
+    </script>
     <script src="/script.js"></script>
 </html>
 <script>

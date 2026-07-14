@@ -69,6 +69,15 @@ float snr;
 
 namespace LoRa_Utils {
 
+    static String sanitizeForWeb(const String& s) {     // replaces non-printable ASCII with '.' for WebUI display
+        String out = s;
+        for (int i = 0; i < (int)out.length(); i++) {
+            uint8_t c = (uint8_t)out[i];
+            if (c < 32 || c == 127) out.setCharAt(i, '.');
+        }
+        return out;
+    }
+
     void setFlag(void) {
         operationDone = true;
     }
@@ -276,7 +285,7 @@ namespace LoRa_Utils {
                                 }
                                 ReceivedPacket receivedPacket;
                                 receivedPacket.rxTime   = NTP_Utils::getFormatedTime();
-                                receivedPacket.packet   = packet.substring(3);
+                                receivedPacket.packet   = sanitizeForWeb(packet.substring(3));
                                 receivedPacket.RSSI     = rssi;
                                 receivedPacket.SNR      = snr;
                                 receivedPackets.push_back(receivedPacket);
