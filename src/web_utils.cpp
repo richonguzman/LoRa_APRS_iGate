@@ -49,6 +49,14 @@ extern const char web_bootstrap_js[] asm("_binary_data_embed_bootstrap_js_gz_sta
 extern const char web_bootstrap_js_end[] asm("_binary_data_embed_bootstrap_js_gz_end");
 extern const size_t web_bootstrap_js_len = web_bootstrap_js_end - web_bootstrap_js;
 
+extern const char web_leaflet_css[] asm("_binary_data_embed_leaflet_css_gz_start");
+extern const char web_leaflet_css_end[] asm("_binary_data_embed_leaflet_css_gz_end");
+extern const size_t web_leaflet_css_len = web_leaflet_css_end - web_leaflet_css;
+
+extern const char web_leaflet_js[] asm("_binary_data_embed_leaflet_js_gz_start");
+extern const char web_leaflet_js_end[] asm("_binary_data_embed_leaflet_js_gz_end");
+extern const size_t web_leaflet_js_len = web_leaflet_js_end - web_leaflet_js;
+
 // Declare external symbols for the embedded image data
 extern const unsigned char favicon_data[] asm("_binary_data_embed_favicon_png_gz_start");
 extern const unsigned char favicon_data_end[] asm("_binary_data_embed_favicon_png_gz_end");
@@ -363,6 +371,20 @@ namespace WEB_Utils {
         request->send(response);
     }
 
+    void handleLeafletStyle(AsyncWebServerRequest *request) {
+        AsyncWebServerResponse *response = request->beginResponse(200, "text/css", (const uint8_t*)web_leaflet_css, web_leaflet_css_len);
+        response->addHeader("Content-Encoding", "gzip");
+        response->addHeader("Cache-Control", "max-age=3600");
+        request->send(response);
+    }
+
+    void handleLeafletScript(AsyncWebServerRequest *request) {
+        AsyncWebServerResponse *response = request->beginResponse(200, "text/javascript", (const uint8_t*)web_leaflet_js, web_leaflet_js_len);
+        response->addHeader("Content-Encoding", "gzip");
+        response->addHeader("Cache-Control", "max-age=3600");
+        request->send(response);
+    }
+
     void setup() {
         if (Config.digi.ecoMode == 0) {
             server.on("/", HTTP_GET, handleHome);
@@ -376,6 +398,8 @@ namespace WEB_Utils {
             server.on("/script.js", HTTP_GET, handleScript);
             server.on("/bootstrap.css", HTTP_GET, handleBootstrapStyle);
             server.on("/bootstrap.js", HTTP_GET, handleBootstrapScript);
+            server.on("/leaflet.css", HTTP_GET, handleLeafletStyle);
+            server.on("/leaflet.js", HTTP_GET, handleLeafletScript);
             server.on("/favicon.png", HTTP_GET, handleFavicon);
 
             OTA_Utils::setup(&server); // Include OTA Updater for WebServer

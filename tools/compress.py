@@ -26,6 +26,8 @@ files = [
   'data_embed/style.css',
   'data_embed/bootstrap.js',
   'data_embed/bootstrap.css',
+  'data_embed/leaflet.js',
+  'data_embed/leaflet.css',
   'data_embed/favicon.png',
 ]
 
