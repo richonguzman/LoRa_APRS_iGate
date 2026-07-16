@@ -25,6 +25,10 @@ static SX1262 radio = new Module(RADIO_CS_PIN, RADIO_DIO1_PIN, RADIO_RST_PIN, RA
 #endif
 static volatile bool rxFlag = false;
 
+// How often to warm-reset the SX126x analog frontend / AGC state (see resetAGC).
+// Ported from upstream PR #440 (ndoo / Andrew Yong), itself from Meshtastic.
+#define AGC_RESET_INTERVAL_MS 60000
+
 // Signal stats of the last received packet (read by the ?APRSSR query; the
 // original firmware keeps these as globals, so the query module externs them).
 int   rssi      = 0;
@@ -36,6 +40,49 @@ static float txFreqMHz = 433.775f;
 static void onLoraDio1() { rxFlag = true; }
 
 namespace LoRa_Utils {
+
+// Undocumented Heltec/Semtech-recommended SX126x register patch (bit 0 of 0x8B5)
+// that measurably reduces packet loss. Needs RADIOLIB_LOW_LEVEL=1 for getMod().
+// Calibrate(0x7F) clears it, so resetAGC() re-applies it after every calibration.
+static void applyRxSensitivityPatch() {
+    if (radio.getMod()->SPIsetRegValue(0x8B5, 0x01, 0, 0) == RADIOLIB_ERR_NONE)
+        Serial.println("[lora] applied SX126x 0x8B5 RX-sensitivity patch");
+    else
+        Serial.println("[lora] FAILED to apply SX126x 0x8B5 RX-sensitivity patch");
+}
+
+// SX126x has no true AGC; the frontend gain can get stuck low after prolonged RX.
+// Periodically warm-reset it (warm sleep + full calibration), skipping if a packet
+// is actively arriving. Called from receivePacket() only (loraTask owns SPI1).
+static void resetAGC() {
+    uint32_t irqFlags = radio.getIrqFlags();
+    if (irqFlags & (RADIOLIB_SX126X_IRQ_HEADER_VALID | RADIOLIB_SX126X_IRQ_PREAMBLE_DETECTED))
+        return;  // packet actively arriving, don't disturb it
+
+    radio.sleep(true);                                  // warm sleep - resets the analog frontend / AGC state
+    radio.standby(RADIOLIB_SX126X_STANDBY_RC, true);    // wake to RC standby for stable calibration
+
+    uint8_t calData = RADIOLIB_SX126X_CALIBRATE_ALL;
+    radio.getMod()->SPIwriteStream(RADIOLIB_SX126X_CMD_CALIBRATE, &calData, 1, true, false);
+
+    radio.getMod()->hal->delay(5);
+    uint32_t calibrationStart = millis();
+    while (radio.getMod()->hal->digitalRead(radio.getMod()->getGpio())) {
+        if (millis() - calibrationStart > 50) {
+            Serial.println("[lora] SX126x AGC reset: calibration did not complete within 50ms");
+            break;
+        }
+        radio.getMod()->hal->yield();
+    }
+
+    float freq = (float)Config.loramodule.rxFreq / 1000000;
+    radio.calibrateImage(freq);         // Calibrate(0x7F) defaults image cal to the wrong band otherwise
+
+    radio.setRxBoostedGainMode(true);   // re-apply settings that Calibrate(0x7F) resets
+    applyRxSensitivityPatch();
+
+    radio.startReceive();
+}
 
 void setup() {
     // RF front-end control depends on how TXEN is wired (see board_pinout.h):
@@ -144,6 +191,8 @@ void setup() {
     // TXEN/RXEN switch pins itself (mutually exclusive) on every RX/TX transition.
     radio.setRfSwitchPins(RADIO_RXEN, RADIO_TXEN);
 #endif
+    radio.setRxBoostedGainMode(true);          // boosted LNA gain (higher RX sensitivity)
+    applyRxSensitivityPatch();                 // undocumented 0x8B5 RX patch (upstream PR #440)
     radio.setDio1Action(onLoraDio1);
     radio.startReceive();
     Serial.printf("[lora] %s @%.4f MHz SF%d BW%.0f CR4:%d (state %d)\n",
@@ -152,6 +201,21 @@ void setup() {
 }
 
 String receivePacket() {
+    // Periodic AGC warm-reset (upstream PR #440). Only when no packet is pending —
+    // resetAGC() sleeps/calibrates the radio, which would drop an already-received
+    // (RxDone) packet waiting in the FIFO. It also bails internally if one is
+    // mid-arrival (HEADER_VALID / PREAMBLE_DETECTED).
+#ifdef LORA_RX_POLL
+    bool rxPending = radio.getIrqFlags() & RADIOLIB_SX126X_IRQ_RX_DONE;
+#else
+    bool rxPending = rxFlag;
+#endif
+    static uint32_t lastAgcResetTime = 0;
+    if (!rxPending && millis() - lastAgcResetTime > AGC_RESET_INTERVAL_MS) {
+        resetAGC();
+        lastAgcResetTime = millis();
+    }
+
 #ifdef LORA_RX_POLL
     // Optional fallback for a carrier that genuinely doesn't route the SX126x
     // DIO1 RxDone interrupt to the MCU: poll the IRQ register over SPI instead of
