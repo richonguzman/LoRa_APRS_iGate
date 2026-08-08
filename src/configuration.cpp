@@ -183,6 +183,7 @@ bool Configuration::writeFile() {
         data["other"]["rebootModeTime"]             = rebootModeTime;
 
         data["other"]["rememberStationTime"]        = rememberStationTime;
+        data["other"]["allowAnyCallsign"]           = allowAnyCallsign;
 
         serializeJson(data, configFile);
         configFile.close();
@@ -420,6 +421,9 @@ bool Configuration::readFile() {
         if (data["other"]["rememberStationTime"].isNull()) needsRewrite = true;
         rememberStationTime             = data["other"]["rememberStationTime"] | 30;
 
+        if (data["other"]["allowAnyCallsign"].isNull()) needsRewrite = true;
+        allowAnyCallsign                = data["other"]["allowAnyCallsign"] | false;
+
         if (wifiAPs.size() == 0) { // If we don't have any WiFi's from config we need to add "empty" SSID for AUTO AP
             WiFi_AP wifiap;
             wifiap.ssid = "";
@@ -564,6 +568,7 @@ void Configuration::setDefaultValues() {
     rebootModeTime                  = 0;
 
     rememberStationTime             = 30;
+    allowAnyCallsign                = false;
 
     Serial.println("New Data Created... All is Written!");
 }

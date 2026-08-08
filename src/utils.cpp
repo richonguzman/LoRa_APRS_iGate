@@ -432,6 +432,7 @@ namespace Utils {
     bool callsignIsValid(const String& callsign) {
         if (callsign == "WLNK-1") return true;
         int totalCallsignLength = callsign.length();
+        if (Config.allowAnyCallsign) return totalCallsignLength >= 3 && totalCallsignLength <= 9;
         if (totalCallsignLength < 4) return false;
 
         int hyphenIndex         = callsign.indexOf("-");

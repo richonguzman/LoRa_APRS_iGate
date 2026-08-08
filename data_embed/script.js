@@ -250,6 +250,8 @@ function loadSettings(settings) {
     RebootModeCheckbox.checked  = settings.other.rebootMode;
     RebootModeTime.disabled     = !RebootModeCheckbox.check;
 
+    document.getElementById("other.allowAnyCallsign").checked           = settings.other.allowAnyCallsign;
+
     // WiFi Auto AP
     document.getElementById("wifi.autoAP.enabled").checked              = settings.wifi.autoAP.enabled;
     document.getElementById("wifi.autoAP.password").value               = settings.wifi.autoAP.password;
