@@ -291,6 +291,7 @@ namespace WEB_Utils {
         Config.ntp.gmtCorrection            = getParamFloatSafe("ntp.gmtCorrection", Config.ntp.gmtCorrection);
 
         Config.rememberStationTime          = getParamIntSafe("other.rememberStationTime", Config.rememberStationTime);
+        Config.allowAnyCallsign             = request->hasParam("other.allowAnyCallsign", true);
 
         bool saveSuccess = Config.writeFile();
 

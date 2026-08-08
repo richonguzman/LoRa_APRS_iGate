@@ -176,6 +176,7 @@ public:
     int                     rememberStationTime;
     bool                    rebootMode;
     int                     rebootModeTime;
+    bool                    allowAnyCallsign;
     int                     startupDelay;
     String                  personalNote;
     String                  blacklist;
