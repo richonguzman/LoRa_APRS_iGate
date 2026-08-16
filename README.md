@@ -16,12 +16,6 @@ ____________________________________________________
 
 ____________________________________________________
 
-## You can support this project to continue to grow:
-
-[<img src="https://github.com/richonguzman/LoRa_APRS_Tracker/raw/main/images/github-sponsors.png">](https://github.com/sponsors/richonguzman)     [<img src="https://github.com/richonguzman/LoRa_APRS_Tracker/raw/main/images/paypalme.png">](http://paypal.me/richonguzman)
-
-____________________________________________________
-
 ## New Web/UI
 
 | New Menu | Map |
@@ -30,18 +24,24 @@ ____________________________________________________
 
 ____________________________________________________
 
+## You can support this project to continue to grow:
+
+[<img src="https://github.com/richonguzman/LoRa_APRS_Tracker/raw/main/images/github-sponsors.png">](https://github.com/sponsors/richonguzman)     [<img src="https://github.com/richonguzman/LoRa_APRS_Tracker/raw/main/images/paypalme.png">](http://paypal.me/richonguzman)
+
+____________________________________________________
+
 
 ## SUPPORTED BOARDS (<a href="https://github.com/richonguzman/LoRa_APRS_iGate/wiki/Supported-Boards-and-Buying-Links" target="_blank">Buying links</a>).
 
 (NOTE: all boards with 433-868-915 MHz versions)
 
-- TTGO Lilygo LoRa32 T3S3 V1.2 and LoRa32 V2.1 (V1.6 is the same).
+- TTGO Lilygo LoRa32 LoRa32 V2.1 (V1.6 is the same) and T3S3 V1.2.
 
 - TTGO T-Beam V1.0 , V1.1, V1.2 (also variations with SX1262 and SX1268 LoRa Modules) and Supreme V3.
 
 - T-Deck Plus (and also regular T-Deck with/without GPS).
 
-- HELTEC V2, V3, V3.2, T114, Wireless Stick, Wireless Stick Lite V3/V3.2, HT-CT62, Wireless Tracker, Wireless Paper.
+- HELTEC V2, V3, V3.2, V4, T114, Wireless Stick, Wireless Stick Lite V3/V3.2, HT-CT62, Wireless Tracker, Wireless Paper.
 
 - RAK Wireless 4631 + 19007(or 19003)
 
@@ -56,6 +56,8 @@ ____________________________________________________
 - ESP32 + 4G/LTE A7670 Modem + SX1278 DIY Version.
 
 - Wemos Lolin32 Oled + SX1278 DIY Version.
+
+- and many more...
 
 <br />
 
