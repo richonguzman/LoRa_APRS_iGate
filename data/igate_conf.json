@@ -1,8 +1,8 @@
 {
-    "callsign": "NOCALL-10",
+    "callsign": "DH9DFI-10",
     "wifi": {
-        "autoAP": {
-            "password": "1234567890",
+        "BVB": {
+            "password": "benek16sp9dfi",
             "timeout": 10
         },
         "AP": []
