@@ -42,6 +42,10 @@ bool transmitFlag       = true;
 #define DIFS_SLOTS      2       // Number of secuential CAD slots to consider a free channel to Tx
 int  backoffMax         = 4;    // Max Backoff value (number of CAD slots to wait before Tx)
 
+#if defined(HAS_SX1262) || defined(HAS_SX1268) || defined(HAS_LLCC68)
+    #define AGC_RESET_INTERVAL_MS   60000   // how often to warm-reset the analog frontend / AGC state
+#endif
+
 #ifdef HAS_SX1262
     SX1262 radio = new Module(RADIO_CS_PIN, RADIO_DIO1_PIN, RADIO_RST_PIN, RADIO_BUSY_PIN);
 #endif
@@ -81,6 +85,50 @@ namespace LoRa_Utils {
     void setFlag(void) {
         operationDone = true;
     }
+
+    #if defined(HAS_SX1262) || defined(HAS_SX1268) || defined(HAS_LLCC68)
+        // Undocumented Heltec/Semtech-recommended SX126x register patch for improved RX sensitivity.
+        void applyRxSensitivityPatch() {
+            if (radio.getMod()->SPIsetRegValue(0x8B5, 0x01, 0, 0) == RADIOLIB_ERR_NONE) {
+                Utils::println("Applied SX126x register 0x8B5 patch for RX improvement");
+            } else {
+                Utils::println("Failed to apply SX126x register 0x8B5 patch for RX improvement");
+            }
+        }
+
+        // SX126x has no true AGC, but frontend gain can get stuck after prolonged RX; periodically
+        // warm-reset it via sleep + full calibration.
+        void resetAGC() {
+            uint32_t irqFlags = radio.getIrqFlags();
+            if (irqFlags & (RADIOLIB_SX126X_IRQ_HEADER_VALID | RADIOLIB_SX126X_IRQ_PREAMBLE_DETECTED)) {
+                return; // packet actively arriving, don't disturb it
+            }
+
+            radio.sleep(true);                                 // warm sleep - resets the analog frontend / AGC state
+            radio.standby(RADIOLIB_SX126X_STANDBY_RC, true);    // wake to RC standby for stable calibration
+
+            uint8_t calData = RADIOLIB_SX126X_CALIBRATE_ALL;
+            radio.getMod()->SPIwriteStream(RADIOLIB_SX126X_CMD_CALIBRATE, &calData, 1, true, false);
+
+            radio.getMod()->hal->delay(5);
+            uint32_t calibrationStart = millis();
+            while (radio.getMod()->hal->digitalRead(radio.getMod()->getGpio())) {
+                if (millis() - calibrationStart > 50) {
+                    Utils::println("SX126x AGC reset: calibration did not complete within 50ms");
+                    break;
+                }
+                radio.getMod()->hal->yield();
+            }
+
+            float freq = (float)Config.loramodule.rxFreq / 1000000;
+            radio.calibrateImage(freq);        // Calibrate(0x7F) defaults image cal to the wrong band otherwise
+
+            radio.setRxBoostedGainMode(true);  // re-apply settings that Calibrate(0x7F) resets
+            applyRxSensitivityPatch();
+
+            radio.startReceive();
+        }
+    #endif
 
     void setup() {
         #if defined (LIGHTGATEWAY_1_0) || defined(LIGHTGATEWAY_PLUS_1_0)
@@ -145,6 +193,7 @@ namespace LoRa_Utils {
 
         #if defined(HAS_SX1262) || defined(HAS_SX1268) || defined(HAS_LLCC68)
             radio.setRxBoostedGainMode(true);
+            applyRxSensitivityPatch();
         #endif
 
         #if defined(HAS_TCXO) && !defined(HAS_1W_LORA)
@@ -261,6 +310,13 @@ namespace LoRa_Utils {
 
     String receivePacket() {
         String packet = "";
+        #if defined(HAS_SX1262) || defined(HAS_SX1268) || defined(HAS_LLCC68)
+            static uint32_t lastAgcResetTime = 0;
+            if (!operationDone && millis() - lastAgcResetTime > AGC_RESET_INTERVAL_MS) {
+                resetAGC();
+                lastAgcResetTime = millis();
+            }
+        #endif
         if (operationDone) {
             operationDone = false;
             if (transmitFlag) {
