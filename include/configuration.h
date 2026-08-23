@@ -174,6 +174,7 @@ class Configuration {
 public:
     String                  callsign;
     String                  tacticalCallsign;
+    bool                    allowAnyCallsign;
     int                     rememberStationTime;
     bool                    rebootMode;
     int                     rebootModeTime;
