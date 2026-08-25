@@ -29,9 +29,7 @@ std::vector<MapStation> mapStations;
 
 namespace MAP_Utils {
 
-    // Copia la hora NTP "HH:MM:SS" si es valida; si no hay red (NTP devuelve
-    // un texto de fallback) deja el campo vacio para no guardar hora falsa.
-    void writeFormatedTime(char* dst, size_t size) {
+    void writeFormatedTime(char* dst, size_t size) { // gets NTP time ("HH:MM:SS") and writes it to dst if valid
         String t = NTP_Utils::getFormatedTime();
         if (t.length() == 8 && t.charAt(2) == ':') {
             t.toCharArray(dst, size);
@@ -40,10 +38,8 @@ namespace MAP_Utils {
         }
     }
 
-    // Inserta una estacion nueva o actualiza la existente (dedup por callsign).
-    // Llamar solo cuando el parser ya decodifico una posicion valida.
-    void upsert(const String& callsign, float latitude, float longitude, const String& symbol, int rssi, float snr) {
-        for (auto &s : mapStations) {                       // 1) ya existe -> actualizar
+    void upsert(const String& callsign, float latitude, float longitude, const String& path, const String& symbol, int rssi, float snr) {   // Upsert station only with valid position with callsign dedup.
+        for (auto &s : mapStations) {                       // 1) update
             if (callsign.equals(s.callsign)) {
                 s.latitude  = latitude;
                 s.longitude = longitude;
@@ -51,13 +47,14 @@ namespace MAP_Utils {
                 s.snr       = snr;
                 s.count++;
                 symbol.toCharArray(s.symbol, sizeof(s.symbol));
+                path.toCharArray(s.path, sizeof(s.path));
                 writeFormatedTime(s.lastHeard, sizeof(s.lastHeard));
                 s.lastHeardMillis = millis();
                 return;
             }
         }
 
-        if (mapStations.size() >= MAX_MAP_STATIONS) {       // 2) llena -> descartar la mas vieja
+        if (mapStations.size() >= MAX_MAP_STATIONS) {       // 2) full? delete oldest one
             size_t oldest = 0;
             for (size_t i = 1; i < mapStations.size(); i++) {
                 if (mapStations[i].lastHeardMillis < mapStations[oldest].lastHeardMillis) {
@@ -67,9 +64,10 @@ namespace MAP_Utils {
             mapStations.erase(mapStations.begin() + oldest);
         }
 
-        MapStation st = {};                                 // 3) insertar nueva
+        MapStation st = {};                                 // 3) insert new
         callsign.toCharArray(st.callsign, sizeof(st.callsign));
         symbol.toCharArray(st.symbol, sizeof(st.symbol));
+        path.toCharArray(st.path, sizeof(st.path));
         st.latitude  = latitude;
         st.longitude = longitude;
         st.rssi      = rssi;
@@ -102,6 +100,7 @@ namespace MAP_Utils {
             data[i]["SNR"]       = mapStations[i].snr;
             data[i]["count"]     = mapStations[i].count;
             data[i]["lastHeard"] = mapStations[i].lastHeard;
+            data[i]["path"]      = mapStations[i].path;
         }
 
         String buffer;

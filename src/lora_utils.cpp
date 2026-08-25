@@ -291,8 +291,8 @@ namespace LoRa_Utils {
                                 receivedPackets.push_back(receivedPacket);
 
                                 APRSPacket aprsPacket = APRSPacketLib::processReceivedPacket(packet.substring(3), rssi, snr, freqError);
-                                if (aprsPacket.type == 0 || aprsPacket.type == 4) {   // 0 = GPS, 4 = Mic-E (los que traen posición)
-                                    MAP_Utils::upsert(aprsPacket.sender, aprsPacket.latitude, aprsPacket.longitude, aprsPacket.overlay + aprsPacket.symbol, aprsPacket.rssi, aprsPacket.snr);
+                                if (aprsPacket.type == 0 || aprsPacket.type == 4) {   // 0 = GPS, 4 = Mic-E (only ones with position)
+                                    MAP_Utils::upsert(aprsPacket.sender, aprsPacket.latitude, aprsPacket.longitude, aprsPacket.path, aprsPacket.overlay + aprsPacket.symbol, aprsPacket.rssi, aprsPacket.snr);
                                 }
                             }
 

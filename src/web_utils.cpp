@@ -62,6 +62,14 @@ extern const unsigned char favicon_data[] asm("_binary_data_embed_favicon_png_gz
 extern const unsigned char favicon_data_end[] asm("_binary_data_embed_favicon_png_gz_end");
 extern const size_t favicon_data_len = favicon_data_end - favicon_data;
 
+extern const unsigned char aprs_symbols_24_0_data[] asm("_binary_data_embed_aprs_symbols_24_0_png_gz_start");
+extern const unsigned char aprs_symbols_24_0_data_end[] asm("_binary_data_embed_aprs_symbols_24_0_png_gz_end");
+extern const size_t aprs_symbols_24_0_data_len = aprs_symbols_24_0_data_end - aprs_symbols_24_0_data;
+
+extern const unsigned char aprs_symbols_24_1_data[] asm("_binary_data_embed_aprs_symbols_24_1_png_gz_start");
+extern const unsigned char aprs_symbols_24_1_data_end[] asm("_binary_data_embed_aprs_symbols_24_1_png_gz_end");
+extern const size_t aprs_symbols_24_1_data_len = aprs_symbols_24_1_data_end - aprs_symbols_24_1_data;
+
 
 namespace WEB_Utils {
 
@@ -89,6 +97,30 @@ namespace WEB_Utils {
     void handleFavicon(AsyncWebServerRequest *request) {
         AsyncWebServerResponse *response = request->beginResponse(200, "image/x-icon", (const uint8_t*)favicon_data, favicon_data_len);
         response->addHeader("Content-Encoding", "gzip");
+        request->send(response);
+    }
+
+    void handleAprsSymbols24Primary(AsyncWebServerRequest *request) {
+        AsyncWebServerResponse *response = request->beginResponse(
+            200,
+            "image/png",
+            (const uint8_t*)aprs_symbols_24_0_data,
+            aprs_symbols_24_0_data_len
+        );
+        response->addHeader("Content-Encoding", "gzip");
+        response->addHeader("Cache-Control", "max-age=3600");
+        request->send(response);
+    }
+
+    void handleAprsSymbols24Alternate(AsyncWebServerRequest *request) {
+        AsyncWebServerResponse *response = request->beginResponse(
+            200,
+            "image/png",
+            (const uint8_t*)aprs_symbols_24_1_data,
+            aprs_symbols_24_1_data_len
+        );
+        response->addHeader("Content-Encoding", "gzip");
+        response->addHeader("Cache-Control", "max-age=3600");
         request->send(response);
     }
 
@@ -401,6 +433,8 @@ namespace WEB_Utils {
             server.on("/leaflet.css", HTTP_GET, handleLeafletStyle);
             server.on("/leaflet.js", HTTP_GET, handleLeafletScript);
             server.on("/favicon.png", HTTP_GET, handleFavicon);
+            server.on("/aprs-symbols-24-0.png", HTTP_GET, handleAprsSymbols24Primary);
+            server.on("/aprs-symbols-24-1.png", HTTP_GET, handleAprsSymbols24Alternate);
 
             OTA_Utils::setup(&server); // Include OTA Updater for WebServer
 
