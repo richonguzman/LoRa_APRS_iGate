@@ -796,12 +796,12 @@ function getAprsSymbolIcon(symbol, callsign = "") {
                     font:600 10px Arial,sans-serif;
                     line-height:12px;
                     white-space:nowrap;
-                    color:#111;
+                    color:#fff;
                     text-shadow:
-                        -1px -1px 0 #fff,
-                         1px -1px 0 #fff,
-                        -1px  1px 0 #fff,
-                         1px  1px 0 #fff;
+                        -1px -1px 0 #000,
+                         1px -1px 0 #000,
+                        -1px  1px 0 #000,
+                         1px  1px 0 #000;
                     pointer-events:none;
                 ">${callsign}</span>
             </div>
