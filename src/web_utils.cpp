@@ -62,17 +62,17 @@ extern const unsigned char favicon_data[] asm("_binary_data_embed_favicon_png_gz
 extern const unsigned char favicon_data_end[] asm("_binary_data_embed_favicon_png_gz_end");
 extern const size_t favicon_data_len = favicon_data_end - favicon_data;
 
-extern const unsigned char aprs_symbols_48_0_data[] asm("_binary_data_embed_aprs_symbols_48_0_png_gz_start");
-extern const unsigned char aprs_symbols_48_0_data_end[] asm("_binary_data_embed_aprs_symbols_48_0_png_gz_end");
-extern const size_t aprs_symbols_48_0_data_len = aprs_symbols_48_0_data_end - aprs_symbols_48_0_data;
+extern const unsigned char aprs_symbols_24_0_data[] asm("_binary_data_embed_aprs_symbols_24_0_png_gz_start");
+extern const unsigned char aprs_symbols_24_0_data_end[] asm("_binary_data_embed_aprs_symbols_24_0_png_gz_end");
+extern const size_t aprs_symbols_24_0_data_len = aprs_symbols_24_0_data_end - aprs_symbols_24_0_data;
 
-extern const unsigned char aprs_symbols_48_1_data[] asm("_binary_data_embed_aprs_symbols_48_1_png_gz_start");
-extern const unsigned char aprs_symbols_48_1_data_end[] asm("_binary_data_embed_aprs_symbols_48_1_png_gz_end");
-extern const size_t aprs_symbols_48_1_data_len = aprs_symbols_48_1_data_end - aprs_symbols_48_1_data;
+extern const unsigned char aprs_symbols_24_1_data[] asm("_binary_data_embed_aprs_symbols_24_1_png_gz_start");
+extern const unsigned char aprs_symbols_24_1_data_end[] asm("_binary_data_embed_aprs_symbols_24_1_png_gz_end");
+extern const size_t aprs_symbols_24_1_data_len = aprs_symbols_24_1_data_end - aprs_symbols_24_1_data;
 
-extern const unsigned char aprs_symbols_48_2_data[] asm("_binary_data_embed_aprs_symbols_48_2_png_gz_start");
-extern const unsigned char aprs_symbols_48_2_data_end[] asm("_binary_data_embed_aprs_symbols_48_2_png_gz_end");
-extern const size_t aprs_symbols_48_2_data_len = aprs_symbols_48_2_data_end - aprs_symbols_48_2_data;
+extern const unsigned char aprs_symbols_24_2_data[] asm("_binary_data_embed_aprs_symbols_24_2_png_gz_start");
+extern const unsigned char aprs_symbols_24_2_data_end[] asm("_binary_data_embed_aprs_symbols_24_2_png_gz_end");
+extern const size_t aprs_symbols_24_2_data_len = aprs_symbols_24_2_data_end - aprs_symbols_24_2_data;
 
 
 namespace WEB_Utils {
@@ -104,36 +104,36 @@ namespace WEB_Utils {
         request->send(response);
     }
 
-    void handleAprsSymbols48Primary(AsyncWebServerRequest *request) {
+    void handleAprsSymbols24Primary(AsyncWebServerRequest *request) {
         AsyncWebServerResponse *response = request->beginResponse(
             200,
             "image/png",
-            (const uint8_t*)aprs_symbols_48_0_data,
-            aprs_symbols_48_0_data_len
+            (const uint8_t*)aprs_symbols_24_0_data,
+            aprs_symbols_24_0_data_len
         );
         response->addHeader("Content-Encoding", "gzip");
         response->addHeader("Cache-Control", "max-age=3600");
         request->send(response);
     }
 
-    void handleAprsSymbols48Alternate(AsyncWebServerRequest *request) {
+    void handleAprsSymbols24Alternate(AsyncWebServerRequest *request) {
         AsyncWebServerResponse *response = request->beginResponse(
             200,
             "image/png",
-            (const uint8_t*)aprs_symbols_48_1_data,
-            aprs_symbols_48_1_data_len
+            (const uint8_t*)aprs_symbols_24_1_data,
+            aprs_symbols_24_1_data_len
         );
         response->addHeader("Content-Encoding", "gzip");
         response->addHeader("Cache-Control", "max-age=3600");
         request->send(response);
     }
 
-    void handleAprsSymbols48Overlay(AsyncWebServerRequest *request) {
+    void handleAprsSymbols24Overlay(AsyncWebServerRequest *request) {
         AsyncWebServerResponse *response = request->beginResponse(
             200,
             "image/png",
-            (const uint8_t*)aprs_symbols_48_2_data,
-            aprs_symbols_48_2_data_len
+            (const uint8_t*)aprs_symbols_24_2_data,
+            aprs_symbols_24_2_data_len
         );
         response->addHeader("Content-Encoding", "gzip");
         response->addHeader("Cache-Control", "max-age=3600");
@@ -449,9 +449,9 @@ namespace WEB_Utils {
             server.on("/leaflet.css", HTTP_GET, handleLeafletStyle);
             server.on("/leaflet.js", HTTP_GET, handleLeafletScript);
             server.on("/favicon.png", HTTP_GET, handleFavicon);
-            server.on("/aprs-symbols-48-0.png", HTTP_GET, handleAprsSymbols48Primary);
-            server.on("/aprs-symbols-48-1.png", HTTP_GET, handleAprsSymbols48Alternate);
-            server.on("/aprs-symbols-48-2.png", HTTP_GET, handleAprsSymbols48Overlay);
+            server.on("/aprs-symbols-24-0.png", HTTP_GET, handleAprsSymbols24Primary);
+            server.on("/aprs-symbols-24-1.png", HTTP_GET, handleAprsSymbols24Alternate);
+            server.on("/aprs-symbols-24-2.png", HTTP_GET, handleAprsSymbols24Overlay);
 
             OTA_Utils::setup(&server); // Include OTA Updater for WebServer
 

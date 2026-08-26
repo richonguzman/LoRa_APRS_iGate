@@ -29,9 +29,9 @@ files = [
   'data_embed/leaflet.js',
   'data_embed/leaflet.css',
   'data_embed/favicon.png',
-  'data_embed/aprs-symbols-48-0.png',
-  'data_embed/aprs-symbols-48-1.png',
-  'data_embed/aprs-symbols-48-2.png',
+  'data_embed/aprs-symbols-24-0.png',
+  'data_embed/aprs-symbols-24-1.png',
+  'data_embed/aprs-symbols-24-2.png',
 ]
 
 string_to_find_str = "String"

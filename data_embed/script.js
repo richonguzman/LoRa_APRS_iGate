@@ -668,9 +668,9 @@ function setMapMessage(text) {
  *   "L&"  Alternate table with overlay
  *
  * Sprite layout:
- *   aprs-symbols-48-0.png = Primary table
- *   aprs-symbols-48-1.png = Alternate table
- *   aprs-symbols-48-2.png = Overlay characters
+ *   aprs-symbols-24-0.png = Primary table
+ *   aprs-symbols-24-1.png = Alternate table
+ *   aprs-symbols-24-2.png = Overlay characters
  */
 
 function getAprsSymbolIcon(symbol, callsign = "") {
@@ -717,8 +717,7 @@ function getAprsSymbolIcon(symbol, callsign = "") {
 
     /*
      * Sprite sheet contains 16 columns x 6 rows.
-     * Each cell occupies 24x24 CSS px, but the underlying PNG assets are
-     * actually 48x48 px/cell (2x) for sharpness on high-DPI screens; the
+     * Each cell occupies 24x24 CSS px; the
      * "background-size" below tells the browser to scale the sheet back
      * down to its original 24px-per-cell layout, so all position math
      * stays in 24px units regardless of source resolution.
@@ -731,8 +730,8 @@ function getAprsSymbolIcon(symbol, callsign = "") {
 
     const sprite =
         table === "/"
-            ? "/aprs-symbols-48-0.png"
-            : "/aprs-symbols-48-1.png";
+            ? "/aprs-symbols-24-0.png"
+            : "/aprs-symbols-24-1.png";
 
     const x = -(col * 24);
     const y = -(row * 24);
@@ -792,7 +791,7 @@ function getAprsSymbolIcon(symbol, callsign = "") {
                     top:0;
                     width:24px;
                     height:24px;
-                    background-image:url('/aprs-symbols-48-2.png');
+                    background-image:url('/aprs-symbols-24-2.png');
                     background-repeat:no-repeat;
                     background-position:${ox}px ${oy}px;
                     background-size:${sheetSize};
