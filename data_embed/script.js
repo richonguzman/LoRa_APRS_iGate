@@ -668,8 +668,9 @@ function setMapMessage(text) {
  *   "L&"  Alternate table with overlay
  *
  * Sprite layout:
- *   aprs-symbols-24-0.png = Primary table
- *   aprs-symbols-24-1.png = Alternate table
+ *   aprs-symbols-48-0.png = Primary table
+ *   aprs-symbols-48-1.png = Alternate table
+ *   aprs-symbols-48-2.png = Overlay characters
  */
 
 function getAprsSymbolIcon(symbol, callsign = "") {
@@ -715,18 +716,23 @@ function getAprsSymbolIcon(symbol, callsign = "") {
     const index = ascii - 33;
 
     /*
-     * Sprite sheet contains 16 columns.
-     * Each cell is 24 x 24 px.
+     * Sprite sheet contains 16 columns x 6 rows.
+     * Each cell occupies 24x24 CSS px, but the underlying PNG assets are
+     * actually 48x48 px/cell (2x) for sharpness on high-DPI screens; the
+     * "background-size" below tells the browser to scale the sheet back
+     * down to its original 24px-per-cell layout, so all position math
+     * stays in 24px units regardless of source resolution.
      */
     const columns = 16;
+    const sheetSize = "384px 144px"; // 16*24 x 6*24, same for all 3 sheets
 
     const col = index % columns;
     const row = Math.floor(index / columns);
 
     const sprite =
         table === "/"
-            ? "/aprs-symbols-24-0.png"
-            : "/aprs-symbols-24-1.png";
+            ? "/aprs-symbols-48-0.png"
+            : "/aprs-symbols-48-1.png";
 
     const x = -(col * 24);
     const y = -(row * 24);
@@ -752,28 +758,48 @@ function getAprsSymbolIcon(symbol, callsign = "") {
                 );
         }
 
-        overlayHtml = `
-            <span style="
-                position:absolute;
-                left:0;
-                top:0;
-                width:24px;
-                height:24px;
-                display:flex;
-                align-items:center;
-                justify-content:center;
-                font:bold 12px sans-serif;
-                color:#000;
-                text-shadow:
-                    -1px -1px 0 #fff,
-                     1px -1px 0 #fff,
-                    -1px  1px 0 #fff,
-                     1px  1px 0 #fff;
-                pointer-events:none;
-            ">
-                ${displayOverlay}
-            </span>
-        `;
+        /*
+         * The overlay sprite sheet does NOT follow the ascii-33 layout used
+         * by the primary/alternate tables above; it has its own grid:
+         * "0" at row 0 col 15, "1".."9" at row 1 col 0-8, "A".."P" at row 2,
+         * "Q".."Z" at row 3 col 0-9. Verified by hand against the PNG.
+         */
+        let overlayCol = null;
+        let overlayRow = null;
+
+        if (displayOverlay === "0") {
+            overlayCol = 15;
+            overlayRow = 0;
+        } else if (displayOverlay >= "1" && displayOverlay <= "9") {
+            overlayCol = displayOverlay.charCodeAt(0) - "1".charCodeAt(0);
+            overlayRow = 1;
+        } else if (displayOverlay >= "A" && displayOverlay <= "P") {
+            overlayCol = displayOverlay.charCodeAt(0) - "A".charCodeAt(0);
+            overlayRow = 2;
+        } else if (displayOverlay >= "Q" && displayOverlay <= "Z") {
+            overlayCol = displayOverlay.charCodeAt(0) - "Q".charCodeAt(0);
+            overlayRow = 3;
+        }
+
+        if (overlayCol !== null) {
+            const ox = -(overlayCol * 24);
+            const oy = -(overlayRow * 24);
+
+            overlayHtml = `
+                <span style="
+                    position:absolute;
+                    left:0;
+                    top:0;
+                    width:24px;
+                    height:24px;
+                    background-image:url('/aprs-symbols-48-2.png');
+                    background-repeat:no-repeat;
+                    background-position:${ox}px ${oy}px;
+                    background-size:${sheetSize};
+                    pointer-events:none;
+                "></span>
+            `;
+        }
     }
 
     return L.divIcon({
@@ -786,6 +812,7 @@ function getAprsSymbolIcon(symbol, callsign = "") {
                 background-image:url('${sprite}');
                 background-repeat:no-repeat;
                 background-position:${x}px ${y}px;
+                background-size:${sheetSize};
             ">
                 ${overlayHtml}
 
@@ -796,12 +823,12 @@ function getAprsSymbolIcon(symbol, callsign = "") {
                     font:600 10px Arial,sans-serif;
                     line-height:12px;
                     white-space:nowrap;
-                    color:#fff;
+                    color:#111;
                     text-shadow:
-                        -1px -1px 0 #000,
-                         1px -1px 0 #000,
-                        -1px  1px 0 #000,
-                         1px  1px 0 #000;
+                        -1px -1px 0 #fff,
+                         1px -1px 0 #fff,
+                        -1px  1px 0 #fff,
+                         1px  1px 0 #fff;
                     pointer-events:none;
                 ">${callsign}</span>
             </div>
