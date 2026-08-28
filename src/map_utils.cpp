@@ -48,6 +48,7 @@ namespace MAP_Utils {
                 s.count++;
                 symbol.toCharArray(s.symbol, sizeof(s.symbol));
                 path.toCharArray(s.path, sizeof(s.path));
+                if (path.indexOf('*') == -1) s.heardDirect = true;   // se oyo directo alguna vez; no se resetea si despues llega repetido
                 writeFormatedTime(s.lastHeard, sizeof(s.lastHeard));
                 s.lastHeardMillis = millis();
                 return;
@@ -73,6 +74,7 @@ namespace MAP_Utils {
         st.rssi      = rssi;
         st.snr       = snr;
         st.count     = 1;
+        st.heardDirect = (path.indexOf('*') == -1);         // primer paquete: directo si no trae digis usados
         writeFormatedTime(st.lastHeard, sizeof(st.lastHeard));
         st.lastHeardMillis = millis();
         mapStations.push_back(st);
@@ -101,6 +103,7 @@ namespace MAP_Utils {
             data[i]["count"]     = mapStations[i].count;
             data[i]["lastHeard"] = mapStations[i].lastHeard;
             data[i]["path"]      = mapStations[i].path;
+            data[i]["heardDirect"] = mapStations[i].heardDirect;
         }
 
         String buffer;

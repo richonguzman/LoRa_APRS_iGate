@@ -864,11 +864,17 @@ function getUsedDigipeaters(path) {
 function describeMapPath(station) {
     const digis = getUsedDigipeaters(station.path);
 
-    if (!digis.length) {
-        return "Direct";
+    // heardDirect viene del firmware: true si ALGUNA VEZ se oyo directo,
+    // aunque el ultimo paquete haya llegado repetido.
+    if (station.heardDirect && digis.length) {
+        return "Direct+Via: " + digis.join(" → ");
     }
 
-    return "Via: " + digis.join(" → ");
+    if (digis.length) {
+        return "Via: " + digis.join(" → ");
+    }
+
+    return "Direct";
 }
 
 

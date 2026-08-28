@@ -34,6 +34,7 @@ struct MapStation {
     char     lastHeard[10];     // "HH:MM:SS" si hay NTP valido, "" si no
     char     path[96];          // last path received
     uint32_t lastHeardMillis;   // millis() -> ordenar / expirar (no se muestra)
+    bool     heardDirect;       // true si ALGUNA VEZ se oyo sin digipeaters (no se resetea)
 };
 
 namespace MAP_Utils {
