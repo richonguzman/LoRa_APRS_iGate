@@ -183,9 +183,12 @@ body{background:var(--msh-bg);color:var(--msh-text);font-family:"Inter",system-u
 <button class="side-link" type="button" data-target="sec-administration"><span class="side-ico"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16"><path d="M9.405 1.05c-.413-1.4-2.397-1.4-2.81 0l-.1.34a1.464 1.464 0 0 1-2.105.872l-.31-.17c-1.283-.698-2.686.705-1.987 1.987l.169.311c.446.82.023 1.841-.872 2.105l-.34.1c-1.4.413-1.4 2.397 0 2.81l.34.1a1.464 1.464 0 0 1 .872 2.105l-.17.31c-.698 1.283.705 2.686 1.987 1.987l.311-.169a1.464 1.464 0 0 1 2.105.872l.1.34c.413 1.4 2.397 1.4 2.81 0l.1-.34a1.464 1.464 0 0 1 2.105-.872l.31.17c1.283.698 2.686-.705 1.987-1.987l-.169-.311a1.464 1.464 0 0 1 .872-2.105l.34-.1c1.4-.413 1.4-2.397 0-2.81l-.34-.1a1.464 1.464 0 0 1-.872-2.105l.17-.31c.698-1.283-.705-2.686-1.987-1.987l-.311.169a1.464 1.464 0 0 1-2.105-.872zM8 10.93a2.929 2.929 0 1 1 0-5.86 2.929 2.929 0 0 1 0 5.858z"/></svg></span><span class="label">Administration</span></button>
 <button class="side-link" type="button" data-target="sec-about"><span class="side-ico"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16"><path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2"/></svg></span><span class="label">About / Info</span></button>
     <div class="side-sep"></div>
+<div class="nav-group-label">Status</div>
 <button class="side-link" type="button" data-target="sec-maps"><span class="side-ico"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16"><path d="M15.817.113A.5.5 0 0 1 16 .5v14a.5.5 0 0 1-.402.49l-5 1a.5.5 0 0 1-.196 0L5.5 15.01l-4.902.98A.5.5 0 0 1 0 15.5v-14a.5.5 0 0 1 .402-.49l5-1a.5.5 0 0 1 .196 0L10.5.99l4.902-.98a.5.5 0 0 1 .415.103M10 1.91l-4-.8v12.98l4 .8zm1 12.98 4-.8V1.11l-4 .8zm-6-.8V1.11l-4 .8v12.98z"/></svg></span><span class="label">Map</span></button>
 <button class="side-link" type="button" id="rpToggle"><span class="side-ico"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5m-3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2m0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2m0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2"/></svg></span><span class="label">Received Packets</span></button>
 <a href="/received-packets" id="rpDummy" style="display:none" aria-hidden="true"></a>
+<button class="side-link" type="button" id="ssToggle"><span class="side-ico"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M6 2a.5.5 0 0 1 .47.33L10 12.036l1.53-4.208A.5.5 0 0 1 12 7.5h3.5a.5.5 0 0 1 0 1h-3.15l-1.88 5.17a.5.5 0 0 1-.94 0L6 3.964 4.47 8.171A.5.5 0 0 1 4 8.5H.5a.5.5 0 0 1 0-1h3.15l1.88-5.17A.5.5 0 0 1 6 2"/></svg></span><span class="label">Station</span></button>
+<a href="/station-status" id="ssDummy" style="display:none" aria-hidden="true"></a>
 <a class="side-link side-ota" href="/update"><span class="side-ico"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16"><path d="M8 2a5.53 5.53 0 0 0-3.594 1.342c-.766.66-1.321 1.52-1.464 2.383C1.266 6.095 0 7.555 0 9.318 0 11.366 1.708 13 3.781 13h8.906C14.502 13 16 11.57 16 9.773c0-1.636-1.242-2.969-2.834-3.194C12.923 3.999 10.69 2 8 2m2.354 5.146a.5.5 0 0 1-.708.708L8.5 6.707V10.5a.5.5 0 0 1-1 0V6.707L6.354 7.854a.5.5 0 1 1-.708-.708l2-2a.5.5 0 0 1 .708 0z"/></svg></span><span class="label">Update OTA</span></a>
   </aside>
   <main class="app-main">
@@ -212,6 +215,495 @@ body{background:var(--msh-bg);color:var(--msh-text);font-family:"Inter",system-u
                 </div>
                 <hr>
             </div>
+    <div class="container d-none" id="station-status">
+        <div class="row my-5 d-flex align-items-top">
+            <div class="col-12">
+                <h3>Current station status</h3>
+                <div id="stationStatus.uptime">
+                    <div class="row my-5 d-flex align-items-top">
+                        <div class="col-lg-3 col-sm-12">
+                            <h5>
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="20"
+                                    height="20"
+                                    fill="currentColor"
+                                    class="bi bi-heart-pulse-fill"
+                                    viewBox="0 0 16 16"
+                                >
+                                    <path
+                                        d="M1.475 9C2.702 10.84 4.779 12.871 8 15c3.221-2.129 5.298-4.16 6.525-6H12a.5.5 0 0 1-.464-.314l-1.457-3.642-1.598 5.593a.5.5 0 0 1-.945.049L5.889 6.568l-1.473 2.21A.5.5 0 0 1 4 9z"
+                                    />
+                                    <path
+                                        d="M.88 8C-2.427 1.68 4.41-2 7.823 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C11.59-2 18.426 1.68 15.12 8h-2.783l-1.874-4.686a.5.5 0 0 0-.945.049L7.921 8.956 6.464 5.314a.5.5 0 0 0-.88-.091L3.732 8z"
+                                    />
+                                </svg>
+                                Up-time
+                            </h5>
+                            <small>Current device up-time</small>
+                        </div>
+                        <div class="col-9">
+                            <div class="row mt-2">
+                                <div class="col-6">
+                                    <label for="stationStatus.elapsedTime" class="form-label"
+                                        >Elapsed time</label
+                                    >
+                                    <div class="input-group">
+                                        <input
+                                            name="stationStatus.elapsedTime"
+                                            id="stationStatus.elapsedTime"
+                                            class="form-control"
+                                            readonly
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="stationStatus.voltage">
+                    <div class="row my-5 d-flex align-items-top">
+                        <div class="col-lg-3 col-sm-12">
+                            <h5>
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="20"
+                                    height="20"
+                                    fill="currentColor"
+                                    class="bi bi-battery-fill"
+                                    viewBox="0 0 16 16">
+                                    <path d="M2 4a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2H2zm1 2h8v4H3V6z"/>
+                                    <path d="M15 6.5a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1V6.5z"/>
+                                    <path d="M4 7h6v2H4V7z"/>
+                                </svg>
+                                Battery
+                            </h5>
+                            <small>Current Battery status</small>
+                        </div>
+                        <div class="col-9">
+                            <div class="row mt-2">
+                                <div class="col-6">
+                                    <label for="stationStatus.voltageInternal" class="form-label"
+                                        >Internal Voltage</label
+                                    >
+                                    <div class="input-group">
+                                        <input
+                                            name="stationStatus.voltageInternal"
+                                            id="stationStatus.voltageInternal"
+                                            class="form-control"
+                                            readonly
+                                        />
+                                        <span class="input-group-text"
+                                            >Volts</span
+                                        >
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <label for="stationStatus.voltageExternal" class="form-label"
+                                        >External voltage</label
+                                    >
+                                    <div class="input-group">
+                                        <input
+                                            name="stationStatus.voltageExternal"
+                                            id="stationStatus.voltageExternal"
+                                            class="form-control"
+                                            readonly
+                                        />
+                                        <span class="input-group-text"
+                                            >Volts</span
+                                        >
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="stationStatus.connectivity">
+                    <div class="row my-5 d-flex align-items-top">
+                        <div class="col-lg-3 col-sm-12">
+                            <h5>
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="20"
+                                    height="20"
+                                    fill="currentColor"
+                                    class="bi bi-router-fill"
+                                    viewBox="0 0 16 16"
+                                >
+                                    <path
+                                        d="M5.525 3.025a3.5 3.5 0 0 1 4.95 0 .5.5 0 1 0 .707-.707 4.5 4.5 0 0 0-6.364 0 .5.5 0 0 0 .707.707"
+                                    />
+                                    <path
+                                        d="M6.94 4.44a1.5 1.5 0 0 1 2.12 0 .5.5 0 0 0 .708-.708 2.5 2.5 0 0 0-3.536 0 .5.5 0 0 0 .707.707Z"
+                                    />
+                                    <path
+                                        d="M2.974 2.342a.5.5 0 1 0-.948.316L3.806 8H1.5A1.5 1.5 0 0 0 0 9.5v2A1.5 1.5 0 0 0 1.5 13H2a.5.5 0 0 0 .5.5h2A.5.5 0 0 0 5 13h6a.5.5 0 0 0 .5.5h2a.5.5 0 0 0 .5-.5h.5a1.5 1.5 0 0 0 1.5-1.5v-2A1.5 1.5 0 0 0 14.5 8h-2.306l1.78-5.342a.5.5 0 1 0-.948-.316L11.14 8H4.86zM2.5 11a.5.5 0 1 1 0-1 .5.5 0 0 1 0 1m4.5-.5a.5.5 0 1 1 1 0 .5.5 0 0 1-1 0m2.5.5a.5.5 0 1 1 0-1 .5.5 0 0 1 0 1m1.5-.5a.5.5 0 1 1 1 0 .5.5 0 0 1-1 0m2 0a.5.5 0 1 1 1 0 .5.5 0 0 1-1 0"
+                                    />
+                                    <path
+                                        d="M8.5 5.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0"
+                                    />
+                                </svg>
+                                Connectivity
+                            </h5>
+                            <small>Current device connectivity and service status</small>
+                        </div>
+                        <div class="col-9">
+                            <div class="row mt-2">
+                                <div class="col-6">
+                                    <label for="stationStatus.statusWifi" class="form-label"
+                                        >WiFi status</label
+                                    >
+                                    <div class="input-group">
+                                        <input
+                                            name="stationStatus.statusWifi"
+                                            id="stationStatus.statusWifi"
+                                            class="form-control"
+                                            readonly
+                                        />
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <label for="stationStatus.statusIS" class="form-label"
+                                        >IS status</label
+                                    >
+                                    <div class="input-group">
+                                        <input
+                                            name="stationStatus.statusIS"
+                                            id="stationStatus.statusIS"
+                                            class="form-control"
+                                            readonly
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-6">
+                                    <label for="stationStatus.statusNTP" class="form-label"
+                                        >NTP status</label
+                                    >
+                                    <div class="input-group">
+                                        <input
+                                            name="stationStatus.statusNTP"
+                                            id="stationStatus.statusNTP"
+                                            class="form-control"
+                                            readonly
+                                        />
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <label for="stationStatus.statusSyslog" class="form-label"
+                                        >Syslog status</label
+                                    >
+                                    <div class="input-group">
+                                        <input
+                                            name="stationStatus.statusSyslog"
+                                            id="stationStatus.statusSyslog"
+                                            class="form-control"
+                                            readonly
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-6">
+                                    <label for="stationStatus.statusMQTT" class="form-label"
+                                        >MQTT status</label
+                                    >
+                                    <div class="input-group">
+                                        <input
+                                            name="stationStatus.statusMQTT"
+                                            id="stationStatus.statusMQTT"
+                                            class="form-control"
+                                            readonly
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="stationStatus.traffic">
+                    <div class="row my-5 d-flex align-items-top">
+                        <div class="col-lg-3 col-sm-12">
+                            <h5>
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="20"
+                                    height="20"
+                                    fill="currentColor"
+                                    class="bi bi-broadcast"
+                                    viewBox="0 0 16 16"
+                                >
+                                    <path
+                                        d="M3.05 3.05a7 7 0 0 0 0 9.9.5.5 0 0 1-.707.707 8 8 0 0 1 0-11.314.5.5 0 0 1 .707.707m2.122 2.122a4 4 0 0 0 0 5.656.5.5 0 1 1-.708.708 5 5 0 0 1 0-7.072.5.5 0 0 1 .708.708m5.656-.708a.5.5 0 0 1 .708 0 5 5 0 0 1 0 7.072.5.5 0 1 1-.708-.708 4 4 0 0 0 0-5.656.5.5 0 0 1 0-.708m2.122-2.12a.5.5 0 0 1 .707 0 8 8 0 0 1 0 11.313.5.5 0 0 1-.707-.707 7 7 0 0 0 0-9.9.5.5 0 0 1 0-.707zM10 8a2 2 0 1 1-4 0 2 2 0 0 1 4 0"
+                                    />
+                                </svg>
+                                Traffic
+                            </h5>
+                            <small>Current packet traffic status. Resets every 24 hours.</small>
+                        </div>
+                        <div class="col-9">
+                            <div class="row mt-2">
+                                <div class="col-6">
+                                    <label for="stationStatus.packetsRFSendSuccess" class="form-label"
+                                        >RF send success</label
+                                    >
+                                    <div class="input-group">
+                                        <input
+                                            name="stationStatus.packetsRFSendSuccess"
+                                            id="stationStatus.packetsRFSendSuccess"
+                                            class="form-control"
+                                            readonly
+                                        />
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <label for="stationStatus.packetsRFSendFail" class="form-label"
+                                        >RF send failures</label
+                                    >
+                                    <div class="input-group">
+                                        <input
+                                            name="stationStatus.packetsRFSendFail"
+                                            id="stationStatus.packetsRFSendFail"
+                                            class="form-control"
+                                            readonly
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-6">
+                                    <label for="stationStatus.packetsRFReceiveSuccess" class="form-label"
+                                        >RF receive success</label
+                                    >
+                                    <div class="input-group">
+                                        <input
+                                            name="stationStatus.packetsRFReceiveSuccess"
+                                            id="stationStatus.packetsRFReceiveSuccess"
+                                            class="form-control"
+                                            readonly
+                                        />
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <label for="stationStatus.packetsRFReceiveFail" class="form-label"
+                                        >RF receive failures</label
+                                    >
+                                    <div class="input-group">
+                                        <input
+                                            name="stationStatus.packetsRFReceiveFail"
+                                            id="stationStatus.packetsRFReceiveFail"
+                                            class="form-control"
+                                            readonly
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-6">
+                                    <label for="stationStatus.packetsISSendSuccess" class="form-label"
+                                        >IS send success</label
+                                    >
+                                    <div class="input-group">
+                                        <input
+                                            name="stationStatus.packetsISSendSuccess"
+                                            id="stationStatus.packetsISSendSuccess"
+                                            class="form-control"
+                                            readonly
+                                        />
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <label for="stationStatus.packetsISSendFail" class="form-label"
+                                        >IS send failures</label
+                                    >
+                                    <div class="input-group">
+                                        <input
+                                            name="stationStatus.packetsISSendFail"
+                                            id="stationStatus.packetsISSendFail"
+                                            class="form-control"
+                                            readonly
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-6">
+                                    <label for="stationStatus.packetsISReceiveSuccess" class="form-label"
+                                        >IS receive success</label
+                                    >
+                                    <div class="input-group">
+                                        <input
+                                            name="stationStatus.packetsISReceiveSuccess"
+                                            id="stationStatus.packetsISReceiveSuccess"
+                                            class="form-control"
+                                            readonly
+                                        />
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <label for="stationStatus.packetsISReceiveFail" class="form-label"
+                                        >IS receive failures</label
+                                    >
+                                    <div class="input-group">
+                                        <input
+                                            name="stationStatus.packetsISReceiveFail"
+                                            id="stationStatus.packetsISReceiveFail"
+                                            class="form-control"
+                                            readonly
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-6">
+                                    <label for="stationStatus.packetsBlacklisted" class="form-label"
+                                        >Blacklisted packets</label
+                                    >
+                                    <div class="input-group">
+                                        <input
+                                            name="stationStatus.packetsBlacklisted"
+                                            id="stationStatus.packetsBlacklisted"
+                                            class="form-control"
+                                            readonly
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="stationStatus.login">
+                    <div class="row my-5 d-flex align-items-top">
+                        <div class="col-lg-3 col-sm-12">
+                            <h5>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M3.5 11.5a3.5 3.5 0 1 1 3.163-5H14L15.5 8 14 9.5l-1-1-1 1-1-1-1 1-1-1-1 1H6.663a3.5 3.5 0 0 1-3.163 2M2.5 9a1 1 0 1 0 0-2 1 1 0 0 0 0 2"/></svg>
+                                Login Events
+                            </h5>
+                            <small>Current login statistics</small>
+                        </div>
+                        <div class="col-9">
+                            <div class="row mt-2">
+                                <div class="col-6">
+                                    <label for="stationStatus.loginsInvalid" class="form-label"
+                                        >Invalid logins</label
+                                    >
+                                    <div class="input-group">
+                                        <input
+                                            name="stationStatus.loginsInvalid"
+                                            id="stationStatus.loginsInvalid"
+                                            class="form-control"
+                                            readonly
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="stationStatus.weather">
+                    <div class="row my-5 d-flex align-items-top">
+                        <div class="col-lg-3 col-sm-12">
+                            <h5>
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="20"
+                                    height="20"
+                                    fill="currentColor"
+                                    class="bi bi-broadcast-pin"
+                                    viewBox="0 0 16 16"
+                                >
+                                    <path
+                                        d="M3.05 3.05a7 7 0 0 0 0 9.9.5.5 0 0 1-.707.707 8 8 0 0 1 0-11.314.5.5 0 0 1 .707.707m2.122 2.122a4 4 0 0 0 0 5.656.5.5 0 1 1-.708.708 5 5 0 0 1 0-7.072.5.5 0 0 1 .708.708m5.656-.708a.5.5 0 0 1 .708 0 5 5 0 0 1 0 7.072.5.5 0 1 1-.708-.708 4 4 0 0 0 0-5.656.5.5 0 0 1 0-.708m2.122-2.12a.5.5 0 0 1 .707 0 8 8 0 0 1 0 11.313.5.5 0 0 1-.707-.707 7 7 0 0 0 0-9.9.5.5 0 0 1 0-.707zM6 8a2 2 0 1 1 2.5 1.937V15.5a.5.5 0 0 1-1 0V9.937A2 2 0 0 1 6 8"
+                                    />
+                                </svg>
+                                Weather
+                            </h5>
+                            <small>Current Weather status</small>
+                        </div>
+                        <div class="col-9">
+                            <div class="row mt-2">
+                                <div class="col-6">
+                                    <label for="stationStatus.weatherTemperature" class="form-label"
+                                        >Temperature</label
+                                    >
+                                    <div class="input-group">
+                                        <input
+                                            name="stationStatus.weatherTemperature"
+                                            id="stationStatus.weatherTemperature"
+                                            class="form-control"
+                                            readonly
+                                        />
+                                        <span class="input-group-text"
+                                            >C°</span
+                                        >
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <label for="stationStatus.weatherHumidity" class="form-label"
+                                        >Humidity</label
+                                    >
+                                    <div class="input-group">
+                                        <input
+                                            name="stationStatus.weatherHumidity"
+                                            id="stationStatus.weatherHumidity"
+                                            class="form-control"
+                                            readonly
+                                        />
+                                        <span class="input-group-text"
+                                            >percent</span
+                                        >
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-6">
+                                    <label for="stationStatus.weatherBarometricPressure" class="form-label"
+                                        >Barometric Pressure</label
+                                    >
+                                    <div class="input-group">
+                                        <input
+                                            name="stationStatus.weatherBarometricPressure"
+                                            id="stationStatus.weatherBarometricPressure"
+                                            class="form-control"
+                                            readonly
+                                        />
+                                        <span class="input-group-text"
+                                            >Mb</span
+                                        >
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <label for="stationStatus.weatherGas" class="form-label"
+                                        >Gas</label
+                                    >
+                                    <div class="input-group">
+                                        <input
+                                            name="stationStatus.weatherGas"
+                                            id="stationStatus.weatherGas"
+                                            class="form-control"
+                                            readonly
+                                        />
+                                        <span class="input-group-text"
+                                            >Kohms</span
+                                        >
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <span>Status updates automatically every 15 seconds.</span><br>
+            </div>
+        </div>
+        <hr>
+    </div>
     <div id="configuration">
 <section class="panel-section" id="sec-maps">
                         <div class="row my-5">
@@ -1823,15 +2315,11 @@ body{background:var(--msh-bg);color:var(--msh-text);font-family:"Inter",system-u
                                         width="20"
                                         height="20"
                                         fill="currentColor"
-                                        class="bi bi-heart-pulse-fill"
-                                        viewBox="0 0 16 16"
-                                    >
-                                        <path
-                                            d="M1.475 9C2.702 10.84 4.779 12.871 8 15c3.221-2.129 5.298-4.16 6.525-6H12a.5.5 0 0 1-.464-.314l-1.457-3.642-1.598 5.593a.5.5 0 0 1-.945.049L5.889 6.568l-1.473 2.21A.5.5 0 0 1 4 9z"
-                                        />
-                                        <path
-                                            d="M.88 8C-2.427 1.68 4.41-2 7.823 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C11.59-2 18.426 1.68 15.12 8h-2.783l-1.874-4.686a.5.5 0 0 0-.945.049L7.921 8.956 6.464 5.314a.5.5 0 0 0-.88-.091L3.732 8z"
-                                        />
+                                        class="bi bi-battery-fill"
+                                        viewBox="0 0 16 16">
+                                        <path d="M2 4a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2H2zm1 2h8v4H3V6z"/>
+                                        <path d="M15 6.5a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1V6.5z"/>
+                                        <path d="M4 7h6v2H4V7z"/>
                                     </svg>
                                     Battery
                                 </h5>
@@ -2400,7 +2888,7 @@ body{background:var(--msh-bg);color:var(--msh-text);font-family:"Inter",system-u
   function paint(name){var r=document.documentElement;if(name==="night"){r.setAttribute("data-bs-theme","dark");r.setAttribute("data-variant","night");}else{r.setAttribute("data-bs-theme",name);r.removeAttribute("data-variant");}if(btn)btn.innerHTML=ICONS[name]||MOON;}
   paint(logical());
   if(btn)btn.addEventListener("click",function(){var c=logical();var n=ORDER[(ORDER.indexOf(c)+1)%ORDER.length];try{localStorage.setItem("igateTheme",n);}catch(e){}paint(n);});
-  function showConfig(){document.getElementById("configuration").classList.remove("d-none");var rp=document.getElementById("received-packets");if(rp)rp.classList.add("d-none");}
+  function showConfig(){document.getElementById("configuration").classList.remove("d-none");var rp=document.getElementById("received-packets");if(rp)rp.classList.add("d-none");var ss=document.getElementById("station-status");if(ss)ss.classList.add("d-none");}
   document.querySelectorAll(".side-link[data-target]").forEach(function(b){
     b.addEventListener("click",function(){
       document.querySelectorAll(".side-link").forEach(function(x){x.classList.remove("active");});
@@ -2415,8 +2903,18 @@ body{background:var(--msh-bg);color:var(--msh-text);font-family:"Inter",system-u
     document.querySelectorAll(".side-link").forEach(function(x){x.classList.remove("active");});
     rpBtn.classList.add("active");
     document.getElementById("configuration").classList.add("d-none");
+    document.getElementById("station-status").classList.add("d-none");
     var rp=document.getElementById("received-packets");if(rp)rp.classList.remove("d-none");
     if(window.fetchReceivedPackets)window.fetchReceivedPackets();
+  });
+  var ssBtn=document.getElementById("ssToggle");
+  if(ssBtn)ssBtn.addEventListener("click",function(){
+    document.querySelectorAll(".side-link").forEach(function(x){x.classList.remove("active");});
+    ssBtn.classList.add("active");
+    document.getElementById("configuration").classList.add("d-none");
+    document.getElementById("received-packets").classList.add("d-none");
+    var ss=document.getElementById("station-status");if(ss)ss.classList.remove("d-none");
+    if(window.fetchStationStatus)window.fetchStationStatus();
   });
   var bi=document.getElementById("buildInfo");
   if(bi){var h=bi.innerHTML; if(/Version date/i.test(h)){h=h.replace(/(<br\s*\/?>)[\s\S]*?(?=Version date)/i,"$1");bi.innerHTML="Board / Environment = "+h;}}

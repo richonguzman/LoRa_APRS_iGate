@@ -20,6 +20,7 @@
 #include <RadioLib.h>
 #include "configuration.h"
 #include "network_manager.h"
+#include "lora_utils.h"
 #include "aprs_is_utils.h"
 #include "station_utils.h"
 #include "board_pinout.h"
@@ -66,8 +67,14 @@ int  backoffMax         = 4;    // Max Backoff value (number of CAD slots to wai
 int rssi, freqError;
 float snr;
 
-
 namespace LoRa_Utils {
+
+    unsigned int packetSendSuccess = 0;
+    unsigned int packetSendFail = 0;
+    unsigned int packetReceiveSuccess = 0;
+    unsigned int packetReceiveFail = 0;
+    unsigned int packetBlacklisted = 0;
+    unsigned long packetCountStartTime = 0;
 
     static String sanitizeForWeb(const String& s) {     // replaces non-printable ASCII with '.' for WebUI display
         String out = s;
@@ -234,9 +241,11 @@ namespace LoRa_Utils {
             }
             Utils::print("---> LoRa Packet Tx : ");
             Utils::println(newPacket);
+            incrementPacketSendSuccess();
         } else {
             Utils::print(F("failed, code "));
             Utils::println(String(state));
+            incrementPacketSendFail();
         }
         #ifdef INTERNAL_LED_PIN
             if (Config.digi.ecoMode != 1) digitalWrite(INTERNAL_LED_PIN, LOW);      // disabled in Ultra Eco Mode
@@ -272,7 +281,8 @@ namespace LoRa_Utils {
                     if (packet != "") {
 
                         String sender   = packet.substring(3, packet.indexOf(">"));
-                        if (packet.substring(0,3) == "\x3c\xff\x01" && !STATION_Utils::isBlacklisted(sender)) {     // avoid processing BlackListed stations
+                        bool isBlacklisted = STATION_Utils::isBlacklisted(sender);
+                        if (packet.substring(0,3) == "\x3c\xff\x01" && !isBlacklisted) {     // avoid processing BlackListed stations
                             rssi        = radio.getRSSI();
                             snr         = radio.getSNR();
                             freqError   = radio.getFrequencyError();
@@ -291,6 +301,7 @@ namespace LoRa_Utils {
                                 receivedPackets.push_back(receivedPacket);
 
                                 APRSPacket aprsPacket = APRSPacketLib::processReceivedPacket(packet.substring(3), rssi, snr, freqError);
+                                incrementPacketReceiveSuccess();
                                 if (aprsPacket.type == 0 || aprsPacket.type == 4) {   // 0 = GPS, 4 = Mic-E (los que traen posición)
                                     MAP_Utils::upsert(aprsPacket.sender, aprsPacket.latitude, aprsPacket.longitude, aprsPacket.overlay + aprsPacket.symbol, aprsPacket.rssi, aprsPacket.snr);
                                 }
@@ -300,6 +311,9 @@ namespace LoRa_Utils {
                                 SYSLOG_Utils::log(1, packet, rssi, snr, freqError); // RX
                             }
                         } else {
+                            if (isBlacklisted) {
+                                incrementPacketBlacklisted();
+                            }
                             packet = "";
                         }
                         return packet;
@@ -313,10 +327,12 @@ namespace LoRa_Utils {
                         SYSLOG_Utils::log(0, packet, rssi, snr, freqError); // CRC
                     }
                     packet = "";
+                    incrementPacketReceiveFail();
                 } else {
                     Utils::print(F("failed, code "));
                     Utils::println(String(state));
                     packet = "";
+                    incrementPacketReceiveFail();
                 }
             }
         }
@@ -331,4 +347,89 @@ namespace LoRa_Utils {
         radio.sleep();
     }
 
+    bool isBeyondWindow(unsigned long time) {
+        unsigned long window = 24*60*60*1000;
+        if (time > packetCountStartTime + window) {
+            return true;
+        }
+        return false;
+    }
+
+    void resetPacketCounters(unsigned long time) {
+        packetCountStartTime = time;
+        packetSendSuccess = 0;
+        packetSendFail = 0;
+        packetReceiveSuccess = 0;
+        packetReceiveFail = 0;
+    }
+
+    void incrementPacketSendSuccess() {
+        unsigned int now = millis();
+        if (isBeyondWindow(now)) {
+            resetPacketCounters(now);
+            packetSendSuccess = 1;
+        } else {
+            packetSendSuccess++;
+        }
+    }
+
+    unsigned int getPacketSendSuccess() {
+        return packetSendSuccess;
+    }
+
+    void incrementPacketSendFail() {
+        unsigned int now = millis();
+        if (isBeyondWindow(now)) {
+            packetCountStartTime = now;
+            packetSendFail = 1;
+        } else {
+            packetSendFail++;
+        }
+    }
+
+    unsigned int getPacketSendFail() {
+        return packetSendFail;
+    }
+
+    void incrementPacketReceiveSuccess() {
+        unsigned int now = millis();
+        if (isBeyondWindow(now)) {
+            packetCountStartTime = now;
+            packetReceiveSuccess = 1;
+        } else {
+            packetReceiveSuccess++;
+        }
+    }
+
+    unsigned int getPacketReceiveSuccess() {
+        return packetReceiveSuccess;
+    }
+
+    void incrementPacketReceiveFail() {
+        unsigned int now = millis();
+        if (isBeyondWindow(now)) {
+            packetCountStartTime = now;
+            packetReceiveFail = 1;
+        } else {
+            packetReceiveFail++;
+        }
+    }
+
+    unsigned int getPacketReceiveFail() {
+        return packetReceiveFail;
+    }
+
+   void incrementPacketBlacklisted() {
+        unsigned int now = millis();
+        if (isBeyondWindow(now)) {
+            packetCountStartTime = now;
+            packetBlacklisted = 1;
+        } else {
+            packetBlacklisted++;
+        }
+    }
+
+    unsigned int getPacketBlacklisted() {
+        return packetBlacklisted;
+    }
 }

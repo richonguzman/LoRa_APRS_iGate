@@ -151,4 +151,13 @@ namespace SYSLOG_Utils {
         }
     }
 
+    String getSyslogStatus() {
+        if (Config.syslog.active) {
+            if (networkManager->isConnected()) {
+                return "Active";
+            } 
+            return "Not connected";
+        } 
+        return "Inactive";
+    }
 }

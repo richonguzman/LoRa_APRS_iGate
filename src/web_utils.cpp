@@ -23,6 +23,15 @@
 #include "map_utils.h"
 #include "display.h"
 #include "utils.h"
+#include "battery_utils.h"
+#include "wx_utils.h"
+#include "station_utils.h"
+#include "ntp_utils.h"
+#include "time_utils.h"
+#include "aprs_is_utils.h"
+#include "syslog_utils.h"
+#include "mqtt_utils.h"
+#include "lora_utils.h"
 
 
 extern Configuration               Config;
@@ -66,6 +75,7 @@ extern const size_t favicon_data_len = favicon_data_end - favicon_data;
 namespace WEB_Utils {
 
     AsyncWebServer server(80);
+    unsigned int loginFailCount = 0;
 
     void handleNotFound(AsyncWebServerRequest *request) {
         AsyncWebServerResponse *response = request->beginResponse(404, "text/plain", "Not found");
@@ -78,9 +88,10 @@ namespace WEB_Utils {
     }
 
     void handleHome(AsyncWebServerRequest *request) {
-        if(Config.webadmin.active && !request->authenticate(Config.webadmin.username.c_str(), Config.webadmin.password.c_str()))
+        if(Config.webadmin.active && !request->authenticate(Config.webadmin.username.c_str(), Config.webadmin.password.c_str())) {
+            loginFailCount++;
             return request->requestAuthentication();
-
+        }
         AsyncWebServerResponse *response = request->beginResponse(200, "text/html", (const uint8_t*)web_index_html, web_index_html_len);
         response->addHeader("Content-Encoding", "gzip");
         request->send(response);
@@ -93,8 +104,10 @@ namespace WEB_Utils {
     }
 
     void handleReadConfiguration(AsyncWebServerRequest *request) {
-        if(Config.webadmin.active && !request->authenticate(Config.webadmin.username.c_str(), Config.webadmin.password.c_str()))
+        if(Config.webadmin.active && !request->authenticate(Config.webadmin.username.c_str(), Config.webadmin.password.c_str())) {
+            loginFailCount++;
             return request->requestAuthentication();
+        }
 
         File file = SPIFFS.open("/igate_conf.json");
 
@@ -121,6 +134,71 @@ namespace WEB_Utils {
         serializeJson(data, buffer);
 
         request->send(200, "application/json", buffer);
+    }
+
+    void handleStationStatus(AsyncWebServerRequest *request) {
+        JsonDocument data;
+
+        // voltage
+        data["stationStatus"]["voltageInternal"] = BATTERY_Utils::checkInternalVoltage();
+        data["stationStatus"]["voltageExternal"] = BATTERY_Utils::checkExternalVoltage();
+
+        // weather
+        boolean weatherModulePresent = WX_Utils::isWeatherModulePresent();
+        data["stationStatus"]["weatherModulePresent"] = weatherModulePresent;
+        if (weatherModulePresent) {
+            data["stationStatus"]["weatherTemperature"] = WX_Utils::getTemperature();
+            data["stationStatus"]["weatherHumidity"] = WX_Utils::getHumidity();
+            data["stationStatus"]["weatherBarometricPressure"] = WX_Utils::getBarometricPressure();
+            data["stationStatus"]["weatherGas"] = WX_Utils::getGas();
+        } else {
+            data["stationStatus"]["weatherTemperature"] = "Unknown";
+            data["stationStatus"]["weatherHumidity"] = "Unknown";
+            data["stationStatus"]["weatherBarometricPressure"] = "Unknown";
+            data["stationStatus"]["weatherGas"] = "Unknown";
+        }
+
+        // elapsed time
+        unsigned long now = millis();
+        unsigned long bootTime = STATION_Utils::getBootTime();
+        data["stationStatus"]["elapsedTime"] = TIME_Utils::generateDuration(bootTime, now);
+
+        // logins
+        data["stationStatus"]["loginsInvalid"] = getLoginFailCount();
+        data["stationStatus"]["webAdminActive"] = Config.webadmin.active;
+
+        // packets
+        data["stationStatus"]["packetsRFSendSuccess"] = LoRa_Utils::getPacketSendSuccess();
+        data["stationStatus"]["packetsRFReceiveSuccess"] = LoRa_Utils::getPacketReceiveSuccess();
+        data["stationStatus"]["packetsISSendSuccess"] = APRS_IS_Utils::getPacketSendSuccess();
+        data["stationStatus"]["packetsISReceiveSuccess"] = APRS_IS_Utils::getPacketReceiveSuccess();
+        data["stationStatus"]["packetsRFSendFail"] = LoRa_Utils::getPacketSendFail();
+        data["stationStatus"]["packetsRFReceiveFail"] = LoRa_Utils::getPacketReceiveFail();
+        data["stationStatus"]["packetsISSendFail"] = APRS_IS_Utils::getPacketSendFail();
+        data["stationStatus"]["packetsISReceiveFail"] = APRS_IS_Utils::getPacketReceiveFail();
+        data["stationStatus"]["packetsBlacklisted"] = LoRa_Utils::getPacketBlacklisted();
+
+        // connectivity / service status
+        data["stationStatus"]["statusWifi"] = APRS_IS_Utils::getWifiState();
+        data["stationStatus"]["statusIS"] = APRS_IS_Utils::getAPRSISState();
+        data["stationStatus"]["statusNTP"] = NTP_Utils::getNTPStatus();
+        data["stationStatus"]["statusSyslog"] = SYSLOG_Utils::getSyslogStatus();
+        data["stationStatus"]["statusMQTT"] = MQTT_Utils::getMQTTStatus();
+
+        // misc
+        data["stationStatus"]["currentTimeRaw"] = now;
+        data["stationStatus"]["bootTimeRaw"] = bootTime;
+        data["stationStatus"]["elapsedTimeRaw"] = now - bootTime;
+
+        String buffer;
+
+        serializeJson(data, buffer);
+
+        request->send(200, "application/json", buffer);
+    }
+
+    unsigned long getLoginFailCount() {
+        return loginFailCount;
     }
 
     void handleStations(AsyncWebServerRequest *request) {
@@ -390,6 +468,7 @@ namespace WEB_Utils {
             server.on("/", HTTP_GET, handleHome);
             server.on("/status", HTTP_GET, handleStatus);
             server.on("/received-packets.json", HTTP_GET, handleReceivedPackets);
+            server.on("/station-status.json", HTTP_GET, handleStationStatus);
             server.on("/stations.json", HTTP_GET, handleStations);
             server.on("/configuration.json", HTTP_GET, handleReadConfiguration);
             server.on("/configuration.json", HTTP_POST, handleWriteConfiguration);

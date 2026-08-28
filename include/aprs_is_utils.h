@@ -40,6 +40,20 @@ namespace APRS_IS_Utils {
 
     void    firstConnection();
 
+    String getAPRSISState();
+    String getWifiState();
+
+    void incrementPacketSendSuccess();
+    unsigned int getPacketSendSuccess();
+    void incrementPacketSendFail();
+    unsigned int getPacketSendFail();
+    void incrementPacketReceiveSuccess();
+    unsigned int getPacketReceiveSuccess();
+    void incrementPacketReceiveFail();
+    unsigned int getPacketReceiveFail();
+    bool isBeyondWindow(unsigned long time);
+    void resetPacketCounters(unsigned long time);
+
 }
 
 #endif
