@@ -28,6 +28,7 @@ namespace MQTT_Utils {
     void connect();
     void loop();
     void setup();
+    String getMQTTStatus();
 
 }
 

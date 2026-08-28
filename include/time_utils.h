@@ -16,30 +16,17 @@
  * along with LoRa APRS iGate. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef WEB_UTILS_H_
-#define WEB_UTILS_H_
+#ifndef TIME_UTILS_H_
+#define TIME_UTILS_H_
 
-#include <ESPAsyncWebServer.h>
-#include <ESPmDNS.h>
 #include <Arduino.h>
-#include <SPIFFS.h>
-#include <WiFi.h>
 
+namespace TIME_Utils {
 
-namespace WEB_Utils {
-
-    void handleNotFound(AsyncWebServerRequest *request);
-    void handleStatus(AsyncWebServerRequest *request);
-    void handleHome(AsyncWebServerRequest *request);
-    void handleStyle(AsyncWebServerRequest *request);
-    void handleScript(AsyncWebServerRequest *request);
-    void handleBootstrapStyle(AsyncWebServerRequest *request);
-    void handleBootstrapScript(AsyncWebServerRequest *request);
-
-    void setup();
-
-    unsigned long getLoginFailCount();
-
+    String  getFormattedTime(unsigned long timeMillis);
+    String  getFormattedDateTime(unsigned long timeMillis);
+    String  generateDuration(unsigned long startMillis, unsigned long endMillis);
+    boolean isValid(unsigned long timeMillis);
 }
 
 #endif

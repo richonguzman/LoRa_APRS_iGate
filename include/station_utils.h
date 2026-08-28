@@ -41,6 +41,8 @@ namespace STATION_Utils {
     void processOutputPacketBufferUltraEcoMode();
     void processOutputPacketBuffer();
     void addToOutputPacketBuffer(const String& packet, bool flag = false);
+    void          markBootTime();
+    unsigned long getBootTime();
 
 }
 

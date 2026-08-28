@@ -39,6 +39,7 @@ int         wxModuleType        = 0;
 uint8_t     wxModuleAddress     = 0x00;
 
 float newHum, newTemp, newPress, newGas;
+bool weatherModulePresent = false;
 
 
 Adafruit_BME280     bme280;
@@ -175,6 +176,7 @@ namespace WX_Utils {
                             break;
                     }
                 }
+                weatherModulePresent = wxModuleFound;
             }
         }
     }
@@ -334,4 +336,19 @@ namespace WX_Utils {
         }
     }
 
+    float getHumidity() {
+        return newHum;
+    }
+    float getTemperature() {
+        return newTemp;
+    }
+    float getBarometricPressure() {
+        return newPress;
+    }
+    float getGas() {
+        return newGas;
+    }
+    boolean isWeatherModulePresent() {
+        return weatherModulePresent;
+    }
 }

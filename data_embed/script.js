@@ -567,6 +567,7 @@ function checkConnection() {
             }, 3000);
 
             fetchSettings();
+            fetchStationStatus();
         })
         .catch((err) => {
             setTimeout(checkConnection, 0);
@@ -636,12 +637,93 @@ document.querySelector('a[href="/received-packets"]').addEventListener('click', 
 
     document.getElementById('received-packets').classList.remove('d-none');
     document.getElementById('configuration').classList.add('d-none');
+    document.getElementById('station-status').classList.add('d-none');
 
     document.querySelector('button[type=submit]').remove();
 
     fetchReceivedPackets();
 })
 
+function loadStationStatus(stationStatus) {
+    if (stationStatus) {
+      document.getElementById("stationStatus.voltageInternal").value               = stationStatus.stationStatus.voltageInternal;
+      document.getElementById("stationStatus.voltageExternal").value               = stationStatus.stationStatus.voltageExternal;
+      document.getElementById("stationStatus.voltage").style.display               = "block";
+      document.getElementById("stationStatus.elapsedTime").value                   = stationStatus.stationStatus.elapsedTime;
+      document.getElementById("stationStatus.uptime").style.display                = "block";
+
+      document.getElementById("stationStatus.statusWifi").value                    = stationStatus.stationStatus.statusWifi;
+      document.getElementById("stationStatus.statusIS").value                      = stationStatus.stationStatus.statusIS;
+      document.getElementById("stationStatus.statusNTP").value                     = stationStatus.stationStatus.statusNTP;
+      document.getElementById("stationStatus.statusSyslog").value                  = stationStatus.stationStatus.statusSyslog;
+      document.getElementById("stationStatus.statusMQTT").value                    = stationStatus.stationStatus.statusMQTT;
+      document.getElementById("stationStatus.connectivity").style.display          = "block";
+      
+      if (stationStatus.stationStatus.webAdminActive) {
+        document.getElementById("stationStatus.loginsInvalid").value               = stationStatus.stationStatus.loginsInvalid;
+        document.getElementById("stationStatus.login").style.display               = "block";
+      } else {
+        document.getElementById("stationStatus.login").style.display               = "none";
+      }
+
+      document.getElementById("stationStatus.packetsRFSendSuccess").value          = stationStatus.stationStatus.packetsRFSendSuccess;
+      document.getElementById("stationStatus.packetsRFReceiveSuccess").value       = stationStatus.stationStatus.packetsRFReceiveSuccess;
+      document.getElementById("stationStatus.packetsISSendSuccess").value          = stationStatus.stationStatus.packetsISSendSuccess;
+      document.getElementById("stationStatus.packetsISReceiveSuccess").value       = stationStatus.stationStatus.packetsISReceiveSuccess;
+      document.getElementById("stationStatus.packetsRFSendFail").value             = stationStatus.stationStatus.packetsRFSendFail;
+      document.getElementById("stationStatus.packetsRFReceiveFail").value          = stationStatus.stationStatus.packetsRFReceiveFail;
+      document.getElementById("stationStatus.packetsISSendFail").value             = stationStatus.stationStatus.packetsISSendFail;
+      document.getElementById("stationStatus.packetsISReceiveFail").value          = stationStatus.stationStatus.packetsISReceiveFail;
+      document.getElementById("stationStatus.packetsBlacklisted").value            = stationStatus.stationStatus.packetsBlacklisted;
+      document.getElementById("stationStatus.traffic").style.display               = "block";
+
+      if (stationStatus.stationStatus.weatherModulePresent) {
+        document.getElementById("stationStatus.weatherTemperature").value          = stationStatus.stationStatus.weatherTemperature;
+        document.getElementById("stationStatus.weatherHumidity").value             = stationStatus.stationStatus.weatherHumidity;
+        document.getElementById("stationStatus.weatherBarometricPressure").value   = stationStatus.stationStatus.weatherBarometricPressure;
+        document.getElementById("stationStatus.weatherGas").value                  = stationStatus.stationStatus.weatherGas;
+        document.getElementById("stationStatus.weather").style.display             = "block";
+      } else {
+        document.getElementById("stationStatus.weather").style.display             = "none";
+      }
+    } else {
+      document.getElementById("stationStatus.voltage").style.display               = "none";
+      document.getElementById("stationStatus.weather").style.display               = "none";
+      document.getElementById("stationStatus.uptime").style.display                = "none";
+      document.getElementById("stationStatus.connectivity").style.display          = "none";
+      document.getElementById("stationStatus.traffic").style.display               = "none";
+      document.getElementById("stationStatus.login").style.display                 = "none";
+    }
+
+    setTimeout(fetchStationStatus, 15000);
+}
+
+fetchStationStatus();
+
+function fetchStationStatus() {
+    fetch("/station-status.json")
+    .then((response) => response.json())
+    .then((deviceTelemetry) => {
+        loadStationStatus(deviceTelemetry);
+    })
+    .catch((err) => {
+        console.error(err);
+
+        console.error(`Failed to load station status`);
+    });
+}
+
+document.querySelector('a[href="/station-status"]').addEventListener('click', function (e) {
+    e.preventDefault();
+
+    document.getElementById('station-status').classList.remove('d-none');
+    document.getElementById('received-packets').classList.add('d-none');
+    document.getElementById('configuration').classList.add('d-none');
+
+    document.querySelector('button[type=submit]').remove();
+
+    fetchDeviceTelemetry();
+})
 
 /* ---------- Stations Map (Leaflet, CDN) ---------- */
 

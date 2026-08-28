@@ -63,6 +63,7 @@ ___________________________________________________________________*/
 #include "wx_utils.h"
 #include "display.h"
 #include "utils.h"
+#include "telemetry_utils.h"
 #ifdef HAS_A7670
     #include "A7670_utils.h"
 #endif
@@ -128,6 +129,7 @@ void setup() {
     Utils::checkRebootMode();
     APRS_IS_Utils::firstConnection();
     SLEEP_Utils::checkSerial();
+    STATION_Utils::markBootTime();  // should be last
 }
 
 void loop() {
