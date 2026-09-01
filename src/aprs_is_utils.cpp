@@ -1,4 +1,4 @@
-/* Copyright (C) 2025 Ricardo Guzman - CA2RXU
+/* Copyright (C) 2026 Ricardo Guzman - CA2RXU
  *
  * This file is part of LoRa APRS iGate.
  *
@@ -16,7 +16,7 @@
  * along with LoRa APRS iGate. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <APRSPacketLib.h> 
+#include <APRSPacketLib.h>
 #include <WiFiClient.h>
 #include "configuration.h"
 #include "network_manager.h"
@@ -47,7 +47,6 @@ extern bool                 modemLoggedToAPRSIS;
 extern bool                 backupDigiMode;
 extern String               versionNumber;
 
-uint32_t    lastRxTime      = millis();
 bool        passcodeValid   = false;
 uint32_t    lastServerCheck = 0;
 
@@ -403,7 +402,6 @@ namespace APRS_IS_Utils {
                     String aprsisPacket = aprsIsClient.readStringUntil('\r');
                     aprsisPacket.trim();    // Serial.println(aprsisPacket);
                     processAPRSISPacket(aprsisPacket);
-                    lastRxTime = millis();
                 }
             }
         #endif

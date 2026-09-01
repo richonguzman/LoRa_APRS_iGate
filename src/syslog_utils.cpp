@@ -1,4 +1,4 @@
-/* Copyright (C) 2025 Ricardo Guzman - CA2RXU
+/* Copyright (C) 2026 Ricardo Guzman - CA2RXU
  *
  * This file is part of LoRa APRS iGate.
  *
@@ -79,11 +79,15 @@ namespace SYSLOG_Utils {
                         syslogPacket.concat(sender);
                         syslogPacket.concat(" ---> ");
                         syslogPacket.concat(packet.substring(colonIndex + 2));
-                    } else if (nextChar == '`') {
+                    } else if (nextChar == '`' || nextChar == '\'') {     // both Mic-E DTIs are valid
                         syslogPacket.concat("MIC-E / ");
                         syslogPacket.concat(sender);
                         syslogPacket.concat(" ---> ");
+                        syslogPacket.concat(String(nextChar));  // restore the actual indicator received
                         syslogPacket.concat(packet.substring(colonIndex + 2));
+                        // append distance for Mic-E, same as the GPS path
+                        //syslogPacket.concat(" / ");
+                        //syslogPacket.concat(GPS_Utils::getDistanceAndComment(packet));
                     } else if (nextChar == ';') {
                         syslogPacket.concat("OBJECT / ");
                         syslogPacket.concat(sender);

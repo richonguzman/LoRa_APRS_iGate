@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en" data-bs-theme="dark">
     <head>
         <meta charset="utf-8" />
@@ -6,65 +7,189 @@
         <title>LoRa iGate & Digi software &minus; Ricardo Guzman CA2RXU</title>
         <link rel="stylesheet" href="/bootstrap.css" />
         <link rel="stylesheet" href="/style.css" />
+        <link rel="stylesheet" href="/leaflet.css" />
         <link rel="icon" href="/favicon.png" type="image/x-icon">
-    </head>
-    <body class="bg-body-tertiary">
+    <script>(function(){try{var t=localStorage.getItem("igateTheme");if(!t)t=window.matchMedia&&window.matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";var r=document.documentElement;if(t==="night"){r.setAttribute("data-bs-theme","dark");r.setAttribute("data-variant","night");}else{r.setAttribute("data-bs-theme",t);}}catch(e){}})();</script>
+<style>
+:root,[data-bs-theme="dark"]{--msh-bg:#121417;--msh-panel:#1c2025;--msh-panel-2:#22272e;--msh-border:#2c333b;--msh-accent:#e23b3b;--msh-accent-soft:rgba(226,59,59,.14);--msh-text-dim:#8b949e;--msh-text:#e6edf3;}
+[data-bs-theme="light"]{--msh-bg:#fbfcfd;--msh-panel:#fff;--msh-panel-2:#eef1f4;--msh-border:#dde3e9;--msh-accent:#cc2b2b;--msh-accent-soft:rgba(204,43,43,.10);--msh-text-dim:#5b6671;--msh-text:#1c2127;}
+[data-variant="night"]{--msh-bg:#000;--msh-panel:#0d0303;--msh-panel-2:#180707;--msh-border:#3a1111;--msh-accent:#ff4242;--msh-accent-soft:rgba(255,66,66,.16);--msh-text-dim:#9c4d4d;--msh-text:#ff6b6b;}
+[data-variant="night"] #send-beacon{background-color:#b81d1d;border-color:#b81d1d;color:#ffdada;}
+[data-variant="night"] .app-topbar{background:#8a1717;}
+[data-variant="night"] .app-topbar .brand{color:#000;}
+[data-variant="night"] .btn-icon{color:#000;border-color:rgba(0,0,0,.4);}
+[data-variant="night"] .btn-icon:hover{background:rgba(0,0,0,.18);color:#000;}
+[data-variant="night"] .btn-save{background:#000;border-color:#000;color:#ff6b6b;}
+[data-variant="night"] .btn-save:hover{background:#1a0000;color:#ff8a8a;}
+body{background:var(--msh-bg);color:var(--msh-text);font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;}
+.app-topbar{background:#b21d1d;border-bottom:1px solid rgba(0,0,0,.25);height:56px;z-index:1030;}
+.app-topbar .brand{font-weight:600;color:#fff;font-size:1.1rem;}
+.btn-icon{background:transparent;border:1px solid rgba(255,255,255,.45);color:#fff;display:inline-flex;align-items:center;}
+.btn-icon:hover{background:rgba(255,255,255,.15);color:#fff;}
+.btn-save{background:#fff;border:1px solid #fff;color:#b21d1d;font-weight:600;}
+.btn-save:hover{background:#f0eaea;color:#b21d1d;}
+.app-shell{display:flex;min-height:calc(100vh - 56px);}
+.app-sidebar{width:250px;background:var(--msh-panel);border-right:1px solid var(--msh-border);padding:16px 12px;flex-shrink:0;}
+.app-main{flex:1;padding:20px 26px;width:100%;}
+.nav-group-label{font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;color:var(--msh-text-dim);padding:8px 12px 4px;}
+.side-link{display:flex;align-items:center;gap:11px;width:100%;padding:9px 12px;border-radius:8px;color:var(--msh-text);text-decoration:none;font-size:.92rem;border:none;background:transparent;text-align:left;transition:background .12s;}
+.side-link:hover{background:var(--msh-panel-2);color:var(--msh-text);}
+.side-link.active{background:var(--msh-accent-soft);color:var(--msh-accent);font-weight:600;}
+.side-ico{width:20px;display:inline-flex;justify-content:center;color:var(--msh-text-dim);}
+.side-link.active .side-ico,.side-link.active .side-ico svg{color:var(--msh-accent);fill:var(--msh-accent);}
+.side-sep{height:1px;background:var(--msh-border);margin:12px 6px;}
+.side-ota{border:1px solid var(--msh-border);margin-top:6px;font-weight:600;}
+.side-ota:hover{border-color:var(--msh-accent);color:var(--msh-accent);}
+.panel-section{display:none;}
+.panel-section.active{display:block;}
+.app-main .row.my-5{background:var(--msh-panel);border:1px solid var(--msh-border);border-radius:14px;padding:22px 24px;margin:0 0 18px 0!important;overflow-wrap:anywhere;}
+.app-main .row.my-5 .col-lg-3{padding-right:22px;}
+.app-main h5{font-size:1.02rem;font-weight:600;margin-bottom:10px;}
+.app-main h5 svg{color:var(--msh-accent);}
+.app-main small{color:var(--msh-text-dim);}
+.about-card{background:var(--msh-panel);border:1px solid var(--msh-border);border-radius:14px;padding:26px 30px;overflow-wrap:anywhere;word-break:break-word;}
+.about-card a{color:var(--msh-accent);}
+.about-card img{background:#fff;padding:6px 12px;border-radius:8px;margin:6px 8px 0 0;vertical-align:middle;}
+#buildInfo{font-family:monospace;color:var(--msh-text-dim);}
+.form-control,.form-select{background-color:var(--msh-bg);border-color:var(--msh-border);color:var(--msh-text);}
+.form-control:focus,.form-select:focus{background-color:var(--msh-bg);color:var(--msh-text);border-color:var(--msh-accent);box-shadow:0 0 0 .18rem var(--msh-accent-soft);}
+.form-select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23e23b3b' stroke-linecap='round' stroke-linejoin='round' stroke-width='2.2' d='m2 5 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .75rem center;background-size:15px 12px;padding-right:2.25rem;}
+#send-beacon{background-color:#0d6efd;border-color:#0d6efd;color:#fff;}
+#send-beacon:hover{background-color:#0b5ed7;border-color:#0b5ed7;color:#fff;}
+.form-check-input:checked{background-color:var(--msh-accent);border-color:var(--msh-accent);}
+.input-group-text{background:var(--msh-panel-2);border-color:var(--msh-border);color:var(--msh-text-dim);}
+#received-packets{max-width:none;padding-left:0;padding-right:0;}
+#received-packets .table{--bs-table-color:var(--msh-text);--bs-table-border-color:var(--msh-border);color:var(--msh-text);}
+#received-packets th{white-space:nowrap;}
+#received-packets td:nth-child(1),#received-packets td:nth-child(3),#received-packets td:nth-child(4){white-space:nowrap;}
+@media(max-width:768px){.app-sidebar{width:60px;padding:12px 6px;}.side-link .label,.nav-group-label{display:none;}.app-main{padding:14px;}}
+</style>
+</head>
+    <body>
         <input type="file" accept="text/json,.json" style="display: none" />
         <form autocomplete="off" action="/configuration.json" method="POST">
-            <nav
-                class="navbar bg-body-secondary shadow-sm border-bottom sticky-top navbar-expand-lg"
-            >
-                <div class="container">
-                    <a class="navbar-brand" href=""
-                        >CA2RXU's LoRa iGate</a
-                    >
-                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
-                    <div class="collapse navbar-collapse" id="navbarColor01">
-                        <ul class="navbar-nav me-auto">
-                            <li class="nav-item">
-                                <a class="nav-link" href="/">
-                                    Configuration
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="/update">
-                                    Update <small>OTA</small>
-                                </a>
-                            </li>
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Backup</a>
-                                <div class="dropdown-menu">
-                                    <a class="dropdown-item" href="#" id="backup">Download Conf.</a>
-                                    <a class="dropdown-item" href="#" id="restore">Restore Conf.</a>
-                                </div>
-                            </li>
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Device</a>
-                                <div class="dropdown-menu">
-                                    <a class="dropdown-item" href="#" id="reboot">Reboot</a>
-                                </div>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="/received-packets">
-                                    Received packets
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="/send-message">
-                                    Messages
-                                </a>
-                            </li>
-                        </ul>
-                        <div class="d-flex">
-                            <button class="btn btn-success my-2 my-sm-0" type="submit">Save</button>
-                        </div>
-                    </div>
-                </div>
-            </nav>
-            
-            <div class="container d-none" id="received-packets">
+<div class="app-topbar d-flex align-items-center px-3 sticky-top">
+  <span class="brand">CA2RXU Firmware --&gt; LoRa APRS iGate/Digipeater</span>
+  <div class="ms-auto d-flex align-items-center gap-2">
+    <button class="btn btn-sm btn-icon" type="button" id="backup" title="Download configuration"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708z"/></svg></button>
+    <button class="btn btn-sm btn-icon" type="button" id="restore" title="Restore configuration"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5"/><path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708z"/></svg></button>
+    <button class="btn btn-sm btn-icon" type="button" id="themeToggle" title="Toggle light/dark"></button>
+    <button class="btn btn-sm btn-save" type="submit">Save</button>
+  </div>
+</div>
+<div class="app-shell">
+  <aside class="app-sidebar">
+    <div class="nav-group-label">Configuration</div>
+    <button class="side-link active" type="button" data-target="sec-station"><span class="side-ico"><svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="18"
+                                        height="18"
+                                        fill="currentColor"
+                                        class="bi bi-person-circle"
+                                        viewBox="0 0 16 16"
+                                    >
+                                        <path
+                                            d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"
+                                        />
+                                        <path
+                                            fill-rule="evenodd"
+                                            d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"
+                                        />
+                                    </svg></span><span class="label">Station</span></button>
+<button class="side-link" type="button" data-target="sec-beaconing"><span class="side-ico"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16"><path d="M15.964.686a.5.5 0 0 0-.65-.65L.767 5.855H.766l-.452.18a.5.5 0 0 0-.082.887l.41.26.001.002 4.995 3.178 3.178 4.995.002.002.26.41a.5.5 0 0 0 .886-.083zm-1.833 1.89L6.637 10.07l-.215-.338a.5.5 0 0 0-.154-.154l-.338-.215 7.494-7.494 1.178-.471z"/></svg></span><span class="label">Beaconing</span></button>
+<button class="side-link" type="button" data-target="sec-connectivity"><span class="side-ico"><svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="18"
+                                        height="18"
+                                        fill="currentColor"
+                                        class="bi bi-router-fill"
+                                        viewBox="0 0 16 16"
+                                    >
+                                        <path
+                                            d="M5.525 3.025a3.5 3.5 0 0 1 4.95 0 .5.5 0 1 0 .707-.707 4.5 4.5 0 0 0-6.364 0 .5.5 0 0 0 .707.707"
+                                        />
+                                        <path
+                                            d="M6.94 4.44a1.5 1.5 0 0 1 2.12 0 .5.5 0 0 0 .708-.708 2.5 2.5 0 0 0-3.536 0 .5.5 0 0 0 .707.707Z"
+                                        />
+                                        <path
+                                            d="M2.974 2.342a.5.5 0 1 0-.948.316L3.806 8H1.5A1.5 1.5 0 0 0 0 9.5v2A1.5 1.5 0 0 0 1.5 13H2a.5.5 0 0 0 .5.5h2A.5.5 0 0 0 5 13h6a.5.5 0 0 0 .5.5h2a.5.5 0 0 0 .5-.5h.5a1.5 1.5 0 0 0 1.5-1.5v-2A1.5 1.5 0 0 0 14.5 8h-2.306l1.78-5.342a.5.5 0 1 0-.948-.316L11.14 8H4.86zM2.5 11a.5.5 0 1 1 0-1 .5.5 0 0 1 0 1m4.5-.5a.5.5 0 1 1 1 0 .5.5 0 0 1-1 0m2.5.5a.5.5 0 1 1 0-1 .5.5 0 0 1 0 1m1.5-.5a.5.5 0 1 1 1 0 .5.5 0 0 1-1 0m2 0a.5.5 0 1 1 1 0 .5.5 0 0 1-1 0"
+                                        />
+                                        <path
+                                            d="M8.5 5.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0"
+                                        />
+                                    </svg></span><span class="label">Connectivity</span></button>
+<button class="side-link" type="button" data-target="sec-aprsis"><span class="side-ico"><svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="18"
+                                        height="18"
+                                        fill="currentColor"
+                                        class="bi bi-database-fill"
+                                        viewBox="0 0 16 16"
+                                    >
+                                        <path
+                                            d="M3.904 1.777C4.978 1.289 6.427 1 8 1s3.022.289 4.096.777C13.125 2.245 14 2.993 14 4s-.875 1.755-1.904 2.223C11.022 6.711 9.573 7 8 7s-3.022-.289-4.096-.777C2.875 5.755 2 5.007 2 4s.875-1.755 1.904-2.223"
+                                        />
+                                        <path
+                                            d="M2 6.161V7c0 1.007.875 1.755 1.904 2.223C4.978 9.71 6.427 10 8 10s3.022-.289 4.096-.777C13.125 8.755 14 8.007 14 7v-.839c-.457.432-1.004.751-1.49.972C11.278 7.693 9.682 8 8 8s-3.278-.307-4.51-.867c-.486-.22-1.033-.54-1.49-.972"
+                                        />
+                                        <path
+                                            d="M2 9.161V10c0 1.007.875 1.755 1.904 2.223C4.978 12.711 6.427 13 8 13s3.022-.289 4.096-.777C13.125 11.755 14 11.007 14 10v-.839c-.457.432-1.004.751-1.49.972-1.232.56-2.828.867-4.51.867s-3.278-.307-4.51-.867c-.486-.22-1.033-.54-1.49-.972"
+                                        />
+                                        <path
+                                            d="M2 12.161V13c0 1.007.875 1.755 1.904 2.223C4.978 15.711 6.427 16 8 16s3.022-.289 4.096-.777C13.125 14.755 14 14.007 14 13v-.839c-.457.432-1.004.751-1.49.972-1.232.56-2.828.867-4.51.867s-3.278-.307-4.51-.867c-.486-.22-1.033-.54-1.49-.972"
+                                        />
+                                    </svg></span><span class="label">APRS-IS</span></button>
+<button class="side-link" type="button" data-target="sec-digipeater"><span class="side-ico"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16"><path d="M3.05 3.05a7 7 0 0 0 0 9.9.5.5 0 0 1-.707.707 8 8 0 0 1 0-11.314.5.5 0 0 1 .707.707m2.122 2.122a4 4 0 0 0 0 5.656.5.5 0 1 1-.708.708 5 5 0 0 1 0-7.072.5.5 0 0 1 .708.708m5.656-.708a.5.5 0 0 1 .708 0 5 5 0 0 1 0 7.072.5.5 0 1 1-.708-.708 4 4 0 0 0 0-5.656.5.5 0 0 1 0-.708m2.122-2.12a.5.5 0 0 1 .707 0 8 8 0 0 1 0 11.313.5.5 0 0 1-.707-.707 7 7 0 0 0 0-9.9.5.5 0 0 1 0-.707zM6 8a2 2 0 1 1 2.5 1.937V15.5a.5.5 0 0 1-1 0V9.937A2 2 0 0 1 6 8"/></svg></span><span class="label">Digipeater</span></button>
+<button class="side-link" type="button" data-target="sec-remote"><span class="side-ico"><svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="18"
+                                        height="18"
+                                        fill="currentColor"
+                                        class="bi bi-cloud-upload-fill"
+                                        viewBox="0 0 16 16"
+                                    >
+                                        <path
+                                            fill-rule="evenodd"
+                                            d="M8 0a5.53 5.53 0 0 0-3.594 1.342c-.766.66-1.321 1.52-1.464 2.383C1.266 4.095 0 5.555 0 7.318 0 9.366 1.708 11 3.781 11H7.5V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V11h4.188C14.502 11 16 9.57 16 7.773c0-1.636-1.242-2.969-2.834-3.194C12.923 1.999 10.69 0 8 0m-.5 14.5V11h1v3.5a.5.5 0 0 1-1 0"
+                                        />
+                                    </svg></span><span class="label">Remote Management</span></button>
+<button class="side-link" type="button" data-target="sec-blacklist"><span class="side-ico"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16"><path d="M15 8a6.97 6.97 0 0 0-1.71-4.584l-9.874 9.875A7 7 0 0 0 15 8M2.71 12.584l9.874-9.875a7 7 0 0 0-9.874 9.874ZM16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0"/></svg></span><span class="label">Black List</span></button>
+<button class="side-link" type="button" data-target="sec-lora"><span class="side-ico"><svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="18"
+                                        height="18"
+                                        fill="currentColor"
+                                        class="bi bi-broadcast"
+                                        viewBox="0 0 16 16"
+                                    >
+                                        <path
+                                            d="M3.05 3.05a7 7 0 0 0 0 9.9.5.5 0 0 1-.707.707 8 8 0 0 1 0-11.314.5.5 0 0 1 .707.707m2.122 2.122a4 4 0 0 0 0 5.656.5.5 0 1 1-.708.708 5 5 0 0 1 0-7.072.5.5 0 0 1 .708.708m5.656-.708a.5.5 0 0 1 .708 0 5 5 0 0 1 0 7.072.5.5 0 1 1-.708-.708 4 4 0 0 0 0-5.656.5.5 0 0 1 0-.708m2.122-2.12a.5.5 0 0 1 .707 0 8 8 0 0 1 0 11.313.5.5 0 0 1-.707-.707 7 7 0 0 0 0-9.9.5.5 0 0 1 0-.707zM10 8a2 2 0 1 1-4 0 2 2 0 0 1 4 0"
+                                        />
+                                    </svg></span><span class="label">LoRa</span></button>
+<button class="side-link" type="button" data-target="sec-services"><span class="side-ico"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16"><path d="M11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.5 2.5 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5"/></svg></span><span class="label">Services</span></button>
+<button class="side-link" type="button" data-target="sec-hardware"><span class="side-ico"><svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="18"
+                                        height="18"
+                                        fill="currentColor"
+                                        class="bi bi-tv-fill"
+                                        viewBox="0 0 16 16"
+                                    >
+                                        <path
+                                            d="M2.5 13.5A.5.5 0 0 1 3 13h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5M2 2h12s2 0 2 2v6s0 2-2 2H2s-2 0-2-2V4s0-2 2-2"
+                                        />
+                                    </svg></span><span class="label">Hardware</span></button>
+<button class="side-link" type="button" data-target="sec-wxtelemetry"><span class="side-ico"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M6 2a.5.5 0 0 1 .47.33L10 12.036l1.53-4.208A.5.5 0 0 1 12 7.5h3.5a.5.5 0 0 1 0 1h-3.15l-1.88 5.17a.5.5 0 0 1-.94 0L6 3.964 4.47 8.171A.5.5 0 0 1 4 8.5H.5a.5.5 0 0 1 0-1h3.15l1.88-5.17A.5.5 0 0 1 6 2"/></svg></span><span class="label">WX Telemetry</span></button>
+<button class="side-link" type="button" data-target="sec-administration"><span class="side-ico"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16"><path d="M9.405 1.05c-.413-1.4-2.397-1.4-2.81 0l-.1.34a1.464 1.464 0 0 1-2.105.872l-.31-.17c-1.283-.698-2.686.705-1.987 1.987l.169.311c.446.82.023 1.841-.872 2.105l-.34.1c-1.4.413-1.4 2.397 0 2.81l.34.1a1.464 1.464 0 0 1 .872 2.105l-.17.31c-.698 1.283.705 2.686 1.987 1.987l.311-.169a1.464 1.464 0 0 1 2.105.872l.1.34c.413 1.4 2.397 1.4 2.81 0l.1-.34a1.464 1.464 0 0 1 2.105-.872l.31.17c1.283.698 2.686-.705 1.987-1.987l-.169-.311a1.464 1.464 0 0 1 .872-2.105l.34-.1c1.4-.413 1.4-2.397 0-2.81l-.34-.1a1.464 1.464 0 0 1-.872-2.105l.17-.31c.698-1.283-.705-2.686-1.987-1.987l-.311.169a1.464 1.464 0 0 1-2.105-.872zM8 10.93a2.929 2.929 0 1 1 0-5.86 2.929 2.929 0 0 1 0 5.858z"/></svg></span><span class="label">Administration</span></button>
+<button class="side-link" type="button" data-target="sec-about"><span class="side-ico"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16"><path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2"/></svg></span><span class="label">About / Info</span></button>
+    <div class="side-sep"></div>
+<button class="side-link" type="button" data-target="sec-maps"><span class="side-ico"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16"><path d="M15.817.113A.5.5 0 0 1 16 .5v14a.5.5 0 0 1-.402.49l-5 1a.5.5 0 0 1-.196 0L5.5 15.01l-4.902.98A.5.5 0 0 1 0 15.5v-14a.5.5 0 0 1 .402-.49l5-1a.5.5 0 0 1 .196 0L10.5.99l4.902-.98a.5.5 0 0 1 .415.103M10 1.91l-4-.8v12.98l4 .8zm1 12.98 4-.8V1.11l-4 .8zm-6-.8V1.11l-4 .8v12.98z"/></svg></span><span class="label">Map</span></button>
+<button class="side-link" type="button" id="rpToggle"><span class="side-ico"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5m-3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2m0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2m0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2"/></svg></span><span class="label">Received Packets</span></button>
+<a href="/received-packets" id="rpDummy" style="display:none" aria-hidden="true"></a>
+<a class="side-link side-ota" href="/update"><span class="side-ico"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16"><path d="M8 2a5.53 5.53 0 0 0-3.594 1.342c-.766.66-1.321 1.52-1.464 2.383C1.266 6.095 0 7.555 0 9.318 0 11.366 1.708 13 3.781 13h8.906C14.502 13 16 11.57 16 9.773c0-1.636-1.242-2.969-2.834-3.194C12.923 3.999 10.69 2 8 2m2.354 5.146a.5.5 0 0 1-.708.708L8.5 6.707V10.5a.5.5 0 0 1-1 0V6.707L6.354 7.854a.5.5 0 1 1-.708-.708l2-2a.5.5 0 0 1 .708 0z"/></svg></span><span class="label">Update OTA</span></a>
+  </aside>
+  <main class="app-main">
+    <div class="container d-none" id="received-packets">
                 <div class="row my-5 d-flex align-items-top">
                     <div class="col-12">
                         <h3>Last 10 received packets list</h3>
@@ -78,7 +203,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                
+
                             </tbody>
                         </table>
                         <span>List refresh automatically every 15 seconds.</span><br>
@@ -87,110 +212,18 @@
                 </div>
                 <hr>
             </div>
-
-            <div class="container d-none" id="send-message-view">
-                <div class="row my-5 d-flex align-items-top">
-                    <div class="col-lg-8 col-sm-12 mx-auto">
-                        <h3>Send APRS Message</h3>
-                        <small>Send an APRS text message to another station. Tip: send <code>?APRSV</code>, <code>?APRSP</code>, <code>?APRSL</code> or <code>?APRSSR</code> to query another iGate.</small>
-                        <div class="row mt-4">
-                            <div class="col-lg-4 col-sm-12">
-                                <label for="message.to" class="form-label">To (callsign)</label>
-                                <input
-                                    type="text"
-                                    class="form-control"
-                                    id="message.to"
-                                    placeholder="EA4XXX-7"
-                                    oninput="this.value = this.value.toUpperCase();"
-                                />
-                            </div>
-                            <div class="col-lg-8 col-sm-12">
-                                <label for="message.text" class="form-label">Message</label>
-                                <input
-                                    type="text"
-                                    class="form-control"
-                                    id="message.text"
-                                    placeholder="Hello world"
-                                    maxlength="67"
-                                />
-                            </div>
-                        </div>
-                        <div class="row mt-3 align-items-center">
-                            <div class="col-lg-3 col-6">
-                                <div class="form-check form-switch">
-                                    <input type="checkbox" class="form-check-input" id="message.viaRF" checked />
-                                    <label class="form-check-label" for="message.viaRF">Send via RF</label>
-                                </div>
-                            </div>
-                            <div class="col-lg-4 col-6">
-                                <div class="form-check form-switch">
-                                    <input type="checkbox" class="form-check-input" id="message.viaTCP" />
-                                    <label class="form-check-label" for="message.viaTCP">Send via APRS-IS (TCP)</label>
-                                </div>
-                            </div>
-                            <div class="col-lg-4 col-sm-12 mt-2 mt-lg-0">
-                                <button class="btn btn-primary form-control" id="send-message">Send message now</button>
-                            </div>
-                        </div>
-
-                        <h5 class="mt-5">Received messages</h5>
-                        <small>Messages addressed to this iGate's callsign. Refreshes every 10 seconds.</small>
-                        <table class="table mt-3">
-                            <thead>
-                                <tr>
-                                    <th scope="col">Ago</th>
-                                    <th scope="col">From</th>
-                                    <th scope="col">Via</th>
-                                    <th scope="col">Message</th>
-                                </tr>
-                            </thead>
-                            <tbody id="received-messages"></tbody>
-                        </table>
-                    </div>
-                </div>
-                <hr>
-            </div>
-
-            <div class="container d-none" id="ota-view">
-                <div class="row my-5 d-flex align-items-top">
-                    <div class="col-lg-8 col-sm-12 mx-auto">
-                        <h3>Firmware Update (OTA)</h3>
-                        <small>Upload a new <code>firmware.bin</code> over the network. The device flashes it and reboots into the new firmware automatically.</small>
-                        <div class="alert alert-secondary mt-3 mb-0" id="ota.current">Current firmware: …</div>
-                        <div class="row mt-4">
+    <div id="configuration">
+<section class="panel-section" id="sec-maps">
+                        <div class="row my-5">
                             <div class="col-12">
-                                <label for="ota.file" class="form-label">Firmware file (firmware.bin)</label>
-                                <input type="file" class="form-control" id="ota.file" accept=".bin" />
+                                <h3>Stations Map</h3>
+                                <div id="map" style="height:70vh;border-radius:14px;"></div>
+                                <small>Needs internet (OpenStreetMap tiles). Updates every 15 seconds. Stations heard in the last hour.</small>
                             </div>
                         </div>
-                        <div class="row mt-3">
-                            <div class="col-lg-6 col-sm-12">
-                                <label for="ota.user" class="form-label">OTA user <small>(only if configured)</small></label>
-                                <input type="text" class="form-control" id="ota.user" placeholder="(optional)" />
-                            </div>
-                            <div class="col-lg-6 col-sm-12">
-                                <label for="ota.pass" class="form-label">OTA password</label>
-                                <input type="password" class="form-control" id="ota.pass" placeholder="(optional)" />
-                            </div>
-                        </div>
-                        <div class="row mt-3">
-                            <div class="col-lg-4 col-sm-12">
-                                <button class="btn btn-primary form-control" id="ota.upload">Upload firmware</button>
-                            </div>
-                        </div>
-                        <div class="progress mt-4 d-none" id="ota.progresswrap" style="height: 1.6rem;">
-                            <div class="progress-bar" id="ota.progress" role="progressbar" style="width: 0%;">0%</div>
-                        </div>
-                        <div id="ota.status" class="mt-3"></div>
-                        <small class="d-block mt-2 text-muted">Do not power off during the update. The connection will drop when the device reboots — that is normal.</small>
-                    </div>
-                </div>
-                <hr>
-            </div>
+</section>
+<section class="panel-section active" id="sec-station">
 
-            <div class="container" id="configuration">
-                <main>
-                    <div class="col-10 my-5 mx-auto">
                         <div class="row my-5 d-flex align-items-top">
                             <div class="col-lg-3 col-sm-12">
                                 <h5>
@@ -213,10 +246,10 @@
                                     Station
                                 </h5>
                                 <small
-                                    >Add your Ham callsign and SSID. 
+                                    >Add your Ham callsign and SSID.
                                     <br>
                                     <br>
-                                    You can leave a comment describing your station. 
+                                    You can leave a comment describing your station.
                                     <br>
                                     <br>
                                     In the bottom there is a field for personal note that can only be seen in WEB GUI.
@@ -398,7 +431,10 @@
                                 </div>
                             </div>
                         </div>
-                        <hr>
+
+</section>
+<section class="panel-section" id="sec-beaconing">
+
 
                         <div class="row my-5 d-flex align-items-top">
                             <div class="col-lg-3 col-sm-12">
@@ -408,54 +444,132 @@
                                         width="20"
                                         height="20"
                                         fill="currentColor"
-                                        class="bi bi-diagram-3"
+                                        class="bi bi-broadcast-pin"
                                         viewBox="0 0 16 16"
                                     >
                                         <path
-                                            fill-rule="evenodd"
-                                            d="M6 3.5A1.5 1.5 0 0 1 7.5 2h1A1.5 1.5 0 0 1 10 3.5v1A1.5 1.5 0 0 1 8.5 6v1H14a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-1 0V8h-5v.5a.5.5 0 0 1-1 0V8h-5v.5a.5.5 0 0 1-1 0v-1A.5.5 0 0 1 2 7h5.5V6A1.5 1.5 0 0 1 6 4.5zM8.5 5a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5zM0 11.5A1.5 1.5 0 0 1 1.5 10h1A1.5 1.5 0 0 1 4 11.5v1A1.5 1.5 0 0 1 2.5 14h-1A1.5 1.5 0 0 1 0 12.5zm1.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm4.5.5A1.5 1.5 0 0 1 7.5 10h1a1.5 1.5 0 0 1 1.5 1.5v1A1.5 1.5 0 0 1 8.5 14h-1A1.5 1.5 0 0 1 6 12.5zm1.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm4.5.5a1.5 1.5 0 0 1 1.5-1.5h1a1.5 1.5 0 0 1 1.5 1.5v1a1.5 1.5 0 0 1-1.5 1.5h-1a1.5 1.5 0 0 1-1.5-1.5zm1.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5z"
+                                            d="M3.05 3.05a7 7 0 0 0 0 9.9.5.5 0 0 1-.707.707 8 8 0 0 1 0-11.314.5.5 0 0 1 .707.707m2.122 2.122a4 4 0 0 0 0 5.656.5.5 0 1 1-.708.708 5 5 0 0 1 0-7.072.5.5 0 0 1 .708.708m5.656-.708a.5.5 0 0 1 .708 0 5 5 0 0 1 0 7.072.5.5 0 1 1-.708-.708 4 4 0 0 0 0-5.656.5.5 0 0 1 0-.708m2.122-2.12a.5.5 0 0 1 .707 0 8 8 0 0 1 0 11.313.5.5 0 0 1-.707-.707 7 7 0 0 0 0-9.9.5.5 0 0 1 0-.707zM6 8a2 2 0 1 1 2.5 1.937V15.5a.5.5 0 0 1-1 0V9.937A2 2 0 0 1 6 8"
                                         />
                                     </svg>
-                                    IP Config
+                                    Beaconing
                                 </h5>
-                                <small>Choose DHCP (automatic) or a static IP address.</small>
+                                <small>Set APRS beacon attributes.</small>
                             </div>
                             <div class="col-lg-9 col-sm-12">
-                                <div class="form-check form-switch">
-                                    <input
-                                        type="checkbox"
-                                        name="network.dhcp"
-                                        id="network.dhcp"
-                                        class="form-check-input"
-                                        checked
-                                    />
-                                    <label for="network.dhcp" class="form-label">Use DHCP (automatic IP)</label>
-                                </div>
-                                <div id="static-ip-config" class="mt-3" style="display: none;">
-                                    <div class="row">
-                                        <div class="col-lg-6 col-sm-12">
-                                            <label for="network.ip" class="form-label">IP Address</label>
-                                            <input type="text" class="form-control" name="network.ip" id="network.ip" placeholder="192.168.1.50" />
-                                        </div>
-                                        <div class="col-lg-6 col-sm-12">
-                                            <label for="network.gateway" class="form-label">Default Gateway</label>
-                                            <input type="text" class="form-control" name="network.gateway" id="network.gateway" placeholder="192.168.1.1" />
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="form-check form-switch">
+                                            <input
+                                                type="checkbox"
+                                                name="beacon.sendViaAPRSIS"
+                                                id="beacon.sendViaAPRSIS"
+                                                class="form-check-input"
+                                            />
+                                            <label
+                                                for="beacon.sendViaAPRSIS"
+                                                class="form-label"
+                                                >Send beacon via APRS-IS
+                                            </label>
                                         </div>
                                     </div>
-                                    <div class="row mt-3">
-                                        <div class="col-lg-6 col-sm-12">
-                                            <label for="network.subnet" class="form-label">Subnet Mask</label>
-                                            <input type="text" class="form-control" name="network.subnet" id="network.subnet" placeholder="255.255.255.0" />
+                                    <div class="col-6">
+                                        <div class="form-check form-switch">
+                                            <input
+                                                type="checkbox"
+                                                name="beacon.sendViaRF"
+                                                id="beacon.sendViaRF"
+                                                class="form-check-input"
+                                            />
+                                            <label
+                                                for="beacon.sendViaRF"
+                                                class="form-label"
+                                                >Send beacon via RF
+                                            </label>
                                         </div>
-                                        <div class="col-lg-6 col-sm-12">
-                                            <label for="network.dns" class="form-label">DNS Server(s) <small>(space-separated for multiple)</small></label>
-                                            <input type="text" class="form-control" name="network.dns" id="network.dns" placeholder="8.8.8.8 1.1.1.1" />
+                                    </div>
+                                </div>
+                                <div class="row mt-3">
+                                    <div class="col-6">
+                                        <button class="btn btn-primary form-control h-100" id="send-beacon">Send beacon now</button>
+                                    </div>
+                                    <div class="col-6">
+                                        <label
+                                            for="beacon.beaconFreq"
+                                            class="form-label">
+                                            <small>(Select LoRa Beacon Frequency)</small>
+                                        </label>
+                                        <select
+                                            class="form-select form-select"
+                                            name="beacon.beaconFreq"
+                                            id="beacon.beaconFreq"
+                                        >
+                                            <option value="0">Beacon on Rx Freq</option>
+                                            <option value="1">Beacon on Tx Freq</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row mt-3">
+                                    <div class="col-6">
+                                        <label
+                                            for="beacon.interval"
+                                            class="form-label"
+                                            >Beacon Interval
+                                        </label>
+                                        <div class="input-group">
+                                            <input
+                                                type="number"
+                                                name="beacon.interval"
+                                                id="beacon.interval"
+                                                class="form-control"
+                                                value="15"
+                                                min="10"
+                                                step="1"
+                                                required
+                                            />
+                                            <span class="input-group-text"
+                                                >minutes
+                                            </span>
                                         </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <label
+                                            for="beacon.ambiguityLevel"
+                                            class="form-label"
+                                            >APRS Position Ambiguity</label
+                                        >
+                                        <select
+                                            class="form-select form-select"
+                                            name="beacon.ambiguityLevel"
+                                            id="beacon.ambiguityLevel"
+                                        >
+                                            <option value="0" selected>No Ambiguity</option>
+                                            <option value="1">~110 m forced Ambiguity</option>
+                                            <option value="2">~1.1 km forced Ambiguity</option>
+                                            <option value="3">~11 km forced Ambiguity</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-12 mt-3">
+                                    <div class="form-check form-switch">
+                                        <input
+                                            type="checkbox"
+                                            name="beacon.gpsActive"
+                                            id="beacon.gpsActive"
+                                            class="form-check-input"
+                                        />
+                                        <label
+                                            for="beacon.gpsActive"
+                                            class="form-label"
+                                            >Send Real-GPS Beacon <small>(Only for Boards with GPS Modules)</small>
+                                        </label>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <hr>
+
+</section>
+<section class="panel-section" id="sec-connectivity">
+
 
                         <div class="row my-5 d-flex align-items-top">
                             <div class="col-lg-3 col-sm-12">
@@ -484,7 +598,7 @@
                                     WiFi Access
                                 </h5>
                                 <small
-                                    ><b>Not available</b> — this board connects via Ethernet (W5500), it has no Wi-Fi.</small
+                                    >Add all Wi-Fi Networks intended to be used.</small
                                 >
                             </div>
                             <div class="col-lg-9 col-sm-12">
@@ -505,7 +619,6 @@
                                             data-target="#add-ap"
                                             aria-expanded="false"
                                             aria-controls="add-ap"
-                                            disabled
                                         >
                                             Add network
                                         </button>
@@ -535,7 +648,182 @@
                                 </div>
                             </div>
                         </div>
-                        <hr>
+
+
+
+                        <div class="row my-5 d-flex align-items-top">
+                            <div class="col-lg-3 col-sm-12">
+                                <h5>
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="20"
+                                        height="20"
+                                        fill="currentColor"
+                                        class="bi bi-cloud-upload-fill"
+                                        viewBox="0 0 16 16"
+                                    >
+                                        <path
+                                            fill-rule="evenodd"
+                                            d="M8 0a5.53 5.53 0 0 0-3.594 1.342c-.766.66-1.321 1.52-1.464 2.383C1.266 4.095 0 5.555 0 7.318 0 9.366 1.708 11 3.781 11H7.5V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V11h4.188C14.502 11 16 9.57 16 7.773c0-1.636-1.242-2.969-2.834-3.194C12.923 1.999 10.69 0 8 0m-.5 14.5V11h1v3.5a.5.5 0 0 1-1 0"
+                                        />
+                                    </svg>
+                                    NTP
+                                </h5>
+                                <small
+                                    >Set your GMT Time Zone.
+                                </small>
+                            </div>
+                            <div class="col-lg-9 col-sm-12">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <label
+                                            for="ntp.server"
+                                            class="form-label"
+                                            >NTP Server hostname</label
+                                        >
+                                        <div class="input-group">
+                                            <input
+                                                type="text"
+                                                name="ntp.server"
+                                                id="ntp.server"
+                                                class="form-control"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <label
+                                            for="ntp.gmtCorrection"
+                                            class="form-label"
+                                            >GMT Time Correction Offset</label
+                                        >
+                                        <div class="input-group">
+                                            <input
+                                                type="number"
+                                                name="ntp.gmtCorrection"
+                                                id="ntp.gmtCorrection"
+                                                placeholder="0"
+                                                class="form-control"
+                                                step="0.25"
+                                                min="-23.75"
+                                                max="23.75"
+                                            />
+                                            <span class="input-group-text"
+                                                >hours</span
+                                            >
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                        <div class="row my-5 d-flex align-items-top">
+                            <div class="col-lg-3 col-sm-12">
+                                <h5>
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="20"
+                                        height="20"
+                                        fill="currentColor"
+                                        class="bi bi-router-fill"
+                                        viewBox="0 0 16 16"
+                                    >
+                                        <path
+                                            d="M5.525 3.025a3.5 3.5 0 0 1 4.95 0 .5.5 0 1 0 .707-.707 4.5 4.5 0 0 0-6.364 0 .5.5 0 0 0 .707.707"
+                                        />
+                                        <path
+                                            d="M6.94 4.44a1.5 1.5 0 0 1 2.12 0 .5.5 0 0 0 .708-.708 2.5 2.5 0 0 0-3.536 0 .5.5 0 0 0 .707.707Z"
+                                        />
+                                        <path
+                                            d="M2.974 2.342a.5.5 0 1 0-.948.316L3.806 8H1.5A1.5 1.5 0 0 0 0 9.5v2A1.5 1.5 0 0 0 1.5 13H2a.5.5 0 0 0 .5.5h2A.5.5 0 0 0 5 13h6a.5.5 0 0 0 .5.5h2a.5.5 0 0 0 .5-.5h.5a1.5 1.5 0 0 0 1.5-1.5v-2A1.5 1.5 0 0 0 14.5 8h-2.306l1.78-5.342a.5.5 0 1 0-.948-.316L11.14 8H4.86zM2.5 11a.5.5 0 1 1 0-1 .5.5 0 0 1 0 1m4.5-.5a.5.5 0 1 1 1 0 .5.5 0 0 1-1 0m2.5.5a.5.5 0 1 1 0-1 .5.5 0 0 1 0 1m1.5-.5a.5.5 0 1 1 1 0 .5.5 0 0 1-1 0m2 0a.5.5 0 1 1 1 0 .5.5 0 0 1-1 0"
+                                        />
+                                        <path
+                                            d="M8.5 5.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0"
+                                        />
+                                    </svg>
+                                    WiFi Auto AP
+                                </h5>
+                                <small
+                                    >WiFi AP will start if there is no WiFi
+                                    connection available. Timeout will count from
+                                    startup or last client disconnected.</small
+                                >
+                            </div>
+                            <div class="col-9">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="form-check form-switch">
+                                            <input
+                                                type="checkbox"
+                                                name="wifi.autoAP.enabled"
+                                                id="wifi.autoAP.enabled"
+                                                class="form-check-input"
+                                            />
+                                            <label
+                                                for="wifi.autoAP.enabled"
+                                                class="form-label"
+                                                >Enable Auto AP</label
+                                            >
+                                            <div class="form-text">
+                                                Create WiFi AP when no network is available
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="wifi-autoap-config" style="{{wifi.autoAP.enabled ? '' : 'display:none'}}">
+                                    <div class="row mt-3">
+                                        <div class="col-6">
+                                            <label
+                                                for="wifi.autoAP.password"
+                                                class="form-label"
+                                                >Password</label
+                                            >
+                                            <div class="input-group">
+                                                <input
+                                                    type="password"
+                                                    name="wifi.autoAP.password"
+                                                    id="wifi.autoAP.password"
+                                                    class="form-control"
+                                                    placeholder="1234567890"
+                                                    required=""
+                                                />
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <label
+                                                for="wifi.autoAP.timeout"
+                                                class="form-label"
+                                                >WiFiAP timeout (to search again)</label
+                                            >
+                                            <div class="input-group">
+                                                <input
+                                                    type="number"
+                                                    name="wifi.autoAP.timeout"
+                                                    id="wifi.autoAP.timeout"
+                                                    class="form-control"
+                                                    placeholder="10"
+                                                    required=""
+                                                    step="1"
+                                                    min="0"
+                                                />
+                                                <span class="input-group-text"
+                                                    >minutes</span
+                                                >
+                                                <div class="form-text">
+                                                    Set to <strong>0</strong> if you don't
+                                                    want WiFi AP to stop.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+</section>
+<section class="panel-section" id="sec-aprsis">
+
 
                         <div class="row my-5 d-flex align-items-top">
                             <div class="col-lg-3 col-sm-12">
@@ -681,7 +969,10 @@
                                 </div>
                             </div>
                         </div>
-                        <hr>
+
+</section>
+<section class="panel-section" id="sec-digipeater">
+
 
                         <div class="row my-5 d-flex align-items-top">
                             <div class="col-lg-3 col-sm-12">
@@ -698,122 +989,137 @@
                                             d="M3.05 3.05a7 7 0 0 0 0 9.9.5.5 0 0 1-.707.707 8 8 0 0 1 0-11.314.5.5 0 0 1 .707.707m2.122 2.122a4 4 0 0 0 0 5.656.5.5 0 1 1-.708.708 5 5 0 0 1 0-7.072.5.5 0 0 1 .708.708m5.656-.708a.5.5 0 0 1 .708 0 5 5 0 0 1 0 7.072.5.5 0 1 1-.708-.708 4 4 0 0 0 0-5.656.5.5 0 0 1 0-.708m2.122-2.12a.5.5 0 0 1 .707 0 8 8 0 0 1 0 11.313.5.5 0 0 1-.707-.707 7 7 0 0 0 0-9.9.5.5 0 0 1 0-.707zM6 8a2 2 0 1 1 2.5 1.937V15.5a.5.5 0 0 1-1 0V9.937A2 2 0 0 1 6 8"
                                         />
                                     </svg>
-                                    Beaconing
+                                    Digipeating
                                 </h5>
-                                <small>Set APRS beacon attributes.</small>
+                                <small>Define the Digipeater mode</small>
+                            </div>
+                            <div class="col-9">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <label
+                                            for="digi.mode"
+                                            class="form-label"
+                                            >Repeater Mode</label
+                                        >
+                                        <select
+                                            class="form-select form-select"
+                                            name="digi.mode"
+                                            id="digi.mode"
+                                        >
+                                            <option value="0" selected>OFF</option>
+                                            <option value="1">WIDE1 (fill-in) Digi</option>
+                                            <option value="2">WIDE2 (+WIDE1) Digi</option>
+                                            <option value="3">Own Callsign Path Digi</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-12 mt-2">
++                                        <small class="text-muted">Mode 4 digipeats packets whose path already contains your callsign, preserving the path and appending a * to your callsign.</small>
++                                   </div>
+                                    <div class="col-12 mt-3">
+                                        <label
+                                            for="digi.ecoMode"
+                                            class="form-label"
+                                            >Eco Mode
+                                            <small
+                                                >(Requires Digipeating enabled and APRS-IS connection disabled).</small
+                                            ></label
+                                        >
+                                        <select
+                                            class="form-select form-select"
+                                            name="digi.ecoMode"
+                                            id="digi.ecoMode"
+                                        >
+                                            <option value="0" selected>OFF (Normal Mode - WiFiAP and Serial Output enabled)</option>
+                                            <option value="1">Ultra Eco Mode (Sleep till Packet Rx (WiFiAP/WebUI & Display disabled))</option>
+                                            <option value="2">OFF (Normal Mode - WiFiAP disabled but Serial Output still enabled)</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-12 mt-3">
+                                        <div class="form-check form-switch">
+                                            <div class="form-text">
+                                                If WiFi/server connection is lost in iGate-only mode, the device switches to Digipeater mode (WIDE1-1) and retries connection every 15 minutes.
+                                            </div>
+                                            <input
+                                                type="checkbox"
+                                                name="digi.backupDigiMode"
+                                                id="digi.backupDigiMode"
+                                                class="form-check-input"
+                                            />
+                                            <label
+                                                for="digi.backupDigiMode"
+                                                class="form-label"
+                                                >Backup Digipeater Mode</label
+                                            >
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+</section>
+<section class="panel-section" id="sec-remote">
+
+
+                        <div class="row my-5 d-flex align-items-top">
+                            <div class="col-lg-3 col-sm-12">
+                                <h5>
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="20"
+                                        height="20"
+                                        fill="currentColor"
+                                        class="bi bi-cloud-upload-fill"
+                                        viewBox="0 0 16 16"
+                                    >
+                                        <path
+                                            fill-rule="evenodd"
+                                            d="M8 0a5.53 5.53 0 0 0-3.594 1.342c-.766.66-1.321 1.52-1.464 2.383C1.266 4.095 0 5.555 0 7.318 0 9.366 1.708 11 3.781 11H7.5V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V11h4.188C14.502 11 16 9.57 16 7.773c0-1.636-1.242-2.969-2.834-3.194C12.923 1.999 10.69 0 8 0m-.5 14.5V11h1v3.5a.5.5 0 0 1-1 0"
+                                        />
+                                    </svg>
+                                    Remote Management
+                                </h5>
+                                <small
+                                    >Manage Station via APRS Messages. Leave empty to disable!
+                                </small>
                             </div>
                             <div class="col-lg-9 col-sm-12">
-                                <div class="row">
-                                    <div class="col-6">
-                                        <div class="form-check form-switch">
-                                            <input
-                                                type="checkbox"
-                                                name="beacon.sendViaAPRSIS"
-                                                id="beacon.sendViaAPRSIS"
-                                                class="form-check-input"
-                                            />
-                                            <label
-                                                for="beacon.sendViaAPRSIS"
-                                                class="form-label"
-                                                >Send beacon via APRS-IS
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div class="col-6">
-                                        <div class="form-check form-switch">
-                                            <input
-                                                type="checkbox"
-                                                name="beacon.sendViaRF"
-                                                id="beacon.sendViaRF"
-                                                class="form-check-input"
-                                            />
-                                            <label
-                                                for="beacon.sendViaRF"
-                                                class="form-label"
-                                                >Send beacon via RF
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row mt-3">
-                                    <div class="col-6">
-                                        <button class="btn btn-primary form-control h-100" id="send-beacon">Send beacon now</button>
-                                    </div>
-                                    <div class="col-6">
-                                        <label
-                                            for="beacon.beaconFreq"
-                                            class="form-label">
-                                            <small>(Select LoRa Beacon Frequency)</small>
-                                        </label>
-                                        <select
-                                            class="form-select form-select"
-                                            name="beacon.beaconFreq"
-                                            id="beacon.beaconFreq"
-                                        >
-                                            <option value="0">Beacon on Rx Freq</option>
-                                            <option value="1">Beacon on Tx Freq</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="row mt-3">
-                                    <div class="col-6">
-                                        <label
-                                            for="beacon.interval"
-                                            class="form-label"
-                                            >Beacon Interval
-                                        </label>
-                                        <div class="input-group">
-                                            <input
-                                                type="number"
-                                                name="beacon.interval"
-                                                id="beacon.interval"
-                                                class="form-control"
-                                                value="15"
-                                                min="10"
-                                                step="1"
-                                                required
-                                            />
-                                            <span class="input-group-text"
-                                                >minutes
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div class="col-6">
-                                        <label
-                                            for="beacon.ambiguityLevel"
-                                            class="form-label"
-                                            >APRS Position Ambiguity</label
-                                        >
-                                        <select
-                                            class="form-select form-select"
-                                            name="beacon.ambiguityLevel"
-                                            id="beacon.ambiguityLevel"
-                                        >
-                                            <option value="0" selected>No Ambiguity</option>
-                                            <option value="1">~110 m forced Ambiguity</option>
-                                            <option value="2">~1.1 km forced Ambiguity</option>
-                                            <option value="3">~11 km forced Ambiguity</option>
-                                        </select>
+                                <div class="col-12">
+                                    <label
+                                        for="remoteManagement.managers"
+                                        class="form-label"
+                                        >Callsign-SSID of Managers, space separated, trailing * wildcard allowed (ex: AB1CDE-9, AB1CDE*)</label
+                                    >
+                                    <div class="input-group">
+                                        <input
+                                            type="text"
+                                            name="remoteManagement.managers"
+                                            id="remoteManagement.managers"
+                                            class="form-control"
+                                            oninput="this.value = this.value.toUpperCase();"
+                                        />
                                     </div>
                                 </div>
                                 <div class="col-12 mt-3">
                                     <div class="form-check form-switch">
                                         <input
                                             type="checkbox"
-                                            name="beacon.gpsActive"
-                                            id="beacon.gpsActive"
+                                            name="remoteManagement.rfOnly"
+                                            id="remoteManagement.rfOnly"
                                             class="form-check-input"
                                         />
                                         <label
-                                            for="beacon.gpsActive"
+                                            for="remoteManagement.rfOnly"
                                             class="form-label"
-                                            >Send Real-GPS Beacon <small>(Only for Boards with GPS Modules)</small>
-                                        </label>
+                                            >Managers commands only via RF (not APRS-IS)</label
+                                        >
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <hr>
+
+</section>
+<section class="panel-section" id="sec-blacklist">
+
 
                         <div class="row my-5 d-flex align-items-top">
                             <div class="col-lg-3 col-sm-12">
@@ -854,86 +1160,10 @@
                                 </div>
                             </div>
                         </div>
-                        <hr>
 
-                        <div class="row my-5 d-flex align-items-top">
-                            <div class="col-lg-3 col-sm-12">
-                                <h5>
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        width="20"
-                                        height="20"
-                                        fill="currentColor"
-                                        class="bi bi-broadcast-pin"
-                                        viewBox="0 0 16 16"
-                                    >
-                                        <path
-                                            d="M3.05 3.05a7 7 0 0 0 0 9.9.5.5 0 0 1-.707.707 8 8 0 0 1 0-11.314.5.5 0 0 1 .707.707m2.122 2.122a4 4 0 0 0 0 5.656.5.5 0 1 1-.708.708 5 5 0 0 1 0-7.072.5.5 0 0 1 .708.708m5.656-.708a.5.5 0 0 1 .708 0 5 5 0 0 1 0 7.072.5.5 0 1 1-.708-.708 4 4 0 0 0 0-5.656.5.5 0 0 1 0-.708m2.122-2.12a.5.5 0 0 1 .707 0 8 8 0 0 1 0 11.313.5.5 0 0 1-.707-.707 7 7 0 0 0 0-9.9.5.5 0 0 1 0-.707zM6 8a2 2 0 1 1 2.5 1.937V15.5a.5.5 0 0 1-1 0V9.937A2 2 0 0 1 6 8"
-                                        />
-                                    </svg>
-                                    Digipeating
-                                </h5>
-                                <small>Define the Digipeater mode</small>
-                            </div>
-                            <div class="col-9">
-                                <div class="row">
-                                    <div class="col-12">
-                                        <label
-                                            for="digi.mode"
-                                            class="form-label"
-                                            >Repeater Mode</label
-                                        >
-                                        <select
-                                            class="form-select form-select"
-                                            name="digi.mode"
-                                            id="digi.mode"
-                                        >
-                                            <option value="0" selected>OFF</option>
-                                            <option value="2">WIDE1 (fill-in) Digi</option>
-                                            <option value="3">WIDE2 (+WIDE1) Digi</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-12 mt-3">
-                                        <label
-                                            for="digi.ecoMode"
-                                            class="form-label"
-                                            >Eco Mode
-                                            <small
-                                                >(Requires Digipeating enabled and APRS-IS connection disabled).</small
-                                            ></label
-                                        >
-                                        <select
-                                            class="form-select form-select"
-                                            name="digi.ecoMode"
-                                            id="digi.ecoMode"
-                                        >
-                                            <option value="0" selected>OFF (Normal Mode - WiFiAP and Serial Output enabled)</option>
-                                            <option value="1">Ultra Eco Mode (Sleep till Packet Rx (WiFiAP/WebUI & Display disabled))</option>
-                                            <option value="2">OFF (Normal Mode - WiFiAP disabled but Serial Output still enabled)</option>
-                                        </select>
-                                    </div>                                    
-                                    <div class="col-12 mt-3">
-                                        <div class="form-check form-switch">
-                                            <div class="form-text">
-                                                If WiFi/server connection is lost in iGate-only mode, the device switches to Digipeater mode (WIDE1-1) and retries connection every 15 minutes.
-                                            </div>
-                                            <input
-                                                type="checkbox"
-                                                name="digi.backupDigiMode"
-                                                id="digi.backupDigiMode"
-                                                class="form-check-input"
-                                            />
-                                            <label
-                                                for="digi.backupDigiMode"
-                                                class="form-label"
-                                                >Backup Digipeater Mode</label
-                                            >
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <hr>
+</section>
+<section class="panel-section" id="sec-lora">
+
 
                         <div class="row my-5 d-flex align-items-top">
                             <div class="col-lg-3 col-sm-12">
@@ -969,7 +1199,7 @@
                                             <label
                                                 for="lora.rxActive"
                                                 class="form-label"
-                                                >Enable LoRa RX</label
+                                                >Enable LoRa Rx</label
                                             >
                                         </div>
                                     </div>
@@ -984,9 +1214,10 @@
                                             <label
                                                 for="lora.txActive"
                                                 class="form-label"
-                                                >Enable LoRa TX</label
+                                                >Enable LoRa Tx</label
                                             >
                                         </div>
+                                        <div class="form-check form-switch mt-2"><input type="checkbox" name="lora.cadActive" id="lora.cadActive" class="form-check-input" /><label for="lora.cadActive" class="form-label">Enable CAD</label></div>
                                     </div>
                                     <div class="col-6 mt-1">
                                         <label
@@ -1006,7 +1237,7 @@
                                                 >Hz
                                             </span>
                                         </div>
-                                    </div>                                    
+                                    </div>
                                     <div class="col-6 mt-1">
                                         <label
                                             for="lora.txFreq"
@@ -1051,10 +1282,10 @@
                                             <option value="6">SF6</option>
                                             <option value="7">SF7</option>
                                             <option value="8">SF8</option>
-                                            <option value="9">SF9</option>
+                                            <option value="9" selected>SF9</option>
                                             <option value="10">SF10</option>
                                             <option value="11">SF11</option>
-                                            <option value="12" selected>SF12 - Highest sensitivity</option>
+                                            <option value="12">SF12 - Highest sensitivity</option>
                                         </select>
                                     </div>
                                     <div class="col-6 mt-3">
@@ -1073,10 +1304,10 @@
                                             <option value="6">SF6</option>
                                             <option value="7">SF7</option>
                                             <option value="8">SF8</option>
-                                            <option value="9">SF9</option>
+                                            <option value="9" selected>SF9</option>
                                             <option value="10">SF10</option>
                                             <option value="11">SF11</option>
-                                            <option value="12" selected>SF12 - Highest sensitivity</option>
+                                            <option value="12">SF12 - Highest sensitivity</option>
                                         </select>
                                     </div>
                                     <div class="col-6 mt-3">
@@ -1091,9 +1322,9 @@
                                             id="lora.rxCodingRate4"
                                             required=""
                                         >
-                                            <option value="5" selected>5</option>
+                                            <option value="5">5</option>
                                             <option value="6">6</option>
-                                            <option value="7">7</option>
+                                            <option value="7" selected>7</option>
                                             <option value="8">8</option>
                                         </select>
                                     </div>
@@ -1109,12 +1340,12 @@
                                             id="lora.txCodingRate4"
                                             required=""
                                         >
-                                            <option value="5" selected>5</option>
+                                            <option value="5">5</option>
                                             <option value="6">6</option>
-                                            <option value="7">7</option>
+                                            <option value="7" selected>7</option>
                                             <option value="8">8</option>
                                         </select>
-                                    </div>                                    
+                                    </div>
                                     <div class="col-6 mt-3">
                                         <label
                                             for="lora.rxSignalBandwidth"
@@ -1127,7 +1358,7 @@
                                                 name="lora.rxSignalBandwidth"
                                                 id="lora.rxSignalBandwidth"
                                                 required=""
-                                            >   
+                                            >
                                                 <option value="62500">62.5 kHz</option>
                                                 <option value="125000" selected>125 kHz</option>
                                                 <option value="250000">250 kHz</option>
@@ -1147,7 +1378,7 @@
                                                 name="lora.txSignalBandwidth"
                                                 id="lora.txSignalBandwidth"
                                                 required=""
-                                            >   
+                                            >
                                                 <option value="62500">62.5 kHz</option>
                                                 <option value="125000" selected>125 kHz</option>
                                                 <option value="250000">250 kHz</option>
@@ -1155,7 +1386,7 @@
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="col-6 mt-3">
+                                    <div class="col-6 offset-6 mt-3">
                                         <label
                                             for="lora.power"
                                             class="form-label">
@@ -1166,9 +1397,9 @@
                                                 type="number"
                                                 name="lora.power"
                                                 id="lora.power"
-                                                placeholder="22"
+                                                placeholder="20"
                                                 min="0"
-                                                max="22"
+                                                max="20"
                                                 step="1"
                                                 class="form-control"
                                                 required=""
@@ -1177,438 +1408,19 @@
                                                 >dBm</span
                                             >
                                         </div>
-                                        <small class="d-block mt-2 text-muted">
-                                            SX126x chip output (max 22&nbsp;dBm). On
-                                            E22&hellip;M30S modules an external PA
-                                            raises this to ~30&nbsp;dBm at the antenna.
-                                        </small>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <hr>
+
+</section>
+<section class="panel-section" id="sec-services">
+
 
                         <div class="row my-5 d-flex align-items-top">
                             <div class="col-lg-3 col-sm-12">
                                 <h5>
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        width="20"
-                                        height="20"
-                                        fill="currentColor"
-                                        class="bi bi-tv-fill"
-                                        viewBox="0 0 16 16"
-                                    >
-                                        <path
-                                            d="M2.5 13.5A.5.5 0 0 1 3 13h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5M2 2h12s2 0 2 2v6s0 2-2 2H2s-2 0-2-2V4s0-2 2-2"
-                                        />
-                                    </svg>
-                                    Display
-                                </h5>
-                                <small><b>Not available</b> — this is a headless iGate (no display).</small>
-                            </div>
-                            <div class="col-lg-9 col-sm-12">
-                                <div class="row">
-                                    <div class="col-6">
-                                        <div class="form-check form-switch">
-                                            <input
-                                                type="checkbox"
-                                                name="display.alwaysOn"
-                                                id="display.alwaysOn"
-                                                class="form-check-input"
-                                                disabled
-                                            />
-                                            <label
-                                                for="display.alwaysOn"
-                                                class="form-label"
-                                                >Always On</label
-                                            >
-                                        </div>
-                                    </div>
-                                    <div class="col-6">
-                                        <div
-                                            class="form-check form-switch mt-1"
-                                        >
-                                            <input
-                                                type="checkbox"
-                                                name="display.turn180"
-                                                id="display.turn180"
-                                                class="form-check-input"
-                                                disabled
-                                            />
-                                            <label
-                                                for="display.turn180"
-                                                class="form-label"
-                                                >Turn 180º</label
-                                            >
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row mt-1">
-                                    <div class="col-6">
-                                        <label
-                                            for="display.timeout"
-                                            class="form-label"
-                                            >Display Timeout</label
-                                        >
-                                        <div class="input-group">
-                                            <input
-                                                type="text"
-                                                name="display.timeout"
-                                                id="display.timeout"
-                                                value="4"
-                                                step="1"
-                                                min="2"
-                                                class="form-control"
-                                                disabled
-                                            />
-                                            <span class="input-group-text"
-                                                >seconds</span
-                                            >
-                                        </div>
-                                    </div>
-                                    <div class="col-6">
-                                        <label
-                                            for="other.rememberStationTime"
-                                            class="form-label"
-                                            >Remember Station Time</label
-                                        >
-                                        <div class="input-group">
-                                            <input
-                                                type="number"
-                                                name="other.rememberStationTime"
-                                                id="other.rememberStationTime"
-                                                placeholder="30"
-                                                class="form-control"
-                                                required=""
-                                                step="1"
-                                                min="1"
-                                            />
-                                            <span class="input-group-text"
-                                                >minutes</span
-                                            >
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <hr>
-
-                        <div class="row my-5 d-flex align-items-top">
-                            <div class="col-lg-3 col-sm-12">
-                                <h5>
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        width="20"
-                                        height="20"
-                                        fill="currentColor"
-                                        class="bi bi-heart-pulse-fill"
-                                        viewBox="0 0 16 16"
-                                    >
-                                        <path
-                                            d="M1.475 9C2.702 10.84 4.779 12.871 8 15c3.221-2.129 5.298-4.16 6.525-6H12a.5.5 0 0 1-.464-.314l-1.457-3.642-1.598 5.593a.5.5 0 0 1-.945.049L5.889 6.568l-1.473 2.21A.5.5 0 0 1 4 9z"
-                                        />
-                                        <path
-                                            d="M.88 8C-2.427 1.68 4.41-2 7.823 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C11.59-2 18.426 1.68 15.12 8h-2.783l-1.874-4.686a.5.5 0 0 0-.945.049L7.921 8.956 6.464 5.314a.5.5 0 0 0-.88-.091L3.732 8z"
-                                        />
-                                    </svg>
-                                    Battery
-                                </h5>
-                                <small>
-                                    Supply-voltage (VSYS) monitor.
-                                    <br>
-                                    <br>
-                                    Only <b>Send Internal Voltage</b> (adds <code>Batt=</code> to the
-                                    beacon) and <b>Send Voltage As Telemetry</b> are available — the
-                                    external-voltage / health-sleep options need hardware this iGate
-                                    doesn't have and are disabled.
-                                </small>
-                            </div>
-                            <div class="col-9">
-                                <div class="row">
-                                    <div class="col-6">
-                                        <div class="form-check form-switch">
-                                            <input
-                                                type="checkbox"
-                                                name="battery.sendInternalVoltage"
-                                                id="battery.sendInternalVoltage"
-                                                class="form-check-input"
-                                            />
-                                            <label
-                                                for="battery.sendInternalVoltage"
-                                                class="form-label"
-                                                >Send Internal Voltage</label
-                                            >
-                                        </div>
-                                        <div class="form-check form-switch">
-                                            <input
-                                                type="checkbox"
-                                                name="battery.sendVoltageAsTelemetry"
-                                                id="battery.sendVoltageAsTelemetry"
-                                                class="form-check-input"
-                                            />
-                                            <label
-                                                for="battery.sendVoltageAsTelemetry"
-                                                class="form-label"
-                                                style="font-style: italic;"
-                                                >(Send Voltage As Telemetry)</label   
-                                            >
-                                        </div>
-                                        <div class="form-check form-switch">
-                                            <input
-                                                type="checkbox"
-                                                name="battery.monitorInternalVoltage"
-                                                id="battery.monitorInternalVoltage"
-                                                class="form-check-input"
-                                                disabled
-                                            />
-                                            <label
-                                                for="battery.monitorInternalVoltage"
-                                                class="form-label"
-                                                >Monitor Internal Voltage Health</label
-                                            >
-                                        </div>
-                                        <div class="col">
-                                            <label for="battery.internalSleepVoltage" class="form-label"
-                                                >Internal Sleep Voltage</label
-                                            >
-                                            <div class="input-group">
-                                                <input
-                                                    type="number"
-                                                    name="battery.internalSleepVoltage"
-                                                    id="battery.internalSleepVoltage"
-                                                    placeholder="3.0"
-                                                    class="form-control"
-                                                    step="0.1"
-                                                    min="2.9"
-                                                    max="3.7"
-                                                    disabled
-                                                />
-                                                <span class="input-group-text"
-                                                    >volts</span
-                                                >
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-6">
-                                        <div class="form-check form-switch">
-                                            <input
-                                                type="checkbox"
-                                                name="battery.sendExternalVoltage"
-                                                id="battery.sendExternalVoltage"
-                                                class="form-check-input"
-                                                disabled
-                                            />
-                                            <label
-                                                for="battery.sendExternalVoltage"
-                                                class="form-label"
-                                                >Send External Voltage</label
-                                            >
-                                        </div>
-                                        <div class="form-check form-switch">
-                                            <input
-                                                type="checkbox"
-                                                name="battery.useExternalI2CSensor"
-                                                id="battery.useExternalI2CSensor"
-                                                class="form-check-input"
-                                                disabled
-                                            />
-                                            <label
-                                                for="battery.useExternalI2CSensor"
-                                                class="form-label"
-                                                >Use External I2C Voltage Sensor</label
-                                            >
-                                        </div>
-                                        <div class="form-check form-switch">
-                                            <input
-                                                type="checkbox"
-                                                name="battery.monitorExternalVoltage"
-                                                id="battery.monitorExternalVoltage"
-                                                class="form-check-input"
-                                                disabled
-                                            />
-                                            <label
-                                                for="battery.monitorExternalVoltage"
-                                                class="form-label"
-                                                >Monitor External Voltage Health</label
-                                            >
-                                        </div>
-                                        <div class="col">
-                                            <label for="battery.externalSleepVoltage" class="form-label"
-                                                >External Sleep Voltage</label
-                                            >
-                                            <div class="input-group">
-                                                <input
-                                                    type="number"
-                                                    name="battery.externalSleepVoltage"
-                                                    id="battery.externalSleepVoltage"
-                                                    placeholder="3.0"
-                                                    class="form-control"
-                                                    step="0.1"
-                                                    min="3.0"
-                                                    max="24.0"
-                                                    disabled
-                                                />
-                                                <span class="input-group-text"
-                                                    >volts</span
-                                                >
-                                            </div>
-                                        </div>
-                                        <div class="form-floating col-7 mt-3">
-                                            <input
-                                                type="text"
-                                                name="battery.externalVoltagePin"
-                                                id="battery.externalVoltagePin"
-                                                value="34"
-                                                class="form-control"
-                                                disabled
-                                            />
-                                            <label
-                                                for="battery.externalVoltagePin"
-                                                class="form-label"
-                                                >External Voltage Pin</label
-                                            >
-                                        </div>
-                                        <div class="col">
-                                            <label for="battery.voltageDividerR1" class="form-label">External Voltage divider R1</label>
-                                            <div class="input-group">
-                                                <input 
-                                                    type="number"
-                                                    name="battery.voltageDividerR1"
-                                                    id="battery.voltageDividerR1"
-                                                    placeholder="100.0"
-                                                    class="form-control"
-                                                    step="0.1"
-                                                    min="1"
-                                                    max="1000"
-                                                    disabled
-                                                />
-                                                <span class="input-group-text">kOhm</span>
-                                            </div>
-                                        </div>
-                                        <div class="col">
-                                            <label for="battery.voltageDividerR2" class="form-label">External Voltage divider R2</label>
-                                            <div class="input-group">
-                                                <input
-                                                    type="number"
-                                                    name="battery.voltageDividerR2"
-                                                    id="battery.voltageDividerR2"
-                                                    placeholder="27.0"
-                                                    class="form-control"
-                                                    step="0.1"
-                                                    min="1"
-                                                    max="1000"
-                                                    disabled
-                                                />
-                                                <span class="input-group-text">kOhm</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <hr>
-
-                        <div class="row my-5 d-flex align-items-top">
-                            <div class="col-lg-3 col-sm-12">
-                                <h5>
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        width="20"
-                                        height="20"
-                                        fill="currentColor"
-                                        class="bi bi-broadcast-pin"
-                                        viewBox="0 0 16 16"
-                                    >
-                                        <path
-                                            d="M3.05 3.05a7 7 0 0 0 0 9.9.5.5 0 0 1-.707.707 8 8 0 0 1 0-11.314.5.5 0 0 1 .707.707m2.122 2.122a4 4 0 0 0 0 5.656.5.5 0 1 1-.708.708 5 5 0 0 1 0-7.072.5.5 0 0 1 .708.708m5.656-.708a.5.5 0 0 1 .708 0 5 5 0 0 1 0 7.072.5.5 0 1 1-.708-.708 4 4 0 0 0 0-5.656.5.5 0 0 1 0-.708m2.122-2.12a.5.5 0 0 1 .707 0 8 8 0 0 1 0 11.313.5.5 0 0 1-.707-.707 7 7 0 0 0 0-9.9.5.5 0 0 1 0-.707zM6 8a2 2 0 1 1 2.5 1.937V15.5a.5.5 0 0 1-1 0V9.937A2 2 0 0 1 6 8"
-                                        />
-                                    </svg>
-                                    WX Telemetry
-                                </h5>
-                                <small>Define Wx telemetry</small>
-                            </div>
-                            <div class="col-9">
-                                <div class="row">
-                                    <div class="col-12">
-                                        <div class="form-check form-switch">
-                                            <input
-                                                type="checkbox"
-                                                name="wxsensor.active"
-                                                id="wxsensor.active"
-                                                class="form-check-input"
-                                            />
-                                            <label
-                                                for="wxsensor.active"
-                                                class="form-label"
-                                                >Activate Wx Telemetry
-                                                <small
-                                                    >(Requires a BME/BMP280, BME680 or Si7021 sensor).</small
-                                                ></label
-                                            >
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row mt-2">
-                                    <div class="col-6">
-                                        <label for="wxsensor.heightCorrection" class="form-label"
-                                            >Height Correction (Above Sea-Level)</label
-                                        >
-                                        <div class="input-group">
-                                            <input
-                                                type="number"
-                                                name="wxsensor.heightCorrection"
-                                                id="wxsensor.heightCorrection"
-                                                placeholder="0"
-                                                class="form-control"
-                                                step="1"
-                                                min="0"
-                                            />
-                                            <span class="input-group-text"
-                                                >meters</span
-                                            >
-                                        </div>
-                                    </div>
-                                    <div class="col-6">
-                                        <label for="wxsensor.temperatureCorrection" class="form-label"
-                                            >Temperature Correction</label
-                                        >
-                                        <div class="input-group">
-                                            <input
-                                                type="number"
-                                                name="wxsensor.temperatureCorrection"
-                                                id="wxsensor.temperatureCorrection"
-                                                placeholder="0.0"
-                                                class="form-control"
-                                                step="0.1"
-                                                min="-5"
-                                                max="5"
-                                            />
-                                            <span class="input-group-text"
-                                                >C°</span
-                                            >
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <hr>
-
-                        <div class="row my-5 d-flex align-items-top">
-                            <div class="col-lg-3 col-sm-12">
-                                <h5>
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        width="20"
-                                        height="20"
-                                        fill="currentColor"
-                                        class="bi bi-file-earmark-text-fill"
-                                        viewBox="0 0 16 16"
-                                    >
-                                        <path
-                                            d="M9.293 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.707A1 1 0 0 0 13.707 4L10 .293A1 1 0 0 0 9.293 0M9.5 3.5v-2l3 3h-2a1 1 0 0 1-1-1M4.5 9a.5.5 0 0 1 0-1h7a.5.5 0 0 1 0 1zM4 10.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5m.5 2.5a.5.5 0 0 1 0-1h4a.5.5 0 0 1 0 1z"
-                                        />
-                                    </svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.5 2.5 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5"/></svg>
                                     Syslog
                                 </h5>
                                 <small
@@ -1678,36 +1490,17 @@
                                             class="form-control"
                                         />
                                     </div>
-                                    
+
                                 </div>
                             </div>
                         </div>
-                        <hr>
+
+
 
                         <div class="row my-5 d-flex align-items-top">
                             <div class="col-lg-3 col-sm-12">
                                 <h5>
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        width="20"
-                                        height="20"
-                                        fill="currentColor"
-                                        class="bi bi-database-fill"
-                                        viewBox="0 0 16 16"
-                                    >
-                                        <path
-                                            d="M3.904 1.777C4.978 1.289 6.427 1 8 1s3.022.289 4.096.777C13.125 2.245 14 2.993 14 4s-.875 1.755-1.904 2.223C11.022 6.711 9.573 7 8 7s-3.022-.289-4.096-.777C2.875 5.755 2 5.007 2 4s.875-1.755 1.904-2.223"
-                                        />
-                                        <path
-                                            d="M2 6.161V7c0 1.007.875 1.755 1.904 2.223C4.978 9.71 6.427 10 8 10s3.022-.289 4.096-.777C13.125 8.755 14 8.007 14 7v-.839c-.457.432-1.004.751-1.49.972C11.278 7.693 9.682 8 8 8s-3.278-.307-4.51-.867c-.486-.22-1.033-.54-1.49-.972"
-                                        />
-                                        <path
-                                            d="M2 9.161V10c0 1.007.875 1.755 1.904 2.223C4.978 12.711 6.427 13 8 13s3.022-.289 4.096-.777C13.125 11.755 14 11.007 14 10v-.839c-.457.432-1.004.751-1.49.972-1.232.56-2.828.867-4.51.867s-3.278-.307-4.51-.867c-.486-.22-1.033-.54-1.49-.972"
-                                        />
-                                        <path
-                                            d="M2 12.161V13c0 1.007.875 1.755 1.904 2.223C4.978 15.711 6.427 16 8 16s3.022-.289 4.096-.777C13.125 14.755 14 14.007 14 13v-.839c-.457.432-1.004.751-1.49.972-1.232.56-2.828.867-4.51.867s-3.278-.307-4.51-.867c-.486-.22-1.033-.54-1.49-.972"
-                                        />
-                                    </svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.5 2.5 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5"/></svg>
                                     TNC
                                 </h5>
                                 <small
@@ -1747,7 +1540,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="row mt-2">                                    
+                                <div class="row mt-2">
                                     <div class="col-6">
                                         <div class="form-check form-switch">
                                             <input
@@ -1781,32 +1574,13 @@
                                 </div>
                             </div>
                         </div>
-                        <hr>
+
+
 
                         <div class="row my-5 d-flex align-items-top">
                             <div class="col-lg-3 col-sm-12">
                                 <h5>
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        width="20"
-                                        height="20"
-                                        fill="currentColor"
-                                        class="bi bi-database-fill"
-                                        viewBox="0 0 16 16"
-                                    >
-                                        <path
-                                            d="M3.904 1.777C4.978 1.289 6.427 1 8 1s3.022.289 4.096.777C13.125 2.245 14 2.993 14 4s-.875 1.755-1.904 2.223C11.022 6.711 9.573 7 8 7s-3.022-.289-4.096-.777C2.875 5.755 2 5.007 2 4s.875-1.755 1.904-2.223"
-                                        />
-                                        <path
-                                            d="M2 6.161V7c0 1.007.875 1.755 1.904 2.223C4.978 9.71 6.427 10 8 10s3.022-.289 4.096-.777C13.125 8.755 14 8.007 14 7v-.839c-.457.432-1.004.751-1.49.972C11.278 7.693 9.682 8 8 8s-3.278-.307-4.51-.867c-.486-.22-1.033-.54-1.49-.972"
-                                        />
-                                        <path
-                                            d="M2 9.161V10c0 1.007.875 1.755 1.904 2.223C4.978 12.711 6.427 13 8 13s3.022-.289 4.096-.777C13.125 11.755 14 11.007 14 10v-.839c-.457.432-1.004.751-1.49.972-1.232.56-2.828.867-4.51.867s-3.278-.307-4.51-.867c-.486-.22-1.033-.54-1.49-.972"
-                                        />
-                                        <path
-                                            d="M2 12.161V13c0 1.007.875 1.755 1.904 2.223C4.978 15.711 6.427 16 8 16s3.022-.289 4.096-.777C13.125 14.755 14 14.007 14 13v-.839c-.457.432-1.004.751-1.49.972-1.232.56-2.828.867-4.51.867s-3.278-.307-4.51-.867c-.486-.22-1.033-.54-1.49-.972"
-                                        />
-                                    </svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.5 2.5 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5"/></svg>
                                     MQTT
                                 </h5>
                                 <small>Set your MQTT server</small>
@@ -1909,7 +1683,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="row mt-3">                                    
+                                <div class="row mt-3">
                                     <div class="col-6">
                                         <label
                                             for="mqtt.port"
@@ -1932,7 +1706,321 @@
                                 </div>
                             </div>
                         </div>
-                        <hr>
+
+</section>
+<section class="panel-section" id="sec-hardware">
+
+
+                        <div class="row my-5 d-flex align-items-top">
+                            <div class="col-lg-3 col-sm-12">
+                                <h5>
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="20"
+                                        height="20"
+                                        fill="currentColor"
+                                        class="bi bi-tv-fill"
+                                        viewBox="0 0 16 16"
+                                    >
+                                        <path
+                                            d="M2.5 13.5A.5.5 0 0 1 3 13h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5M2 2h12s2 0 2 2v6s0 2-2 2H2s-2 0-2-2V4s0-2 2-2"
+                                        />
+                                    </svg>
+                                    Display
+                                </h5>
+                                <small>OLED screen configuration.</small>
+                            </div>
+                            <div class="col-lg-9 col-sm-12">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="form-check form-switch">
+                                            <input
+                                                type="checkbox"
+                                                name="display.alwaysOn"
+                                                id="display.alwaysOn"
+                                                class="form-check-input"
+                                            />
+                                            <label
+                                                for="display.alwaysOn"
+                                                class="form-label"
+                                                >Always On</label
+                                            >
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div
+                                            class="form-check form-switch mt-1"
+                                        >
+                                            <input
+                                                type="checkbox"
+                                                name="display.turn180"
+                                                id="display.turn180"
+                                                class="form-check-input"
+                                            />
+                                            <label
+                                                for="display.turn180"
+                                                class="form-label"
+                                                >Turn 180º</label
+                                            >
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row mt-1">
+                                    <div class="col-6">
+                                        <label
+                                            for="display.timeout"
+                                            class="form-label"
+                                            >Display Timeout</label
+                                        >
+                                        <div class="input-group">
+                                            <input
+                                                type="text"
+                                                name="display.timeout"
+                                                id="display.timeout"
+                                                value="4"
+                                                step="1"
+                                                min="2"
+                                                class="form-control"
+                                            />
+                                            <span class="input-group-text"
+                                                >seconds</span
+                                            >
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <label
+                                            for="other.rememberStationTime"
+                                            class="form-label"
+                                            >Remember Station Time</label
+                                        >
+                                        <div class="input-group">
+                                            <input
+                                                type="number"
+                                                name="other.rememberStationTime"
+                                                id="other.rememberStationTime"
+                                                placeholder="30"
+                                                class="form-control"
+                                                required=""
+                                                step="1"
+                                                min="1"
+                                            />
+                                            <span class="input-group-text"
+                                                >minutes</span
+                                            >
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                        <div class="row my-5 d-flex align-items-top">
+                            <div class="col-lg-3 col-sm-12">
+                                <h5>
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="20"
+                                        height="20"
+                                        fill="currentColor"
+                                        class="bi bi-heart-pulse-fill"
+                                        viewBox="0 0 16 16"
+                                    >
+                                        <path
+                                            d="M1.475 9C2.702 10.84 4.779 12.871 8 15c3.221-2.129 5.298-4.16 6.525-6H12a.5.5 0 0 1-.464-.314l-1.457-3.642-1.598 5.593a.5.5 0 0 1-.945.049L5.889 6.568l-1.473 2.21A.5.5 0 0 1 4 9z"
+                                        />
+                                        <path
+                                            d="M.88 8C-2.427 1.68 4.41-2 7.823 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C11.59-2 18.426 1.68 15.12 8h-2.783l-1.874-4.686a.5.5 0 0 0-.945.049L7.921 8.956 6.464 5.314a.5.5 0 0 0-.88-.091L3.732 8z"
+                                        />
+                                    </svg>
+                                    Battery
+                                </h5>
+                                <small>
+                                    Battery Monitor & Health
+                                    <br>
+                                    <br>
+                                    Max Voltage on input pin is 3.3V.
+                                    <br>
+                                    <br>
+                                    Calculate voltage divider accordingly.
+                                </small>
+                            </div>
+                            <div class="col-9">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="form-check form-switch">
+                                            <input
+                                                type="checkbox"
+                                                name="battery.sendInternalVoltage"
+                                                id="battery.sendInternalVoltage"
+                                                class="form-check-input"
+                                            />
+                                            <label
+                                                for="battery.sendInternalVoltage"
+                                                class="form-label"
+                                                >Send Internal Voltage</label
+                                            >
+                                        </div>
+                                        <div class="form-check form-switch">
+                                            <input
+                                                type="checkbox"
+                                                name="battery.sendVoltageAsTelemetry"
+                                                id="battery.sendVoltageAsTelemetry"
+                                                class="form-check-input"
+                                            />
+                                            <label
+                                                for="battery.sendVoltageAsTelemetry"
+                                                class="form-label"
+                                                style="font-style: italic;"
+                                                >(Send Voltage As Telemetry)</label
+                                            >
+                                        </div>
+                                        <div class="form-check form-switch">
+                                            <input
+                                                type="checkbox"
+                                                name="battery.monitorInternalVoltage"
+                                                id="battery.monitorInternalVoltage"
+                                                class="form-check-input"
+                                            />
+                                            <label
+                                                for="battery.monitorInternalVoltage"
+                                                class="form-label"
+                                                >Monitor Internal Voltage Health</label
+                                            >
+                                        </div>
+                                        <div class="col">
+                                            <label for="battery.internalSleepVoltage" class="form-label"
+                                                >Internal Sleep Voltage</label
+                                            >
+                                            <div class="input-group">
+                                                <input
+                                                    type="number"
+                                                    name="battery.internalSleepVoltage"
+                                                    id="battery.internalSleepVoltage"
+                                                    placeholder="3.0"
+                                                    class="form-control"
+                                                    step="0.1"
+                                                    min="2.9"
+                                                    max="3.7"
+                                                />
+                                                <span class="input-group-text"
+                                                    >volts</span
+                                                >
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="form-check form-switch">
+                                            <input
+                                                type="checkbox"
+                                                name="battery.sendExternalVoltage"
+                                                id="battery.sendExternalVoltage"
+                                                class="form-check-input"
+                                            />
+                                            <label
+                                                for="battery.sendExternalVoltage"
+                                                class="form-label"
+                                                >Send External Voltage</label
+                                            >
+                                        </div>
+                                        <div class="form-check form-switch">
+                                            <input
+                                                type="checkbox"
+                                                name="battery.useExternalI2CSensor"
+                                                id="battery.useExternalI2CSensor"
+                                                class="form-check-input"
+                                            />
+                                            <label
+                                                for="battery.useExternalI2CSensor"
+                                                class="form-label"
+                                                >Use External I2C Voltage Sensor</label
+                                            >
+                                        </div>
+                                        <div class="form-check form-switch">
+                                            <input
+                                                type="checkbox"
+                                                name="battery.monitorExternalVoltage"
+                                                id="battery.monitorExternalVoltage"
+                                                class="form-check-input"
+                                            />
+                                            <label
+                                                for="battery.monitorExternalVoltage"
+                                                class="form-label"
+                                                >Monitor External Voltage Health</label
+                                            >
+                                        </div>
+                                        <div class="col">
+                                            <label for="battery.externalSleepVoltage" class="form-label"
+                                                >External Sleep Voltage</label
+                                            >
+                                            <div class="input-group">
+                                                <input
+                                                    type="number"
+                                                    name="battery.externalSleepVoltage"
+                                                    id="battery.externalSleepVoltage"
+                                                    placeholder="3.0"
+                                                    class="form-control"
+                                                    step="0.1"
+                                                    min="3.0"
+                                                    max="24.0"
+                                                />
+                                                <span class="input-group-text"
+                                                    >volts</span
+                                                >
+                                            </div>
+                                        </div>
+                                        <div class="form-floating col-7 mt-3">
+                                            <input
+                                                type="text"
+                                                name="battery.externalVoltagePin"
+                                                id="battery.externalVoltagePin"
+                                                value="34"
+                                                class="form-control"
+                                            />
+                                            <label
+                                                for="battery.externalVoltagePin"
+                                                class="form-label"
+                                                >External Voltage Pin</label
+                                            >
+                                        </div>
+                                        <div class="col">
+                                            <label for="battery.voltageDividerR1" class="form-label">External Voltage divider R1</label>
+                                            <div class="input-group">
+                                                <input
+                                                    type="number"
+                                                    name="battery.voltageDividerR1"
+                                                    id="battery.voltageDividerR1"
+                                                    placeholder="100.0"
+                                                    class="form-control"
+                                                    step="0.1"
+                                                    min="1"
+                                                    max="1000"
+                                                />
+                                                <span class="input-group-text">kOhm</span>
+                                            </div>
+                                        </div>
+                                        <div class="col">
+                                            <label for="battery.voltageDividerR2" class="form-label">External Voltage divider R2</label>
+                                            <div class="input-group">
+                                                <input
+                                                    type="number"
+                                                    name="battery.voltageDividerR2"
+                                                    id="battery.voltageDividerR2"
+                                                    placeholder="27.0"
+                                                    class="form-control"
+                                                    step="0.1"
+                                                    min="1"
+                                                    max="1000"
+                                                />
+                                                <span class="input-group-text">kOhm</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
 
                         <div class="row my-5 d-flex align-items-top">
                             <div class="col-lg-3 col-sm-12">
@@ -1977,7 +2065,7 @@
                                             for="other.rebootModeTime"
                                             class="form-label"
                                             >Time before forced Reboot</label
-                                        >                                    
+                                        >
                                         <div class="input-group">
                                             <input
                                                 type="number"
@@ -1997,7 +2085,12 @@
                                 </div>
                             </div>
                         </div>
-                        <hr>
+
+<div class="row my-5 d-flex align-items-top"><div class="col-lg-3 col-sm-12"><h5>Reboot Device</h5><small>Restart the iGate now.</small></div><div class="col-lg-9 col-sm-12 d-flex align-items-center"><button type="button" class="btn btn-outline-danger" id="reboot">Reboot Device</button></div></div>
+
+</section>
+<section class="panel-section" id="sec-wxtelemetry">
+
 
                         <div class="row my-5 d-flex align-items-top">
                             <div class="col-lg-3 col-sm-12">
@@ -2007,29 +2100,16 @@
                                         width="20"
                                         height="20"
                                         fill="currentColor"
-                                        class="bi bi-router-fill"
+                                        class="bi bi-broadcast-pin"
                                         viewBox="0 0 16 16"
                                     >
                                         <path
-                                            d="M5.525 3.025a3.5 3.5 0 0 1 4.95 0 .5.5 0 1 0 .707-.707 4.5 4.5 0 0 0-6.364 0 .5.5 0 0 0 .707.707"
-                                        />
-                                        <path
-                                            d="M6.94 4.44a1.5 1.5 0 0 1 2.12 0 .5.5 0 0 0 .708-.708 2.5 2.5 0 0 0-3.536 0 .5.5 0 0 0 .707.707Z"
-                                        />
-                                        <path
-                                            d="M2.974 2.342a.5.5 0 1 0-.948.316L3.806 8H1.5A1.5 1.5 0 0 0 0 9.5v2A1.5 1.5 0 0 0 1.5 13H2a.5.5 0 0 0 .5.5h2A.5.5 0 0 0 5 13h6a.5.5 0 0 0 .5.5h2a.5.5 0 0 0 .5-.5h.5a1.5 1.5 0 0 0 1.5-1.5v-2A1.5 1.5 0 0 0 14.5 8h-2.306l1.78-5.342a.5.5 0 1 0-.948-.316L11.14 8H4.86zM2.5 11a.5.5 0 1 1 0-1 .5.5 0 0 1 0 1m4.5-.5a.5.5 0 1 1 1 0 .5.5 0 0 1-1 0m2.5.5a.5.5 0 1 1 0-1 .5.5 0 0 1 0 1m1.5-.5a.5.5 0 1 1 1 0 .5.5 0 0 1-1 0m2 0a.5.5 0 1 1 1 0 .5.5 0 0 1-1 0"
-                                        />
-                                        <path
-                                            d="M8.5 5.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0"
+                                            d="M3.05 3.05a7 7 0 0 0 0 9.9.5.5 0 0 1-.707.707 8 8 0 0 1 0-11.314.5.5 0 0 1 .707.707m2.122 2.122a4 4 0 0 0 0 5.656.5.5 0 1 1-.708.708 5 5 0 0 1 0-7.072.5.5 0 0 1 .708.708m5.656-.708a.5.5 0 0 1 .708 0 5 5 0 0 1 0 7.072.5.5 0 1 1-.708-.708 4 4 0 0 0 0-5.656.5.5 0 0 1 0-.708m2.122-2.12a.5.5 0 0 1 .707 0 8 8 0 0 1 0 11.313.5.5 0 0 1-.707-.707 7 7 0 0 0 0-9.9.5.5 0 0 1 0-.707zM6 8a2 2 0 1 1 2.5 1.937V15.5a.5.5 0 0 1-1 0V9.937A2 2 0 0 1 6 8"
                                         />
                                     </svg>
-                                    WiFi Auto AP
+                                    WX Telemetry
                                 </h5>
-                                <small
-                                    >WiFi AP will start if there is no WiFi
-                                    connection available. Timeout will count from 
-                                    startup or last client disconnected.</small
-                                >
+                                <small>Define Wx telemetry</small>
                             </div>
                             <div class="col-9">
                                 <div class="row">
@@ -2037,141 +2117,73 @@
                                         <div class="form-check form-switch">
                                             <input
                                                 type="checkbox"
-                                                name="wifi.autoAP.enabled"
-                                                id="wifi.autoAP.enabled"
+                                                name="wxsensor.active"
+                                                id="wxsensor.active"
                                                 class="form-check-input"
-                                                disabled
                                             />
                                             <label
-                                                for="wifi.autoAP.enabled"
+                                                for="wxsensor.active"
                                                 class="form-label"
-                                                >Enable Auto AP</label
+                                                >Activate Wx Telemetry
+                                                <small
+                                                    >(Requires a BME/BMP280, BME680 or Si7021 sensor).</small
+                                                ></label
                                             >
-                                            <div class="form-text">
-                                                Not available — this board has no Wi-Fi (Ethernet/W5500).
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div id="wifi-autoap-config" style="{{wifi.autoAP.enabled ? '' : 'display:none'}}">
-                                    <div class="row mt-3">
-                                        <div class="col-6">
-                                            <label
-                                                for="wifi.autoAP.password"
-                                                class="form-label"
-                                                >Password</label
+                                <div class="row mt-2">
+                                    <div class="col-6">
+                                        <label for="wxsensor.heightCorrection" class="form-label"
+                                            >Height Correction (Above Sea-Level)</label
+                                        >
+                                        <div class="input-group">
+                                            <input
+                                                type="number"
+                                                name="wxsensor.heightCorrection"
+                                                id="wxsensor.heightCorrection"
+                                                placeholder="0"
+                                                class="form-control"
+                                                step="1"
+                                                min="0"
+                                            />
+                                            <span class="input-group-text"
+                                                >meters</span
                                             >
-                                            <div class="input-group">
-                                                <input
-                                                    type="password"
-                                                    name="wifi.autoAP.password"
-                                                    id="wifi.autoAP.password"
-                                                    class="form-control"
-                                                    placeholder="1234567890"
-                                                    required=""
-                                                />
-                                            </div>
                                         </div>
-                                        <div class="col-6">
-                                            <label
-                                                for="wifi.autoAP.timeout"
-                                                class="form-label"
-                                                >WiFiAP timeout (to search again)</label
+                                    </div>
+                                    <div class="col-6">
+                                        <label for="wxsensor.temperatureCorrection" class="form-label"
+                                            >Temperature Correction</label
+                                        >
+                                        <div class="input-group">
+                                            <input
+                                                type="number"
+                                                name="wxsensor.temperatureCorrection"
+                                                id="wxsensor.temperatureCorrection"
+                                                placeholder="0.0"
+                                                class="form-control"
+                                                step="0.1"
+                                                min="-5"
+                                                max="5"
+                                            />
+                                            <span class="input-group-text"
+                                                >C°</span
                                             >
-                                            <div class="input-group">
-                                                <input
-                                                    type="number"
-                                                    name="wifi.autoAP.timeout"
-                                                    id="wifi.autoAP.timeout"
-                                                    class="form-control"
-                                                    placeholder="10"
-                                                    required=""
-                                                    step="1"
-                                                    min="0"
-                                                />
-                                                <span class="input-group-text"
-                                                    >minutes</span
-                                                >
-                                                <div class="form-text">
-                                                    Set to <strong>0</strong> if you don't
-                                                    want WiFi AP to stop.
-                                                </div>
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <hr>
+
+</section>
+<section class="panel-section" id="sec-administration">
+
 
                         <div class="row my-5 d-flex align-items-top">
                             <div class="col-lg-3 col-sm-12">
                                 <h5>
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        width="20"
-                                        height="20"
-                                        fill="currentColor"
-                                        class="bi bi-cloud-upload-fill"
-                                        viewBox="0 0 16 16"
-                                    >
-                                        <path
-                                            fill-rule="evenodd"
-                                            d="M8 0a5.53 5.53 0 0 0-3.594 1.342c-.766.66-1.321 1.52-1.464 2.383C1.266 4.095 0 5.555 0 7.318 0 9.366 1.708 11 3.781 11H7.5V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V11h4.188C14.502 11 16 9.57 16 7.773c0-1.636-1.242-2.969-2.834-3.194C12.923 1.999 10.69 0 8 0m-.5 14.5V11h1v3.5a.5.5 0 0 1-1 0"
-                                        />
-                                    </svg>
-                                    OTA
-                                </h5>
-                                <small
-                                    >Set your username and password to allow
-                                    firmware updating over-the-air.</small
-                                >
-                            </div>
-                            <div class="col-lg-9 col-sm-12">
-                                <div class="row">
-                                    <div class="col-6">
-                                        <label for="ota.username" class="form-label"
-                                            >Username</label
-                                        >
-                                        <input
-                                            type="text"
-                                            name="ota.username"
-                                            id="ota.username"
-                                            class="form-control"
-                                        />
-                                    </div>
-                                    <div class="col-6">
-                                        <label for="ota.password" class="form-label"
-                                            >Password</label
-                                        >
-                                        <input
-                                            type="password"
-                                            name="ota.password"
-                                            id="ota.password"
-                                            class="form-control"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <hr>
-
-                        <div class="row my-5 d-flex align-items-top">
-                            <div class="col-lg-3 col-sm-12">
-                                <h5>
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        width="20"
-                                        height="20"
-                                        fill="currentColor"
-                                        class="bi bi-cloud-upload-fill"
-                                        viewBox="0 0 16 16"
-                                    >
-                                        <path
-                                            fill-rule="evenodd"
-                                            d="M8 0a5.53 5.53 0 0 0-3.594 1.342c-.766.66-1.321 1.52-1.464 2.383C1.266 4.095 0 5.555 0 7.318 0 9.366 1.708 11 3.781 11H7.5V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V11h4.188C14.502 11 16 9.57 16 7.773c0-1.636-1.242-2.969-2.834-3.194C12.923 1.999 10.69 0 8 0m-.5 14.5V11h1v3.5a.5.5 0 0 1-1 0"
-                                        />
-                                    </svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M3.5 11.5a3.5 3.5 0 1 1 3.163-5H14L15.5 8 14 9.5l-1-1-1 1-1-1-1 1-1-1-1 1H6.663a3.5 3.5 0 0 1-3.163 2M2.5 9a1 1 0 1 0 0-2 1 1 0 0 0 0 2"/></svg>
                                     Admin
                                 </h5>
                                 <small
@@ -2223,137 +2235,56 @@
                                 </div>
                             </div>
                         </div>
-                        <hr>
+
+
 
                         <div class="row my-5 d-flex align-items-top">
                             <div class="col-lg-3 col-sm-12">
                                 <h5>
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        width="20"
-                                        height="20"
-                                        fill="currentColor"
-                                        class="bi bi-cloud-upload-fill"
-                                        viewBox="0 0 16 16"
-                                    >
-                                        <path
-                                            fill-rule="evenodd"
-                                            d="M8 0a5.53 5.53 0 0 0-3.594 1.342c-.766.66-1.321 1.52-1.464 2.383C1.266 4.095 0 5.555 0 7.318 0 9.366 1.708 11 3.781 11H7.5V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V11h4.188C14.502 11 16 9.57 16 7.773c0-1.636-1.242-2.969-2.834-3.194C12.923 1.999 10.69 0 8 0m-.5 14.5V11h1v3.5a.5.5 0 0 1-1 0"
-                                        />
-                                    </svg>
-                                    Remote Management
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M1 0 0 1l2.2 3.081a1 1 0 0 0 .815.419h.07a1 1 0 0 1 .708.293l2.675 2.675-2.617 2.654A3.003 3.003 0 0 0 0 13a3 3 0 1 0 5.878-.851l2.654-2.617.968.968-.305.914a1 1 0 0 0 .242 1.023l3.27 3.27a.997.997 0 0 0 1.414 0l1.586-1.586a.997.997 0 0 0 0-1.414l-3.27-3.27a1 1 0 0 0-1.023-.242L10.5 9.5l-.96-.96 2.68-2.643A3.005 3.005 0 0 0 16 3q0-.405-.102-.777l-2.14 2.141L12 4l-.364-1.757L13.777.102a3 3 0 0 0-3.675 3.68L7.462 6.46 4.793 3.793a1 1 0 0 1-.293-.707v-.071a1 1 0 0 0-.419-.814z"/></svg>
+                                    OTA
                                 </h5>
                                 <small
-                                    >Manage Station via APRS Messages. Leave empty to disable!
-                                </small>
-                            </div>
-                            <div class="col-lg-9 col-sm-12">
-                                <div class="col-12">
-                                    <label
-                                        for="remoteManagement.managers"
-                                        class="form-label"
-                                        >Callsign-SSID of Managers, space separated, trailing * wildcard allowed (ex: AB1CDE-9, AB1CDE*)</label
-                                    >
-                                    <div class="input-group">
-                                        <input
-                                            type="text"
-                                            name="remoteManagement.managers"
-                                            id="remoteManagement.managers"
-                                            class="form-control"
-                                            oninput="this.value = this.value.toUpperCase();"
-                                        />
-                                    </div>
-                                </div>
-                                <div class="col-12 mt-3">
-                                    <div class="form-check form-switch">
-                                        <input
-                                            type="checkbox"
-                                            name="remoteManagement.rfOnly"
-                                            id="remoteManagement.rfOnly"
-                                            class="form-check-input"
-                                        />
-                                        <label
-                                            for="remoteManagement.rfOnly"
-                                            class="form-label"
-                                            >Managers commands only via RF (not APRS-IS)</label
-                                        >
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <hr>
-
-                        <div class="row my-5 d-flex align-items-top">
-                            <div class="col-lg-3 col-sm-12">
-                                <h5>
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        width="20"
-                                        height="20"
-                                        fill="currentColor"
-                                        class="bi bi-cloud-upload-fill"
-                                        viewBox="0 0 16 16"
-                                    >
-                                        <path
-                                            fill-rule="evenodd"
-                                            d="M8 0a5.53 5.53 0 0 0-3.594 1.342c-.766.66-1.321 1.52-1.464 2.383C1.266 4.095 0 5.555 0 7.318 0 9.366 1.708 11 3.781 11H7.5V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V11h4.188C14.502 11 16 9.57 16 7.773c0-1.636-1.242-2.969-2.834-3.194C12.923 1.999 10.69 0 8 0m-.5 14.5V11h1v3.5a.5.5 0 0 1-1 0"
-                                        />
-                                    </svg>
-                                    NTP
-                                </h5>
-                                <small
-                                    >Set your GMT Time Zone.
-                                </small>
+                                    >Set your username and password to allow
+                                    firmware updating over-the-air.</small
+                                >
                             </div>
                             <div class="col-lg-9 col-sm-12">
                                 <div class="row">
                                     <div class="col-6">
-                                        <label
-                                            for="ntp.server"
-                                            class="form-label"
-                                            >NTP Server hostname</label
+                                        <label for="ota.username" class="form-label"
+                                            >Username</label
                                         >
-                                        <div class="input-group">
-                                            <input
-                                                type="text"
-                                                name="ntp.server"
-                                                id="ntp.server"
-                                                class="form-control"
-                                            />
-                                        </div>
+                                        <input
+                                            type="text"
+                                            name="ota.username"
+                                            id="ota.username"
+                                            class="form-control"
+                                        />
                                     </div>
                                     <div class="col-6">
-                                        <label
-                                            for="ntp.gmtCorrection"
-                                            class="form-label"
-                                            >GMT Time Correction Offset</label
+                                        <label for="ota.password" class="form-label"
+                                            >Password</label
                                         >
-                                        <div class="input-group">
-                                            <input
-                                                type="number"
-                                                name="ntp.gmtCorrection"
-                                                id="ntp.gmtCorrection"
-                                                placeholder="0"
-                                                class="form-control"
-                                                step="0.25"
-                                                min="-23.75"
-                                                max="23.75"
-                                            />
-                                            <span class="input-group-text"
-                                                >hours</span
-                                            >
-                                        </div>
+                                        <input
+                                            type="password"
+                                            name="ota.password"
+                                            id="ota.password"
+                                            class="form-control"
+                                        />
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <hr>
-                    </div>
-                </main>
-                <footer
+
+</section>
+<section class="panel-section" id="sec-about"><div class="about-card"><footer
                     class="my-5 py-5 text-body-secondary text-center text-small"
                 >
-                    <p class="mb-4 small">%BUILD_INFO%</p>
+                    <p class="mb-4 small" id="buildInfo">%BUILD_INFO%</p>
+                    <p class="mb-4 fs-5 fw-bold"><a href="https://github.com/richonguzman/LoRa_APRS_iGate" target="_blank">LoRa APRS iGate Firmware</a><br><a href="https://drive.google.com/file/d/1Hff_Szd7ks8RC7_RiV6POxPJlclbO05M/view?usp=sharing" target="_blank">LoRa APRS iGate Manual</a></p>
+                    <br />
+                    <br />
                     <p class="mb-1 small">
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -2367,67 +2298,15 @@
                                 d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M5.408 5.89c.681 0 1.138.47 1.187 1.107h1.147v-.11c-.053-1.187-1.024-2-2.343-2-1.604 0-2.518 1.05-2.518 2.751v.747c0 1.7.906 2.73 2.518 2.73 1.314 0 2.285-.792 2.343-1.939v-.114H6.595c-.049.615-.497 1.05-1.187 1.05-.84 0-1.318-.62-1.318-1.727v-.742c0-1.112.488-1.754 1.318-1.754Zm5.404 0c.68 0 1.138.47 1.186 1.107h1.147v-.11c-.053-1.187-1.024-2-2.342-2-1.604 0-2.518 1.05-2.518 2.751v.747c0 1.7.905 2.73 2.518 2.73 1.314 0 2.285-.792 2.342-1.939v-.114h-1.147c-.048.615-.496 1.05-1.186 1.05-.84 0-1.319-.62-1.319-1.727v-.742c0-1.112.488-1.754 1.319-1.754Z"
                             />
                         </svg>
-                        2023-25
+                        2023-26
                         <b
                             ><a href="https://github.com/richonguzman"
                                 >CA2RXU</a
                             ></b
                         >:
-                        <a
-                            href="https://github.com/richonguzman/LoRa_APRS_iGate"
-                            >LoRa APRS iGate Firmware</a
-                        >.
+                        LoRa APRS iGate Firmware.
                     </p>
-                    <p class="mb-1 small">
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="16"
-                            height="16"
-                            fill="currentColor"
-                            class="bi bi-cc-circle-fill"
-                            viewBox="0 0 16 16"
-                        >
-                            <path
-                                d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M5.408 5.89c.681 0 1.138.47 1.187 1.107h1.147v-.11c-.053-1.187-1.024-2-2.343-2-1.604 0-2.518 1.05-2.518 2.751v.747c0 1.7.906 2.73 2.518 2.73 1.314 0 2.285-.792 2.343-1.939v-.114H6.595c-.049.615-.497 1.05-1.187 1.05-.84 0-1.318-.62-1.318-1.727v-.742c0-1.112.488-1.754 1.318-1.754Zm5.404 0c.68 0 1.138.47 1.186 1.107h1.147v-.11c-.053-1.187-1.024-2-2.342-2-1.604 0-2.518 1.05-2.518 2.751v.747c0 1.7.905 2.73 2.518 2.73 1.314 0 2.285-.792 2.342-1.939v-.114h-1.147c-.048.615-.496 1.05-1.186 1.05-.84 0-1.319-.62-1.319-1.727v-.742c0-1.112.488-1.754 1.319-1.754Z"
-                            />
-                        </svg>
-                        2024
-                        <b
-                            ><a
-                                href="https://sq2cpa.pl/r/lora-footer"
-                                target="_blank"
-                                >SQ2CPA</a
-                            >
-                            &
-                            <a
-                                href="https://cd3eap.aguayoki.cl/"
-                                target="_blank"
-                                >CA3EAP</a
-                            ></b
-                        >: Settings Page.
-                    </p>
-                    <p class="mb-1 small">
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="16"
-                            height="16"
-                            fill="currentColor"
-                            class="bi bi-cc-circle-fill"
-                            viewBox="0 0 16 16"
-                        >
-                            <path
-                                d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M5.408 5.89c.681 0 1.138.47 1.187 1.107h1.147v-.11c-.053-1.187-1.024-2-2.343-2-1.604 0-2.518 1.05-2.518 2.751v.747c0 1.7.906 2.73 2.518 2.73 1.314 0 2.285-.792 2.343-1.939v-.114H6.595c-.049.615-.497 1.05-1.187 1.05-.84 0-1.318-.62-1.318-1.727v-.742c0-1.112.488-1.754 1.318-1.754Zm5.404 0c.68 0 1.138.47 1.186 1.107h1.147v-.11c-.053-1.187-1.024-2-2.342-2-1.604 0-2.518 1.05-2.518 2.751v.747c0 1.7.905 2.73 2.518 2.73 1.314 0 2.285-.792 2.342-1.939v-.114h-1.147c-.048.615-.496 1.05-1.186 1.05-.84 0-1.319-.62-1.319-1.727v-.742c0-1.112.488-1.754 1.319-1.754Z"
-                            />
-                        </svg>
-                        2026
-                        <b
-                            ><a
-                                href="https://ea4glo.cvaldess.com"
-                                target="_blank"
-                                >EA4GLO</a
-                            ></b
-                        >: RP2350 port.
-                    </p>
+                    <br />
                     <p class="mt-4 small">
                         Support this project<br />
                         <a
@@ -2440,9 +2319,11 @@
                                 src="data:image/png;base64,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aHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL3NUeXBlL1Jlc291cmNlRXZlbnQjIgogICAgeG1sbnM6ZGM9Imh0dHA6Ly9wdXJsLm9yZy9kYy9lbGVtZW50cy8xLjEvIgogICAgeG1sbnM6ZXhpZj0iaHR0cDovL25zLmFkb2JlLmNvbS9leGlmLzEuMC8iCiAgICB4bWxuczpHSU1QPSJodHRwOi8vd3d3LmdpbXAub3JnL3htcC8iCiAgICB4bWxuczp0aWZmPSJodHRwOi8vbnMuYWRvYmUuY29tL3RpZmYvMS4wLyIKICAgIHhtbG5zOnhtcD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wLyIKICAgeG1wTU06RG9jdW1lbnRJRD0iZ2ltcDpkb2NpZDpnaW1wOmUzMGFmOWQ2LWUyZjktNDc4My04YzU1LWIyODgwOGQyYTc4ZCIKICAgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDo3NzhjNjQwOC0wYmY2LTQ4NGUtOGU3Ny0zYjFjNDZlMDNmMzgiCiAgIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDoxMWI2YzEzMy0yMzZmLTQzOGUtYTI2YS1jYWU5MjlkM2I2NmMiCiAgIGRjOkZvcm1hdD0iaW1hZ2UvcG5nIgogICBleGlmOkNvbG9yU3BhY2U9IjEiCiAgIGV4aWY6UGl4ZWxYRGltZW5zaW9uPSIyMDQiCiAgIGV4aWY6UGl4ZWxZRGltZW5zaW9uPSI4MCIKICAgR0lNUDpBUEk9IjIuMCIKICAgR0lNUDpQbGF0Zm9ybT0iV2luZG93cyIKICAgR0lNUDpUaW1lU3RhbXA9IjE3MDk4MzI5NDE1NTcyMzIiCiAgIEdJTVA6VmVyc2lvbj0iMi4xMC4zMCIKICAgdGlmZjpPcmllbnRhdGlvbj0iMSIKICAgdGlmZjpSZXNvbHV0aW9uVW5pdD0iMiIKICAgdGlmZjpYUmVzb2x1dGlvbj0iNzIiCiAgIHRpZmY6WVJlc29sdXRpb249IjcyIgogICB4bXA6Q3JlYXRvclRvb2w9IkdJTVAgMi4xMCI+CiAgIDx4bXBNTTpIaXN0b3J5PgogICAgPHJkZjpTZXE+CiAgICAgPHJkZjpsaQogICAgICBzdEV2dDphY3Rpb249InNhdmVkIgogICAgICBzdEV2dDpjaGFuZ2VkPSIvIgogICAgICBzdEV2dDppbnN0YW5jZUlEPSJ4bXAuaWlkOjQ5ZGUzMmQ4LTU1ZTMtNGRmNi1hZDJkLTNlZmMzMzQ3MDJlYSIKICAgICAgc3RFdnQ6c29mdHdhcmVBZ2VudD0iR2ltcCAyLjEwIChXaW5kb3dzKSIKICAgICAgc3RFdnQ6d2hlbj0iMjAyNC0wMy0wN1QxODozNTo0MSIvPgogICAgPC9yZGY6U2VxPgogICA8L3htcE1NOkhpc3Rvcnk+CiAgPC9yZGY6RGVzY3JpcHRpb24+CiA8L3JkZjpSREY+CjwveDp4bXBtZXRhPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgCjw/eHBhY2tldCBlbmQ9InciPz48wR78AAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH6AMHESMpDUtXbAAAHyVJREFUeNrtnHmUXVWd7z/7DHeue2ueK6lKJakklaQyQCUhkIQAETDiALEVkW7t9vl4QosKjQMiivq6H61NG2kHRFEBJQlEERVppiBTAogkZE5lqulW3bpVdae6wxl2/3FuEopUIEF8ZrHOZ61atWrVOefus893//Zvf/fvXHBxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFx+YsQb3bA4ODorYPx1HW6rmHb8sRnSFAVgT/goam+Qrhd63JaiXl4JB257gv3jb7ycj+RsgCFggGKAFk8s/hbSIGUEl1XqKsN0NJcTsfcRjo7Z9DcVOkK2+VvL+Y/bz0g5829nVmLK9kTswhrIOX40+wj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"
                         /></a>
                     </p>
-                </footer>
-            </div>
-        </form>
+                </footer></div></section>
+    </div>
+  </main>
+</div>
+</form>
         <div
             class="modal fade"
             id="saveModal"
@@ -2505,5 +2386,40 @@
         </div>
     </body>
     <script src="/bootstrap.js"></script>
+    <script src="/leaflet.js"></script>
     <script src="/script.js"></script>
 </html>
+<script>
+(function(){
+  var SUN='<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M8 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6m0 1a4 4 0 1 0 0-8 4 4 0 0 0 0 8M8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0m0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13m8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5M3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8m10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0m-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0m9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707M4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708"/></svg>';
+  var MOON='<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M6 .278a.77.77 0 0 1 .08.858 7.2 7.2 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277q.792-.001 1.533-.16a.79.79 0 0 1 .81.316.73.73 0 0 1-.031.893A8.35 8.35 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.75.75 0 0 1 6 .278"/></svg>';
+  var NIGHT='<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M6 .278a.77.77 0 0 1 .08.858 7.2 7.2 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277q.792-.001 1.533-.16a.79.79 0 0 1 .81.316.73.73 0 0 1-.031.893A8.35 8.35 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.75.75 0 0 1 6 .278"/><path d="M10.794 3.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387a1.73 1.73 0 0 0-1.097 1.097l-.387 1.162a.217.217 0 0 1-.412 0l-.387-1.162A1.73 1.73 0 0 0 9.31 6.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387a1.73 1.73 0 0 0 1.097-1.097zM13.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.16 1.16 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.16 1.16 0 0 0-.732-.732l-.774-.258a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732z"/></svg>';
+  var btn=document.getElementById("themeToggle");
+  var ORDER=["light","dark","night"], ICONS={light:SUN,dark:MOON,night:NIGHT};
+  function logical(){var s=localStorage.getItem("igateTheme");if(s)return s;return (window.matchMedia&&window.matchMedia("(prefers-color-scheme: light)").matches)?"light":"dark";}
+  function paint(name){var r=document.documentElement;if(name==="night"){r.setAttribute("data-bs-theme","dark");r.setAttribute("data-variant","night");}else{r.setAttribute("data-bs-theme",name);r.removeAttribute("data-variant");}if(btn)btn.innerHTML=ICONS[name]||MOON;}
+  paint(logical());
+  if(btn)btn.addEventListener("click",function(){var c=logical();var n=ORDER[(ORDER.indexOf(c)+1)%ORDER.length];try{localStorage.setItem("igateTheme",n);}catch(e){}paint(n);});
+  function showConfig(){document.getElementById("configuration").classList.remove("d-none");var rp=document.getElementById("received-packets");if(rp)rp.classList.add("d-none");}
+  document.querySelectorAll(".side-link[data-target]").forEach(function(b){
+    b.addEventListener("click",function(){
+      document.querySelectorAll(".side-link").forEach(function(x){x.classList.remove("active");});
+      document.querySelectorAll(".panel-section").forEach(function(s){s.classList.remove("active");});
+      b.classList.add("active");var el=document.getElementById(b.dataset.target);if(el)el.classList.add("active");
+      showConfig();
+      if(b.dataset.target==="sec-maps"&&window.showMap)window.showMap();
+    });
+  });
+  var rpBtn=document.getElementById("rpToggle");
+  if(rpBtn)rpBtn.addEventListener("click",function(){
+    document.querySelectorAll(".side-link").forEach(function(x){x.classList.remove("active");});
+    rpBtn.classList.add("active");
+    document.getElementById("configuration").classList.add("d-none");
+    var rp=document.getElementById("received-packets");if(rp)rp.classList.remove("d-none");
+    if(window.fetchReceivedPackets)window.fetchReceivedPackets();
+  });
+  var bi=document.getElementById("buildInfo");
+  if(bi){var h=bi.innerHTML; if(/Version date/i.test(h)){h=h.replace(/(<br\s*\/?>)[\s\S]*?(?=Version date)/i,"$1");bi.innerHTML="Board / Environment = "+h;}}
+  if(window.loadReceivedPackets){var _o=window.loadReceivedPackets;window.loadReceivedPackets=function(p){if(p&&p.slice){p=p.slice().reverse();}return _o(p);};}
+})();
+</script>

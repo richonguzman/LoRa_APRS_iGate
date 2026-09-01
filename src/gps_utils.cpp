@@ -1,4 +1,4 @@
-/* Copyright (C) 2025 Ricardo Guzman - CA2RXU
+/* Copyright (C) 2026 Ricardo Guzman - CA2RXU
  *
  * This file is part of LoRa APRS iGate.
  *
@@ -184,6 +184,16 @@ namespace GPS_Utils {
         }
         return " _ / _ / _ ";
     }
+
+    /*String getDistanceAndCommentFromMicE(const String& packet) {
+        int indexOfMicE1 = packet.indexOf(":`");
+        int indexOfMicE2 = packet.indexOf(":\'");
+
+        if (indexOfMicE1 > 10 || indexOfMicE2 > 10) {
+            return decodeEncodedGPS(packet);
+        }
+        return " _ / _ / _ ";
+    }*/
 
     void setup() {
         #ifdef HAS_GPS

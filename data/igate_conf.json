@@ -28,9 +28,9 @@
         "messagesToRF": false,
         "objectsToRF": false,
         "server": "rotate.aprs2.net",
-        "passcode": "XYZVW",        
+        "passcode": "XYZVW",
         "port": 14580,
-        "filter": "m/10"        
+        "filter": "m/10"
     },
     "personalNote": "",
     "blacklist": "",
@@ -47,10 +47,11 @@
         "rxSignalBandwidth": 125000,
         "txActive": false,
         "txFreq": 433775000,
-        "txSpreadingFactor": 12,
-        "txCodingRate4": 5,
+        "txSpreadingFactor": 9,
+        "txCodingRate4": 7,
         "txSignalBandwidth": 125000,
-        "power": 20
+        "power": 20,
+        "cadActive": true
     },
     "display": {
         "alwaysOn": true,

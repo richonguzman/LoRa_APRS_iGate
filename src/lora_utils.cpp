@@ -1,4 +1,4 @@
-/* Copyright (C) 2025 Ricardo Guzman - CA2RXU
+/* Copyright (C) 2026 Ricardo Guzman - CA2RXU
  *
  * This file is part of LoRa APRS iGate.
  *
@@ -16,6 +16,7 @@
  * along with LoRa APRS iGate. If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <APRSPacketLib.h>
 #include <RadioLib.h>
 #include "configuration.h"
 #include "network_manager.h"
@@ -23,6 +24,7 @@
 #include "station_utils.h"
 #include "board_pinout.h"
 #include "syslog_utils.h"
+#include "map_utils.h"
 #include "ntp_utils.h"
 #include "display.h"
 #include "utils.h"
@@ -30,13 +32,15 @@
 
 extern Configuration    Config;
 extern NetworkManager   *networkManager;
-extern uint32_t         lastRxTime;
 extern bool             packetIsBeacon;
 
 extern std::vector<ReceivedPacket> receivedPackets;
 
-bool operationDone   = true;
-bool transmitFlag    = true;
+bool operationDone      = true;
+bool transmitFlag       = true;
+
+#define DIFS_SLOTS      2       // Number of secuential CAD slots to consider a free channel to Tx
+int  backoffMax         = 4;    // Max Backoff value (number of CAD slots to wait before Tx)
 
 #ifdef HAS_SX1262
     SX1262 radio = new Module(RADIO_CS_PIN, RADIO_DIO1_PIN, RADIO_RST_PIN, RADIO_BUSY_PIN);
@@ -64,6 +68,15 @@ float snr;
 
 
 namespace LoRa_Utils {
+
+    static String sanitizeForWeb(const String& s) {     // replaces non-printable ASCII with '.' for WebUI display
+        String out = s;
+        for (int i = 0; i < (int)out.length(); i++) {
+            uint8_t c = (uint8_t)out[i];
+            if (c < 32 || c == 127) out.setCharAt(i, '.');
+        }
+        return out;
+    }
 
     void setFlag(void) {
         operationDone = true;
@@ -167,6 +180,34 @@ namespace LoRa_Utils {
         radio.setBandwidth(signalBandwidth);
     }
 
+    bool doCAD() {      // CAD (Channel Activity Detection)
+        return radio.scanChannel() != RADIOLIB_CHANNEL_FREE;    // false=channel free | true=RADIOLIB_LORA_DETECTED or CAD failed
+    }
+
+    bool doDIFS() {
+        for (uint8_t i = DIFS_SLOTS; i > 0; i--) {
+            if (doCAD()) return false;
+        }
+        return true;
+    }
+
+    void waitForDIFS() {
+        while (!doDIFS()) {
+            Serial.println("CAD/DIFS failed, retry...");
+        }
+    }
+
+    void doBEB() {
+        int backoffCounter = random(1, backoffMax + 1);
+        while (backoffCounter > 0) {
+            if (doCAD()) {
+                waitForDIFS();  // busy channel: freeze backoff and restart DIFS
+            } else {
+                backoffCounter--;
+            }
+        }
+    }
+
     void sendNewPacket(const String& newPacket) {
         if (!Config.loramodule.txActive) return;
 
@@ -179,6 +220,12 @@ namespace LoRa_Utils {
         #ifdef INTERNAL_LED_PIN
             if (Config.digi.ecoMode != 1) digitalWrite(INTERNAL_LED_PIN, HIGH);     // disabled in Ultra Eco Mode
         #endif
+
+        if (Config.loramodule.cadActive) {
+            waitForDIFS();  // DIFS (Distributed Inter-Frame Space)
+            doBEB();        // BEB  (Binary Exponential Backoff)
+        }
+
         int state = radio.transmit("\x3c\xff\x01" + newPacket);
         transmitFlag = true;
         if (state == RADIOLIB_ERR_NONE) {
@@ -238,10 +285,15 @@ namespace LoRa_Utils {
                                 }
                                 ReceivedPacket receivedPacket;
                                 receivedPacket.rxTime   = NTP_Utils::getFormatedTime();
-                                receivedPacket.packet   = packet.substring(3);
+                                receivedPacket.packet   = sanitizeForWeb(packet.substring(3));
                                 receivedPacket.RSSI     = rssi;
                                 receivedPacket.SNR      = snr;
                                 receivedPackets.push_back(receivedPacket);
+
+                                APRSPacket aprsPacket = APRSPacketLib::processReceivedPacket(packet.substring(3), rssi, snr, freqError);
+                                if (aprsPacket.type == 0 || aprsPacket.type == 4) {   // 0 = GPS, 4 = Mic-E (los que traen posición)
+                                    MAP_Utils::upsert(aprsPacket.sender, aprsPacket.latitude, aprsPacket.longitude, aprsPacket.overlay + aprsPacket.symbol, aprsPacket.rssi, aprsPacket.snr);
+                                }
                             }
 
                             if (Config.syslog.active && networkManager->isConnected()) {
@@ -250,7 +302,6 @@ namespace LoRa_Utils {
                         } else {
                             packet = "";
                         }
-                        lastRxTime = millis();
                         return packet;
                     }
                 } else if (state == RADIOLIB_ERR_CRC_MISMATCH) {

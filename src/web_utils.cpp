@@ -1,4 +1,4 @@
-/* Copyright (C) 2025 Ricardo Guzman - CA2RXU
+/* Copyright (C) 2026 Ricardo Guzman - CA2RXU
  *
  * This file is part of LoRa APRS iGate.
  *
@@ -20,6 +20,7 @@
 #include "configuration.h"
 #include "ota_utils.h"
 #include "web_utils.h"
+#include "map_utils.h"
 #include "display.h"
 #include "utils.h"
 
@@ -47,6 +48,14 @@ extern const size_t web_bootstrap_css_len = web_bootstrap_css_end - web_bootstra
 extern const char web_bootstrap_js[] asm("_binary_data_embed_bootstrap_js_gz_start");
 extern const char web_bootstrap_js_end[] asm("_binary_data_embed_bootstrap_js_gz_end");
 extern const size_t web_bootstrap_js_len = web_bootstrap_js_end - web_bootstrap_js;
+
+extern const char web_leaflet_css[] asm("_binary_data_embed_leaflet_css_gz_start");
+extern const char web_leaflet_css_end[] asm("_binary_data_embed_leaflet_css_gz_end");
+extern const size_t web_leaflet_css_len = web_leaflet_css_end - web_leaflet_css;
+
+extern const char web_leaflet_js[] asm("_binary_data_embed_leaflet_js_gz_start");
+extern const char web_leaflet_js_end[] asm("_binary_data_embed_leaflet_js_gz_end");
+extern const size_t web_leaflet_js_len = web_leaflet_js_end - web_leaflet_js;
 
 // Declare external symbols for the embedded image data
 extern const unsigned char favicon_data[] asm("_binary_data_embed_favicon_png_gz_start");
@@ -112,6 +121,10 @@ namespace WEB_Utils {
         serializeJson(data, buffer);
 
         request->send(200, "application/json", buffer);
+    }
+
+    void handleStations(AsyncWebServerRequest *request) {
+        request->send(200, "application/json", MAP_Utils::getStationsJson());
     }
 
     void handleWriteConfiguration(AsyncWebServerRequest *request) {
@@ -213,6 +226,8 @@ namespace WEB_Utils {
         Config.loramodule.txCodingRate4     = getParamIntSafe("lora.txCodingRate4", Config.loramodule.txCodingRate4);
         Config.loramodule.txSignalBandwidth = getParamIntSafe("lora.txSignalBandwidth", Config.loramodule.txSignalBandwidth);
         Config.loramodule.power             = getParamIntSafe("lora.power", Config.loramodule.power);
+        if (Config.loramodule.txActive)
+            Config.loramodule.cadActive     = request->hasParam("lora.cadActive", true);
 
         Config.display.alwaysOn             = request->hasParam("display.alwaysOn", true);
         if (!Config.display.alwaysOn) {
@@ -356,11 +371,26 @@ namespace WEB_Utils {
         request->send(response);
     }
 
+    void handleLeafletStyle(AsyncWebServerRequest *request) {
+        AsyncWebServerResponse *response = request->beginResponse(200, "text/css", (const uint8_t*)web_leaflet_css, web_leaflet_css_len);
+        response->addHeader("Content-Encoding", "gzip");
+        response->addHeader("Cache-Control", "max-age=3600");
+        request->send(response);
+    }
+
+    void handleLeafletScript(AsyncWebServerRequest *request) {
+        AsyncWebServerResponse *response = request->beginResponse(200, "text/javascript", (const uint8_t*)web_leaflet_js, web_leaflet_js_len);
+        response->addHeader("Content-Encoding", "gzip");
+        response->addHeader("Cache-Control", "max-age=3600");
+        request->send(response);
+    }
+
     void setup() {
         if (Config.digi.ecoMode == 0) {
             server.on("/", HTTP_GET, handleHome);
             server.on("/status", HTTP_GET, handleStatus);
             server.on("/received-packets.json", HTTP_GET, handleReceivedPackets);
+            server.on("/stations.json", HTTP_GET, handleStations);
             server.on("/configuration.json", HTTP_GET, handleReadConfiguration);
             server.on("/configuration.json", HTTP_POST, handleWriteConfiguration);
             server.on("/action", HTTP_POST, handleAction);
@@ -368,6 +398,8 @@ namespace WEB_Utils {
             server.on("/script.js", HTTP_GET, handleScript);
             server.on("/bootstrap.css", HTTP_GET, handleBootstrapStyle);
             server.on("/bootstrap.js", HTTP_GET, handleBootstrapScript);
+            server.on("/leaflet.css", HTTP_GET, handleLeafletStyle);
+            server.on("/leaflet.js", HTTP_GET, handleLeafletScript);
             server.on("/favicon.png", HTTP_GET, handleFavicon);
 
             OTA_Utils::setup(&server); // Include OTA Updater for WebServer

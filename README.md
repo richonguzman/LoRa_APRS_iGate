@@ -16,23 +16,32 @@ ____________________________________________________
 
 ____________________________________________________
 
+## New Web/UI
+
+| New Menu | Map |
+| --- | --- |
+| ![new menu](images/1.png) | ![map](images/2.png) |
+
+____________________________________________________
+
 ## You can support this project to continue to grow:
 
 [<img src="https://github.com/richonguzman/LoRa_APRS_Tracker/raw/main/images/github-sponsors.png">](https://github.com/sponsors/richonguzman)     [<img src="https://github.com/richonguzman/LoRa_APRS_Tracker/raw/main/images/paypalme.png">](http://paypal.me/richonguzman)
 
 ____________________________________________________
 
+
 ## SUPPORTED BOARDS (<a href="https://github.com/richonguzman/LoRa_APRS_iGate/wiki/Supported-Boards-and-Buying-Links" target="_blank">Buying links</a>).
 
 (NOTE: all boards with 433-868-915 MHz versions)
 
-- TTGO Lilygo LoRa32 T3S3 V1.2 and LoRa32 V2.1 (V1.6 is the same).
+- TTGO Lilygo LoRa32 LoRa32 V2.1 (V1.6 is the same) and T3S3 V1.2.
 
 - TTGO T-Beam V1.0 , V1.1, V1.2 (also variations with SX1262 and SX1268 LoRa Modules) and Supreme V3.
 
 - T-Deck Plus (and also regular T-Deck with/without GPS).
 
-- HELTEC V2, V3, V3.2, T114, Wireless Stick, Wireless Stick Lite V3/V3.2, HT-CT62, Wireless Tracker, Wireless Paper.
+- HELTEC V2, V3, V3.2, V4, T114, Wireless Stick, Wireless Stick Lite V3/V3.2, HT-CT62, Wireless Tracker, Wireless Paper.
 
 - RAK Wireless 4631 + 19007(or 19003)
 
@@ -49,6 +58,8 @@ ____________________________________________________
 - Wemos Lolin32 Oled + SX1278 DIY Version.
 
 - **RP2350 (Raspberry Pi Pico 2) + WIZnet W5500 Ethernet + Ebyte E22 1W LoRa Module** — wired, headless DIY version (see the section below).
+
+- and many more...
 
 <br />
 
@@ -74,11 +85,13 @@ shared; the ESP32-specific WiFi/ESPAsyncWebServer/Update.h paths are replaced wi
 lean equivalents over `EthernetClient`/`EthernetServer`/`EthernetUDP`.
 
 **Features:** iGate RX→APRS-IS (qAR), position beacon (RF + APRS-IS), digipeater
-(WIDEn-N + anti-loop), station blacklist/dedup/last-heard, APRS queries + bidirectional
-messaging, KISS TNC server (TCP :8001), structured T# telemetry, WX (BMP280),
-SNTP time, remote syslog, MQTT bridge, DHCP or static IP, HTTP Basic web auth,
+(WIDEn-N, own-callsign path and anti-loop), CAD/DIFS channel access before TX,
+station blacklist/dedup/last-heard, APRS queries + bidirectional messaging, KISS TNC
+server (TCP :8001), structured T# telemetry, WX (BMP280 / BME680 / SHT40), optional
+GPS, SNTP time, remote syslog, MQTT bridge, DHCP or static IP, HTTP Basic web auth,
 scheduled auto-reboot, VSYS monitor, and network OTA (web UI with progress). Config
-is the same web SPA served from flash, persisted to LittleFS.
+is the same web SPA served from flash (including the live stations map, served from
+`/stations.json`), persisted to LittleFS.
 
 **Boards / build:**
 
@@ -105,6 +118,8 @@ DIO3; W5500 SPI0: MISO16/SCK18/MOSI19/CS17/RST20). Web assets are regenerated wi
 <br />
 
 # Timeline (Versions):
+- 2026-08-16 New UI (Web) and also Live View over a Map to see Rx stations.
+- 2026-08-10 CAD (Channel Activity Detection) and DIFS (Distributed Inter-Frame Space) added.
 - 2026-03-25 More Boards, SDK update, OTA fix, GPS process update.
 - 2026-02-26 9M2IBR ESP32 1W (400M30S) + GPS board added.
 - 2026-02-25 Code Improvements: reduced String comparisons and improved logic for faster code execution.

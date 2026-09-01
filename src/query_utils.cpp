@@ -1,4 +1,4 @@
-/* Copyright (C) 2025 Ricardo Guzman - CA2RXU
+/* Copyright (C) 2026 Ricardo Guzman - CA2RXU
  *
  * This file is part of LoRa APRS iGate.
  *
@@ -82,7 +82,7 @@ namespace QUERY_Utils {
             int radioTxActive       = Config.loramodule.txActive;
             bool onlyRadioActive    = radioTxActive && Config.loramodule.rxActive && !Config.aprs_is.active;
             if (queryQuestion.startsWith("?EM=OFF")) {
-                if ((digiMode == 2 || digiMode == 3) && onlyRadioActive) {
+                if ((digiMode == 1 || digiMode == 2 || digiMode == 3) && onlyRadioActive) {
                     if (digiEcoMode == 1 || digiEcoMode == 2) { // Exit Digipeater EcoMode or Digipeater without WiFiAP
                         answer = (digiEcoMode == 1) ? "DigiEcoMode:OFF" : "Digipeater + WiFiAP enabled";
                         Config.digi.ecoMode         = 0;
@@ -97,7 +97,7 @@ namespace QUERY_Utils {
                     answer = "Digipeater Mode control not possible";
                 }
             } else if (queryQuestion.startsWith("?EM=ON")) {
-                if ((digiMode == 2 || digiMode == 3) && onlyRadioActive) {
+                if ((digiMode == 1 || digiMode == 2 || digiMode == 3) && onlyRadioActive) {
                     if (digiEcoMode == 0) {     // Start Digipeater EcoMode
                         answer = "DigiEcoMode:ON";
                         Config.digi.ecoMode         = 1;
@@ -139,7 +139,7 @@ namespace QUERY_Utils {
 
         if (answer == "") return "";
 
-        String queryAnswer = Config.callsign;
+        String queryAnswer = (Config.tacticalCallsign == "" ? Config.callsign : Config.tacticalCallsign);
         queryAnswer += ">APLRG1";
         if (queryFromAPRSIS) {
             queryAnswer += ",TCPIP,qAC";

@@ -1,4 +1,4 @@
-/* Copyright (C) 2025 Ricardo Guzman - CA2RXU
+/* Copyright (C) 2026 Ricardo Guzman - CA2RXU
  *
  * This file is part of LoRa APRS iGate.
  *
@@ -68,8 +68,8 @@ ___________________________________________________________________*/
 #endif
 
 
-String              versionDate             = "2026-04-21";
-String              versionNumber           = "3.2.4";
+String              versionDate             = "2026-08-16";
+String              versionNumber           = "4.0.0";
 Configuration       Config;
 WiFiClient          aprsIsClient;
 WiFiClient          mqttClient;
@@ -196,7 +196,7 @@ void loop() {
                 APRS_IS_Utils::processLoRaPacket(packet); // Send received packet to APRSIS
             }
 
-            if (Config.loramodule.txActive && (Config.digi.mode == 2 || Config.digi.mode == 3 || backupDigiMode)) { // If Digi enabled
+            if (Config.loramodule.txActive && (Config.digi.mode == 1 || Config.digi.mode == 2 || Config.digi.mode == 3 || backupDigiMode)) { // If Digi enabled
                 DIGI_Utils::processLoRaPacket(packet); // Send received packet to Digi
             }
 

@@ -1,4 +1,4 @@
-/* Copyright (C) 2025 Ricardo Guzman - CA2RXU
+/* Copyright (C) 2026 Ricardo Guzman - CA2RXU
  *
  * This file is part of LoRa APRS iGate.
  *
@@ -25,15 +25,11 @@
 #include "utils.h"
 #include <vector>
 
-#define SECS_TO_WAIT            3   // soon to be deleted...
-
 
 extern Configuration            Config;
-extern uint32_t                 lastRxTime;
 extern String                   fourthLine;
 extern bool                     shouldSleepLowVoltage;
 
-uint32_t lastTxTime             = millis();
 std::vector<LastHeardStation>   lastHeardStations;
 std::vector<String>             blacklist;
 std::vector<String>             managers;
@@ -214,15 +210,11 @@ namespace STATION_Utils {
     }
 
     void processOutputPacketBuffer() {
-        int timeToWait                  = SECS_TO_WAIT * 1000;          // 3 segs between packet Tx and also Rx ???
-        uint32_t lastRx                 = millis() - lastRxTime;
-        uint32_t lastTx                 = millis() - lastTxTime;
-        if (outputPacketBuffer.size() > 0 && lastTx > timeToWait && lastRx > timeToWait) {
+        if (outputPacketBuffer.size() > 0) {
             if (outputPacketBuffer[0].isBeacon) packetIsBeacon = true;
             LoRa_Utils::sendNewPacket(outputPacketBuffer[0].packet);
             if (outputPacketBuffer[0].isBeacon) packetIsBeacon = false;
             outputPacketBuffer.erase(outputPacketBuffer.begin());
-            lastTxTime = millis();
         }
         if (shouldSleepLowVoltage) {
             while (outputPacketBuffer.size() > 0) {
