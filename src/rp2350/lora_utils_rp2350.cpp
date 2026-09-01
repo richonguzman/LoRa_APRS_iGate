@@ -245,9 +245,54 @@ String receivePacketFromSleep() { return receivePacket(); }
 void changeFreqTx() { radio.standby(); radio.setFrequency(txFreqMHz); }
 void changeFreqRx() { radio.standby(); radio.setFrequency(rxFreqMHz); radio.startReceive(); }
 
+// --- CAD / DIFS / BEB (port of the V4.0.0 channel access in src/lora_utils.cpp) --
+// Listen before transmitting: DIFS = N consecutive free CAD slots, then a binary
+// exponential backoff of free slots. Enabled per config (LoRa -> "Channel Activity
+// Detection"). Unlike upstream this wait is BOUNDED: loraTask also services RX and
+// the TX buffer, so it must never block forever on a permanently busy channel.
+#define DIFS_SLOTS      2
+#define CAD_MAX_WAIT_MS 3000
+
+static const int CAD_BACKOFF_MAX = 4;
+
+static bool doCAD() { return radio.scanChannel() != RADIOLIB_CHANNEL_FREE; }   // true = busy
+
+static bool doDIFS() {
+    for (uint8_t i = DIFS_SLOTS; i > 0; i--) {
+        if (doCAD()) return false;
+    }
+    return true;
+}
+
+// Returns false when the deadline expired with the channel still busy (caller
+// transmits anyway rather than dropping the packet).
+static bool waitForDIFS(uint32_t deadline) {
+    while (!doDIFS()) {
+        if ((int32_t)(millis() - deadline) >= 0) {
+            Serial.println("[lora] CAD: channel busy, transmitting anyway");
+            return false;
+        }
+    }
+    return true;
+}
+
+static void channelAccess() {
+    uint32_t deadline = millis() + CAD_MAX_WAIT_MS;
+    if (!waitForDIFS(deadline)) return;
+    int backoff = random(1, CAD_BACKOFF_MAX + 1);
+    while (backoff > 0) {
+        if (doCAD()) {
+            if (!waitForDIFS(deadline)) return;
+        } else {
+            backoff--;
+        }
+    }
+}
+
 void sendNewPacket(const String& newPacket) {
     if (!Config.loramodule.txActive) return;   // RF TX disabled (RX-only iGate / ?TX=OFF)
     changeFreqTx();
+    if (Config.loramodule.cadActive) channelAccess();   // listen before transmit
 #if RADIO_TXEN < 0
     digitalWrite(RADIO_RXEN, LOW);             // bridged: RX path off; DIO2 drives TXEN during transmit
 #endif

@@ -46,13 +46,44 @@ String checkForStartingBytes(const String& packet) {
     return (idx != -1) ? packet.substring(0, idx) : packet;
 }
 
-String cleanPathAsterisks(String path) {
-    const char* terms[] = {",WIDE1*", ",WIDE2*", "*"};
+String cleanPath(String path) {
+    const char* terms[] = {"WIDE1*,", "WIDE2*,", "*"};
     for (const char* term : terms) {
         int idx = path.indexOf(term);
         if (idx != -1) path.remove(idx, strlen(term));
     }
     return path;
+}
+
+// Port of DIGI_Utils::processMode3Path: digipeat only when our own callsign is
+// listed (unused) in the path, keeping the rest of the path intact and marking
+// our token with '*'. Every token before ours must already be marked.
+String processMode3Path(const String& path, const String& call) {
+    int  start = 0;
+    bool prevTokensAllStar = true;
+    int  ownTokenEnd = -1;
+
+    while (start < (int)path.length()) {
+        int delim = path.indexOf(',', start);
+        if (delim == -1) delim = path.length();
+
+        String token   = path.substring(start, delim);
+        bool tokenIsOwn = (token == call) || (token == call + "*");
+        bool tokenStar  = token.endsWith("*");
+
+        if (tokenIsOwn) {
+            if (tokenStar) return "";                   // already digipeated by us
+            if (!prevTokensAllStar) return "";          // earlier hops must be marked
+            ownTokenEnd = delim;
+            break;
+        }
+
+        if (!tokenStar) prevTokensAllStar = false;
+        start = delim + 1;
+    }
+
+    if (ownTokenEnd == -1) return "";
+    return cleanPath(path.substring(0, ownTokenEnd)) + "*" + path.substring(ownTokenEnd);
 }
 
 // Port of DIGI_Utils::buildPacket, non-crossFreq / non-thirdParty branch only.
@@ -64,11 +95,11 @@ String buildPacket(const String& path, const String& packet) {
     int    digiMode  = Config.digi.mode;
     String tempPath  = path;
 
-    if (tempPath.indexOf("WIDE1-1") != -1 && (digiMode == 2 || digiMode == 3 || Config.digi.backupDigiMode)) {
+    if (tempPath.indexOf("WIDE1-1") != -1 && (digiMode == 1 || digiMode == 2 || Config.digi.backupDigiMode)) {
         if (tempPath.indexOf('*') != -1) return "";          // '*' shouldn't precede WIDE1-1
         tempPath.replace("WIDE1-1", call + "*");
-    } else if (tempPath.indexOf("WIDE2-") != -1 && digiMode == 3) {
-        tempPath = cleanPathAsterisks(path);
+    } else if (tempPath.indexOf("WIDE2-") != -1 && digiMode == 2) {
+        tempPath = cleanPath(path);
         if (tempPath.indexOf("WIDE2-1") != -1) {
             tempPath.replace("WIDE2-1", call + "*");
         } else if (tempPath.indexOf("WIDE2-2") != -1) {
@@ -76,6 +107,9 @@ String buildPacket(const String& path, const String& packet) {
         } else {
             return "";                                       // WIDE2-3+ unsupported
         }
+    } else if (digiMode == 3) {                              // own-callsign path digi
+        tempPath = processMode3Path(tempPath, call);
+        if (tempPath == "") return "";
     } else {
         return "";
     }
@@ -99,15 +133,18 @@ String generateDigipeatedPacket(const String& packet) {
     if (comma <= 2) return "";                        // no path -> nothing to consume
     String path = hdr.substring(comma + 1);
 
-    if (digiMode == 2 || backup) {
+    if (digiMode == 1 || backup) {                    // WIDE1-1 fill-in digi
         return (path.indexOf("WIDE1-1") != -1) ? buildPacket(path, packet) : "";
     }
-    if (digiMode == 3) {
+    if (digiMode == 2) {                              // WIDE2-n (+ WIDE1-1) digi
         int w1 = path.indexOf("WIDE1-1");
         int w2 = path.indexOf("WIDE2-");
         bool hasW1 = w1 != -1, hasW2 = w2 != -1;
         if (hasW1 && hasW2 && w2 < w1) return "";     // WIDE1 must precede WIDE2
         if (hasW1 || hasW2) return buildPacket(path, packet);
+    }
+    if (digiMode == 3) {                              // repeat only if we are in the path
+        if (path.indexOf(stationCall()) != -1) return buildPacket(path, packet);
     }
     return "";
 }
@@ -117,7 +154,9 @@ String generateDigipeatedPacket(const String& packet) {
 namespace Digi {
 
 bool enabled() {
-    return Config.digi.mode == 2 || Config.digi.mode == 3 || Config.digi.backupDigiMode;
+    // Digi modes (upstream V4.0.0 numbering): 1 = WIDE1-1 fill-in, 2 = WIDE2-n,
+    // 3 = own-callsign path. CrossFreq digipeating is not ported.
+    return (Config.digi.mode >= 1 && Config.digi.mode <= 3) || Config.digi.backupDigiMode;
 }
 
 String process(const String& rawPacket) {

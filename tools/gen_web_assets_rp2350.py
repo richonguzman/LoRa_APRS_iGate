@@ -22,6 +22,8 @@ ASSETS = [
     ("/script.js",     "script.js",     "asset_script_js",     "application/javascript"),
     ("/bootstrap.css", "bootstrap.css", "asset_bootstrap_css", "text/css"),
     ("/bootstrap.js",  "bootstrap.js",  "asset_bootstrap_js",  "application/javascript"),
+    ("/leaflet.css",   "leaflet.css",   "asset_leaflet_css",   "text/css"),
+    ("/leaflet.js",    "leaflet.js",    "asset_leaflet_js",    "application/javascript"),
     ("/favicon.png",   "favicon.png",   "asset_favicon_png",   "image/png"),
 ]
 

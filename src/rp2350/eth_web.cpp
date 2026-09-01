@@ -6,6 +6,7 @@
 #include "web_assets.h"   // gzipped SPA assets embedded in flash
 #include "ntp_rp2350.h"
 #include "ota_rp2350.h"
+#include "map_utils.h"    // stations heard with a decoded position (web "Map" view)
 #include "configuration.h"
 
 extern Configuration Config;
@@ -288,6 +289,11 @@ static void handleClient(EthernetClient &c) {
     if (req.path == "/status") {
         extern const char *FW_BUILD;
         sendText(c, 200, "OK", "text/plain", String("LoRa APRS iGate RP2350 — built ") + FW_BUILD);
+        c.flush();
+        return;
+    }
+    if (req.path == "/stations.json") {   // stations with a position, for the Map view
+        sendText(c, 200, "OK", "application/json", MAP_Utils::getStationsJson());
         c.flush();
         return;
     }

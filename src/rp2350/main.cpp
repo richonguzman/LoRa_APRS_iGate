@@ -33,6 +33,8 @@
 #include "syslog_rp2350.h"
 #include "battery_rp2350.h"
 #include "gps_rp2350.h"
+#include "map_utils.h"        // stations map behind the web "Map" view (/stations.json)
+#include <APRSPacketLib.h>
 #include "pico/unique_id.h"   // pico_get_unique_board_id (cached at boot — SMP-safe)
 
 #ifndef HB_LED
@@ -289,6 +291,14 @@ void netTask(void *) {
                 int prssi = lp->substring(0, t1).toInt();
                 float psnr = lp->substring(t1 + 1, t2).toFloat();
                 ethWebAddPacket(frame, prssi, psnr);
+                // feed the stations map (upstream V4 "Map" view -> GET /stations.json).
+                // Decoded here, in netTask, because that task owns both the map store
+                // and the web server (no cross-core access to mapStations).
+                APRSPacket ap = APRSPacketLib::processReceivedPacket(frame, prssi, psnr, 0);
+                if (ap.type == 0 || ap.type == 4) {   // 0 = GPS position, 4 = Mic-E
+                    MAP_Utils::upsert(ap.sender, ap.latitude, ap.longitude,
+                                      ap.overlay + ap.symbol, ap.rssi, ap.snr);
+                }
                 Tnc::broadcast(frame);
                 Mqtt::publishRx(frame);
                 Syslog::logRx(frame, prssi, psnr);

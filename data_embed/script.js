@@ -276,6 +276,8 @@ function loadSettings(settings) {
     document.getElementById("ntp.server").value                         = settings.ntp.server;
     document.getElementById("ntp.gmtCorrection").value                  = settings.ntp.gmtCorrection;
 
+    applyWiredBuildUi(settings);    // RP2350 + Ethernet build (see bottom of this file)
+
     updateImage();
 }
 
@@ -801,4 +803,253 @@ window.showMap = function () {
             fetchMapStations();
         }
     }, 15000);
+}
+
+
+/* --------------------------------------------------------------- wired (RP2350) build
+ * The RP2350 + WIZnet W5500 port serves this same page, but that board has no
+ * WiFi, no display and no ElegantOTA page, and it adds a wired IP configuration,
+ * an APRS "Messages" view and its own OTA uploader. All of it is feature-detected
+ * from the configuration ("network" only exists on the wired build), so on ESP32
+ * boards nothing below changes the UI.
+ */
+function isWiredBuild(settings) {
+    return !!(settings && settings.network);
+}
+
+function markUnavailable(id, note) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.disabled = true;
+    el.title = note || "Not available on this board";
+}
+
+// Replace the description of the settings block a control belongs to.
+function describeSection(id, html) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const row = el.closest(".row.my-5") || el.closest(".row");
+    if (!row) return;
+    const small = row.querySelector("small");
+    if (small && !small.dataset.wiredNote) {
+        small.innerHTML = html;
+        small.dataset.wiredNote = "1";
+    }
+}
+
+function applyWiredBuildUi(settings) {
+    if (!isWiredBuild(settings)) return;
+
+    // --- wired IP configuration (DHCP or static), shown only on this build
+    const net = settings.network;
+    document.getElementById("network.dhcp").checked    = net.dhcp;
+    document.getElementById("network.ip").value        = net.ip || "";
+    document.getElementById("network.gateway").value   = net.gateway || "";
+    document.getElementById("network.subnet").value    = net.subnet || "255.255.255.0";
+    document.getElementById("network.dns").value       = net.dns || "";
+    document.getElementById("ip-config-section").style.display = "";
+    document.getElementById("ip-config-hr").style.display      = "";
+    document.getElementById("static-ip-config").style.display  = net.dhcp ? "none" : "";
+
+    // --- sidebar: this build has its own Messages + OTA views, and no ElegantOTA
+    document.querySelectorAll(".side-link.rp2350-only").forEach(function (el) {
+        el.style.display = "";
+    });
+    const elegantOta = document.querySelector(".side-link.side-ota");
+    if (elegantOta) elegantOta.style.display = "none";
+
+    // --- WiFi: not present on this board
+    ["wifi.autoAP.enabled", "wifi.autoAP.password", "wifi.autoAP.timeout"].forEach(function (id) {
+        markUnavailable(id, "This board connects over Ethernet, it has no WiFi");
+    });
+    const addAp = document.querySelector('[data-bs-target="#add-ap"]');
+    if (addAp) addAp.disabled = true;
+    describeSection("wifi.autoAP.enabled", "<b>Not available</b> &mdash; this board connects via Ethernet (W5500), it has no WiFi.");
+
+    // --- Display: headless iGate
+    ["display.alwaysOn", "display.turn180", "display.timeout"].forEach(function (id) {
+        markUnavailable(id, "Headless build, no display");
+    });
+    describeSection("display.alwaysOn", "<b>Not available</b> &mdash; this is a headless iGate (no display).");
+
+    // --- Battery: only the internal (VSYS) reading exists here
+    ["battery.monitorInternalVoltage", "battery.internalSleepVoltage", "battery.sendExternalVoltage",
+     "battery.useExternalI2CSensor", "battery.monitorExternalVoltage", "battery.externalSleepVoltage",
+     "battery.externalVoltagePin", "battery.voltageDividerR1", "battery.voltageDividerR2"].forEach(function (id) {
+        markUnavailable(id, "Needs hardware this iGate does not have");
+    });
+    describeSection("battery.sendInternalVoltage",
+        "Supply-voltage (VSYS) monitor.<br><br>Only <b>Send Internal Voltage</b> (adds <code>Batt=</code> to the beacon) "
+        + "and <b>Send Voltage As Telemetry</b> are available &mdash; the external-voltage / health-sleep options need "
+        + "hardware this iGate does not have and are disabled.");
+}
+
+const dhcpCheckbox = document.getElementById("network.dhcp");
+if (dhcpCheckbox) {
+    dhcpCheckbox.addEventListener("change", function () {
+        document.getElementById("static-ip-config").style.display = this.checked ? "none" : "";
+    });
+}
+
+/* ------------------------------------------------------------------- Messages view */
+let receivedMessagesTimer = null;
+
+function loadReceivedMessages() {
+    fetch("/messages.json")
+        .then((r) => r.json())
+        .then((msgs) => {
+            const tbody = document.getElementById("received-messages");
+            if (!tbody) return;
+            if (!msgs.length) {
+                tbody.innerHTML = '<tr><td colspan="4" class="text-muted">No messages received yet.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = msgs.map((m) => {
+                const ago = m.age < 60 ? m.age + "s" : Math.floor(m.age / 60) + "m";
+                const esc = (t) => t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                return "<tr><td>" + ago + "</td><td>" + esc(m.from) + "</td><td>" + esc(m.via || "") + "</td><td>" + esc(m.text) + "</td></tr>";
+            }).join("");
+        })
+        .catch((err) => console.error("Failed to load messages", err));
+}
+
+const sendMessageButton = document.getElementById("send-message");
+if (sendMessageButton) {
+    sendMessageButton.addEventListener("click", function (e) {
+        e.preventDefault();
+
+        const to = document.getElementById("message.to").value.trim();
+        const text = document.getElementById("message.text").value.trim();
+        const viaRF = document.getElementById("message.viaRF").checked;
+        const viaTCP = document.getElementById("message.viaTCP").checked;
+        if (!to || !text) {
+            showToast("Enter both a destination callsign and a message.");
+            return;
+        }
+        if (!viaRF && !viaTCP) {
+            showToast("Pick at least one path: RF and/or APRS-IS.");
+            return;
+        }
+
+        const params = "to=" + encodeURIComponent(to) + "&text=" + encodeURIComponent(text)
+            + "&rf=" + (viaRF ? "1" : "0") + "&tcp=" + (viaTCP ? "1" : "0");
+        fetch("/action?type=send-message&" + params, { method: "POST" });
+
+        const via = [viaRF ? "RF" : null, viaTCP ? "APRS-IS" : null].filter(Boolean).join(" + ");
+        showToast("Message to <b>" + to + "</b> queued (" + via + ").");
+        document.getElementById("message.text").value = "";
+    });
+}
+
+const messagesLink = document.querySelector('.side-link[data-target="sec-messages"]');
+if (messagesLink) {
+    messagesLink.addEventListener("click", function () {
+        loadReceivedMessages();
+        if (!receivedMessagesTimer) {
+            receivedMessagesTimer = setInterval(function () {      // refresh only while visible
+                const section = document.getElementById("sec-messages");
+                if (section && section.classList.contains("active")) loadReceivedMessages();
+            }, 10000);
+        }
+    });
+}
+
+/* ------------------------------------------------------------ OTA (firmware update) */
+let otaPrevBuild = "";
+
+function loadOtaStatus() {
+    const el = document.getElementById("ota.current");
+    if (!el) return;
+    fetch("/status", { cache: "no-store" })
+        .then((r) => r.text())
+        .then((text) => { otaPrevBuild = text.trim(); el.innerHTML = "Current firmware: <b>" + otaPrevBuild + "</b>"; })
+        .catch(() => { el.textContent = "Current firmware: (could not read /status)"; });
+}
+
+// after an update: poll /status until the device is back, then confirm
+function waitForReboot(prev, attempt) {
+    attempt = attempt || 0;
+    const status = document.getElementById("ota.status");
+    const el = document.getElementById("ota.current");
+    if (attempt > 25) {
+        status.innerHTML = '<span class="text-warning">Device did not respond after the update &mdash; please check it manually.</span>';
+        return;
+    }
+    const controller = new AbortController();
+    const t = setTimeout(() => controller.abort(), 1500);
+    fetch("/status", { cache: "no-store", signal: controller.signal })
+        .then((r) => r.text())
+        .then((text) => {
+            clearTimeout(t);
+            const now = text.trim();
+            el.innerHTML = "Current firmware: <b>" + now + "</b>";
+            if (now !== prev) {
+                status.innerHTML = '<span class="text-success"><b>&#10003; Update complete.</b> Now running the new firmware.</span>';
+            } else {
+                status.innerHTML = '<span class="text-success"><b>&#10003; Device is back online</b> (firmware version unchanged).</span>';
+            }
+        })
+        .catch(() => {
+            clearTimeout(t);
+            status.textContent = "Waiting for the device to reboot... (" + (attempt + 1) + ")";
+            setTimeout(() => waitForReboot(prev, attempt + 1), 2000);
+        });
+}
+
+const otaLink = document.querySelector('.side-link[data-target="sec-ota"]');
+if (otaLink) otaLink.addEventListener("click", loadOtaStatus);
+
+const otaUploadButton = document.getElementById("ota.upload");
+if (otaUploadButton) {
+    otaUploadButton.addEventListener("click", function (e) {
+        e.preventDefault();
+
+        const file = document.getElementById("ota.file").files[0];
+        if (!file) { showToast("Pick a firmware.bin file first."); return; }
+
+        const user = document.getElementById("ota.user").value.trim();
+        const pass = document.getElementById("ota.pass").value;
+        const wrap = document.getElementById("ota.progresswrap");
+        const bar = document.getElementById("ota.progress");
+        const status = document.getElementById("ota.status");
+
+        wrap.classList.remove("d-none");
+        bar.style.width = "0%"; bar.textContent = "0%";
+        status.textContent = "Uploading " + file.name + " (" + file.size + " bytes)...";
+
+        let bodySent = false;
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", "/update", true);
+        if (user) xhr.setRequestHeader("Authorization", "Basic " + btoa(user + ":" + pass));
+
+        xhr.upload.onprogress = function (ev) {
+            if (ev.lengthComputable) {
+                const pct = Math.round(ev.loaded * 100 / ev.total);
+                bar.style.width = pct + "%"; bar.textContent = pct + "%";
+            }
+        };
+        xhr.upload.onload = function () { bodySent = true; };
+
+        xhr.onload = function () {
+            if (xhr.status === 200) {
+                bar.style.width = "100%"; bar.textContent = "100%";
+                status.innerHTML = "Update staged &mdash; waiting for the device to reboot...";
+                setTimeout(() => waitForReboot(otaPrevBuild, 0), 4000);
+            } else if (xhr.status === 401) {
+                status.innerHTML = '<span class="text-danger">Unauthorized &mdash; check the OTA user/password.</span>';
+            } else {
+                status.innerHTML = '<span class="text-danger">Update failed: ' + xhr.status + " " + xhr.responseText + "</span>";
+            }
+        };
+        xhr.onerror = function () {
+            if (bodySent) {   // socket dropped after the full upload = device rebooting
+                bar.style.width = "100%"; bar.textContent = "100%";
+                status.innerHTML = "Update sent &mdash; waiting for the device to reboot...";
+                setTimeout(() => waitForReboot(otaPrevBuild, 0), 4000);
+            } else {
+                status.innerHTML = '<span class="text-danger">Upload failed (connection error before the firmware was fully sent).</span>';
+            }
+        };
+        xhr.send(file);
+    });
 }

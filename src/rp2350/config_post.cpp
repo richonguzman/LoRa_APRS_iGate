@@ -155,6 +155,7 @@ bool applyConfigForm(const String &contentType, const String &body) {
         Config.loramodule.txCodingRate4     = getParamIntSafe("lora.txCodingRate4", Config.loramodule.txCodingRate4);
         Config.loramodule.txSignalBandwidth = getParamIntSafe("lora.txSignalBandwidth", Config.loramodule.txSignalBandwidth);
         Config.loramodule.power             = getParamIntSafe("lora.power", Config.loramodule.power);
+        Config.loramodule.cadActive         = fHas("lora.cadActive");
 
         Config.display.alwaysOn             = fHas("display.alwaysOn");
         if (!Config.display.alwaysOn) {
