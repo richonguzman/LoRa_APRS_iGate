@@ -193,13 +193,31 @@ static void cors(EthernetClient &c) {
     c.print("Access-Control-Allow-Headers: Content-Type\r\n");
     c.print("Access-Control-Allow-Methods: GET, POST, OPTIONS\r\n");
 }
+// WIZnet's socketSend() clamps a write to the socket TX buffer (SSIZE, 2 KB here)
+// but EthernetClient::write() returns the size it was ASKED for, not what it sent,
+// so a single print() of a longer body silently loses the tail: a /stations.json of
+// 2616 bytes reached the browser cut at 2048, mid-JSON, and the map stayed empty.
+// Always hand the socket chunks that fit, and give up if the peer goes away.
+static void sendBody(EthernetClient &c, const uint8_t *data, size_t len) {
+    size_t   sent     = 0;
+    uint32_t deadline = millis() + 5000;
+    while (sent < len && c.connected() && (int32_t)(millis() - deadline) < 0) {
+        size_t chunk = len - sent;
+        if (chunk > 1024) chunk = 1024;
+        size_t w = c.write(data + sent, chunk);
+        if (w == 0) { delay(1); continue; }        // TX buffer full: let it drain
+        sent += w;
+    }
+    if (sent < len) Serial.printf("[web] short send: %u of %u bytes\n", (unsigned)sent, (unsigned)len);
+}
+
 static void sendText(EthernetClient &c, int code, const char *reason, const char *ctype, const String &body) {
     sendStatus(c, code, reason);
     c.print("Content-Type: "); c.print(ctype); c.print("\r\n");
     cors(c);
     c.print("Content-Length: "); c.print(body.length()); c.print("\r\n");
     c.print("Connection: close\r\n\r\n");
-    c.print(body);
+    sendBody(c, (const uint8_t *)body.c_str(), body.length());
 }
 
 static void serveConfig(EthernetClient &c) {
@@ -249,14 +267,7 @@ static void serveAsset(EthernetClient &c, const WebAsset &a, const String &ifNon
     cors(c);
     c.print("Content-Length: "); c.print((uint32_t)a.len); c.print("\r\n");
     c.print("Connection: close\r\n\r\n");
-    size_t sent = 0;
-    while (sent < a.len) {
-        size_t chunk = a.len - sent;
-        if (chunk > 1024) chunk = 1024;
-        size_t w = c.write(a.data + sent, chunk);   // RP2350: flash is directly addressable
-        if (w == 0) break;
-        sent += w;
-    }
+    sendBody(c, a.data, a.len);                     // RP2350: flash is directly addressable
 }
 
 // POST /configuration.json : read the urlencoded body, apply to Config, persist,
