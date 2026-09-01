@@ -186,6 +186,8 @@ body{background:var(--msh-bg);color:var(--msh-text);font-family:"Inter",system-u
 <button class="side-link" type="button" data-target="sec-maps"><span class="side-ico"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16"><path d="M15.817.113A.5.5 0 0 1 16 .5v14a.5.5 0 0 1-.402.49l-5 1a.5.5 0 0 1-.196 0L5.5 15.01l-4.902.98A.5.5 0 0 1 0 15.5v-14a.5.5 0 0 1 .402-.49l5-1a.5.5 0 0 1 .196 0L10.5.99l4.902-.98a.5.5 0 0 1 .415.103M10 1.91l-4-.8v12.98l4 .8zm1 12.98 4-.8V1.11l-4 .8zm-6-.8V1.11l-4 .8v12.98z"/></svg></span><span class="label">Map</span></button>
 <button class="side-link" type="button" id="rpToggle"><span class="side-ico"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5m-3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2m0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2m0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2"/></svg></span><span class="label">Received Packets</span></button>
 <a href="/received-packets" id="rpDummy" style="display:none" aria-hidden="true"></a>
+<button class="side-link rp2350-only" type="button" data-target="sec-messages" style="display:none"><span class="side-ico"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16"><path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1zm13 2.383-4.708 2.825L15 11.105zm-.034 6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741M1 11.105l4.708-2.897L1 5.383z"/></svg></span><span class="label">Messages</span></button>
+<button class="side-link rp2350-only" type="button" data-target="sec-ota" style="display:none"><span class="side-ico"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16"><path d="M8 2a5.53 5.53 0 0 0-3.594 1.342c-.766.66-1.321 1.52-1.464 2.383C1.266 6.095 0 7.555 0 9.318 0 11.366 1.708 13 3.781 13h8.906C14.502 13 16 11.57 16 9.773c0-1.636-1.242-2.969-2.834-3.194C12.923 3.999 10.69 2 8 2m2.354 5.146a.5.5 0 0 1-.708.708L8.5 6.707V10.5a.5.5 0 0 1-1 0V6.707L6.354 7.854a.5.5 0 1 1-.708-.708l2-2a.5.5 0 0 1 .708 0z"/></svg></span><span class="label">Firmware Update</span></button>
 <a class="side-link side-ota" href="/update"><span class="side-ico"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16"><path d="M8 2a5.53 5.53 0 0 0-3.594 1.342c-.766.66-1.321 1.52-1.464 2.383C1.266 6.095 0 7.555 0 9.318 0 11.366 1.708 13 3.781 13h8.906C14.502 13 16 11.57 16 9.773c0-1.636-1.242-2.969-2.834-3.194C12.923 3.999 10.69 2 8 2m2.354 5.146a.5.5 0 0 1-.708.708L8.5 6.707V10.5a.5.5 0 0 1-1 0V6.707L6.354 7.854a.5.5 0 1 1-.708-.708l2-2a.5.5 0 0 1 .708 0z"/></svg></span><span class="label">Update OTA</span></a>
   </aside>
   <main class="app-main">
@@ -213,6 +215,102 @@ body{background:var(--msh-bg);color:var(--msh-text);font-family:"Inter",system-u
                 <hr>
             </div>
     <div id="configuration">
+<section class="panel-section" id="sec-messages">
+                        <div class="row my-5 d-flex align-items-top">
+                            <div class="col-lg-10 col-sm-12">
+                                <h3>Send APRS Message</h3>
+                                <small>Send an APRS text message to another station. Tip: send <code>?APRSV</code>, <code>?APRSP</code>, <code>?APRSL</code> or <code>?APRSSR</code> to query another iGate.</small>
+                                <div class="row mt-4">
+                                    <div class="col-lg-4 col-sm-12">
+                                        <label for="message.to" class="form-label">To (callsign)</label>
+                                        <input
+                                            type="text"
+                                            class="form-control"
+                                            id="message.to"
+                                            placeholder="EA4XXX-7"
+                                            oninput="this.value = this.value.toUpperCase();"
+                                        />
+                                    </div>
+                                    <div class="col-lg-8 col-sm-12">
+                                        <label for="message.text" class="form-label">Message</label>
+                                        <input
+                                            type="text"
+                                            class="form-control"
+                                            id="message.text"
+                                            placeholder="Hello world"
+                                            maxlength="67"
+                                        />
+                                    </div>
+                                </div>
+                                <div class="row mt-3 align-items-center">
+                                    <div class="col-lg-3 col-6">
+                                        <div class="form-check form-switch">
+                                            <input type="checkbox" class="form-check-input" id="message.viaRF" checked />
+                                            <label class="form-check-label" for="message.viaRF">Send via RF</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 col-6">
+                                        <div class="form-check form-switch">
+                                            <input type="checkbox" class="form-check-input" id="message.viaTCP" />
+                                            <label class="form-check-label" for="message.viaTCP">Send via APRS-IS (TCP)</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 col-sm-12 mt-2 mt-lg-0">
+                                        <button class="btn btn-primary form-control" type="button" id="send-message">Send message now</button>
+                                    </div>
+                                </div>
+
+                                <h5 class="mt-5">Received messages</h5>
+                                <small>Messages addressed to this iGate&#39;s callsign. Refreshes every 10 seconds.</small>
+                                <table class="table mt-3">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Ago</th>
+                                            <th scope="col">From</th>
+                                            <th scope="col">Via</th>
+                                            <th scope="col">Message</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="received-messages"></tbody>
+                                </table>
+                            </div>
+                        </div>
+</section>
+<section class="panel-section" id="sec-ota">
+                        <div class="row my-5 d-flex align-items-top">
+                            <div class="col-lg-8 col-sm-12">
+                                <h3>Firmware Update (OTA)</h3>
+                                <small>Upload a new <code>firmware.bin</code> over the network. The device flashes it and reboots into the new firmware automatically.</small>
+                                <div class="alert alert-secondary mt-3 mb-0" id="ota.current">Current firmware: &hellip;</div>
+                                <div class="row mt-4">
+                                    <div class="col-12">
+                                        <label for="ota.file" class="form-label">Firmware file (firmware.bin)</label>
+                                        <input type="file" class="form-control" id="ota.file" accept=".bin" />
+                                    </div>
+                                </div>
+                                <div class="row mt-3">
+                                    <div class="col-lg-6 col-sm-12">
+                                        <label for="ota.user" class="form-label">OTA user <small>(only if configured)</small></label>
+                                        <input type="text" class="form-control" id="ota.user" placeholder="(optional)" />
+                                    </div>
+                                    <div class="col-lg-6 col-sm-12">
+                                        <label for="ota.pass" class="form-label">OTA password</label>
+                                        <input type="password" class="form-control" id="ota.pass" placeholder="(optional)" />
+                                    </div>
+                                </div>
+                                <div class="row mt-3">
+                                    <div class="col-lg-4 col-sm-12">
+                                        <button class="btn btn-primary form-control" type="button" id="ota.upload">Upload firmware</button>
+                                    </div>
+                                </div>
+                                <div class="progress mt-4 d-none" id="ota.progresswrap" style="height: 1.6rem;">
+                                    <div class="progress-bar" id="ota.progress" role="progressbar" style="width: 0%;">0%</div>
+                                </div>
+                                <div id="ota.status" class="mt-3"></div>
+                                <small class="d-block mt-2 text-muted">Do not power off during the update. The connection will drop when the device reboots &mdash; that is normal.</small>
+                            </div>
+                        </div>
+</section>
 <section class="panel-section" id="sec-maps">
                         <div class="row my-5">
                             <div class="col-12">
@@ -569,6 +667,63 @@ body{background:var(--msh-bg);color:var(--msh-text);font-family:"Inter",system-u
 
 </section>
 <section class="panel-section" id="sec-connectivity">
+
+                        <div class="row my-5 d-flex align-items-top" id="ip-config-section" style="display:none">
+                            <div class="col-lg-3 col-sm-12">
+                                <h5>
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="20"
+                                        height="20"
+                                        fill="currentColor"
+                                        class="bi bi-diagram-3"
+                                        viewBox="0 0 16 16"
+                                    >
+                                        <path
+                                            fill-rule="evenodd"
+                                            d="M6 3.5A1.5 1.5 0 0 1 7.5 2h1A1.5 1.5 0 0 1 10 3.5v1A1.5 1.5 0 0 1 8.5 6v1H14a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-1 0V8h-5v.5a.5.5 0 0 1-1 0V8h-5v.5a.5.5 0 0 1-1 0v-1A.5.5 0 0 1 2 7h5.5V6A1.5 1.5 0 0 1 6 4.5zM8.5 5a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5zM0 11.5A1.5 1.5 0 0 1 1.5 10h1A1.5 1.5 0 0 1 4 11.5v1A1.5 1.5 0 0 1 2.5 14h-1A1.5 1.5 0 0 1 0 12.5zm1.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm4.5.5A1.5 1.5 0 0 1 7.5 10h1a1.5 1.5 0 0 1 1.5 1.5v1A1.5 1.5 0 0 1 8.5 14h-1A1.5 1.5 0 0 1 6 12.5zm1.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm4.5.5a1.5 1.5 0 0 1 1.5-1.5h1a1.5 1.5 0 0 1 1.5 1.5v1a1.5 1.5 0 0 1-1.5 1.5h-1a1.5 1.5 0 0 1-1.5-1.5zm1.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5z"
+                                        />
+                                    </svg>
+                                    IP Config
+                                </h5>
+                                <small>Wired Ethernet: choose DHCP (automatic) or a static IP address.</small>
+                            </div>
+                            <div class="col-lg-9 col-sm-12">
+                                <div class="form-check form-switch">
+                                    <input
+                                        type="checkbox"
+                                        name="network.dhcp"
+                                        id="network.dhcp"
+                                        class="form-check-input"
+                                        checked
+                                    />
+                                    <label for="network.dhcp" class="form-label">Use DHCP (automatic IP)</label>
+                                </div>
+                                <div id="static-ip-config" class="mt-3" style="display: none;">
+                                    <div class="row">
+                                        <div class="col-lg-6 col-sm-12">
+                                            <label for="network.ip" class="form-label">IP Address</label>
+                                            <input type="text" class="form-control" name="network.ip" id="network.ip" placeholder="192.168.1.50" />
+                                        </div>
+                                        <div class="col-lg-6 col-sm-12">
+                                            <label for="network.gateway" class="form-label">Default Gateway</label>
+                                            <input type="text" class="form-control" name="network.gateway" id="network.gateway" placeholder="192.168.1.1" />
+                                        </div>
+                                    </div>
+                                    <div class="row mt-3">
+                                        <div class="col-lg-6 col-sm-12">
+                                            <label for="network.subnet" class="form-label">Subnet Mask</label>
+                                            <input type="text" class="form-control" name="network.subnet" id="network.subnet" placeholder="255.255.255.0" />
+                                        </div>
+                                        <div class="col-lg-6 col-sm-12">
+                                            <label for="network.dns" class="form-label">DNS Server(s) <small>(space-separated for multiple)</small></label>
+                                            <input type="text" class="form-control" name="network.dns" id="network.dns" placeholder="8.8.8.8 1.1.1.1" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr id="ip-config-hr" style="display:none">
 
 
                         <div class="row my-5 d-flex align-items-top">
@@ -2305,6 +2460,28 @@ body{background:var(--msh-bg);color:var(--msh-text);font-family:"Inter",system-u
                             ></b
                         >:
                         LoRa APRS iGate Firmware.
+                    </p>
+                    <p class="mb-1 small">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="16"
+                            height="16"
+                            fill="currentColor"
+                            class="bi bi-cc-circle-fill"
+                            viewBox="0 0 16 16"
+                        >
+                            <path
+                                d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M5.408 5.89c.681 0 1.138.47 1.187 1.107h1.147v-.11c-.053-1.187-1.024-2-2.343-2-1.604 0-2.518 1.05-2.518 2.751v.747c0 1.7.906 2.73 2.518 2.73 1.314 0 2.285-.792 2.343-1.939v-.114H6.595c-.049.615-.497 1.05-1.187 1.05-.84 0-1.318-.62-1.318-1.727v-.742c0-1.112.488-1.754 1.318-1.754Zm5.404 0c.68 0 1.138.47 1.186 1.107h1.147v-.11c-.053-1.187-1.024-2-2.342-2-1.604 0-2.518 1.05-2.518 2.751v.747c0 1.7.905 2.73 2.518 2.73 1.314 0 2.285-.792 2.342-1.939v-.114h-1.147c-.048.615-.496 1.05-1.186 1.05-.84 0-1.319-.62-1.319-1.727v-.742c0-1.112.488-1.754 1.319-1.754Z"
+                            />
+                        </svg>
+                        2026
+                        <b
+                            ><a
+                                href="https://ea4glo.cvaldess.com"
+                                target="_blank"
+                                >EA4GLO</a
+                            ></b
+                        >: RP2350 port.
                     </p>
                     <br />
                     <p class="mt-4 small">

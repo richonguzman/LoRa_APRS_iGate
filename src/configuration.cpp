@@ -17,7 +17,17 @@
  */
 
 #include <ArduinoJson.h>
+#if defined(ARDUINO_ARCH_RP2040)
+#include <LittleFS.h>
+#define IGATE_FS LittleFS
+#define IGATE_FS_BEGIN() LittleFS.begin()
+#define IGATE_RESTART() rp2040.restart()
+#else
 #include <SPIFFS.h>
+#define IGATE_FS SPIFFS
+#define IGATE_FS_BEGIN() SPIFFS.begin(false)
+#define IGATE_RESTART() ESP.restart()
+#endif
 #include "configuration.h"
 #include "board_pinout.h"
 #include "display.h"
@@ -30,7 +40,7 @@ bool Configuration::writeFile() {
     Serial.println("Saving configuration...");
 
     JsonDocument data;
-    File configFile = SPIFFS.open("/igate_conf.json", "w");
+    File configFile = IGATE_FS.open("/igate_conf.json", "w");
 
     if (!configFile) {
         Serial.println("Error: Could not open config file for writing");
@@ -179,6 +189,16 @@ bool Configuration::writeFile() {
         data["ntp"]["server"]                       = ntp.server;
         data["ntp"]["gmtCorrection"]                = ntp.gmtCorrection;
 
+#if defined(ARDUINO_ARCH_RP2040)
+        // Wired IP settings: only the RP2350 + W5500 build has an Ethernet stack
+        // to configure (the web UI shows its "IP Config" block when this exists).
+        data["network"]["dhcp"]                     = network.dhcp;
+        data["network"]["ip"]                       = network.ip;
+        data["network"]["gateway"]                  = network.gateway;
+        data["network"]["subnet"]                   = network.subnet;
+        data["network"]["dns"]                      = network.dns;
+#endif
+
         data["other"]["rebootMode"]                 = rebootMode;
         data["other"]["rebootModeTime"]             = rebootModeTime;
 
@@ -196,7 +216,7 @@ bool Configuration::writeFile() {
 
 bool Configuration::readFile() {
     Serial.println("Reading config..");
-    File configFile = SPIFFS.open("/igate_conf.json", "r");
+    File configFile = IGATE_FS.open("/igate_conf.json", "r");
 
     if (configFile) {
         bool needsRewrite = false;
@@ -412,6 +432,15 @@ bool Configuration::readFile() {
         ntp.server                      = data["ntp"]["server"] | "pool.ntp.org";
         ntp.gmtCorrection               = data["ntp"]["gmtCorrection"] | 0.0;
 
+#if defined(ARDUINO_ARCH_RP2040)
+        if (data["network"]["dhcp"].isNull()) needsRewrite = true;
+        network.dhcp                    = data["network"]["dhcp"] | true;
+        network.ip                      = data["network"]["ip"] | "";
+        network.gateway                 = data["network"]["gateway"] | "";
+        network.subnet                  = data["network"]["subnet"] | "255.255.255.0";
+        network.dns                     = data["network"]["dns"] | "";
+#endif
+
         if (data["other"]["rebootMode"].isNull() ||
             data["other"]["rebootModeTime"].isNull()) needsRewrite = true;
         rebootMode                      = data["other"]["rebootMode"] | false;
@@ -433,7 +462,7 @@ bool Configuration::readFile() {
             Serial.println("Config JSON incomplete, rewriting...");
             writeFile();
             delay(1000);
-            ESP.restart();
+            IGATE_RESTART();
         }
         Serial.println("Config read successfuly");
         return true;
@@ -560,6 +589,12 @@ void Configuration::setDefaultValues() {
     ntp.server                      = "pool.ntp.org";
     ntp.gmtCorrection               = 0.0;
 
+    network.dhcp                    = true;
+    network.ip                      = "";
+    network.gateway                 = "";
+    network.subnet                  = "255.255.255.0";
+    network.dns                     = "";
+
     rebootMode                      = false;
     rebootModeTime                  = 0;
 
@@ -569,22 +604,58 @@ void Configuration::setDefaultValues() {
 }
 
 void Configuration::setup() {
-    if (!SPIFFS.begin(false)) {
+    if (!IGATE_FS_BEGIN()) {
+#if defined(ARDUINO_ARCH_RP2040)
+        // A stale/incompatible LittleFS (e.g. this board previously ran a
+        // firmware with a different filesystem_size, leaving the FS region with
+        // data that mounts but can't be written) fails to mount cleanly — format
+        // once and retry rather than giving up.
+        Serial.println("File system mount failed — formatting...");
+        LittleFS.format();
+        if (!IGATE_FS_BEGIN()) {
+            Serial.println("File system unusable after format");
+            return;
+        }
+        Serial.println("File system formatted and mounted");
+#else
         Serial.println("SPIFFS Mount Failed, formatting...");
 
         if (!SPIFFS.begin(true)) {
             Serial.println("SPIFFS Format Failed");
             return;
         }
+        Serial.println("SPIFFS Ready");
+#endif
+    } else {
+        Serial.println("File system mounted");
     }
-    Serial.println("SPIFFS Ready");
 
-    if (!SPIFFS.exists("/igate_conf.json")) {
+    bool exists = IGATE_FS.exists("/igate_conf.json");
+    if (!exists) {
         Serial.println("Config not found, creating default...");
         setDefaultValues();
-        writeFile();
+        bool ok = writeFile();
+#if defined(ARDUINO_ARCH_RP2040)
+        if (!ok) {
+            // Mounted but the write was rejected (stale FS from a different
+            // layout). Format once, remount and retry so we never reboot-loop
+            // here on a config that can't be created.
+            Serial.println("Config write failed — formatting file system and retrying...");
+            LittleFS.format();
+            IGATE_FS_BEGIN();
+            ok = writeFile();
+        }
+        if (ok) {
+            delay(1000);
+            IGATE_RESTART();
+        } else {
+            Serial.println("Config could not be persisted — continuing with defaults");
+        }
+#else
+        (void)ok;
         delay(1000);
-        ESP.restart();
+        IGATE_RESTART();
+#endif
     }
 
     readFile();
