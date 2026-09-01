@@ -56,6 +56,7 @@ struct Request {
     String query;
     String contentType;
     String authorization;
+    String ifNoneMatch;
     long   contentLength = 0;
 };
 
@@ -178,6 +179,7 @@ static bool parseRequest(EthernetClient &c, Request &req, uint32_t deadlineMs) {
         if (headerIs(line, "Content-Length", val)) req.contentLength = val.toInt();
         else if (headerIs(line, "Content-Type", val)) req.contentType = val;
         else if (headerIs(line, "Authorization", val)) req.authorization = val;
+        else if (headerIs(line, "If-None-Match", val)) req.ifNoneMatch = val;
     }
     return false;
 }
@@ -215,11 +217,35 @@ static void serveConfig(EthernetClient &c) {
 }
 
 // Serve a gzipped flash asset (chunked — the W5500 TX buffer is ~2 KB/socket).
-static void serveAsset(EthernetClient &c, const WebAsset &a) {
+// The SPA assets live in flash, so they only change when the firmware does:
+// tag them with the build stamp and let the browser revalidate on each load.
+// With a plain "max-age" a browser kept serving the old page for an hour after
+// an OTA -- and mixed old and new files, since each asset expires on its own --
+// which looks exactly like a broken web UI.
+static String assetEtag(const WebAsset &a) {
+    extern const char *FW_BUILD;
+    uint32_t h = 5381;
+    for (const char *p = FW_BUILD; *p; p++) h = h * 33u + (uint8_t)*p;
+    char buf[32];
+    snprintf(buf, sizeof(buf), "\"%08lx-%x\"", (unsigned long)h, (unsigned)a.len);
+    return String(buf);
+}
+
+static void serveAsset(EthernetClient &c, const WebAsset &a, const String &ifNoneMatch) {
+    String etag = assetEtag(a);
+    if (ifNoneMatch.length() && ifNoneMatch.indexOf(etag) >= 0) {   // unchanged since last load
+        sendStatus(c, 304, "Not Modified");
+        c.print("ETag: "); c.print(etag); c.print("\r\n");
+        c.print("Cache-Control: no-cache\r\n");
+        cors(c);
+        c.print("Content-Length: 0\r\nConnection: close\r\n\r\n");
+        return;
+    }
     sendStatus(c, 200, "OK");
     c.print("Content-Type: "); c.print(a.ctype); c.print("\r\n");
     c.print("Content-Encoding: gzip\r\n");
-    c.print("Cache-Control: max-age=3600\r\n");
+    c.print("Cache-Control: no-cache\r\n");
+    c.print("ETag: "); c.print(etag); c.print("\r\n");
     cors(c);
     c.print("Content-Length: "); c.print((uint32_t)a.len); c.print("\r\n");
     c.print("Connection: close\r\n\r\n");
@@ -382,7 +408,7 @@ static void handleClient(EthernetClient &c) {
     if (req.method == "GET") {  // static SPA assets
         for (size_t i = 0; i < WEB_ASSETS_N; i++) {
             if (req.path == WEB_ASSETS[i].path) {
-                serveAsset(c, WEB_ASSETS[i]);
+                serveAsset(c, WEB_ASSETS[i], req.ifNoneMatch);
                 c.flush();
                 return;
             }
