@@ -25,9 +25,13 @@ namespace {
 // Build the APRS message envelope addressed back to `station`:
 //   CALL>APLRG1,RFONLY[,PATH]::STATION   :   (9-char padded addressee, RFONLY so
 // the reply is not gated). Caller appends the message body.
-String envelope(const String& station) {
+// `gateable` drops the RFONLY tag so a neighbouring iGate may put the reply on
+// APRS-IS: used for third-party traffic, whose originator is not on our RF
+// (same rule as upstream's APRS_IS_Utils::processReceivedLoRaMessage).
+String envelope(const String& station, bool gateable = false) {
     String s = Config.callsign;
-    s += ">APLRG1,RFONLY";
+    s += ">APLRG1";
+    if (!gateable) s += ",RFONLY";
     if (Config.beacon.path.length()) { s += ','; s += Config.beacon.path; }
     s += "::";
     String padded = station;
@@ -88,15 +92,35 @@ String answerFor(const String& query, const String& sender) {
 namespace Query {
 
 bool handleMessage(const String& body, const String& sender) {
-    int dc = body.indexOf("::");
+    // Third-party packet ("GATE>PATH:}ORIGINAL>PATH,TCPIP,GATE*::ADDRESSEE:text"):
+    // a message another iGate pulled off APRS-IS and re-transmitted on RF. Unwrap
+    // it so the message is credited to the ORIGINAL sender instead of the station
+    // that repeated it (same detection as DIGI_Utils::processLoRaPacket upstream).
+    String packet     = body;
+    String from       = sender;
+    bool   thirdParty = false;
+    int    fc         = body.indexOf(':');
+    if (fc > 5 && fc < (int)body.length() - 1 && body[fc + 1] == '}' && body.indexOf("TCPIP") > 0) {
+        thirdParty = true;
+        packet     = body.substring(body.indexOf(":}") + 2);
+        int gt     = packet.indexOf('>');
+        if (gt <= 0) return false;
+        from       = packet.substring(0, gt);
+    }
+
+    int dc = packet.indexOf("::");
     if (dc <= 10) return false;                              // not an APRS message
 
-    String addresseeAndMsg = body.substring(dc + 2);
+    String addresseeAndMsg = packet.substring(dc + 2);
     int firstColon = addresseeAndMsg.indexOf(':');
     if (firstColon < 0) return false;
     String addressee = addresseeAndMsg.substring(0, firstColon);
     addressee.trim();
     if (addressee != Config.callsign) return false;          // not for us
+
+    // Our own message handed back by an APRS-IS gateway: consume it (so it is
+    // neither gated nor digipeated again) but don't log it or ack ourselves.
+    if (from == Config.callsign) return true;
 
     String text = addresseeAndMsg.substring(firstColon + 1); // message text (+ optional {msgid})
 
@@ -104,28 +128,28 @@ bool handleMessage(const String& body, const String& sender) {
     int brace = text.indexOf('{');
     String msgText = (brace > 0) ? text.substring(0, brace) : text;
 
-    onIncomingMessage(sender, msgText);                      // log it for the web UI
+    onIncomingMessage(from, msgText);                        // log it for the web UI
     if (brace > 0) {
         String ackId = text.substring(brace + 1);
         ackId.trim();
-        String ack = envelope(sender);
+        String ack = envelope(from, thirdParty);
         ack += "ack";
         ack += ackId;
         Station::enqueueTx(ack, false);
-        Serial.println("[query] ack -> " + sender + " (" + ackId + ")");
+        Serial.println("[query] ack -> " + from + (thirdParty ? " (3rd party, " : " (") + ackId + ")");
     }
 
     if (msgText.indexOf('?') == 0) {                         // it's a query
-        String answer = answerFor(msgText, sender);
+        String answer = answerFor(msgText, from);
         if (answer.length()) {
-            String reply = envelope(sender);
+            String reply = envelope(from, thirdParty);
             reply += answer;
             reply += " *";                                  // random 2-char tag (matches upstream)
             reply += char(random(97, 123));
             reply += char(random(97, 123));
             reply += '*';
             Station::enqueueTx(reply, false);
-            Serial.println("[query] " + msgText + " -> " + sender + ": " + answer);
+            Serial.println("[query] " + msgText + " -> " + from + ": " + answer);
         }
         return true;                                        // query handled: don't gate/digipeat
     }
