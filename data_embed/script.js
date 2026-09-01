@@ -277,6 +277,7 @@ function loadSettings(settings) {
     document.getElementById("ntp.gmtCorrection").value                  = settings.ntp.gmtCorrection;
 
     applyWiredBuildUi(settings);    // RP2350 + Ethernet build (see bottom of this file)
+    clampOutOfRangeInputs();        // keep the form submittable (see bottom of this file)
 
     updateImage();
 }
@@ -1053,3 +1054,69 @@ if (otaUploadButton) {
         xhr.send(file);
     });
 }
+
+
+/* ------------------------------------------------- keeping the form submittable
+ * A control that fails HTML5 validation blocks the whole form. When it sits in a
+ * panel that is not the visible one the browser cannot show its bubble either, so
+ * pressing Save just does nothing at all -- no message, no request, no clue. Two
+ * guards against that: pull stored values back inside the allowed range on load,
+ * and, if something still fails, open the offending section and say what is wrong.
+ */
+function clampOutOfRangeInputs() {
+    const fixed = [];
+
+    document.querySelectorAll("#configuration input[type=number]").forEach((el) => {
+        if (el.disabled || el.value === "") return;
+
+        const value = parseFloat(el.value);
+        if (isNaN(value)) return;
+
+        const min = el.min !== "" ? parseFloat(el.min) : null;
+        const max = el.max !== "" ? parseFloat(el.max) : null;
+
+        let clamped = value;
+        if (max !== null && value > max) clamped = max;
+        if (min !== null && value < min) clamped = min;
+
+        if (clamped !== value) {
+            el.value = clamped;
+            fixed.push((el.name || el.id) + ": " + value + " &rarr; " + clamped);
+        }
+    });
+
+    if (fixed.length) {
+        showToast("Stored values outside the allowed range, adjusted:<br>" + fixed.join("<br>")
+                  + "<br><small>Save to keep them.</small>");
+    }
+}
+
+let invalidFieldReported = false;
+
+form.addEventListener("invalid", function (event) {
+    const el = event.target;
+
+    if (!invalidFieldReported) {          // only the first one: the rest would pile up toasts
+        invalidFieldReported = true;
+        setTimeout(() => { invalidFieldReported = false; }, 500);
+
+        const section = el.closest(".panel-section");
+        if (section) {
+            const link = document.querySelector('.side-link[data-target="' + section.id + '"]');
+            if (link) {
+                link.click();             // reuses the sidebar switcher (also shows the config view)
+            } else {
+                document.querySelectorAll(".panel-section").forEach((s) => s.classList.remove("active"));
+                section.classList.add("active");
+                document.getElementById("configuration").classList.remove("d-none");
+            }
+        }
+
+        showToast("<b>" + (el.name || el.id) + "</b>: " + (el.validationMessage || "invalid value"));
+
+        setTimeout(() => {
+            el.focus();
+            el.scrollIntoView({ block: "center", behavior: "smooth" });
+        }, 0);
+    }
+}, true);
