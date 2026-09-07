@@ -57,19 +57,20 @@
             String lastEpaperText;
         #else
             #include <Adafruit_GFX.h>
+            #if defined RPC_LORA_DIGIGATE_1W
+                #define SCREEN_HEIGHT 32
+            #else
+                #define SCREEN_HEIGHT 64
+            #endif
+
             #ifdef HAS_SH1106
                 #include <Adafruit_SH110X.h>
-                Adafruit_SH1106G display(128, 64, &Wire, OLED_RST);
+                Adafruit_SH1106G display(128, SCREEN_HEIGHT, &Wire, OLED_RST);
             #else
                 #include <Adafruit_SSD1306.h>
                 #ifdef HELTEC_WSL_V3_DISPLAY
-                    Adafruit_SSD1306 display(128, 64, &Wire1, OLED_RST);
+                    Adafruit_SSD1306 display(128, SCREEN_HEIGHT, &Wire1, OLED_RST);
                 #else
-                    #if defined RPC_LORA_DIGIGATE_1W
-                        #define SCREEN_HEIGHT 32
-                    #else
-                        #define SCREEN_HEIGHT 64
-                    #endif
                     Adafruit_SSD1306 display(128, SCREEN_HEIGHT, &Wire, OLED_RST);
                 #endif
             #endif
@@ -107,6 +108,8 @@ void displaySetup() {
                 maxLines = 6;
             #elif (SCREEN_HEIGHT == 32)
                 maxLines = 3;
+            #else
+                maxLines = 6;
             #endif
             #ifdef HAS_EPAPER
                 display.landscape();
