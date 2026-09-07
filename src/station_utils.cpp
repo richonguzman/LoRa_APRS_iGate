@@ -50,6 +50,7 @@ std::vector<Packet25SegBuffer>  packet25SegBuffer;
 
 bool saveNewDigiEcoModeConfig   = false;
 bool packetIsBeacon             = false;
+uint32_t    bootTimeMillis      = 0;
 
 
 namespace STATION_Utils {
@@ -235,6 +236,14 @@ namespace STATION_Utils {
 
     void addToOutputPacketBuffer(const String& packet, bool flag) {
         outputPacketBuffer.emplace_back(OutputPacketBuffer{packet, flag});
+    }
+
+    void markBootTime() {
+        bootTimeMillis = millis();
+    }
+
+    unsigned long getBootTime() {
+        return bootTimeMillis;
     }
 
 }

@@ -98,4 +98,13 @@ namespace MQTT_Utils {
         pubSub.setCallback(receivedFromMqtt);
     }
 
+    String getMQTTStatus() {
+        if (!Config.mqtt.active) {
+            return "Inactive";
+        }
+        if (pubSub.connected()) {
+            return "Connected";
+        }
+        return "Not connected";
+    }
 }

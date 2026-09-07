@@ -63,4 +63,23 @@ namespace NTP_Utils {
         return "DigiEcoMode Active";
     }
 
+    unsigned long getTimeMillis() {
+        if (networkManager->isConnected() && Config.digi.ecoMode == 0 && timeClient != nullptr) {
+            return timeClient->getEpochTime()*1000;
+        }
+        return millis();
+    }
+
+    String getNTPStatus() {
+        if ((networkManager == nullptr) || (timeClient == nullptr)) {
+            return "Not connected";
+        }
+        if (networkManager->isConnected() && Config.digi.ecoMode != 0) {
+            return "DigiEcoMode Active";
+        }
+        if (timeClient->isTimeSet()) {
+            return "OK";
+        }
+        return "Error";
+    }
 }

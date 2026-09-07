@@ -50,7 +50,6 @@ extern String               versionNumber;
 bool        passcodeValid   = false;
 uint32_t    lastServerCheck = 0;
 
-
 #ifdef HAS_A7670
     extern bool             stationBeacon;
 #endif
@@ -58,7 +57,14 @@ uint32_t    lastServerCheck = 0;
 
 namespace APRS_IS_Utils {
 
+    unsigned int packetSendSuccess = 0;
+    unsigned int packetSendFail = 0;
+    unsigned int packetReceiveSuccess = 0;
+    unsigned int packetReceiveFail = 0;
+    unsigned long packetCountStartTime = 0;
+
     void upload(const String& line) {
+        incrementPacketSendSuccess();
         aprsIsClient.print(line + "\r\n");
     }
 
@@ -93,7 +99,30 @@ namespace APRS_IS_Utils {
     }
 
     void checkStatus() {
-        String wifiState, aprsisState;
+        String wifiState = getWifiState();
+        String aprsisState = getAPRSISState();
+
+        if (!networkManager->isWiFiConnected()) {
+            if (!Config.display.alwaysOn && Config.display.timeout != 0) {
+                displayToggle(true);
+            }
+            lastScreenOn = millis();
+        }
+
+        if (Config.aprs_is.active) {
+            if(aprsisState == "--" && !Config.display.alwaysOn && Config.display.timeout != 0) {
+                displayToggle(true);
+                lastScreenOn = millis();
+            }
+        }
+        secondLine = "WiFi: ";
+        secondLine += wifiState;
+        secondLine += " APRS-IS: ";
+        secondLine += aprsisState;
+    }
+
+    String getWifiState() {
+        String wifiState;
         if (networkManager->isWiFiConnected()) {
             wifiState = "OK";
         } else {
@@ -102,11 +131,13 @@ namespace APRS_IS_Utils {
             } else {
                 wifiState = "AP";
             }
-            if (!Config.display.alwaysOn && Config.display.timeout != 0) {
-                displayToggle(true);
-            }
-            lastScreenOn = millis();
         }
+
+        return wifiState;
+    }
+
+    String getAPRSISState() {
+        String aprsisState;
 
         if (!Config.aprs_is.active) {
             aprsisState = "OFF";
@@ -124,15 +155,8 @@ namespace APRS_IS_Utils {
                     aprsisState = "--";
                 }
             #endif
-            if(aprsisState == "--" && !Config.display.alwaysOn && Config.display.timeout != 0) {
-                displayToggle(true);
-                lastScreenOn = millis();
-            }
         }
-        secondLine = "WiFi: ";
-        secondLine += wifiState;
-        secondLine += " APRS-IS: ";
-        secondLine += aprsisState;
+        return aprsisState;
     }
 
     String checkForStartingBytes(const String& packet) {
@@ -225,6 +249,7 @@ namespace APRS_IS_Utils {
                         lastScreenOn = millis();
                         #ifdef HAS_A7670
                             stationBeacon = true;
+                            incrementPacketReceiveSuccess();
                             A7670_Utils::uploadToAPRSIS(aprsPacket);
                             stationBeacon = false;
                         #else
@@ -299,6 +324,7 @@ namespace APRS_IS_Utils {
         ackPacket += ackMessage;
 
         #ifdef HAS_A7670
+            incrementPacketReceiveSuccess();
             A7670_Utils::uploadToAPRSIS(ackPacket);
         #else
             upload(ackPacket);
@@ -322,6 +348,7 @@ namespace APRS_IS_Utils {
             if (packet.startsWith("#")) {
                 if (Config.digi.backupDigiMode) lastServerCheck = currentTime;
             } else {
+                incrementPacketReceiveSuccess();
                 int doubleColonIndex = packet.indexOf("::");
                 if (Config.aprs_is.messagesToRF && doubleColonIndex > 0) {
                     String Sender = packet.substring(0, packet.indexOf(">"));
@@ -347,6 +374,7 @@ namespace APRS_IS_Utils {
                             }
                             lastScreenOn = currentTime;
                             #ifdef HAS_A7670
+                                incrementPacketReceiveSuccess();
                                 A7670_Utils::uploadToAPRSIS(queryAnswer);
                             #else
                                 upload(queryAnswer);
@@ -416,4 +444,75 @@ namespace APRS_IS_Utils {
         }
     }
 
+    bool isBeyondWindow(unsigned long time) {
+        unsigned long window = 24*60*60*1000;
+        if (time > packetCountStartTime + window) {
+            return true;
+        }
+        return false;
+    }
+
+    void resetPacketCounters(unsigned long time) {
+        packetCountStartTime = time;
+        packetSendSuccess = 0;
+        packetSendFail = 0;
+        packetReceiveSuccess = 0;
+        packetReceiveFail = 0;
+    }
+
+    void incrementPacketSendSuccess() {
+        unsigned int now = millis();
+        if (isBeyondWindow(now)) {
+            resetPacketCounters(now);
+            packetSendSuccess = 1;
+        } else {
+            packetSendSuccess++;
+        }
+    }
+
+    unsigned int getPacketSendSuccess() {
+        return packetSendSuccess;
+    }
+
+    void incrementPacketSendFail() {
+        unsigned int now = millis();
+        if (isBeyondWindow(now)) {
+            packetCountStartTime = now;
+            packetSendFail = 1;
+        } else {
+            packetSendFail++;
+        }
+    }
+
+    unsigned int getPacketSendFail() {
+        return packetSendFail;
+    }
+
+    void incrementPacketReceiveSuccess() {
+        unsigned int now = millis();
+        if (isBeyondWindow(now)) {
+            packetCountStartTime = now;
+            packetReceiveSuccess = 1;
+        } else {
+            packetReceiveSuccess++;
+        }
+    }
+
+    unsigned int getPacketReceiveSuccess() {
+        return packetReceiveSuccess;
+    }
+
+    void incrementPacketReceiveFail() {
+        unsigned int now = millis();
+        if (isBeyondWindow(now)) {
+            packetCountStartTime = now;
+            packetReceiveFail = 1;
+        } else {
+            packetReceiveFail++;
+        }
+    }
+
+    unsigned int getPacketReceiveFail() {
+        return packetReceiveFail;
+    }
 }

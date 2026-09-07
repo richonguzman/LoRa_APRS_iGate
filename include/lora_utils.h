@@ -33,6 +33,19 @@ namespace LoRa_Utils {
     void    wakeRadio();
     void    sleepRadio();
 
+    void incrementPacketSendSuccess();
+    unsigned int getPacketSendSuccess();
+    void incrementPacketSendFail();
+    unsigned int getPacketSendFail();
+    void incrementPacketReceiveSuccess();
+    unsigned int getPacketReceiveSuccess();
+    void incrementPacketReceiveFail();
+    unsigned int getPacketReceiveFail();
+    void incrementPacketBlacklisted();
+    unsigned int getPacketBlacklisted();
+    bool isBeyondWindow(unsigned long time);
+    void resetPacketCounters(unsigned long time);
+
 }
 
 #endif
