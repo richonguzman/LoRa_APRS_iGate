@@ -242,16 +242,18 @@ body{background:var(--msh-bg);color:var(--msh-text);font-family:"Inter",system-u
                             </h5>
                             <small>Current device up-time</small>
                         </div>
-                        <div class="col-9">
+                        <div class="col-lg-9 col-sm-12">
                             <div class="row mt-2">
-                                <div class="col-6">
+                                <div class="col-6 mt-1">
                                     <label for="stationStatus.elapsedTime" class="form-label"
                                         >Elapsed time</label
                                     >
                                     <div class="input-group">
                                         <input
+                                            type="text"
                                             name="stationStatus.elapsedTime"
                                             id="stationStatus.elapsedTime"
+                                            placeholder="000d 00h 00m 00s"
                                             class="form-control"
                                             readonly
                                         />
@@ -281,32 +283,38 @@ body{background:var(--msh-bg);color:var(--msh-text);font-family:"Inter",system-u
                             </h5>
                             <small>Current Battery status</small>
                         </div>
-                        <div class="col-9">
+                        <div class="col-lg-9 col-sm-12">
                             <div class="row mt-2">
-                                <div class="col-6">
-                                    <label for="stationStatus.voltageInternal" class="form-label"
-                                        >Internal Voltage</label
-                                    >
+                                <div class="col-6 mt-1">
+                                    <label
+                                        for="stationStatus.voltageInternal"
+                                        class="form-label">
+                                        Internal Voltage
+                                    </label>
                                     <div class="input-group">
                                         <input
+                                            type="text"
                                             name="stationStatus.voltageInternal"
                                             id="stationStatus.voltageInternal"
+                                            placeholder="0.00"
                                             class="form-control"
                                             readonly
                                         />
                                         <span class="input-group-text"
-                                            >Volts</span
-                                        >
+                                            >Volts
+                                        </span>
                                     </div>
                                 </div>
-                                <div class="col-6">
+                                <div class="col-6 mt-1">
                                     <label for="stationStatus.voltageExternal" class="form-label"
                                         >External voltage</label
                                     >
                                     <div class="input-group">
                                         <input
+                                            type="text"
                                             name="stationStatus.voltageExternal"
                                             id="stationStatus.voltageExternal"
+                                            placeholder="0.00"
                                             class="form-control"
                                             readonly
                                         />

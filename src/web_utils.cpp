@@ -140,8 +140,11 @@ namespace WEB_Utils {
         JsonDocument data;
 
         // voltage
-        data["stationStatus"]["voltageInternal"] = BATTERY_Utils::checkInternalVoltage();
-        data["stationStatus"]["voltageExternal"] = BATTERY_Utils::checkExternalVoltage();
+        char voltageInfo[10];   // Enough to hold "xx.xx\0"
+        snprintf(voltageInfo, sizeof(voltageInfo), "%.2f", BATTERY_Utils::checkInternalVoltage());
+        data["stationStatus"]["voltageInternal"] = voltageInfo;
+        snprintf(voltageInfo, sizeof(voltageInfo), "%.2f", BATTERY_Utils::checkExternalVoltage());
+        data["stationStatus"]["voltageExternal"] = voltageInfo;
 
         // weather
         boolean weatherModulePresent = WX_Utils::isWeatherModulePresent();
