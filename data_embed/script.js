@@ -909,8 +909,10 @@ function drawStationRoute(station) {
 
     points.push(iGateLatLng);
 
+    const routeColor = digis.length > 0 ? "#2e7d32" : "#1565c0";
+
     mapRouteLayer = L.polyline(points, {
-        color: "#e53935",
+        color: routeColor,
         weight: 3,
         opacity: 0.9
     }).addTo(mapInstance);
