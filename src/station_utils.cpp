@@ -239,7 +239,7 @@ namespace STATION_Utils {
     }
 
     void markBootTime() {
-        bootTimeMillis = millis();
+        bootTimeMillis = millis() / 1000;
     }
 
     unsigned long getBootTime() {

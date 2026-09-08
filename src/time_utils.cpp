@@ -71,9 +71,8 @@ namespace TIME_Utils {
         return true;
     }
 
-    String  generateDuration(unsigned long startMillis, unsigned long endMillis) {
-        unsigned long diff = endMillis - startMillis;
-        diff /= 1000;  // convert to seconds
+    String  generateDuration(unsigned long startSeconds, unsigned long endSeconds) {
+        unsigned long diff = endSeconds - startSeconds;
 
         unsigned long seconds = diff - ((diff/60) * 60);
         diff -= seconds;

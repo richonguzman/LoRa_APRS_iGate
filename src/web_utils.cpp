@@ -162,7 +162,7 @@ namespace WEB_Utils {
         }
 
         // elapsed time
-        unsigned long now = millis();
+        unsigned long now = millis() / 1000;
         unsigned long bootTime = STATION_Utils::getBootTime();
         data["stationStatus"]["elapsedTime"] = TIME_Utils::generateDuration(bootTime, now);
 
