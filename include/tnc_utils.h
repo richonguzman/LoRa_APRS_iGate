@@ -20,6 +20,8 @@
 #define TNC_UTILS_H_
 
 #include <Arduino.h>
+#include <vector>
+#include "lora_utils.h" // for LoRa_Utils::RxtHopMetric
 
 
 namespace TNC_Utils {
@@ -27,8 +29,8 @@ namespace TNC_Utils {
     void setup();
     void loop();
 
-    void sendToClients(const String& packet, bool stripBytes = false);
-    void sendToSerial(const String& packet, bool stripBytes = false);
+    void sendToClients(const String& packet, bool stripBytes, const std::vector<LoRa_Utils::RxtHopMetric>& hopMetrics);
+    void sendToSerial(const String& packet, bool stripBytes, const std::vector<LoRa_Utils::RxtHopMetric>& hopMetrics);
 
 }
 

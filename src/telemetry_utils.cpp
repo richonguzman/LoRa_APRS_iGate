@@ -30,6 +30,10 @@
 
 
 extern      Configuration       Config;
+// Defined in station_utils.cpp, mirrors packetIsBeacon. Defaults false and
+// is only ever set true immediately around the one genuine digipeat-relay
+// call in digi_utils.cpp.
+extern      bool                packetEligibleForRxt;
 
 int         telemetryCounter    = random(1,999);
 uint32_t    telemetryEUPTime    = 0;
@@ -81,6 +85,13 @@ namespace TELEMETRY_Utils {
             delay(300);
         } else if (Config.beacon.sendViaRF) {
             String baseRFTelemetryPacket = APRSPacketLib::generateMessagePacket(currentCallsign, "APLRG1", Config.beacon.path, currentCallsign, packet);
+            // Self-originated content -- no real LoRa reception behind this
+            // transmission, so RXT must never be attached. This call
+            // bypasses STATION_Utils::addToOutputPacketBuffer()'s queue
+            // entirely, so the explicit reset here (rather than relying on
+            // the global's default) keeps that invariant visible at the
+            // point it actually matters.
+            packetEligibleForRxt = false;
             LoRa_Utils::sendNewPacket(baseRFTelemetryPacket);
             delay(3000);
         }

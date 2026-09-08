@@ -28,6 +28,7 @@
 #include "A7670_utils.h"
 #include "digi_utils.h"
 #include "tnc_utils.h"
+#include "lora_utils.h"
 #include "display.h"
 #include "utils.h"
 
@@ -79,7 +80,6 @@ namespace APRS_IS_Utils {
             Serial.println("Tried: " + String(count) + " FAILED!");
         } else {
             Serial.println("Connected!\n(Server: " + String(Config.aprs_is.server) + " / Port: " + String(Config.aprs_is.port) + ")");
-            // String filter = "t/m/" + Config.callsign + "/" + (String)Config.aprs_is.reportingDistance;
             String aprsAuth = "user ";
             aprsAuth += Config.callsign;
             aprsAuth += " pass ";
@@ -150,7 +150,14 @@ namespace APRS_IS_Utils {
         }
         packetToUpload += Config.callsign;
         packetToUpload += checkForStartingBytes(packet.substring(colonIndex));
-        return packetToUpload;
+
+        // Belt-and-suspenders: RXT trailers should already be gone by this
+        // point (stripped once in LoRa_Utils::receivePacket(), the sole
+        // upstream source of RF packets). This is a second, independent
+        // strip at the actual APRS-IS upload boundary -- a no-op in normal
+        // operation, but it means this guarantee doesn't rest entirely on
+        // a call site in a different file continuing to behave correctly.
+        return LoRa_Utils::stripRxtTrailer(packetToUpload);
     }
 
     bool processReceivedLoRaMessage(const String& sender, const String& packet, bool thirdParty) {
@@ -161,7 +168,6 @@ namespace APRS_IS_Utils {
             String ackMessage = "ack";
             ackMessage.concat(packet.substring(leftCurlyBraceIndex + 1));
             ackMessage.trim();
-            //Serial.println(ackMessage);
 
             String addToBuffer = Config.callsign;
             addToBuffer += ">APLRG1";
@@ -341,7 +347,6 @@ namespace APRS_IS_Utils {
                         if (receivedMessage.indexOf("?") == 0) {
                             Utils::println("Rx Query (APRS-IS)  : " + packet);
                             String queryAnswer = QUERY_Utils::process(receivedMessage, Sender, true, false);
-                            //Serial.println("---> QUERY Answer : " + queryAnswer.substring(0,queryAnswer.indexOf("\n")));
                             if (!Config.display.alwaysOn && Config.display.timeout != 0) {
                                 displayToggle(true);
                             }
@@ -386,8 +391,17 @@ namespace APRS_IS_Utils {
                     }
                 }
                 if (Config.tnc.aprsBridgeActive) {
-                    if (Config.tnc.enableServer) TNC_Utils::sendToClients(packet);  // Send received packet to TNC KISS
-                    if (Config.tnc.enableSerial) TNC_Utils::sendToSerial(packet);   // Send received packet to Serial KISS
+                    // Packets bridged from APRS-IS never carry RXT telemetry --
+                    // RXT is strictly an RF-local feature (enforced upstream by
+                    // LoRa_Utils::receivePacket(), which strips any trailer
+                    // before a packet is handed anywhere). Pass an empty
+                    // hop-metrics vector rather than calling
+                    // getDecodedRxtMetrics() here, which would incorrectly
+                    // reuse whatever RXT state is left over from the last
+                    // real RF receive and attach it to an unrelated packet.
+                    static const std::vector<LoRa_Utils::RxtHopMetric> noHopMetrics;
+                    if (Config.tnc.enableServer) TNC_Utils::sendToClients(packet, false, noHopMetrics);  // Send received packet to TNC KISS
+                    if (Config.tnc.enableSerial) TNC_Utils::sendToSerial(packet, false, noHopMetrics);   // Send received packet to Serial KISS
                 }
             }
         }
@@ -400,7 +414,7 @@ namespace APRS_IS_Utils {
             if (aprsIsClient.connected()) {
                 if (aprsIsClient.available()) {
                     String aprsisPacket = aprsIsClient.readStringUntil('\r');
-                    aprsisPacket.trim();    // Serial.println(aprsisPacket);
+                    aprsisPacket.trim();
                     processAPRSISPacket(aprsisPacket);
                 }
             }

@@ -18,24 +18,24 @@
 
 /*___________________________________________________________________
 
-██╗      ██████╗ ██████╗  █████╗      █████╗ ██████╗ ██████╗ ███████╗
-██║     ██╔═══██╗██╔══██╗██╔══██╗    ██╔══██╗██╔══██╗██╔══██╗██╔════╝
-██║     ██║   ██║██████╔╝███████║    ███████║██████╔╝██████╔╝███████╗
-██║     ██║   ██║██╔══██╗██╔══██║    ██╔══██║██╔═══╝ ██╔══██╗╚════██║
-███████╗╚██████╔╝██║  ██║██║  ██║    ██║  ██║██║     ██║  ██║███████║
-╚══════╝ ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝    ╚═╝  ╚═╝╚═╝     ╚═╝  ╚═╝╚══════╝
+██╗       ██████╗ ██████╗  █████╗      █████╗ ██████╗ ██████╗ ███████╗
+██║      ██╔═══██╗██╔══██╗██╔══██╗    ██╔══██╗██╔══██╗██╔══██╗██╔════╝
+██║      ██║   ██║██████╔╝███████║    ███████║██████╔╝██████╔╝███████╗
+██║      ██║   ██║██╔══██╗██╔══██║    ██╔══██║██╔═══╝ ██╔══██╗╚════██║
+███████╗ ╚██████╔╝██║  ██║██║  ██║    ██║  ██║██║     ██║  ██║███████║
+╚══════╝  ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝    ╚═╝  ╚═╝╚═╝     ╚═╝  ╚═╝╚══════╝
 
                 ██╗ ██████╗  █████╗ ████████╗███████╗
                 ██║██╔════╝ ██╔══██╗╚══██╔══╝██╔════╝
-                ██║██║  ███╗███████║   ██║   █████╗
-                ██║██║   ██║██╔══██║   ██║   ██╔══╝
+                ██║██║  ███╗███████║   ██║   █████╗  
+                ██║██║   ██║██╔══██║   ██║   ██╔══╝  
                 ██║╚██████╔╝██║  ██║   ██║   ███████╗
                 ╚═╝ ╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚══════╝
 
 
-                       Ricardo Guzman - CA2RXU
+                    Ricardo Guzman - CA2RXU
            https://github.com/richonguzman/LoRa_APRS_iGate
-             (donations : http://paypal.me/richonguzman)
+              (donations : http://paypal.me/richonguzman)
 ___________________________________________________________________*/
 
 #include <ElegantOTA.h>
@@ -67,9 +67,11 @@ ___________________________________________________________________*/
     #include "A7670_utils.h"
 #endif
 
+// External hook for RXT / TTH tracking from lora_utils.cpp
+extern unsigned long rxCompletedMillis;
 
-String              versionDate             = "2026-08-16";
-String              versionNumber           = "4.0.0";
+String              versionDate             = "2026-08-25";
+String              versionNumber           = "4.0.0RXT";
 Configuration       Config;
 WiFiClient          aprsIsClient;
 WiFiClient          mqttClient;
@@ -200,12 +202,29 @@ void loop() {
                 DIGI_Utils::processLoRaPacket(packet); // Send received packet to Digi
             }
 
-            if (Config.tnc.enableServer) TNC_Utils::sendToClients(packet, true);    // Send received packet to TNC KISS
-            if (Config.tnc.enableSerial) TNC_Utils::sendToSerial(packet, true);     // Send received packet to Serial KISS
+            // Decode the RXT hop chain once per received packet, shared by
+            // both TNC output paths below. Cheap regardless of whether
+            // either path actually has a listener -- if neither is enabled
+            // the result is simply unused.
+            std::vector<LoRa_Utils::RxtHopMetric> hopMetrics = LoRa_Utils::getDecodedRxtMetrics(packet);
+
+            #ifdef RXT_RAW_DEBUG
+            // Temporary diagnostic: shows exactly what was in the raw RXT
+            // trailer field (if anything) at the moment it was decoded for
+            // this packet. Uses the existing plain getter rather than any
+            // print from lora_utils.cpp, so the radio-interface layer still
+            // never writes to a local client. Remove or leave #undef'd once
+            // the field-population timing question is resolved.
+            String rawField = LoRa_Utils::getLastRxtField();
+            Serial.println("[RXT-RAW] len=" + String(rawField.length()) + " field=\"" + rawField + "\"");
+            #endif
+
+            if (Config.tnc.enableServer) TNC_Utils::sendToClients(packet, true, hopMetrics);    // Send received packet to TNC KISS
+            if (Config.tnc.enableSerial) TNC_Utils::sendToSerial(packet, true, hopMetrics);     // Send received packet to Serial KISS
             if (Config.mqtt.active) MQTT_Utils::sendToMqtt(packet);                 // Send received packet to MQTT
         }
 
-        if (Config.aprs_is.active) APRS_IS_Utils::listenAPRSIS();           // listen received packet from APRSIS
+        if (Config.aprs_is.active) APRS_IS_Utils::listenAPRSIS();          // listen received packet from APRSIS
 
         STATION_Utils::processOutputPacketBuffer();
 

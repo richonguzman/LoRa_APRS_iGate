@@ -40,7 +40,15 @@ namespace STATION_Utils {
     bool isIn25SegHashBuffer(const String& station, const String& textMessage);
     void processOutputPacketBufferUltraEcoMode();
     void processOutputPacketBuffer();
-    void addToOutputPacketBuffer(const String& packet, bool flag = false);
+    // eligibleForRxt defaults to false: RXT must only ever be attached to a
+    // packet that is genuinely relaying a frame just received by this
+    // station's own LoRa receiver. Every other origin (self-beacon,
+    // telemetry, APRS-IS-to-RF conversion, local TNC client traffic, query/
+    // command responses) is self-generated content with no real RF
+    // reception behind it, and must stay false -- the single known-safe
+    // call site (digi_utils.cpp's genuine digipeat relay) is the only one
+    // that should ever pass true explicitly.
+    void addToOutputPacketBuffer(const String& packet, bool flag = false, bool eligibleForRxt = false);
 
 }
 

@@ -26,7 +26,9 @@
 #include "display.h"
 #include "utils.h"
 
-
+extern int      rssi;
+extern float    snr;
+extern int      freqOffset;
 extern Configuration    Config;
 extern uint32_t         lastScreenOn;
 extern String           iGateBeaconPacket;
@@ -46,7 +48,7 @@ namespace DIGI_Utils {
         String terms[] = {"WIDE1*,", "WIDE2*,", "*"};
         for (String term : terms) {
             int index = path.indexOf(term);
-            if (index != -1) path.remove(index, term.length());     // less memory than: tempPath.replace("*", "");
+            if (index != -1) path.remove(index, term.length());    // less memory than: tempPath.replace("*", "");
         }
         return path;
     }
@@ -90,9 +92,9 @@ namespace DIGI_Utils {
             String tempPath     = path;
 
             if (tempPath.indexOf("WIDE1-1") != -1 && (digiMode == 1 || digiMode == 2)) {    // WIDE1-1
-                if (tempPath.indexOf("*") != -1 ) return "";                                // "*" shouldn't be in WIDE1-1 (only) type of packet
+                if (tempPath.indexOf("*") != -1 ) return "";                            // "*" shouldn't be in WIDE1-1 (only) type of packet
                 tempPath.replace("WIDE1-1", stationCallsign + "*");
-            } else if (tempPath.indexOf("WIDE2-") != -1 && digiMode == 2) {                 // WIDE2-n Digipeater
+            } else if (tempPath.indexOf("WIDE2-") != -1 && digiMode == 2) {              // WIDE2-n Digipeater
                 tempPath = cleanPath(path);
                 if (tempPath.indexOf("WIDE2-1") != -1) {
                     tempPath.replace("WIDE2-1", stationCallsign + "*");
@@ -101,7 +103,7 @@ namespace DIGI_Utils {
                 } else {
                     return "";
                 }
-            } else if (digiMode == 3) {                                                     // Repeat if station callsign is in path (free to repeat).
+            } else if (digiMode == 3) {                                                 // Repeat if station callsign is in path (free to repeat).
                 tempPath = processMode3Path(tempPath, stationCallsign);
                 if (tempPath == "") return "";
             }
@@ -109,7 +111,7 @@ namespace DIGI_Utils {
             packetToRepeat += tempPath;
         } else {   // CrossFreq Digipeater
             packetToRepeat = cleanPath(packet.substring(0, suffixIndex));
-            if (packetToRepeat.indexOf(stationCallsign) != -1) return "";                   // stationCallsign shouldn't be in path
+            if (packetToRepeat.indexOf(stationCallsign) != -1) return "";                  // stationCallsign shouldn't be in path
             packetToRepeat += ",";
             packetToRepeat += stationCallsign;
             packetToRepeat += "*";
@@ -145,7 +147,7 @@ namespace DIGI_Utils {
                 bool hasWide1 = wide1Index != -1;
                 bool hasWide2 = wide2Index != -1;
 
-                if (hasWide1 && hasWide2 && wide2Index < wide1Index) return "";                     // check that WIDE1 before WIDE2
+                if (hasWide1 && hasWide2 && wide2Index < wide1Index) return "";                  // check that WIDE1 before WIDE2
 
                 if (hasWide1 || hasWide2) return buildPacket(path, packet, thirdParty, false);      // regular APRS with WIDEn-N
 
@@ -173,38 +175,52 @@ namespace DIGI_Utils {
         bool thirdPartyPacket = false;
         String temp, Sender;
         int firstColonIndex = packet.indexOf(":");
+        
         if (firstColonIndex > 5 && firstColonIndex < (packet.length() - 1) && packet[firstColonIndex + 1] == '}' && packet.indexOf("TCPIP") > 0) {   // 3rd Party
             thirdPartyPacket = true;
             temp    = packet.substring(packet.indexOf(":}") + 2);
             Sender  = temp.substring(0, temp.indexOf(">"));
         } else {
-            temp    = packet.substring(3);
-            Sender  = packet.substring(3, packet.indexOf(">"));
+            temp    = packet;
+            int gtIdx = packet.indexOf('>');
+            if (gtIdx != -1) {
+                // Extract sender from the absolute beginning of the packet up to '>'
+                Sender = packet.substring(0, gtIdx);
+            } else {
+                return; // Malformed header
+            }
         }
 
+        Sender.trim();
         String stationCallsign = Config.tacticalCallsign == "" ? Config.callsign : Config.tacticalCallsign;
         if (Sender == stationCallsign) return;          // Avoid listening to self packets
-        if (!thirdPartyPacket && Config.tacticalCallsign == "" && !Utils::callsignIsValid(Sender)) return;  // No thirdParty + no tactical y no valid callsign
+        if (!thirdPartyPacket && Config.tacticalCallsign == "" && !Utils::callsignIsValid(Sender)) return;  // No thirdParty + no tactical + invalid callsign
 
-        if (STATION_Utils::isIn25SegHashBuffer(Sender, temp.substring(temp.indexOf(":") + 2))) return;
+        // Now the hash check will receive the correct Sender and clean payload
+        if (STATION_Utils::isIn25SegHashBuffer(Sender, temp.substring(temp.indexOf(":") + 1))) return;
 
         STATION_Utils::updateLastHeard(Sender);
-        Utils::typeOfPacket(temp, 2);               // Digi
-        bool queryMessage       = false;
-        int doubleColonIndex    = temp.indexOf("::");
+        Utils::typeOfPacket(temp, 2);              // Digi
+        bool queryMessage                   = false;
+        int doubleColonIndex                = temp.indexOf("::");
         if (doubleColonIndex > 10) {                // it's a message
-            String AddresseeAndMessage  = temp.substring(doubleColonIndex + 2);
-            String Addressee            = AddresseeAndMessage.substring(0, AddresseeAndMessage.indexOf(":"));
+            String AddresseeAndMessage            = temp.substring(doubleColonIndex + 2);
+            String Addressee                      = AddresseeAndMessage.substring(0, AddresseeAndMessage.indexOf(":"));
             Addressee.trim();
             if (Addressee == stationCallsign) {     // it's a message for me!
                 queryMessage = APRS_IS_Utils::processReceivedLoRaMessage(Sender, AddresseeAndMessage, thirdPartyPacket);
             }
         }
-        if (queryMessage) return;                   // answer should not be repeated.
+        if (queryMessage) return;                  // answer should not be repeated.
 
-        String loraPacket = generateDigipeatedPacket(packet.substring(3), thirdPartyPacket);
+        String loraPacket = generateDigipeatedPacket(packet, thirdPartyPacket);
         if (loraPacket != "") {
-            STATION_Utils::addToOutputPacketBuffer(loraPacket);
+            // This is the ONE genuine case where RXT is legitimate: a frame
+            // this station's own LoRa receiver just heard, being relayed
+            // onward unmodified in content (only the path changes). Every
+            // other addToOutputPacketBuffer() call site in the codebase
+            // must leave eligibleForRxt at its default (false).
+            STATION_Utils::addToOutputPacketBuffer(loraPacket, false, true);
             if (Config.digi.ecoMode != 1) displayToggle(true);
             lastScreenOn = millis();
         }

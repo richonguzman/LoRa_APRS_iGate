@@ -38,7 +38,8 @@ std::vector<LastHeardStation>   lastHeardObjects;
 struct OutputPacketBuffer {
     String      packet;
     bool        isBeacon;
-    OutputPacketBuffer(const String& p, bool b) : packet(p), isBeacon(b) {}
+    bool        eligibleForRxt;
+    OutputPacketBuffer(const String& p, bool b, bool r) : packet(p), isBeacon(b), eligibleForRxt(r) {}
 };
 std::vector<OutputPacketBuffer> outputPacketBuffer;
 
@@ -50,6 +51,13 @@ std::vector<Packet25SegBuffer>  packet25SegBuffer;
 
 bool saveNewDigiEcoModeConfig   = false;
 bool packetIsBeacon             = false;
+// Mirrors packetIsBeacon's pattern exactly: set immediately before calling
+// LoRa_Utils::sendNewPacket(), reset immediately after. sendNewPacket() reads
+// this to decide whether attaching an RXT tuple is even legitimate for this
+// specific transmission -- see the extern declaration and allowRxt logic in
+// lora_utils.cpp for why this must default false and only ever be set true
+// around a genuine digipeat relay.
+bool packetEligibleForRxt        = false;
 
 
 namespace STATION_Utils {
@@ -180,22 +188,44 @@ namespace STATION_Utils {
 
     bool isIn25SegHashBuffer(const String& station, const String& textMessage) {
         clean25SegHashBuffer();
-        uint32_t newHash        = makeHash(station, textMessage);
+        Utils::println("[DEBUG-HASH-CHECK] Checking packet from: " + station);
+        // 1. Isolate the base source callsign
+        String baseStation = station;
+        int gtIdx = baseStation.indexOf('>');
+        if (gtIdx != -1) {
+            baseStation = baseStation.substring(0, gtIdx);
+        }
+        baseStation.trim();
+
+        // 2. Strip any incoming RXT telemetry trailer so the hash remains invariant 
+        // across hops and as telemetry accumulates.
+        String corePayload = LoRa_Utils::stripRxtTrailer(textMessage);
+        corePayload.trim();
+
+        // 3. Generate invariant hash based solely on originator + clean payload
+        uint32_t newHash        = makeHash(baseStation, corePayload);
         uint32_t currentTime    = millis();
-        for (int i = 0; i < packet25SegBuffer.size(); i++) {
+
+        // --- Debug Print ---
+        Utils::println("[DE-DUPE] Station: " + baseStation + " | Hash: " + String(newHash, HEX));
+
+        for (size_t i = 0; i < packet25SegBuffer.size(); i++) {
             if (packet25SegBuffer[i].hash == newHash) return true;
         }
+        
         packet25SegBuffer.push_back({currentTime, newHash});
         return false;
-    }
+    }    
 
     void processOutputPacketBufferUltraEcoMode() {
         size_t currentIndex = 0;
         while (currentIndex < outputPacketBuffer.size()) {                  // this sends all packets from output buffer
             delay(3000);                                                    // and cleans buffer to avoid sending packets with time offset
             if (outputPacketBuffer[currentIndex].isBeacon) packetIsBeacon = true;
+            packetEligibleForRxt = outputPacketBuffer[currentIndex].eligibleForRxt;
             LoRa_Utils::sendNewPacket(outputPacketBuffer[currentIndex].packet);    // next time it wakes up
             if (outputPacketBuffer[currentIndex].isBeacon) packetIsBeacon = false;
+            packetEligibleForRxt = false;
             currentIndex++;
         }
         outputPacketBuffer.clear();
@@ -212,15 +242,19 @@ namespace STATION_Utils {
     void processOutputPacketBuffer() {
         if (outputPacketBuffer.size() > 0) {
             if (outputPacketBuffer[0].isBeacon) packetIsBeacon = true;
+            packetEligibleForRxt = outputPacketBuffer[0].eligibleForRxt;
             LoRa_Utils::sendNewPacket(outputPacketBuffer[0].packet);
             if (outputPacketBuffer[0].isBeacon) packetIsBeacon = false;
+            packetEligibleForRxt = false;
             outputPacketBuffer.erase(outputPacketBuffer.begin());
         }
         if (shouldSleepLowVoltage) {
             while (outputPacketBuffer.size() > 0) {
                 if (outputPacketBuffer[0].isBeacon) packetIsBeacon = true;
+                packetEligibleForRxt = outputPacketBuffer[0].eligibleForRxt;
                 LoRa_Utils::sendNewPacket(outputPacketBuffer[0].packet);
                 if (outputPacketBuffer[0].isBeacon) packetIsBeacon = false;
+                packetEligibleForRxt = false;
                 outputPacketBuffer.erase(outputPacketBuffer.begin());
                 delay(4000);
             }
@@ -233,8 +267,8 @@ namespace STATION_Utils {
         }
     }
 
-    void addToOutputPacketBuffer(const String& packet, bool flag) {
-        outputPacketBuffer.emplace_back(OutputPacketBuffer{packet, flag});
+    void addToOutputPacketBuffer(const String& packet, bool flag, bool eligibleForRxt) {
+        outputPacketBuffer.emplace_back(OutputPacketBuffer{packet, flag, eligibleForRxt});
     }
 
 }

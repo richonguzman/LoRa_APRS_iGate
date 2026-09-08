@@ -1508,7 +1508,7 @@ body{background:var(--msh-bg);color:var(--msh-text);font-family:"Inter",system-u
                                 >
                             </div>
                             <div class="col-lg-9 col-sm-12">
-                                <div class="row">
+                                                            <div class="row">
                                     <div class="col-6">
                                         <div class="form-check form-switch">
                                             <input
@@ -1520,7 +1520,7 @@ body{background:var(--msh-bg);color:var(--msh-text);font-family:"Inter",system-u
                                             <label
                                                 for="tnc.enableSerial"
                                                 class="form-label"
-                                                >Enable Serial KISS</label
+                                                >Enable Serial Port</label
                                             >
                                         </div>
                                     </div>
@@ -1542,6 +1542,26 @@ body{background:var(--msh-bg);color:var(--msh-text);font-family:"Inter",system-u
                                 </div>
                                 <div class="row mt-2">
                                     <div class="col-6">
+                                        <label
+                                            for="tnc.protocol"
+                                            class="form-label"
+                                            >Communications Protocol</label
+                                        >
+                                        <select
+                                            class="form-select form-select"
+                                            name="tnc.protocol"
+                                            id="tnc.protocol"
+                                        >
+                                            <option value="TNC2">TNC2</option>
+                                            <option value="KISS">KISS</option>
+                                        </select>
+                                        <div class="form-text">
+                                            Applies to both Serial and IP. TNC2 is recommended for modern APRS apps; use KISS only for legacy clients that require it.
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-6">
                                         <div class="form-check form-switch">
                                             <input
                                                 type="checkbox"
@@ -1552,7 +1572,7 @@ body{background:var(--msh-bg);color:var(--msh-text);font-family:"Inter",system-u
                                             <label
                                                 for="tnc.acceptOwn"
                                                 class="form-label"
-                                                >Accept own frames via KISS</label
+                                                >Accept own frames via TNC</label
                                             >
                                         </div>
                                     </div>
@@ -1571,8 +1591,7 @@ body{background:var(--msh-bg);color:var(--msh-text);font-family:"Inter",system-u
                                             >
                                         </div>
                                     </div>
-                                </div>
-                            </div>
+                                </div> </div>
                         </div>
 
 

@@ -20,14 +20,30 @@
 #define LORA_UTILS_H_
 
 #include <Arduino.h>
+#include <vector>
 
 
 namespace LoRa_Utils {
 
+struct RxtHopMetric {
+        String fromNode; // The node that transmitted (e.g., N7AIL-15 or previous digi)
+        String toNode;   // The digi that received and reported (e.g., SOMTNX, TSRXAX)
+        bool hasData;    // false = this hop exists in the path but no RXT-enabled
+                         // digi measured it (caller should print "NA", not the
+                         // fields below, which are meaningless when false)
+        int rssi;
+        float snr;
+        int fo;
+        unsigned long tth; // ms -- unsigned long (not int) so slow SF/BW configs
+                            // (e.g. SF12, ~2000-3000 ms packet frames) can't overflow
+    };
     void    setup();
     void    sendNewPacket(const String& newPacket);
     String  receivePacketFromSleep();
     String  receivePacket();
+    String  stripRxtTrailer(const String& packet, String* outTuple = nullptr);
+    String  getLastRxtField();
+    std::vector<RxtHopMetric> getDecodedRxtMetrics(const String& packet);
     void    changeFreqTx();
     void    changeFreqRx();
     void    wakeRadio();

@@ -132,6 +132,7 @@ public:
     bool    enableSerial;
     bool    acceptOwn;
     bool    aprsBridgeActive;
+    String  protocol;    // "TNC2" or "KISS" -- governs both serial and IP output/input format
 };
 
 class OTA {
