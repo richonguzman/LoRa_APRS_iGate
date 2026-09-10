@@ -264,6 +264,11 @@ namespace WEB_Utils {
         Config.digi.mode                    = getParamIntSafe("digi.mode", Config.digi.mode);
         Config.digi.ecoMode                 = getParamIntSafe("digi.ecoMode", Config.digi.ecoMode);
         Config.digi.backupDigiMode          = request->hasParam("digi.backupDigiMode", true);
+        Config.digi.regionalAliases         = getParamStringSafe("digi.regionalAliases", Config.digi.regionalAliases);
+        Config.digi.regionalAliases.trim();
+        Config.digi.regionalAliases.toUpperCase();
+        Config.digi.regionalMaxHops         = constrain(
+            getParamIntSafe("digi.regionalMaxHops", Config.digi.regionalMaxHops), 1, 9);
 
         Config.loramodule.rxActive          = request->hasParam("lora.rxActive", true);
         Config.loramodule.rxFreq            = getParamIntSafe("lora.rxFreq", Config.loramodule.rxFreq);

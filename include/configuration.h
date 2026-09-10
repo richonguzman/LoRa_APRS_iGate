@@ -71,6 +71,8 @@ public:
     int     mode;
     int     ecoMode;        // 0 = Not Active | 1 = Ultra EcoMode | 2 = Not Active (WiFi OFF, Serial ON)
     bool    backupDigiMode;
+    String  regionalAliases;
+    int     regionalMaxHops;
 };
 
 class LoraModule {
