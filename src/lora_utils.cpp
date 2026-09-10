@@ -75,10 +75,14 @@ const float TTH_SCALE_FACTOR = 10.0f; // tthScale = symbolTimeMs * TTH_SCALE_FAC
 // measure and append RXT tuples. Used by isRxtWhitelisted()/findAllRxtHops()
 // to distinguish RXT-capable digis (which contribute a hop + tuple) from
 // legacy digis (which only pass the trailer through unmodified).
-// Which stations are RXT-capable is now runtime-configurable via
-// Config.rxtWhitelist (Station -> Black List tab in the web GUI), loaded
-// once at startup by loadRxtWhitelist(). No recompile needed to add a
-// newly-upgraded digi -- see rxtWhitelistLoaded below.
+//
+// NOTE: this branch does not include the runtime-configurable whitelist
+// (Config.rxtWhitelist / web GUI editing) -- that work lives on a separate
+// branch and depends on configuration.h/station_utils.h changes not present
+// here. This list is hardcoded and requires a recompile to change; keep in
+// sync with the whitelist branch's list of genuinely RXT-capable stations.
+const char* const RXT_WHITELIST[] = {"TSRXAX", "TSRXBX", "SOMTNX", "PINALX"};
+const size_t RXT_WHITELIST_COUNT = sizeof(RXT_WHITELIST) / sizeof(RXT_WHITELIST[0]);
 //=================================================================
 //=================================================================
 
@@ -355,28 +359,16 @@ namespace LoRa_Utils {
     }
 
     // --- MULTI-HOP RXT PATH RESOLUTION ---
-    // Crutch until every digi on the network is RXT-enabled: a runtime
+    // Crutch until every digi on the network is RXT-enabled: a hardcoded
     // whitelist of callsigns known to append RXT tuples. Used to figure out
     // which path elements actually measured/appended a tuple versus which
     // are plain legacy digis just passing the trailer through unmodified.
-    //
-    // Populated from Config.rxtWhitelist (space-delimited callsigns, set via
-    // the web GUI's Station -> Black List tab) by loadRxtWhitelist(), called
-    // once at startup -- same pattern as STATION_Utils::loadBlacklistAndManagers().
-    // Adding a newly-upgraded RXT digi is now a config change + reboot, not
-    // a recompile.
-    std::vector<String> rxtWhitelistLoaded;
-
-    void loadRxtWhitelist() {
-        rxtWhitelistLoaded = STATION_Utils::loadCallsignList(Config.rxtWhitelist);
-    }
-
     bool isRxtWhitelisted(const String& callsign) {
         String baseCall = callsign;
         int dashIdx = baseCall.indexOf('-');
         if (dashIdx > 0) baseCall = baseCall.substring(0, dashIdx);
-        for (size_t i = 0; i < rxtWhitelistLoaded.size(); i++) {
-            if (baseCall.equals(rxtWhitelistLoaded[i])) return true;
+        for (size_t i = 0; i < RXT_WHITELIST_COUNT; i++) {
+            if (baseCall.equals(RXT_WHITELIST[i])) return true;
         }
         return false;
     }
