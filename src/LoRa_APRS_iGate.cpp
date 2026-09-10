@@ -69,9 +69,14 @@ ___________________________________________________________________*/
 
 // External hook for RXT / TTH tracking from lora_utils.cpp
 extern unsigned long rxCompletedMillis;
+// Set by receivePacket() when the last receive attempt failed CRC. rssi/
+// snr/freqOffset are still valid chip measurements even without a usable
+// packet -- checked here so a harmonized "CRC ERROR" block can be emitted
+// on serial/IP, then reset.
+extern bool          lastReceiveWasCrcError;
 
-String              versionDate             = "2026-08-25";
-String              versionNumber           = "4.0.0RXT";
+String              versionDate             = "2026-09-10";
+String              versionNumber           = "4.0.0CRC";
 Configuration       Config;
 WiFiClient          aprsIsClient;
 WiFiClient          mqttClient;
@@ -115,6 +120,7 @@ void setup() {
     Utils::validateFreqs();
     GPS_Utils::setup();
     STATION_Utils::loadBlacklistAndManagers();
+    LoRa_Utils::loadRxtWhitelist();
     Utils::startupDelay();
     SLEEP_Utils::setup();
     WIFI_Utils::setup();
@@ -191,6 +197,15 @@ void loop() {
         String packet = "";
         if (Config.loramodule.rxActive) {
             packet = LoRa_Utils::receivePacket(); // We need to fetch LoRa packet above APRSIS and Digi
+        }
+
+        if (lastReceiveWasCrcError) {
+            // No trustworthy FROM_CALL/PATH -- never digipeated, never sent
+            // to APRS-IS, no RXT decode attempted. Local receive metrics
+            // only, on whichever client interfaces are enabled.
+            if (Config.tnc.enableServer) TNC_Utils::sendCrcErrorToClients();
+            if (Config.tnc.enableSerial) TNC_Utils::sendCrcErrorToSerial();
+            lastReceiveWasCrcError = false;
         }
 
         if (packet != "") {

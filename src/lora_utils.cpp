@@ -75,14 +75,10 @@ const float TTH_SCALE_FACTOR = 10.0f; // tthScale = symbolTimeMs * TTH_SCALE_FAC
 // measure and append RXT tuples. Used by isRxtWhitelisted()/findAllRxtHops()
 // to distinguish RXT-capable digis (which contribute a hop + tuple) from
 // legacy digis (which only pass the trailer through unmodified).
-// As of this build, only these two nodes are actually running RXT-capable
-// firmware in the field. KEYSTN and SOMTNP appeared in this list during
-// earlier development as illustrative examples and must not be added back
-// until those stations are genuinely upgraded -- including a station here
-// that hasn't actually appended a tuple causes every real tuple after it
-// in the same trailer to misattribute to the wrong hop.
-const char* const RXT_WHITELIST[] = {"TSRXAX", "TSRXBX"};
-const size_t RXT_WHITELIST_COUNT = sizeof(RXT_WHITELIST) / sizeof(RXT_WHITELIST[0]);
+// Which stations are RXT-capable is now runtime-configurable via
+// Config.rxtWhitelist (Station -> Black List tab in the web GUI), loaded
+// once at startup by loadRxtWhitelist(). No recompile needed to add a
+// newly-upgraded digi -- see rxtWhitelistLoaded below.
 //=================================================================
 //=================================================================
 
@@ -140,6 +136,12 @@ String sanitizeForWeb(const String& input) {
 
 int rssi, freqOffset;
 float snr;
+// Set true when the last receive attempt was a CRC failure -- rssi/snr/
+// freqOffset above are still valid (chip-measured) even though there's no
+// trustworthy packet content. Read and reset by the orchestrator, which
+// emits a harmonized "CRC ERROR" block on serial/IP instead of the old
+// raw, unlabeled println this used to be.
+bool lastReceiveWasCrcError = false;
 unsigned long rxCompletedMillis = 0;  // High-resolution timestamp marking exact packet read completion
 
 
@@ -178,7 +180,7 @@ namespace LoRa_Utils {
 
     // --- FREQUENCY OFFSET ENCODER/DECODER HELPER ---
     // FO Encoder: Hz -> ASCII. Carried as int end-to-end (matches the chip's
-    // native integer FreqOffset reading; no fractional-Hz resolution to gain).
+    // native integer FreqError reading; no fractional-Hz resolution to gain).
     char encodeFO(int FO_Hz) {
         float clamped = constrain((float)FO_Hz, -FO_MAX_Hz, FO_MAX_Hz);
         float normalized = clamped / FO_MAX_Hz;
@@ -353,16 +355,28 @@ namespace LoRa_Utils {
     }
 
     // --- MULTI-HOP RXT PATH RESOLUTION ---
-    // Crutch until every digi on the network is RXT-enabled: a hardcoded
+    // Crutch until every digi on the network is RXT-enabled: a runtime
     // whitelist of callsigns known to append RXT tuples. Used to figure out
     // which path elements actually measured/appended a tuple versus which
     // are plain legacy digis just passing the trailer through unmodified.
+    //
+    // Populated from Config.rxtWhitelist (space-delimited callsigns, set via
+    // the web GUI's Station -> Black List tab) by loadRxtWhitelist(), called
+    // once at startup -- same pattern as STATION_Utils::loadBlacklistAndManagers().
+    // Adding a newly-upgraded RXT digi is now a config change + reboot, not
+    // a recompile.
+    std::vector<String> rxtWhitelistLoaded;
+
+    void loadRxtWhitelist() {
+        rxtWhitelistLoaded = STATION_Utils::loadCallsignList(Config.rxtWhitelist);
+    }
+
     bool isRxtWhitelisted(const String& callsign) {
         String baseCall = callsign;
         int dashIdx = baseCall.indexOf('-');
         if (dashIdx > 0) baseCall = baseCall.substring(0, dashIdx);
-        for (size_t i = 0; i < RXT_WHITELIST_COUNT; i++) {
-            if (baseCall.equals(RXT_WHITELIST[i])) return true;
+        for (size_t i = 0; i < rxtWhitelistLoaded.size(); i++) {
+            if (baseCall.equals(rxtWhitelistLoaded[i])) return true;
         }
         return false;
     }
@@ -810,7 +824,15 @@ namespace LoRa_Utils {
                     rssi        = radio.getRSSI();
                     snr         = radio.getSNR();
                     freqOffset   = radio.getFrequencyError();
-                    Utils::println(F("CRC error!"));
+                    // The Semtech chip still reports valid RSSI/SNR/FO even
+                    // when the frame's CRC fails -- the receive buffer holds
+                    // a partial/corrupted packet we can't safely parse (no
+                    // way to know where the corruption is, so FROM_CALL/PATH
+                    // can't be trusted) and must never be digipeated. Signal
+                    // this to the orchestrator so it can emit a harmonized
+                    // "CRC ERROR" block on serial/IP instead of a raw,
+                    // client-stream-polluting println here.
+                    lastReceiveWasCrcError = true;
                     if (Config.syslog.active && networkManager->isConnected()) {
                         SYSLOG_Utils::log(0, "", rssi, snr, freqOffset); 
                     }

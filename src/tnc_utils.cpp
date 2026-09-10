@@ -251,6 +251,36 @@ namespace TNC_Utils {
         Serial.flush();
     }
 
+    // The Semtech chip still reports valid RSSI/SNR/FO for a frame that
+    // failed CRC -- there's no trustworthy FROM_CALL/PATH (no way to know
+    // where the corruption is), so no packet line and no RXT hop chain are
+    // emitted, only the raw local receive metrics. rssi/snr/freqOffset were
+    // already captured by receivePacket() at the moment of the CRC failure.
+    void sendCrcErrorToClients() {
+        String lineToSend = String("\r\n") + "CRC ERROR\r\n" +
+            "LOCAL -- RSSI:" + String(rssi) + " SNR:" + signedFloat(snr, 2) + " FO:" + signedInt(freqOffset) + "\r\n";
+
+        for (int i = 0; i < MAX_CLIENTS; i++) {
+            auto client = clients[i];
+            if (client != nullptr) {
+                if (client->connected()) {
+                    client->print(lineToSend);
+                    client->flush();
+                } else {
+                    delete client;
+                    clients[i] = nullptr;
+                }
+            }
+        }
+    }
+
+    void sendCrcErrorToSerial() {
+        Serial.print("\r\n");
+        Serial.println("CRC ERROR");
+        Serial.println("LOCAL -- RSSI:" + String(rssi) + " SNR:" + signedFloat(snr, 2) + " FO:" + signedInt(freqOffset));
+        Serial.flush();
+    }
+
     void loop() {
         if (Config.digi.ecoMode == 0) {
             if (Config.tnc.enableServer) {
