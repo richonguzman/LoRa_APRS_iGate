@@ -173,7 +173,10 @@ namespace TNC_Utils {
         // upstream so a second RXT digi can concatenate onto it when
         // forwarding). Strip it here for the client-facing line -- TNC
         // clients should only ever see the clean APRS packet.
-        String lineToSend = LoRa_Utils::stripRxtTrailer(packet) + "\r\n"; // Line 1: Clean APRS packet
+        // Leading "\r\n" matches sendToSerial()'s spacing -- both output
+        // paths must look identical, since debugging happens on whichever
+        // one is convenient at the time.
+        String lineToSend = String("\r\n") + LoRa_Utils::stripRxtTrailer(packet) + "\r\n"; // Line 1: Clean APRS packet
 
         for (int i = 0; i < MAX_CLIENTS; i++) {
             auto client = clients[i];
@@ -184,7 +187,7 @@ namespace TNC_Utils {
                     
                     // Send Line 2: Local receiver metrics
                     if (levelInfo) {
-                        client->print("RSSI:" + String(rssi) + " SNR:" + signedFloat(snr, 2) + " FO:" + signedInt(freqOffset) + "\r\n");
+                        client->print("LOCAL -- RSSI:" + String(rssi) + " SNR:" + signedFloat(snr, 2) + " FO:" + signedInt(freqOffset) + "\r\n");
                     }
 
                     // Send Line 3+: full hop chain -- real data or NA per hop.

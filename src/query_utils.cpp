@@ -28,7 +28,7 @@ extern std::vector<LastHeardStation>    lastHeardStations;
 extern String                           versionDate;
 extern int                              rssi;
 extern float                            snr;
-extern int                              freqError;
+extern int                              freqOffset;
 extern bool                             shouldSleepLowVoltage;
 extern bool                             saveNewDigiEcoModeConfig;
 extern String                           versionNumber;
@@ -65,7 +65,7 @@ namespace QUERY_Utils {
             }
         } else if (queryQuestion == "?APRSSR") {
             char signalData[35];
-            snprintf(signalData, sizeof(signalData), " %ddBm / %.2fdB / %dHz", rssi, snr, freqError);
+            snprintf(signalData, sizeof(signalData), " %ddBm / %.2fdB / %dHz", rssi, snr, freqOffset);
             answer.concat(signalData);
         } /*else if (queryQuestion.indexOf("?APRSH") == 0) {
             // sacar callsign despues de ?APRSH

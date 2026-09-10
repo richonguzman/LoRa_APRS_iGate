@@ -33,7 +33,7 @@ WiFiUDP udpClient;
 
 namespace SYSLOG_Utils {
 
-    void log(const uint8_t type, const String& packet, const int rssi, const float snr, const int freqError) {
+    void log(const uint8_t type, const String& packet, const int rssi, const float snr, const int freqOffset) {
         if (Config.syslog.active && networkManager->isConnected()) {
             String syslogPacket = "<165>1 - ";
             syslogPacket.concat(Config.callsign);
@@ -42,7 +42,7 @@ namespace SYSLOG_Utils {
             syslogPacket.concat(" - - - "); //RFC5424 The Syslog Protocol
 
             char signalData[35];
-            snprintf(signalData, sizeof(signalData), " / %ddBm / %.2fdB / %dHz", rssi, snr, freqError);
+            snprintf(signalData, sizeof(signalData), " / %ddBm / %.2fdB / %dHz", rssi, snr, freqOffset);
 
             int colonIndex              = packet.indexOf(":");
             char nextChar               = packet[colonIndex + 1];

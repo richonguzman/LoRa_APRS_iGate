@@ -51,7 +51,7 @@ extern String               iGateBeaconPacket;
 extern String               iGateLoRaBeaconPacket;
 extern int                  rssi;
 extern float                snr;
-extern int                  freqError;
+extern int                  freqOffset;
 extern String               distance;
 extern int                  wxModuleType;
 extern bool                 backupDigiMode;

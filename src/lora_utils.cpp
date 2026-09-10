@@ -178,7 +178,7 @@ namespace LoRa_Utils {
 
     // --- FREQUENCY OFFSET ENCODER/DECODER HELPER ---
     // FO Encoder: Hz -> ASCII. Carried as int end-to-end (matches the chip's
-    // native integer FreqError reading; no fractional-Hz resolution to gain).
+    // native integer FreqOffset reading; no fractional-Hz resolution to gain).
     char encodeFO(int FO_Hz) {
         float clamped = constrain((float)FO_Hz, -FO_MAX_Hz, FO_MAX_Hz);
         float normalized = clamped / FO_MAX_Hz;
