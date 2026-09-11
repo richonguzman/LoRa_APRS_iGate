@@ -32,12 +32,14 @@ struct MapStation {
     float    snr;               // ultimo SNR
     uint16_t count;             // nro de paquetes oidos de esa estacion
     char     lastHeard[10];     // "HH:MM:SS" si hay NTP valido, "" si no
+    char     path[96];          // last path received
     uint32_t lastHeardMillis;   // millis() -> ordenar / expirar (no se muestra)
+    bool     heardDirect;       // true si ALGUNA VEZ se oyo sin digipeaters (no se resetea)
 };
 
 namespace MAP_Utils {
 
-    void    upsert(const String& callsign, float latitude, float longitude, const String& symbol, int rssi, float snr);
+    void    upsert(const String& callsign, float latitude, float longitude, const String& path, const String& symbol, int rssi, float snr);
     String  getStationsJson();
 
 }
