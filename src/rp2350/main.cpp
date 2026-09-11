@@ -296,7 +296,7 @@ void netTask(void *) {
                 // and the web server (no cross-core access to mapStations).
                 APRSPacket ap = APRSPacketLib::processReceivedPacket(frame, prssi, psnr, 0);
                 if (ap.type == 0 || ap.type == 4) {   // 0 = GPS position, 4 = Mic-E
-                    MAP_Utils::upsert(ap.sender, ap.latitude, ap.longitude,
+                    MAP_Utils::upsert(ap.sender, ap.latitude, ap.longitude, ap.path,
                                       ap.overlay + ap.symbol, ap.rssi, ap.snr);
                 }
                 Tnc::broadcast(frame);
