@@ -22,6 +22,7 @@
 #include "station_utils.h"
 #include "aprs_is_utils.h"
 #include "tnc_utils.h"
+#include "kiss_utils.h"
 #include "utils.h"
 #include "lora_utils.h"
 
@@ -171,12 +172,41 @@ namespace TNC_Utils {
 
         // packet now arrives with any RXT trailer still attached (needed
         // upstream so a second RXT digi can concatenate onto it when
-        // forwarding). Strip it here for the client-facing line -- TNC
-        // clients should only ever see the clean APRS packet.
+        // forwarding). Strip it here once, regardless of output protocol --
+        // no client, TNC2 or KISS, should ever see the raw trailer.
+        String cleanPacket = LoRa_Utils::stripRxtTrailer(packet);
+
+        if (Config.tnc.protocol == "KISS") {
+            // Legacy AX.25/KISS clients expect ONLY valid KISS frames on the
+            // wire. There is no AX.25 representation for the LOCAL/RXT
+            // hop-chain diagnostic lines, so they are not sent in this mode
+            // -- injecting them would corrupt a KISS client's framing
+            // expectations. write() with an explicit length is used instead
+            // of print(): a KISS frame's 2nd byte is always 0x00 (CMD_DATA),
+            // and String-based print() risks NUL-truncating output on some
+            // Arduino core implementations.
+            String kissFrame = encodeKISS(cleanPacket);
+            for (int i = 0; i < MAX_CLIENTS; i++) {
+                auto client = clients[i];
+                if (client != nullptr) {
+                    if (client->connected()) {
+                        client->write((const uint8_t*)kissFrame.c_str(), kissFrame.length());
+                        client->flush();
+                    } else {
+                        delete client;
+                        clients[i] = nullptr;
+                    }
+                }
+            }
+            Utils::print("---> Sent to TNC (KISS): ");
+            Utils::println(packet);
+            return;
+        }
+
         // Leading "\r\n" matches sendToSerial()'s spacing -- both output
         // paths must look identical, since debugging happens on whichever
         // one is convenient at the time.
-        String lineToSend = String("\r\n") + LoRa_Utils::stripRxtTrailer(packet) + "\r\n"; // Line 1: Clean APRS packet
+        String lineToSend = String("\r\n") + cleanPacket + "\r\n"; // Line 1: Clean APRS packet
 
         for (int i = 0; i < MAX_CLIENTS; i++) {
             auto client = clients[i];
@@ -221,10 +251,21 @@ namespace TNC_Utils {
 
         // packet now arrives with any RXT trailer still attached (needed
         // upstream so a second RXT digi can concatenate onto it when
-        // forwarding). Strip it here for the client-facing line -- serial
-        // clients should only ever see the clean APRS packet.
+        // forwarding). Strip it here once, regardless of output protocol.
+        String cleanPacket = LoRa_Utils::stripRxtTrailer(packet);
+
+        if (Config.tnc.protocol == "KISS") {
+            // Same reasoning as sendToClients(): raw KISS frame only, no
+            // diagnostic lines, write() with explicit length to avoid
+            // NUL-truncation risk (KISS frame byte 2 is always 0x00).
+            String kissFrame = encodeKISS(cleanPacket);
+            Serial.write((const uint8_t*)kissFrame.c_str(), kissFrame.length());
+            Serial.flush();
+            return;
+        }
+
         Serial.print("\r\n");
-        Serial.print(LoRa_Utils::stripRxtTrailer(packet) + "\r\n");
+        Serial.print(cleanPacket + "\r\n");
         Serial.flush();
         
         // Line 2: Local receiver metrics
