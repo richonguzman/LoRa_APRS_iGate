@@ -25,6 +25,9 @@ ASSETS = [
     ("/leaflet.css",   "leaflet.css",   "asset_leaflet_css",   "text/css"),
     ("/leaflet.js",    "leaflet.js",    "asset_leaflet_js",    "application/javascript"),
     ("/favicon.png",   "favicon.png",   "asset_favicon_png",   "image/png"),
+    ("/aprs-symbols-24-0.png", "aprs-symbols-24-0.png", "asset_sym24_0", "image/png"),
+    ("/aprs-symbols-24-1.png", "aprs-symbols-24-1.png", "asset_sym24_1", "image/png"),
+    ("/aprs-symbols-24-2.png", "aprs-symbols-24-2.png", "asset_sym24_2", "image/png"),
 ]
 
 def build_info():
