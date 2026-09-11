@@ -18,7 +18,11 @@
 
 #include <ArduinoJson.h>
 #include "map_utils.h"
-#include "ntp_utils.h"
+#if defined(ARDUINO_ARCH_RP2040)
+    #include "rp2350/ntp_rp2350.h"      // RP2350 port: lean SNTP client over W5500
+#else
+    #include "ntp_utils.h"
+#endif
 
 #define MAX_MAP_STATIONS    50
 #define STATION_TTL_MS      3600000UL   // 1 hora (en milisegundos)
@@ -30,7 +34,11 @@ std::vector<MapStation> mapStations;
 namespace MAP_Utils {
 
     void writeFormatedTime(char* dst, size_t size) { // gets NTP time ("HH:MM:SS") and writes it to dst if valid
+#if defined(ARDUINO_ARCH_RP2040)
+        String t = Ntp::synced() ? Ntp::hms(Ntp::nowEpoch()) : String("");
+#else
         String t = NTP_Utils::getFormatedTime();
+#endif
         if (t.length() == 8 && t.charAt(2) == ':') {
             t.toCharArray(dst, size);
         } else {
