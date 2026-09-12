@@ -21,6 +21,7 @@
 #include "configuration.h"
 #include "network_manager.h"
 #include "ntp_utils.h"
+#include "utils.h"
 #include "time.h"
 
 
@@ -35,7 +36,7 @@ namespace NTP_Utils {
     bool setup() {
         if (networkManager->isConnected() && Config.digi.ecoMode == 0 && Config.callsign != "NOCALL-10") {
             int gmt = Config.ntp.gmtCorrection * 3600;
-            Serial.println("[NTP] Setting up, TZ offset: " + String(gmt) + " Server: " +  Config.ntp.server);
+            Utils::println("[NTP] Setting up, TZ offset: " + String(gmt) + " Server: " +  Config.ntp.server);
             timeClient = new NTPClient(ntpUDP, Config.ntp.server.c_str(), gmt, 15 * 60 * 1000); // Update interval 15 min
             timeClient->begin();
             return true;

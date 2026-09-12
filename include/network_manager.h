@@ -21,6 +21,7 @@
 #include <WiFi.h>
 #include <ETH.h>
 #include <vector>
+#include <functional>
 
 /**
  * Class for managing network connections
@@ -44,10 +45,18 @@ private:
     String _hostName = "";
     std::vector<WiFiNetwork> _wifiNetworks;
 
+    // Optional injected logger -- keeps this class standalone/reusable with
+    // no dependency on any app-specific logging feature. If unset, falls
+    // back to a direct Serial.println (matches this class's original,
+    // unconditional behavior) so nothing breaks if a caller never wires one
+    // up.
+    std::function<void(const String&)> _logger = nullptr;
+
     int _findWiFiNetworkIndex(const String& ssid) const;
     bool _connectWiFi(const WiFiNetwork& network);
     void _processAPTimeout();
     void _onNetworkEvent(arduino_event_id_t event, arduino_event_info_t /*info*/);
+    void _log(const String& text) const;
 
 public:
     // Constructor
@@ -61,6 +70,11 @@ public:
     void loop();
 
     void setHostName(const String& hostName);
+    // Inject a logging callback (e.g. Utils::println) so this class's status
+    // messages can be routed by the caller -- e.g. suppressed on a serial
+    // port currently acting as a binary KISS TNC channel -- without this
+    // class knowing anything about that feature.
+    void setLogger(std::function<void(const String&)> logger);
 
     // WiFi methods
     bool setupAP(String apName, String apPsk = "");

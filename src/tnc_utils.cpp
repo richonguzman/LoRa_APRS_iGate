@@ -54,15 +54,15 @@ namespace TNC_Utils {
             tncServer.begin();
             String host = "igate-" + Config.callsign;
             if (!MDNS.begin(host.c_str())) {
-                Serial.println("Error Starting mDNS");
+                broadcastDiagnostic("Error Starting mDNS", true);
                 tncServer.stop();
                 return;
             }
             if (!MDNS.addService("tnc", "tcp", TNC_PORT)) {
-                Serial.println("Error: Could not add mDNS service");
+                broadcastDiagnostic("Error: Could not add mDNS service", true);
             }
-            Serial.println("TNC server started successfully (TNC2 text mode)");
-            Serial.println("mDNS Host: " + host + ".local");
+            broadcastDiagnostic("TNC server started successfully (" + Config.tnc.protocol + " mode)", true);
+            broadcastDiagnostic("mDNS Host: " + host + ".local", true);
         }
     }
 
@@ -328,6 +328,37 @@ namespace TNC_Utils {
         Serial.println("CRC ERROR");
         Serial.println("LOCAL -- RSSI:" + String(rssi) + " SNR:" + signedFloat(snr, 2) + " FO:" + signedInt(freqOffset));
         Serial.flush();
+    }
+
+    void broadcastDiagnostic(const String& text, bool newline) {
+        String out = newline ? (text + "\r\n") : text;
+
+        // Serial: unconstrained if the serial port isn't a TNC channel at
+        // all (nothing else is using that UART); if it is a TNC channel,
+        // this text is safe in TNC2 mode (any line without '>' is trivially
+        // skippable by a client parser -- see the app-developer connection
+        // guide) but must never appear in KISS mode, where it would corrupt
+        // the binary AX.25 stream.
+        if (!Config.tnc.enableSerial || Config.tnc.protocol != "KISS") {
+            Serial.print(out);
+        }
+
+        // IP: this is not an independent "debug over IP" channel -- it only
+        // ever rides along with the TNC server, and only in TNC2 mode.
+        if (Config.tnc.enableServer && Config.tnc.protocol != "KISS") {
+            for (int i = 0; i < MAX_CLIENTS; i++) {
+                auto client = clients[i];
+                if (client != nullptr) {
+                    if (client->connected()) {
+                        client->print(out);
+                        client->flush();
+                    } else {
+                        delete client;
+                        clients[i] = nullptr;
+                    }
+                }
+            }
+        }
     }
 
     void loop() {

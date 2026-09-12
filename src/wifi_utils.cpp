@@ -49,11 +49,11 @@ namespace WIFI_Utils {
 
         if (backupDigiMode) {
             if (!networkManager->isWiFiConnected() && ((currentTime - lastBackupDigiTime) >= 15 * 60 * 1000)) {
-                Serial.println("*** Stopping BackUp Digi Mode ***");
+                Utils::println("*** Stopping BackUp Digi Mode ***");
                 backupDigiMode = false;
                 wifiCounter = 0;
             } else if (networkManager->isWiFiConnected()) {
-                Serial.println("*** WiFi Reconnect Success (Stopping Backup Digi Mode) ***");
+                Utils::println("*** WiFi Reconnect Success (Stopping Backup Digi Mode) ***");
                 backupDigiMode = false;
                 wifiCounter = 0;
             }
@@ -63,17 +63,17 @@ namespace WIFI_Utils {
             lastWiFiCheck = currentTime;
             if (networkManager->isWiFiConnected()) {
                 if (Config.digi.backupDigiMode && (currentTime - lastServerCheck > 30 * 1000)) {
-                    Serial.println("*** Server Connection LOST → Backup Digi Mode ***");
+                    Utils::println("*** Server Connection LOST → Backup Digi Mode ***");
                     backupDigiMode = true;
                     lastBackupDigiTime = currentTime;
                 }
             } else {
-                Serial.println("Reconnecting to WiFi...");
+                Utils::println("Reconnecting to WiFi...");
                 WIFI_Utils::startWiFi();
 
                 if (Config.digi.backupDigiMode) wifiCounter++;
                 if (wifiCounter >= 2) {
-                    Serial.println("*** Starting BackUp Digi Mode ***");
+                    Utils::println("*** Starting BackUp Digi Mode ***");
                     backupDigiMode = true;
                     lastBackupDigiTime = currentTime;
                 }
@@ -95,9 +95,9 @@ namespace WIFI_Utils {
         }
 
         if (!networkManager->hasWiFiNetworks()) {
-            Serial.println("WiFi SSID not set!");
+            Utils::println("WiFi SSID not set!");
             if (Config.wifiAutoAP.enabled) {
-                Serial.println("Starting AP fallback...");
+                Utils::println("Starting AP fallback...");
                 startAutoAP();
             }
             return;
@@ -110,15 +110,15 @@ namespace WIFI_Utils {
             digitalWrite(INTERNAL_LED_PIN, LOW);
         #endif
         if (networkManager->isWiFiConnected()) {
-            Serial.print("[WiFi] Connected as ");
-            Serial.print(networkManager->getWiFiIP());
-            Serial.print(" / MAC Address: ");
-            Serial.println(networkManager->getWiFimacAddress());
+            Utils::print("[WiFi] Connected as ");
+            Utils::print(networkManager->getWiFiIP().toString());
+            Utils::print(" / MAC Address: ");
+            Utils::println(networkManager->getWiFimacAddress());
             displayShow("", "     Connected!!", "" , "     loading ...", 1000);
         } else {
-            Serial.println("[WiFi] Not connected to WiFi!");
+            Utils::println("[WiFi] Not connected to WiFi!");
             if (Config.wifiAutoAP.enabled) {
-                Serial.println("Starting AP fallback...");
+                Utils::println("Starting AP fallback...");
                 displayShow("", " WiFi Not Connected!", "" , "     loading ...", 1000);
                 startAutoAP();
             } else {

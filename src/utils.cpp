@@ -32,6 +32,7 @@
 #include "gps_utils.h"
 #include "wx_utils.h"
 #include "display.h"
+#include "tnc_utils.h"
 #include "utils.h"
 
 #define DAY_MS (24UL * 60UL * 60UL * 1000UL)
@@ -120,14 +121,14 @@ namespace Utils {
         #ifdef INTERNAL_LED_PIN
             digitalWrite(INTERNAL_LED_PIN,HIGH);
         #endif
-        Serial.println("\nStarting Station: " + Config.callsign + "   Version: " + versionDate);
-        Serial.print("(DigiEcoMode: ");
+        println("\nStarting Station: " + Config.callsign + "   Version: " + versionDate);
+        print("(DigiEcoMode: ");
         if (Config.digi.ecoMode == 0) {
-            Serial.println("OFF)");
+            println("OFF)");
         } else if (Config.digi.ecoMode == 1) {
-            Serial.println("ON)");
+            println("ON)");
         } else {
-            Serial.println("ON / Only Serial Output)");
+            println("ON / Only Serial Output)");
         }
         displayShow(" LoRa APRS", "", "", "   ( iGATE & DIGI )", "", "" , "  CA2RXU  " + versionDate, 4000);
         #ifdef INTERNAL_LED_PIN
@@ -381,15 +382,11 @@ namespace Utils {
     }
 
     void print(const String& text) {
-        if (!Config.tnc.enableSerial) {
-            Serial.print(text);
-        }
+        TNC_Utils::broadcastDiagnostic(text, false);
     }
 
     void println(const String& text) {
-        if (!Config.tnc.enableSerial) {
-            Serial.println(text);
-        }
+        TNC_Utils::broadcastDiagnostic(text, true);
     }
 
     void checkRebootMode() {

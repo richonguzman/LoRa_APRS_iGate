@@ -109,6 +109,7 @@ void setup() {
     Serial.begin(115200);
     Config.setup();
     networkManager = new NetworkManager();
+    networkManager->setLogger(Utils::println);
     networkManager->setup();
     if (Config.wifiAutoAP.enabled) {
         networkManager->setAPTimeout(Config.wifiAutoAP.timeout * 60 * 1000); // Convert minutes to milliseconds

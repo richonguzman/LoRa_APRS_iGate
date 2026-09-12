@@ -28,6 +28,14 @@ NetworkManager::~NetworkManager() { }
 
 // Private methods
 
+void NetworkManager::_log(const String& text) const {
+    if (_logger) {
+        _logger(text);
+    } else {
+        Serial.println(text);
+    }
+}
+
 int NetworkManager::_findWiFiNetworkIndex(const String& ssid) const {
     for (size_t i = 0; i < _wifiNetworks.size(); i++) {
         if (_wifiNetworks[i].ssid == ssid) {
@@ -50,10 +58,13 @@ bool NetworkManager::_connectWiFi(const WiFiNetwork& network) {
 
     WiFi.mode(_wifiAPmode ? WIFI_AP_STA : WIFI_STA);
 
-    Serial.println("[NM] Attempting to connect to WiFi: " + network.ssid);
+    _log("[NM] Attempting to connect to WiFi: " + network.ssid);
     WiFi.begin(network.ssid.c_str(), network.psk.c_str());
 
-    Serial.print("[NM] Connecting ");
+    // Dots are buffered and logged as one complete line once the loop
+    // finishes, rather than streamed live char-by-char as before -- a
+    // callback-based logger works in whole lines, not mid-line writes.
+    String connectingLine = "[NM] Connecting ";
 
     int attempts = 0;
     while (!isWiFiConnected() && attempts < 10) {
@@ -61,18 +72,18 @@ bool NetworkManager::_connectWiFi(const WiFiNetwork& network) {
         #ifdef INTERNAL_LED_PIN
             digitalWrite(INTERNAL_LED_PIN,HIGH);
         #endif
-        Serial.print('.');
+        connectingLine += '.';
         delay(500);
         #ifdef INTERNAL_LED_PIN
             digitalWrite(INTERNAL_LED_PIN,LOW);
         #endif
         attempts++;
     }
-    Serial.println();
+    _log(connectingLine);
 
     if (isWiFiConnected()) return true;
 
-    Serial.println("[NM] Failed to connect to WiFi after " + String(attempts) + " attempts. SSID: " + network.ssid);
+    _log("[NM] Failed to connect to WiFi after " + String(attempts) + " attempts. SSID: " + network.ssid);
     return false;
 }
 
@@ -88,7 +99,7 @@ void NetworkManager::_processAPTimeout() {
     }
 
     if (millis() - _apStartup > _apTimeout) {
-        Serial.println("[NM] AP timeout reached. Disabling AP mode.");
+        _log("[NM] AP timeout reached. Disabling AP mode.");
         disableAP();
     }
 }
@@ -96,25 +107,25 @@ void NetworkManager::_processAPTimeout() {
 void NetworkManager::_onNetworkEvent(arduino_event_id_t event, arduino_event_info_t /*info*/) {
     switch (event) {
         case ARDUINO_EVENT_ETH_START:
-            Serial.println("[NM] ETH Started");
+            _log("[NM] ETH Started");
             if (!_hostName.isEmpty()) {
-                Serial.println("[NM] ETH Setting Hostname: " + _hostName);
+                _log("[NM] ETH Setting Hostname: " + _hostName);
                 ETH.setHostname(_hostName.c_str());
             }
         break;
         case ARDUINO_EVENT_ETH_CONNECTED:
-            Serial.println("[NM] ETH Connected");
+            _log("[NM] ETH Connected");
             break;
         case ARDUINO_EVENT_ETH_GOT_IP:
-            Serial.println("[NM] ETH Got IP");
+            _log("[NM] ETH Got IP");
             _ethernetConnected = true;
             break;
         case ARDUINO_EVENT_ETH_DISCONNECTED:
-            Serial.println("[NM] ETH Disconnected");
+            _log("[NM] ETH Disconnected");
             _ethernetConnected = false;
             break;
         case ARDUINO_EVENT_ETH_STOP:
-            Serial.println("[NM] ETH Stopped");
+            _log("[NM] ETH Stopped");
             _ethernetConnected = false;
             break;
         default:
@@ -124,7 +135,7 @@ void NetworkManager::_onNetworkEvent(arduino_event_id_t event, arduino_event_inf
 
 // Initialize
 bool NetworkManager::setup() {
-    Serial.println("[NM] Initializing Networking...");
+    _log("[NM] Initializing Networking...");
 
     WiFi.onEvent(
         [this](arduino_event_id_t event, arduino_event_info_t info) {
@@ -144,12 +155,16 @@ void NetworkManager::setHostName(const String& hostName) {
     _hostName = hostName;
 }
 
+void NetworkManager::setLogger(std::function<void(const String&)> logger) {
+    _logger = logger;
+}
+
 // WiFi methods
 
 bool NetworkManager::setupAP(String apName, String apPsk) {
     _wifiAPmode = true;
 
-    Serial.println("[NM] Starting AP mode: " + apName);
+    _log("[NM] Starting AP mode: " + apName);
 
     // Full WiFi reset sequence
     WiFi.disconnect(true);
@@ -163,16 +178,16 @@ bool NetworkManager::setupAP(String apName, String apPsk) {
     delay(1000); // Give AP time to fully initialize
 
     if (apStarted) {
-        Serial.println("[NM] AP setup successful");
+        _log("[NM] AP setup successful");
         _apStartup = millis();
     }
     else {
-        Serial.println("[NM] AP setup failed");
+        _log("[NM] AP setup failed");
         return false;
     }
 
     IPAddress apIP = getWiFiAPIP();
-    Serial.println("[NM] AP IP assigned: " + apIP.toString());
+    _log("[NM] AP IP assigned: " + apIP.toString());
 
     return true;
 }
@@ -185,7 +200,7 @@ bool NetworkManager::disableAP() {
 }
 
 void NetworkManager::setAPTimeout(unsigned long timeout) {
-    Serial.println("[NM] Setting AP timeout to " + String(timeout / 1000) + " sec");
+    _log("[NM] Setting AP timeout to " + String(timeout / 1000) + " sec");
     _apTimeout = timeout;
 }
 
@@ -196,12 +211,12 @@ void NetworkManager::addWiFiNetwork(const String& ssid, const String& psk) {
 
     int index = _findWiFiNetworkIndex(ssid);
     if (index >= 0) {
-        Serial.println("[NM] Updating WiFi network: " + ssid);
+        _log("[NM] Updating WiFi network: " + ssid);
         _wifiNetworks[static_cast<size_t>(index)].psk = psk;
         return;
     }
 
-    Serial.println("[NM] Adding WiFi network: " + ssid);
+    _log("[NM] Adding WiFi network: " + ssid);
     WiFiNetwork network;
     network.ssid = ssid;
     network.psk = psk;
@@ -279,7 +294,7 @@ String NetworkManager::getWiFimacAddress(void) const {
 // Ethernet methods
 bool NetworkManager::ethernetConnect(eth_phy_type_t type, uint8_t phy_addr, uint8_t mdc, uint8_t mdio, int power, eth_clock_mode_t clock_mode, bool use_mac_from_efuse) {
     _ethernetMode = true;
-    Serial.println("[NM] Setting up Ethernet...");
+    _log("[NM] Setting up Ethernet...");
 
     #if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
         // SDK 5.x (Arduino SDK 3.x)
@@ -299,7 +314,7 @@ bool NetworkManager::setEthernetIP(const String& staticIP, const String& gateway
 
     IPAddress ip, gw, sn, d1, d2;
     if (!ip.fromString(staticIP) || !gw.fromString(gateway) || !sn.fromString(subnet)) {
-        Serial.println("[NM] Invalid static IP configuration");
+        _log("[NM] Invalid static IP configuration");
         return false;
     }
 
@@ -313,7 +328,7 @@ bool NetworkManager::setEthernetIP(const String& staticIP, const String& gateway
         ETH.config(ip, gw, sn);
     }
 
-    Serial.println("[NM] Ethernet static IP: " + staticIP);
+    _log("[NM] Ethernet static IP: " + staticIP);
     return true;
 }
 

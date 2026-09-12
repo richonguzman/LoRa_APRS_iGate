@@ -643,7 +643,7 @@ namespace LoRa_Utils {
 
     void waitForDIFS() {
         while (!doDIFS()) {
-            Serial.println("CAD/DIFS failed, retry...");
+            Utils::println("CAD/DIFS failed, retry...");
         }
     }
 
