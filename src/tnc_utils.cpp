@@ -20,6 +20,7 @@
 #include "ESPmDNS.h"
 #include "configuration.h"
 #include "station_utils.h"
+#include "kiss_protocol.h"
 #include "aprs_is_utils.h"
 #include "tnc_utils.h"
 #include "kiss_utils.h"
@@ -89,36 +90,70 @@ namespace TNC_Utils {
         }
     }
 
+    // Shared by both input protocols once each has produced a clean,
+    // TNC2-format frame string (decodeKISS() already returns this exact
+    // shape, so both paths converge here) -- accept-own check, LoRa TX
+    // queueing, and APRS-IS bridge upload exist in exactly one place,
+    // never duplicated or allowed to drift between protocols.
+    void processReceivedFrame(const String& frame, bool fromClient, const String& viaLabel) {
+        if (frame.length() == 0) return;
+
+        if (fromClient) {
+            Utils::print("<--- Got from " + viaLabel + "     : ");
+            Utils::println(frame);
+        }
+
+        int gtIdx = frame.indexOf('>');
+        if (gtIdx == -1) return;
+        String sender = frame.substring(0, gtIdx);
+
+        if (Config.tnc.acceptOwn || sender != Config.callsign) {
+            if (Config.loramodule.txActive) STATION_Utils::addToOutputPacketBuffer(frame);
+            if (Config.tnc.aprsBridgeActive && Config.aprs_is.active && passcodeValid && aprsIsClient.connected()) {
+                APRS_IS_Utils::upload(frame);
+            }
+        } else {
+            Utils::println("Ignored own frame from " + viaLabel);
+        }
+    }
+
     void handleInputData(char character, int bufferIndex) {
         String* data = (bufferIndex == -1) ? &inputSerialBuffer : &inputServerBuffer[bufferIndex];
-        
+
+        if (Config.tnc.protocol == "KISS") {
+            // FEND-delimited binary accumulation, ported from upstream --
+            // ignore anything before the first real frame start (this is
+            // also what safely discards a legacy client's plain-text
+            // command-mode preamble, e.g. "~", "XFLOW OFF", "KISS ON":
+            // none of those bytes are FEND, so they never begin
+            // accumulating at all).
+            if (data->length() == 0 && character != (char)FEND) return;
+
+            data->concat(character);
+
+            if (character == (char)FEND && data->length() > 3) {
+                bool isDataFrame = false;
+                const String& frame = decodeKISS(*data, isDataFrame);
+                if (isDataFrame) {
+                    processReceivedFrame(frame, bufferIndex != -1, "KISS");
+                }
+                data->clear();
+            }
+
+            if (data->length() > 255) {
+                data->clear();
+            }
+            return;
+        }
+
+        // TNC2 text mode
         if (character == '\r') return;
 
         if (character == '\n') {
             if (data->length() > 3) {
                 String frame = *data;
                 frame.trim();
-                
-                if (frame.length() > 0) {
-                    if (bufferIndex != -1) {
-                        Utils::print("<--- Got from TNC2     : ");
-                        Utils::println(frame);
-                    }
-
-                    int gtIdx = frame.indexOf('>');
-                    if (gtIdx != -1) {
-                        String sender = frame.substring(0, gtIdx);
-
-                        if (Config.tnc.acceptOwn || sender != Config.callsign) {
-                            if (Config.loramodule.txActive) STATION_Utils::addToOutputPacketBuffer(frame);
-                            if (Config.tnc.aprsBridgeActive && Config.aprs_is.active && passcodeValid && aprsIsClient.connected()) {
-                                APRS_IS_Utils::upload(frame);
-                            }
-                        } else {
-                            Utils::println("Ignored own frame from TNC2 line");
-                        }
-                    }
-                }
+                processReceivedFrame(frame, bufferIndex != -1, "TNC2");
             }
             data->clear();
             return;
