@@ -116,7 +116,7 @@ namespace DIGI_Utils {
             packetToRepeat += stationCallsign;
             packetToRepeat += "*";
         }
-        packetToRepeat += APRS_IS_Utils::checkForStartingBytes(packet.substring(suffixIndex));
+        packetToRepeat += packet.substring(suffixIndex);
         return packetToRepeat;
     }
 

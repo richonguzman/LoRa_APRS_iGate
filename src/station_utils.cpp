@@ -188,7 +188,6 @@ namespace STATION_Utils {
 
     bool isIn25SegHashBuffer(const String& station, const String& textMessage) {
         clean25SegHashBuffer();
-        Utils::println("[DEBUG-HASH-CHECK] Checking packet from: " + station);
         // 1. Isolate the base source callsign
         String baseStation = station;
         int gtIdx = baseStation.indexOf('>');
@@ -205,9 +204,6 @@ namespace STATION_Utils {
         // 3. Generate invariant hash based solely on originator + clean payload
         uint32_t newHash        = makeHash(baseStation, corePayload);
         uint32_t currentTime    = millis();
-
-        // --- Debug Print ---
-        Utils::println("[DE-DUPE] Station: " + baseStation + " | Hash: " + String(newHash, HEX));
 
         for (size_t i = 0; i < packet25SegBuffer.size(); i++) {
             if (packet25SegBuffer[i].hash == newHash) return true;

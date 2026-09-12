@@ -95,13 +95,8 @@ namespace TNC_Utils {
     // shape, so both paths converge here) -- accept-own check, LoRa TX
     // queueing, and APRS-IS bridge upload exist in exactly one place,
     // never duplicated or allowed to drift between protocols.
-    void processReceivedFrame(const String& frame, bool fromClient, const String& viaLabel) {
+    void processReceivedFrame(const String& frame) {
         if (frame.length() == 0) return;
-
-        if (fromClient) {
-            Utils::print("<--- Got from " + viaLabel + "     : ");
-            Utils::println(frame);
-        }
 
         int gtIdx = frame.indexOf('>');
         if (gtIdx == -1) return;
@@ -112,8 +107,6 @@ namespace TNC_Utils {
             if (Config.tnc.aprsBridgeActive && Config.aprs_is.active && passcodeValid && aprsIsClient.connected()) {
                 APRS_IS_Utils::upload(frame);
             }
-        } else {
-            Utils::println("Ignored own frame from " + viaLabel);
         }
     }
 
@@ -135,7 +128,7 @@ namespace TNC_Utils {
                 bool isDataFrame = false;
                 const String& frame = decodeKISS(*data, isDataFrame);
                 if (isDataFrame) {
-                    processReceivedFrame(frame, bufferIndex != -1, "KISS");
+                    processReceivedFrame(frame);
                 }
                 data->clear();
             }
@@ -153,7 +146,7 @@ namespace TNC_Utils {
             if (data->length() > 3) {
                 String frame = *data;
                 frame.trim();
-                processReceivedFrame(frame, bufferIndex != -1, "TNC2");
+                processReceivedFrame(frame);
             }
             data->clear();
             return;
@@ -233,8 +226,6 @@ namespace TNC_Utils {
                     }
                 }
             }
-            Utils::print("---> Sent to TNC (KISS): ");
-            Utils::println(packet);
             return;
         }
 
@@ -252,7 +243,7 @@ namespace TNC_Utils {
                     
                     // Send Line 2: Local receiver metrics
                     if (levelInfo) {
-                        client->print("LOCAL -- RSSI:" + String(rssi) + " SNR:" + signedFloat(snr, 2) + " FO:" + signedInt(freqOffset) + "\r\n");
+                        client->print("LOCALRX -- RSSI:" + String(rssi) + " SNR:" + signedFloat(snr, 2) + " FO:" + signedInt(freqOffset) + "\r\n");
                     }
 
                     // Send Line 3+: full hop chain -- real data or NA per hop.
@@ -277,8 +268,6 @@ namespace TNC_Utils {
                 }
             }
         }
-        Utils::print("---> Sent to TNC2     : ");
-        Utils::println(packet);
     }
 
     void sendToSerial(const String& packet, bool levelInfo, const std::vector<LoRa_Utils::RxtHopMetric>& hopMetrics) {
@@ -305,7 +294,7 @@ namespace TNC_Utils {
         
         // Line 2: Local receiver metrics
         if (levelInfo) {
-            Serial.println("LOCAL -- RSSI:" + String(rssi) + " SNR:" + signedFloat(snr, 2) + " FO:" + signedInt(freqOffset));
+            Serial.println("LOCALRX -- RSSI:" + String(rssi) + " SNR:" + signedFloat(snr, 2) + " FO:" + signedInt(freqOffset));
         }
 
         // Line 3+: full hop chain -- real data or NA per hop. Printed
@@ -340,7 +329,7 @@ namespace TNC_Utils {
         if (Config.tnc.protocol == "KISS") return;
 
         String lineToSend = String("\r\n") + "CRC ERROR\r\n" +
-            "LOCAL -- RSSI:" + String(rssi) + " SNR:" + signedFloat(snr, 2) + " FO:" + signedInt(freqOffset) + "\r\n";
+            "LOCALRX -- RSSI:" + String(rssi) + " SNR:" + signedFloat(snr, 2) + " FO:" + signedInt(freqOffset) + "\r\n";
 
         for (int i = 0; i < MAX_CLIENTS; i++) {
             auto client = clients[i];
@@ -361,7 +350,7 @@ namespace TNC_Utils {
 
         Serial.print("\r\n");
         Serial.println("CRC ERROR");
-        Serial.println("LOCAL -- RSSI:" + String(rssi) + " SNR:" + signedFloat(snr, 2) + " FO:" + signedInt(freqOffset));
+        Serial.println("LOCALRX -- RSSI:" + String(rssi) + " SNR:" + signedFloat(snr, 2) + " FO:" + signedInt(freqOffset));
         Serial.flush();
     }
 

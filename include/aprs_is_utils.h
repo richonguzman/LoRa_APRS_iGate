@@ -28,7 +28,6 @@ namespace APRS_IS_Utils {
     void    connect();
 
     void    checkStatus();
-    String  checkForStartingBytes(const String& packet);
 
     String  buildPacketToUpload(const String& packet);
     bool    processReceivedLoRaMessage(const String& sender, const String& packet, bool thirdParty);

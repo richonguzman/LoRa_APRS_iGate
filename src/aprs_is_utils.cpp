@@ -135,21 +135,16 @@ namespace APRS_IS_Utils {
         secondLine += aprsisState;
     }
 
-    String checkForStartingBytes(const String& packet) {
-        int index = packet.indexOf("\x3c\xff\x01");
-        return (index != -1) ? packet.substring(0, index) : packet;
-    }
-
     String buildPacketToUpload(const String& packet) {
         int colonIndex = packet.indexOf(":");
-        String packetToUpload = packet.substring(3, colonIndex);
+        String packetToUpload = packet.substring(0, colonIndex);
         if (Config.aprs_is.active && passcodeValid && Config.aprs_is.messagesToRF) {
             packetToUpload += ",qAR,";
         } else {
             packetToUpload += ",qAO,";
         }
         packetToUpload += Config.callsign;
-        packetToUpload += checkForStartingBytes(packet.substring(colonIndex));
+        packetToUpload += packet.substring(colonIndex);
 
         // Belt-and-suspenders: RXT trailers should already be gone by this
         // point (stripped once in LoRa_Utils::receivePacket(), the sole
@@ -210,17 +205,17 @@ namespace APRS_IS_Utils {
             if (packet.indexOf("NOGATE") == -1 && packet.indexOf("RFONLY") == -1) {
                 int firstColonIndex = packet.indexOf(":");
                 if (firstColonIndex > 5 && firstColonIndex < (packet.length() - 1) && packet[firstColonIndex + 1] != '}' && packet.indexOf("TCPIP") == -1) {
-                    const String& Sender = packet.substring(3, packet.indexOf(">"));
+                    const String& Sender = packet.substring(0, packet.indexOf(">"));
                     if (Sender != Config.callsign && Utils::callsignIsValid(Sender)) {
                         STATION_Utils::updateLastHeard(Sender);
-                        Utils::typeOfPacket(packet.substring(3), 0);  // LoRa-APRS
+                        Utils::typeOfPacket(packet, 0);  // LoRa-APRS
                         int doubleColonIndex = packet.indexOf("::");
                         const String& AddresseeAndMessage = packet.substring(doubleColonIndex + 2);
                         String Addressee = AddresseeAndMessage.substring(0, AddresseeAndMessage.indexOf(":"));
                         Addressee.trim();
                         bool queryMessage = false;
                         if (doubleColonIndex > 10 && Addressee == Config.callsign) {      // its a message for me!
-                            queryMessage = processReceivedLoRaMessage(Sender, checkForStartingBytes(AddresseeAndMessage), false);
+                            queryMessage = processReceivedLoRaMessage(Sender, AddresseeAndMessage, false);
                         }
                         if (queryMessage) return;
 

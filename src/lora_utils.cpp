@@ -724,8 +724,15 @@ namespace LoRa_Utils {
             if (Config.syslog.active && networkManager->isConnected()) {
                 SYSLOG_Utils::log(3, finalPacket, 0, 0.0, 0);    
             }
-            Utils::print("---> LoRa Packet Tx : ");
-            Utils::println(finalPacket);
+            // Own stanza (leading blank line), TNC2-only, both interfaces --
+            // this is the one piece of information a TNC-attached client has
+            // no other way to observe: the device's own, independently-
+            // triggered decision to key up the radio. The RXT trailer (if
+            // any) is stripped for the same reason it's stripped everywhere
+            // else a client can see it -- it has no meaning outside an
+            // RXT-aware digi and must never reach a TNC client.
+            Utils::println("");
+            Utils::println("LOCALTX -- " + stripRxtTrailer(finalPacket));
         } else {
             Utils::print(F("failed, code "));
             Utils::println(String(state));
