@@ -297,7 +297,13 @@ namespace TNC_Utils {
     // where the corruption is), so no packet line and no RXT hop chain are
     // emitted, only the raw local receive metrics. rssi/snr/freqOffset were
     // already captured by receivePacket() at the moment of the CRC failure.
+    //
+    // KISS mode: silent. There is no AX.25 frame to encode -- no valid
+    // addresses exist for a corrupted receive -- so nothing is sent at all,
+    // same reasoning as suppressing LOCAL/hop-chain lines in sendToClients().
     void sendCrcErrorToClients() {
+        if (Config.tnc.protocol == "KISS") return;
+
         String lineToSend = String("\r\n") + "CRC ERROR\r\n" +
             "LOCAL -- RSSI:" + String(rssi) + " SNR:" + signedFloat(snr, 2) + " FO:" + signedInt(freqOffset) + "\r\n";
 
@@ -316,6 +322,8 @@ namespace TNC_Utils {
     }
 
     void sendCrcErrorToSerial() {
+        if (Config.tnc.protocol == "KISS") return;
+
         Serial.print("\r\n");
         Serial.println("CRC ERROR");
         Serial.println("LOCAL -- RSSI:" + String(rssi) + " SNR:" + signedFloat(snr, 2) + " FO:" + signedInt(freqOffset));
