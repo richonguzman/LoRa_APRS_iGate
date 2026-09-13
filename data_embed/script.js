@@ -100,6 +100,7 @@ function loadSettings(settings) {
 
     // APRS-IS
     document.getElementById("aprs_is.active").checked                   = settings.aprs_is.active;
+    document.getElementById("other.allowAnyCallsign").checked           = settings.other.allowAnyCallsign;
     document.getElementById("aprs_is.messagesToRF").checked             = settings.aprs_is.messagesToRF;
     document.getElementById("aprs_is.objectsToRF").checked              = settings.aprs_is.objectsToRF;
     document.getElementById("aprs_is.server").value                     = settings.aprs_is.server;
