@@ -203,7 +203,8 @@ namespace DIGI_Utils {
         Utils::typeOfPacket(temp, 2);              // Digi
         bool queryMessage                   = false;
         int doubleColonIndex                = temp.indexOf("::");
-        if (doubleColonIndex > 10) {                // it's a message
+        bool isMessageType                  = doubleColonIndex > 10;   // ":" payload type -- RXT must never attach to this, regardless of addressee
+        if (isMessageType) {                        // it's a message
             String AddresseeAndMessage            = temp.substring(doubleColonIndex + 2);
             String Addressee                      = AddresseeAndMessage.substring(0, AddresseeAndMessage.indexOf(":"));
             Addressee.trim();
@@ -215,12 +216,16 @@ namespace DIGI_Utils {
 
         String loraPacket = generateDigipeatedPacket(packet, thirdPartyPacket);
         if (loraPacket != "") {
-            // This is the ONE genuine case where RXT is legitimate: a frame
-            // this station's own LoRa receiver just heard, being relayed
-            // onward unmodified in content (only the path changes). Every
-            // other addToOutputPacketBuffer() call site in the codebase
-            // must leave eligibleForRxt at its default (false).
-            STATION_Utils::addToOutputPacketBuffer(loraPacket, false, true);
+            // RXT is legitimate on a genuine digipeat relay of a frame this
+            // station's own LoRa receiver just heard -- EXCEPT for APRS
+            // messaging packets (":" payload type, isMessageType above),
+            // which must never carry an RXT trailer regardless of addressee:
+            // it would interfere with the message's own ack-tracking and
+            // message-ID semantics. This is the only call site in the
+            // codebase where eligibleForRxt is ever conditionally true;
+            // every other addToOutputPacketBuffer() call site must leave it
+            // at its default (false).
+            STATION_Utils::addToOutputPacketBuffer(loraPacket, false, !isMessageType);
             if (Config.digi.ecoMode != 1) displayToggle(true);
             lastScreenOn = millis();
         }
