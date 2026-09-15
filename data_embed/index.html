@@ -1520,7 +1520,7 @@ body{background:var(--msh-bg);color:var(--msh-text);font-family:"Inter",system-u
                                             <label
                                                 for="tnc.enableSerial"
                                                 class="form-label"
-                                                >Enable Serial KISS</label
+                                                >Enable Serial</label
                                             >
                                         </div>
                                     </div>
@@ -1552,7 +1552,7 @@ body{background:var(--msh-bg);color:var(--msh-text);font-family:"Inter",system-u
                                             <label
                                                 for="tnc.acceptOwn"
                                                 class="form-label"
-                                                >Accept own frames via KISS</label
+                                                >Accept own frames</label
                                             >
                                         </div>
                                     </div>
@@ -1570,6 +1570,23 @@ body{background:var(--msh-bg);color:var(--msh-text);font-family:"Inter",system-u
                                                 >Enable APRS Bridge</label
                                             >
                                         </div>
+                                    </div>
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-6">
+                                        <label
+                                            for="tnc.kissProtocol"
+                                            class="form-label"
+                                            >Protocol</label
+                                        >
+                                        <select
+                                            class="form-select form-select"
+                                            name="tnc.kissProtocol"
+                                            id="tnc.kissProtocol"
+                                        >
+                                            <option value="KISS" selected>KISS</option>
+                                            <option value="TNC2">TNC2</option>
+                                        </select>
                                     </div>
                                 </div>
                             </div>
