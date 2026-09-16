@@ -154,10 +154,6 @@ namespace GPS_Utils {
         int indexOfAt = packet.indexOf(":@");
         if (indexOfAt > 10) return getReceivedGPS(packet);
 
-        const uint8_t nonEncondedLatitudeOffset     = 9;    // "N" / "S"
-        const uint8_t nonEncondedLongitudeOffset    = 19;   // "E" / "W"
-        const uint8_t encodedByteOffset             = 14;
-
         int indexOfExclamation  = packet.indexOf(":!");
         int indexOfEqual        = packet.indexOf(":=");
         int baseIndex           = - 1;
@@ -168,32 +164,33 @@ namespace GPS_Utils {
         }
         if (baseIndex == -1) return " _ / _ / _ ";
 
-        int latitudeIndex       = baseIndex + nonEncondedLatitudeOffset;
-        int longitudeIndex      = baseIndex + nonEncondedLongitudeOffset;
-        int encodedByteIndex    = baseIndex + encodedByteOffset;
-        int packetLength        = packet.length();
+        int packetLength = packet.length();
+        if (baseIndex + 2 >= packetLength) return " _ / _ / _ ";
 
-        if (latitudeIndex < packetLength && longitudeIndex < packetLength) {
-            char latChar = packet[latitudeIndex];
-            char lngChar = packet[longitudeIndex];
-            if ((latChar == 'N' || latChar == 'S') && (lngChar == 'E' || lngChar == 'W')) return getReceivedGPS(packet);
-        }
-        if (encodedByteIndex < packetLength) {
-            char byteChar = packet[encodedByteIndex];
-            if (byteChar == 'G' || byteChar == 'Q' || byteChar == '[' || byteChar == 'H' || byteChar == 'X' || byteChar == '3') return decodeEncodedGPS(packet);
-        }
+        // Spec-based: the first character right after the DTI decides the format.
+        // Uncompressed positions always start with a latitude digit.
+        // Compressed positions always start with the symbol table id: '/', '\', or an overlay A-Z/a-j.
+        char firstInfoChar = packet[baseIndex + 2];
+        if (firstInfoChar >= '0' && firstInfoChar <= '9') return getReceivedGPS(packet);
+        if (firstInfoChar == '/' || firstInfoChar == '\\' ||
+            (firstInfoChar >= 'A' && firstInfoChar <= 'Z') ||
+            (firstInfoChar >= 'a' && firstInfoChar <= 'j')) return decodeEncodedGPS(packet);
         return " _ / _ / _ ";
     }
 
-    /*String getDistanceAndCommentFromMicE(const String& packet) {
-        int indexOfMicE1 = packet.indexOf(":`");
-        int indexOfMicE2 = packet.indexOf(":\'");
+    String getDistanceAndCommentFromMicE(const String& packet) {
+        // Mic-E encodes latitude in the AX.25 destination field and longitude
+        // in the info field with its own +28 offset scheme -- nothing like
+        // the non-encoded/base91 formats above. APRSPacketLib::processReceivedPacket
+        // already implements that decode (used for the map upsert in
+        // lora_utils.cpp), so it's reused here instead of duplicating it.
+        if (packet.length() < 4) return " _ / _ / _ ";
 
-        if (indexOfMicE1 > 10 || indexOfMicE2 > 10) {
-            return decodeEncodedGPS(packet);
-        }
-        return " _ / _ / _ ";
-    }*/
+        APRSPacket aprsPacket = APRSPacketLib::processReceivedPacket(packet.substring(3), 0, 0, 0);
+        if (aprsPacket.type != 4) return " _ / _ / _ ";   // 4 = Mic-E
+
+        return buildDistanceAndComment(aprsPacket.latitude, aprsPacket.longitude, "");
+    }
 
     void setup() {
         #ifdef HAS_GPS

@@ -85,9 +85,8 @@ namespace SYSLOG_Utils {
                         syslogPacket.concat(" ---> ");
                         syslogPacket.concat(String(nextChar));  // restore the actual indicator received
                         syslogPacket.concat(packet.substring(colonIndex + 2));
-                        // append distance for Mic-E, same as the GPS path
-                        //syslogPacket.concat(" / ");
-                        //syslogPacket.concat(GPS_Utils::getDistanceAndComment(packet));
+                        syslogPacket.concat(" / ");
+                        syslogPacket.concat(GPS_Utils::getDistanceAndCommentFromMicE(packet));
                     } else if (nextChar == ';') {
                         syslogPacket.concat("OBJECT / ");
                         syslogPacket.concat(sender);
