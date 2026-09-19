@@ -53,7 +53,7 @@ int  backoffMax         = 4;    // Max Backoff value (number of CAD slots to wai
         SX1268 radio = new Module(RADIO_CS_PIN, RADIO_DIO1_PIN, RADIO_RST_PIN, RADIO_BUSY_PIN);
     #endif
 #endif
-#ifdef HAS_SX1278
+#ifdef HAS_SX1278 
     SX1278 radio = new Module(RADIO_CS_PIN, RADIO_BUSY_PIN, RADIO_RST_PIN);
 #endif
 #ifdef HAS_SX1276
@@ -94,6 +94,11 @@ namespace LoRa_Utils {
         #if defined(RADIO_HAS_XTAL)
             radio.XTAL = true;
         #endif
+
+        #if (defined(RADIO_RXEN) && defined(RADIO_TXEN))    // moved before radio.begin(freq) 
+            radio.setRfSwitchPins(RADIO_RXEN, RADIO_TXEN);
+        #endif
+
         int state = radio.begin(freq);
         if (state != RADIOLIB_ERR_NONE) {
             Utils::println("Starting LoRa failed! State: " + String(state));
@@ -121,9 +126,7 @@ namespace LoRa_Utils {
         radio.setBandwidth(signalBandwidth);
         radio.setCRC(true);
 
-        #if (defined(RADIO_RXEN) && defined(RADIO_TXEN))    // QRP Labs LightGateway has 400M22S (SX1268)
-            radio.setRfSwitchPins(RADIO_RXEN, RADIO_TXEN);
-        #endif
+    
 
         /*#ifdef SX126X_DIO2_AS_RF_SWITCH
         radio.setRfSwitchPins(RADIO_RXEN, RADIOLIB_NC);
