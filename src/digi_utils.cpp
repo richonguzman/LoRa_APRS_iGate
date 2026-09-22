@@ -42,13 +42,32 @@ extern bool             backupDigiMode;
 
 namespace DIGI_Utils {
 
-    String cleanPath(String path) {
-        String terms[] = {"WIDE1*,", "WIDE2*,", "*"};
-        for (String term : terms) {
-            int index = path.indexOf(term);
-            if (index != -1) path.remove(index, term.length());     // less memory than: tempPath.replace("*", "");
+    String cleanPath(const String& path) {
+        String result;
+        unsigned int start = 0;
+        while (true) {
+            int delim = path.indexOf(',', start);
+            int end = (delim == -1) ? path.length() : delim;
+            String token = path.substring(start, end);
+            if (token != "WIDE1*" && token != "WIDE2*") {
+                if (result.length() > 0) result += ",";
+                result += token;
+            }
+            if (delim == -1) break;
+            start = delim + 1;
         }
-        return path;
+        return result;
+    }
+
+    static int pathTokenIndex(const String& path, const String& token) {
+        unsigned int start = 0;
+        while (start < path.length()) {
+            int end = path.indexOf(",", start);
+            if (end == -1) end = path.length();
+            if (path.substring(start, end) == token) return start;
+            start = end + 1;
+        }
+        return -1;
     }
 
     String processMode3Path(const String& path, const String& stationCallsign) {
@@ -94,12 +113,13 @@ namespace DIGI_Utils {
                 tempPath.replace("WIDE1-1", stationCallsign + "*");
             } else if (tempPath.indexOf("WIDE2-") != -1 && digiMode == 2) {                 // WIDE2-n Digipeater
                 tempPath = cleanPath(path);
-                if (tempPath.indexOf("WIDE2-1") != -1) {
-                    tempPath.replace("WIDE2-1", stationCallsign + "*");
-                } else if (tempPath.indexOf("WIDE2-2") != -1) {
-                    tempPath.replace("WIDE2-2", stationCallsign + "*,WIDE2-1");
+                int idx = pathTokenIndex(tempPath, "WIDE2-1");
+                if (idx != -1) {
+                    tempPath = tempPath.substring(0, idx) + stationCallsign + "*" + tempPath.substring(idx + 7);
                 } else {
-                    return "";
+                    idx = pathTokenIndex(tempPath, "WIDE2-2");
+                    if (idx == -1) return "";
+                    tempPath = tempPath.substring(0, idx) + stationCallsign + "*,WIDE2-1" + tempPath.substring(idx + 7);
                 }
             } else if (digiMode == 3) {                                                     // Repeat if station callsign is in path (free to repeat).
                 tempPath = processMode3Path(tempPath, stationCallsign);
