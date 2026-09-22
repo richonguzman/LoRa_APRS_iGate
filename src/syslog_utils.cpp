@@ -16,6 +16,7 @@
  * along with LoRa APRS iGate. If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <APRSPacketLib.h>
 #include <WiFiUdp.h>
 #include "configuration.h"
 #include "network_manager.h"
@@ -30,116 +31,150 @@ extern String           versionNumber;
 
 WiFiUDP udpClient;
 
+namespace {
+
+    String createSyslogStart() {
+        String syslogStartPacket = "<165>1 - ";
+        syslogStartPacket.concat(Config.callsign);
+        syslogStartPacket.concat(" CA2RXU_LoRa_iGate_");
+        syslogStartPacket.concat(versionNumber);
+        syslogStartPacket.concat(" - - - "); //RFC5424 The Syslog Protocol
+        return syslogStartPacket;
+    }
+
+    void sendSyslogPacket(const String& syslogPacket) {
+        udpClient.beginPacket(Config.syslog.server.c_str(), Config.syslog.port);
+        udpClient.write((const uint8_t*)syslogPacket.c_str(), syslogPacket.length());
+        udpClient.endPacket();
+    }
+
+    String formatSignalData(int rssi, float snr, int freqError) {
+        char signalData[35];
+        snprintf(signalData, sizeof(signalData), " / %ddBm / %.2fdB / %dHz", rssi, snr, freqError);
+        return String(signalData);
+    }
+
+}
 
 namespace SYSLOG_Utils {
 
-    void log(const uint8_t type, const String& packet, const int rssi, const float snr, const int freqError) {
+    void logLoRaRx(APRSPacket& aprsPacket, const String& packet, const int rssi, const float snr, const int freqError) {
         if (Config.syslog.active && networkManager->isConnected()) {
-            String syslogPacket = "<165>1 - ";
-            syslogPacket.concat(Config.callsign);
-            syslogPacket.concat(" CA2RXU_LoRa_iGate_");
-            syslogPacket.concat(versionNumber);
-            syslogPacket.concat(" - - - "); //RFC5424 The Syslog Protocol
+            String syslogPacket = createSyslogStart();
+            syslogPacket.concat("RX / ");
 
-            char signalData[35];
-            snprintf(signalData, sizeof(signalData), " / %ddBm / %.2fdB / %dHz", rssi, snr, freqError);
-
-            int colonIndex              = packet.indexOf(":");
-            char nextChar               = packet[colonIndex + 1];
-            int greaterThanIndex        = packet.indexOf(">");
-            int telemetryPacketIndex    = packet.indexOf(":T#");
-            String sender               = packet.substring(3, greaterThanIndex);
-
-            switch (type) {
-                case 0:     // CRC
-                    syslogPacket.concat("CRC / CRC-ERROR / ");
-                    syslogPacket.concat(packet);
-                    syslogPacket.concat(signalData);
+            switch (aprsPacket.type) {
+                case 1:     // MESSAGE
+                    syslogPacket.concat("MESSAGE / ");
+                    syslogPacket.concat(aprsPacket.sender);
+                    syslogPacket.concat(" ---> ");
+                    syslogPacket.concat(aprsPacket.addressee);
+                    syslogPacket.concat(":");
+                    syslogPacket.concat(aprsPacket.payload);
                     break;
-                case 1:     // RX
-                    syslogPacket.concat("RX / ");
-                    if (nextChar == ':') {
-                        syslogPacket.concat("MESSAGE / ");
-                        syslogPacket.concat(sender);
-                        syslogPacket.concat(" ---> ");
-                        syslogPacket.concat(packet.substring(colonIndex + 2));
-                    } else if (nextChar == '!' || nextChar == '=' || nextChar == '@') {
-                        syslogPacket.concat("GPS / ");
-                        syslogPacket.concat(sender);
-                        syslogPacket.concat(" / ");
-                        if (packet.indexOf("WIDE1-1") > 10) {
-                            syslogPacket.concat(packet.substring(greaterThanIndex + 1, packet.indexOf(",")));
-                            syslogPacket.concat(" / WIDE1-1");
-                        } else {
-                            syslogPacket.concat(packet.substring(greaterThanIndex + 1, colonIndex));
-                            syslogPacket.concat(" / -");
+                case 0:     // GPS
+                    syslogPacket.concat("GPS / ");
+                    syslogPacket.concat(aprsPacket.sender);
+                    syslogPacket.concat(" / ");
+                    if (aprsPacket.path.indexOf("WIDE1-1") != -1) {
+                        syslogPacket.concat(aprsPacket.tocall);
+                        syslogPacket.concat(" / WIDE1-1");
+                    } else {
+                        syslogPacket.concat(aprsPacket.tocall);
+                        if (aprsPacket.path != "") {
+                            syslogPacket.concat(",");
+                            syslogPacket.concat(aprsPacket.path);
                         }
-                    } else if (nextChar == '>') {
-                        syslogPacket.concat("STATUS / ");
-                        syslogPacket.concat(sender);
-                        syslogPacket.concat(" ---> ");
-                        syslogPacket.concat(packet.substring(colonIndex + 2));
-                    } else if (nextChar == '`' || nextChar == '\'') {     // both Mic-E DTIs are valid
-                        syslogPacket.concat("MIC-E / ");
-                        syslogPacket.concat(sender);
-                        syslogPacket.concat(" ---> ");
-                        syslogPacket.concat(String(nextChar));  // restore the actual indicator received
-                        syslogPacket.concat(packet.substring(colonIndex + 2));
-                        syslogPacket.concat(" / ");
-                        syslogPacket.concat(GPS_Utils::getDistanceAndCommentFromMicE(packet));
-                    } else if (nextChar == ';') {
-                        syslogPacket.concat("OBJECT / ");
-                        syslogPacket.concat(sender);
-                        syslogPacket.concat(" ---> ");
-                        syslogPacket.concat(packet.substring(colonIndex + 2));
-                    } else if (telemetryPacketIndex >= 10 && packet.indexOf(":=/") == -1) {
-                        syslogPacket.concat("TELEMETRY / ");
-                        syslogPacket.concat(sender);
-                        syslogPacket.concat(" ---> ");
-                        syslogPacket.concat(packet.substring(telemetryPacketIndex + 3));
-                    } else {
-                        syslogPacket.concat(packet);
-                    }
-                    syslogPacket.concat(signalData);
-                    if (nextChar == '!' || nextChar == '=' || nextChar == '@') {
-                        syslogPacket.concat(" / ");
-                        syslogPacket.concat(GPS_Utils::getDistanceAndComment(packet));
+                        syslogPacket.concat(" / -");
                     }
                     break;
-                case 2:     // APRSIS TX
-                    syslogPacket.concat("APRSIS TX / ");
-                    if (nextChar == '>') {
-                        syslogPacket.concat("StartUp_Status / ");
-                        syslogPacket.concat(packet.substring(colonIndex + 2));
-                    } else if (nextChar == ':') {
-                        syslogPacket.concat("QUERY / ");
-                        syslogPacket.concat(packet);
-                    } else {
-                        syslogPacket.concat("BEACON / ");
-                        syslogPacket.concat(packet);
-                    }
+                case 2:     // STATUS
+                    syslogPacket.concat("STATUS / ");
+                    syslogPacket.concat(aprsPacket.sender);
+                    syslogPacket.concat(" ---> ");
+                    syslogPacket.concat(aprsPacket.payload);
                     break;
-                case 3:     // TX
-                    syslogPacket.concat("TX / ");
-                    if (packet.indexOf("RFONLY") > 10) {
-                        syslogPacket.concat("RFONLY / ");
-                        syslogPacket.concat(packet);
-                    } else if (nextChar == ':') {
-                        syslogPacket.concat("MESSAGE / ");
-                        syslogPacket.concat(sender);
-                        syslogPacket.concat(" ---> ");
-                        syslogPacket.concat(packet.substring(colonIndex + 2));
-                    } else {
-                        syslogPacket.concat(packet);
-                    }
+                case 4:     // MIC-E
+                    syslogPacket.concat("MIC-E / ");
+                    syslogPacket.concat(aprsPacket.sender);
+                    syslogPacket.concat(" ---> ");
+                    syslogPacket.concat(packet.indexOf(":`") != -1 ? "`" : "'");   // restore the actual indicator received
                     break;
-                default:
-                    syslogPacket = "<165>1 - ERROR LoRa - - - ERROR / Error in Syslog Packet"; //RFC5424 The Syslog Protocol
+                case 5:     // OBJECT
+                    syslogPacket.concat("OBJECT / ");
+                    syslogPacket.concat(aprsPacket.sender);
+                    syslogPacket.concat(" ---> ");
+                    syslogPacket.concat(aprsPacket.payload);
+                    break;
+                case 3:     // TELEMETRY
+                    syslogPacket.concat("TELEMETRY / ");
+                    syslogPacket.concat(aprsPacket.sender);
+                    syslogPacket.concat(" ---> ");
+                    syslogPacket.concat(aprsPacket.payload);
+                    break;
+                default:    // type == 6, unrecognized -- payload is the full, uncut packet
+                    syslogPacket.concat(aprsPacket.payload);
                     break;
             }
-            udpClient.beginPacket(Config.syslog.server.c_str(), Config.syslog.port);
-            udpClient.write((const uint8_t*)syslogPacket.c_str(), syslogPacket.length());
-            udpClient.endPacket();
+            syslogPacket.concat(formatSignalData(rssi, snr, freqError));
+            if (aprsPacket.type == 0 || aprsPacket.type == 4) {   // GPS or Mic-E -- both already carry
+                syslogPacket.concat(" / ");                        // clean lat/lon + comment in aprsPacket
+                syslogPacket.concat(GPS_Utils::buildDistanceAndComment(aprsPacket.latitude, aprsPacket.longitude, aprsPacket.payload));
+            }
+            sendSyslogPacket(syslogPacket);
+        }
+    }
+
+    void logAPRSISTx(const String& packet) {
+        if (Config.syslog.active && networkManager->isConnected()) {
+            String syslogPacket = createSyslogStart();
+            syslogPacket.concat("APRSIS TX / ");
+
+            APRSPacket aprsPacket = APRSPacketLib::processReceivedPacket(packet, 0, 0, 0);
+            if (aprsPacket.type == 2) {          // STATUS
+                syslogPacket.concat("StartUp_Status / ");
+                syslogPacket.concat(aprsPacket.payload);
+            } else if (aprsPacket.type == 1) {   // MESSAGE
+                syslogPacket.concat("QUERY / ");
+                syslogPacket.concat(packet);
+            } else {
+                syslogPacket.concat("BEACON / ");
+                syslogPacket.concat(packet);
+            }
+            sendSyslogPacket(syslogPacket);
+        }
+    }
+
+    void logLoRaTx(const String& packet) {
+        if (Config.syslog.active && networkManager->isConnected()) {
+            String syslogPacket = createSyslogStart();
+            syslogPacket.concat("TX / ");
+
+            APRSPacket aprsPacket = APRSPacketLib::processReceivedPacket(packet, 0, 0, 0);
+            if (aprsPacket.path.indexOf("RFONLY") != -1) {
+                syslogPacket.concat("RFONLY / ");
+                syslogPacket.concat(packet);
+            } else if (aprsPacket.type == 1) {
+                syslogPacket.concat("MESSAGE / ");
+                syslogPacket.concat(aprsPacket.sender);
+                syslogPacket.concat(" ---> ");
+                syslogPacket.concat(aprsPacket.addressee);
+                syslogPacket.concat(":");
+                syslogPacket.concat(aprsPacket.payload);
+            } else {
+                syslogPacket.concat(packet);
+            }
+            sendSyslogPacket(syslogPacket);
+        }
+    }
+
+    void logCRCError(const String& packet, const int rssi, const float snr, const int freqError) {
+        if (Config.syslog.active && networkManager->isConnected()) {
+            String syslogPacket = createSyslogStart();
+            syslogPacket.concat("CRC / CRC-ERROR / ");
+            syslogPacket.concat(packet);
+            syslogPacket.concat(formatSignalData(rssi, snr, freqError));
+            sendSyslogPacket(syslogPacket);
         }
     }
 

@@ -16,6 +16,7 @@
  * along with LoRa APRS iGate. If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <APRSPacketLib.h>
 #include <WiFi.h>
 #include "configuration.h"
 #include "station_utils.h"
@@ -29,6 +30,7 @@
 
 extern Configuration    Config;
 extern uint32_t         lastScreenOn;
+extern APRSPacket       lastAprsPacket;
 extern String           iGateBeaconPacket;
 extern String           firstLine;
 extern String           secondLine;
@@ -99,9 +101,9 @@ namespace DIGI_Utils {
         return tempPacket + "*" + path.substring(ownTokenEnd);
     }
 
-    String buildPacket(const String& path, const String& packet, bool thirdParty, bool crossFreq) {
+    String buildPacket(const String& path, const String& packet, bool crossFreq) {
         String stationCallsign  = (Config.tacticalCallsign == "" ? Config.callsign : Config.tacticalCallsign);
-        String suffix           = thirdParty ? ":}" : ":";
+        String suffix           = (lastAprsPacket.header != "") ? ":}" : ":";
         int suffixIndex         = packet.indexOf(suffix);
         String packetToRepeat;
         if (!crossFreq) {
@@ -134,13 +136,13 @@ namespace DIGI_Utils {
             packetToRepeat += stationCallsign;
             packetToRepeat += "*";
         }
-        packetToRepeat += APRS_IS_Utils::checkForStartingBytes(packet.substring(suffixIndex));
+        packetToRepeat += APRSPacketLib::checkForStartingBytes(packet.substring(suffixIndex));
         return packetToRepeat;
     }
 
-    String generateDigipeatedPacket(const String& packet, bool thirdParty){
+    String generateDigipeatedPacket(const String& packet){
         String temp;
-        if (thirdParty) {   // only header is used
+        if (lastAprsPacket.header != "") {   // thirdparty : only header is used
             const String& header = packet.substring(0, packet.indexOf(":}"));
             temp = header.substring(header.indexOf(">") + 1);
         } else {
@@ -155,7 +157,7 @@ namespace DIGI_Utils {
             if (digiMode == 1 || backupDigiMode) {
                 bool hasWide = path.indexOf("WIDE1-1") != -1;
                 if (hasWide || crossFreq) {
-                    return buildPacket(path, packet, thirdParty, !hasWide);
+                    return buildPacket(path, packet, !hasWide);
                 }
                 return "";
             }
@@ -167,62 +169,49 @@ namespace DIGI_Utils {
 
                 if (hasWide1 && hasWide2 && wide2Index < wide1Index) return "";                     // check that WIDE1 before WIDE2
 
-                if (hasWide1 || hasWide2) return buildPacket(path, packet, thirdParty, false);      // regular APRS with WIDEn-N
+                if (hasWide1 || hasWide2) return buildPacket(path, packet, false);      // regular APRS with WIDEn-N
 
-                if (crossFreq) return buildPacket(path, packet, thirdParty, true);                  // CrossFreq (without WIDE)
+                if (crossFreq) return buildPacket(path, packet, true);                  // CrossFreq (without WIDE)
 
                 return "";
             }
             if (digiMode == 3) {
                 String stationCallsign  = (Config.tacticalCallsign == "" ? Config.callsign : Config.tacticalCallsign);
                 bool containsOwnCall    = path.indexOf(stationCallsign) != -1;
-                if (containsOwnCall) return buildPacket(path, packet, thirdParty, false);
+                if (containsOwnCall) return buildPacket(path, packet, false);
                 return "";
             }
             return "";
         }
 
-        if (commaIndex == -1 && (digiMode == 1 || backupDigiMode || digiMode == 2) && crossFreq) return buildPacket("", packet, thirdParty, true);  // no "path" but is CrossFreq Digi
+        if (commaIndex == -1 && (digiMode == 1 || backupDigiMode || digiMode == 2) && crossFreq) return buildPacket("", packet, true);  // no "path" but is CrossFreq Digi
 
         return "";
     }
 
     void processLoRaPacket(const String& packet) {
-        if (packet.indexOf("NOGATE") >= 0) return;
+        if (lastAprsPacket.path.indexOf("NOGATE") >= 0) return;
 
-        bool thirdPartyPacket = false;
-        String temp, Sender;
-        int firstColonIndex = packet.indexOf(":");
-        if (firstColonIndex > 5 && firstColonIndex < (packet.length() - 1) && packet[firstColonIndex + 1] == '}' && packet.indexOf("TCPIP") > 0) {   // 3rd Party
-            thirdPartyPacket = true;
-            temp    = packet.substring(packet.indexOf(":}") + 2);
-            Sender  = temp.substring(0, temp.indexOf(">"));
-        } else {
-            temp    = packet.substring(3);
-            Sender  = packet.substring(3, packet.indexOf(">"));
-        }
+        String temp = (lastAprsPacket.header != "") ? packet.substring(packet.indexOf(":}") + 2) : packet.substring(3);
 
         String stationCallsign = Config.tacticalCallsign == "" ? Config.callsign : Config.tacticalCallsign;
-        if (Sender == stationCallsign) return;          // Avoid listening to self packets
-        if (!thirdPartyPacket && Config.tacticalCallsign == "" && !Utils::callsignIsValid(Sender)) return;  // No thirdParty + no tactical y no valid callsign
+        if (lastAprsPacket.sender == stationCallsign) return;          // Avoid listening to self packets
+        if (lastAprsPacket.header == "" && Config.tacticalCallsign == "" && !Utils::callsignIsValid(lastAprsPacket.sender)) return;  // No thirdParty + no tactical y no valid callsign
 
-        if (STATION_Utils::isIn25SegHashBuffer(Sender, temp.substring(temp.indexOf(":") + 2))) return;
+        if (STATION_Utils::isIn25SegHashBuffer(lastAprsPacket.sender, temp.substring(temp.indexOf(":") + 2))) return;
 
-        STATION_Utils::updateLastHeard(Sender);
+        STATION_Utils::updateLastHeard(lastAprsPacket.sender);
         Utils::typeOfPacket(temp, 2);               // Digi
-        bool queryMessage       = false;
-        int doubleColonIndex    = temp.indexOf("::");
-        if (doubleColonIndex > 10) {                // it's a message
-            String AddresseeAndMessage  = temp.substring(doubleColonIndex + 2);
-            String Addressee            = AddresseeAndMessage.substring(0, AddresseeAndMessage.indexOf(":"));
-            Addressee.trim();
-            if (Addressee == stationCallsign) {     // it's a message for me!
-                queryMessage = APRS_IS_Utils::processReceivedLoRaMessage(Sender, AddresseeAndMessage, thirdPartyPacket);
+        bool queryMessage = false;
+        if (lastAprsPacket.type == 1) {   // MESSAGE
+            if (lastAprsPacket.addressee == stationCallsign) {     // it's a message for me!
+                String AddresseeAndMessage = lastAprsPacket.addressee + ":" + lastAprsPacket.payload;
+                queryMessage = APRS_IS_Utils::processReceivedLoRaMessage(lastAprsPacket.sender, AddresseeAndMessage);
             }
         }
         if (queryMessage) return;                   // answer should not be repeated.
 
-        String loraPacket = generateDigipeatedPacket(packet.substring(3), thirdPartyPacket);
+        String loraPacket = generateDigipeatedPacket(packet.substring(3));
         if (loraPacket != "") {
             STATION_Utils::addToOutputPacketBuffer(loraPacket);
             if (Config.digi.ecoMode != 1) displayToggle(true);

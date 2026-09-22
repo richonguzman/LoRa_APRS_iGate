@@ -178,20 +178,6 @@ namespace GPS_Utils {
         return " _ / _ / _ ";
     }
 
-    String getDistanceAndCommentFromMicE(const String& packet) {
-        // Mic-E encodes latitude in the AX.25 destination field and longitude
-        // in the info field with its own +28 offset scheme -- nothing like
-        // the non-encoded/base91 formats above. APRSPacketLib::processReceivedPacket
-        // already implements that decode (used for the map upsert in
-        // lora_utils.cpp), so it's reused here instead of duplicating it.
-        if (packet.length() < 4) return " _ / _ / _ ";
-
-        APRSPacket aprsPacket = APRSPacketLib::processReceivedPacket(packet.substring(3), 0, 0, 0);
-        if (aprsPacket.type != 4) return " _ / _ / _ ";   // 4 = Mic-E
-
-        return buildDistanceAndComment(aprsPacket.latitude, aprsPacket.longitude, "");
-    }
-
     void setup() {
         #ifdef HAS_GPS
             if (Config.beacon.gpsActive && Config.digi.ecoMode != 1) {

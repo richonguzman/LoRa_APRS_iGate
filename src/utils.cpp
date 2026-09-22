@@ -89,7 +89,7 @@ namespace Utils {
 
         if (sendOverAPRSIS) {
             APRS_IS_Utils::upload(statusPacket);
-            SYSLOG_Utils::log(2, statusPacket, 0, 0.0, 0);              // APRSIS TX
+            SYSLOG_Utils::logAPRSISTx(statusPacket);
         } else {
             STATION_Utils::addToOutputPacketBuffer(statusPacket, true); // treated also as beacon on Tx Freq
         }
@@ -288,7 +288,7 @@ namespace Utils {
                 #else
                     APRS_IS_Utils::upload(beaconPacket);
                 #endif
-                if (Config.syslog.logBeaconOverTCPIP) SYSLOG_Utils::log(1, "tcp" + beaconPacket, 0, 0.0, 0);   // APRSIS TX
+                if (Config.syslog.logBeaconOverTCPIP) SYSLOG_Utils::logAPRSISTx(beaconPacket);
             }
 
             if (Config.beacon.sendViaRF || backupDigiMode) {

@@ -33,6 +33,7 @@
 
 
 extern Configuration        Config;
+extern APRSPacket           lastAprsPacket;
 extern NetworkManager       *networkManager;
 extern WiFiClient           aprsIsClient;
 extern uint32_t             lastScreenOn;
@@ -135,11 +136,6 @@ namespace APRS_IS_Utils {
         secondLine += aprsisState;
     }
 
-    String checkForStartingBytes(const String& packet) {
-        int index = packet.indexOf("\x3c\xff\x01");
-        return (index != -1) ? packet.substring(0, index) : packet;
-    }
-
     String buildPacketToUpload(const String& packet) {
         int colonIndex = packet.indexOf(":");
         String packetToUpload = packet.substring(3, colonIndex);
@@ -149,11 +145,11 @@ namespace APRS_IS_Utils {
             packetToUpload += ",qAO,";
         }
         packetToUpload += Config.callsign;
-        packetToUpload += checkForStartingBytes(packet.substring(colonIndex));
+        packetToUpload += APRSPacketLib::checkForStartingBytes(packet.substring(colonIndex));
         return packetToUpload;
     }
 
-    bool processReceivedLoRaMessage(const String& sender, const String& packet, bool thirdParty) {
+    bool processReceivedLoRaMessage(const String& sender, const String& packet) {
         String receivedMessage;
         int leftCurlyBraceIndex = packet.indexOf("{");
         int colonIndex          = packet.indexOf(":");
@@ -165,7 +161,7 @@ namespace APRS_IS_Utils {
 
             String addToBuffer = Config.callsign;
             addToBuffer += ">APLRG1";
-            if (!thirdParty) addToBuffer += ",RFONLY";
+            if (lastAprsPacket.header == "") addToBuffer += ",RFONLY";
             if (Config.beacon.path != "") {
                 addToBuffer += ",";
                 addToBuffer += Config.beacon.path;
@@ -186,51 +182,44 @@ namespace APRS_IS_Utils {
             receivedMessage = packet.substring(colonIndex + 1);
         }
         if (receivedMessage.indexOf("?") == 0) {
-            if (!Config.display.alwaysOn && Config.display.timeout != 0) {
-                displayToggle(true);
-            }
-            STATION_Utils::addToOutputPacketBuffer(QUERY_Utils::process(receivedMessage, sender, false, thirdParty));
+            if (!Config.display.alwaysOn && Config.display.timeout != 0) displayToggle(true);
+
+            STATION_Utils::addToOutputPacketBuffer(QUERY_Utils::process(receivedMessage, sender, false, lastAprsPacket.header != ""));
             lastScreenOn = millis();
             displayShow(firstLine, secondLine, thirdLine, fourthLine, fifthLine, "Callsign = " + sender, "TYPE --> QUERY", 0);
             return true;
-        }
-        else {
+        } else {
             return false;
         }
     }
 
     void processLoRaPacket(const String& packet) {
         if (passcodeValid && (aprsIsClient.connected() || modemLoggedToAPRSIS)) {
-            if (packet.indexOf("NOGATE") == -1 && packet.indexOf("RFONLY") == -1) {
-                int firstColonIndex = packet.indexOf(":");
-                if (firstColonIndex > 5 && firstColonIndex < (packet.length() - 1) && packet[firstColonIndex + 1] != '}' && packet.indexOf("TCPIP") == -1) {
-                    const String& Sender = packet.substring(3, packet.indexOf(">"));
-                    if (Sender != Config.callsign && Utils::callsignIsValid(Sender)) {
-                        STATION_Utils::updateLastHeard(Sender);
+            if (lastAprsPacket.path.indexOf("NOGATE") == -1 && lastAprsPacket.path.indexOf("RFONLY") == -1) {
+                if (lastAprsPacket.header == "" && lastAprsPacket.path.indexOf("TCPIP") == -1) {
+                    if (lastAprsPacket.sender != Config.callsign && Utils::callsignIsValid(lastAprsPacket.sender)) {
+                        STATION_Utils::updateLastHeard(lastAprsPacket.sender);
                         Utils::typeOfPacket(packet.substring(3), 0);  // LoRa-APRS
-                        int doubleColonIndex = packet.indexOf("::");
-                        const String& AddresseeAndMessage = packet.substring(doubleColonIndex + 2);
-                        String Addressee = AddresseeAndMessage.substring(0, AddresseeAndMessage.indexOf(":"));
-                        Addressee.trim();
                         bool queryMessage = false;
-                        if (doubleColonIndex > 10 && Addressee == Config.callsign) {      // its a message for me!
-                            queryMessage = processReceivedLoRaMessage(Sender, checkForStartingBytes(AddresseeAndMessage), false);
+                        if (lastAprsPacket.type == 1 && lastAprsPacket.addressee == Config.callsign) {      // its a message for me!
+                            String AddresseeAndMessage = lastAprsPacket.addressee + ":" + lastAprsPacket.payload;
+                            queryMessage = processReceivedLoRaMessage(lastAprsPacket.sender, APRSPacketLib::checkForStartingBytes(AddresseeAndMessage));
                         }
                         if (queryMessage) return;
 
-                        const String& aprsPacket = buildPacketToUpload(packet);
+                        const String& aprsPacketToUpload = buildPacketToUpload(packet);
                         if (!Config.display.alwaysOn && Config.display.timeout != 0) {
                             displayToggle(true);
                         }
                         lastScreenOn = millis();
                         #ifdef HAS_A7670
                             stationBeacon = true;
-                            A7670_Utils::uploadToAPRSIS(aprsPacket);
+                            A7670_Utils::uploadToAPRSIS(aprsPacketToUpload);
                             stationBeacon = false;
                         #else
-                            upload(aprsPacket);
+                            upload(aprsPacketToUpload);
                         #endif
-                        Utils::println("---> Uploaded to APRS-IS");
+                        Utils::println("(Uploaded to APRS-IS)");
                         displayShow(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
                     }
                 }
@@ -351,7 +340,7 @@ namespace APRS_IS_Utils {
                             #else
                                 upload(queryAnswer);
                             #endif
-                            SYSLOG_Utils::log(2, queryAnswer, 0, 0.0, 0); // APRSIS TX
+                            SYSLOG_Utils::logAPRSISTx(queryAnswer);
                             fifthLine = "APRS-IS ----> APRS-IS";
                             sixthLine = Config.callsign;
                             for (int j = sixthLine.length();j < 9;j++) {

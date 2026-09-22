@@ -32,7 +32,7 @@ namespace GPS_Utils {
     String  decodeEncodedGPS(const String& packet);
     String  getReceivedGPS(const String& packet);
     String  getDistanceAndComment(const String& packet);
-    String  getDistanceAndCommentFromMicE(const String& packet);
+    String  buildDistanceAndComment(float latitude, float longitude, const String& comment);
 
     void    setup();
     void    getData();

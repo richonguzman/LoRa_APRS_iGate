@@ -19,12 +19,16 @@
 #ifndef SYSLOG_H_
 #define SYSLOG_H_
 
+#include <APRSPacketLib.h>
 #include <Arduino.h>
 
 
 namespace SYSLOG_Utils {
 
-    void log(const uint8_t type ,const String& packet, const int rssi, const float snr, const int freqError);
+    void logLoRaRx(APRSPacket& aprsPacket, const String& packet, const int rssi, const float snr, const int freqError);
+    void logAPRSISTx(const String& packet);
+    void logLoRaTx(const String& packet);
+    void logCRCError(const String& packet, const int rssi, const float snr, const int freqError);
     void setup();
 
 }
