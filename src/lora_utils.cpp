@@ -99,6 +99,9 @@ namespace LoRa_Utils {
         #if defined(RADIO_HAS_XTAL)
             radio.XTAL = true;
         #endif
+        #if (defined(RADIO_RXEN) && defined(RADIO_TXEN))    // before begin() so RF switch is driven from start (Ebyte E22/E32 1W, QRP Labs LightGateway)
+            radio.setRfSwitchPins(RADIO_RXEN, RADIO_TXEN);
+        #endif
         int state = radio.begin(freq);
         if (state != RADIOLIB_ERR_NONE) {
             Utils::println("Starting LoRa failed! State: " + String(state));
@@ -125,10 +128,6 @@ namespace LoRa_Utils {
         float signalBandwidth = Config.loramodule.rxSignalBandwidth / 1000;
         radio.setBandwidth(signalBandwidth);
         radio.setCRC(true);
-
-        #if (defined(RADIO_RXEN) && defined(RADIO_TXEN))    // QRP Labs LightGateway has 400M22S (SX1268)
-            radio.setRfSwitchPins(RADIO_RXEN, RADIO_TXEN);
-        #endif
 
         /*#ifdef SX126X_DIO2_AS_RF_SWITCH
         radio.setRfSwitchPins(RADIO_RXEN, RADIOLIB_NC);

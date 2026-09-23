@@ -49,7 +49,7 @@ ____________________________________________________
 
 - QRP Labs LightGateway 1.0 and Plus 1.0.
 
-- ESP32 + SX1278 LoRa Module or Ebyte 400M30S (or 900M30S) 1W LoRa Module for a DIY Versions.
+- ESP32 + SX1278 LoRa Module or Ebyte 400M30S (or 900M30S) or Ebyte E32 400M30S 1W LoRa Module for a DIY Versions.
 
 - ESP32C3 + Ebyte 400M30S(or 900M30S) 1W LoRa Module for another DIY version.
 

@@ -47,6 +47,8 @@ jobs:
                       chip: esp32
                     - name: ESP32_DIY_1W_LoRa_LLCC68
                       chip: esp32
+                    - name: ESP32_DIY_1W_LoRa_E32_400M30S
+                      chip: esp32
                     - name: ESP32_DIY_1W_LoRa_Mesh_V1_2
                       chip: esp32
                     - name: ttgo-t-beam-v1_2
