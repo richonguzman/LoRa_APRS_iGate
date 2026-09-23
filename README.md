@@ -43,7 +43,7 @@ ____________________________________________________
 
 - HELTEC V2, V3, V3.2, V4, T114, Wireless Stick, Wireless Stick Lite V3/V3.2, HT-CT62, Wireless Tracker, Wireless Paper.
 
-- RAK Wireless 4631 + 19007(or 19003)
+- RAK Wireless 4631 + 19007(or 19003), RAK3312 and RAK3112.
 
 - Faketec V3 (NRF52840 + Heltec HTRA62(SX1262))
 

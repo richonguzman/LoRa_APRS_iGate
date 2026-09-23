@@ -203,6 +203,10 @@ namespace BATTERY_Utils {
                     #ifdef LIGHTGATEWAY_PLUS_1_0
                         double inputDivider = (1.0 / (560.0 + 100.0)) * 100.0;  // The voltage divider is a 560k + 100k resistor in series, 100k on the low side.
                         return (((sampleSum/adcReadings) * adcReadingTransformation) / inputDivider) + 0.41;
+                    #elif defined(RAK3112)
+                        return (sampleSum/adcReadings) * adcReadingTransformation * (3 * 1.73 * 1.187 / 3.3);   // multiplier from MeshCore RAK3112Board.h
+                    #elif defined(RAK3312)
+                        return (sampleSum/adcReadings) * adcReadingTransformation * (3 * 1.73 * 1.187 / 3.3) * (1.667 / 2.11);  // RAK3112 value scaled by Meshtastic RAK3312/RAK3112 ratio
                     #else
                         return (2 * (sampleSum/adcReadings) * adcReadingTransformation) + voltageDividerCorrection;  // raw voltage without mapping
                     #endif

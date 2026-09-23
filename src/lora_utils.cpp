@@ -91,6 +91,10 @@ namespace LoRa_Utils {
         #else
             SPI.begin(RADIO_SCLK_PIN, RADIO_MISO_PIN, RADIO_MOSI_PIN);
         #endif
+        #ifdef RADIO_ANT_SW_PIN     // RAK3312 antenna switch needs power
+            pinMode(RADIO_ANT_SW_PIN, OUTPUT);
+            digitalWrite(RADIO_ANT_SW_PIN, RADIO_ANT_SW_ON_STATE);
+        #endif
         float freq = (float)Config.loramodule.rxFreq / 1000000;
         #if defined(RADIO_HAS_XTAL)
             radio.XTAL = true;
@@ -329,6 +333,9 @@ namespace LoRa_Utils {
 
     void sleepRadio() {
         radio.sleep();
+        #ifdef RADIO_ANT_SW_PIN
+            digitalWrite(RADIO_ANT_SW_PIN, !RADIO_ANT_SW_ON_STATE);
+        #endif
     }
 
 }
