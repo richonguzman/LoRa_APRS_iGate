@@ -36,6 +36,7 @@ namespace WX_Utils {
     String  generateHumString(const float sensorHum);
     String  generatePresString(const float sensorPres);
     String  readDataSensor();
+    float   readBoardTemperature();
 
 }
 

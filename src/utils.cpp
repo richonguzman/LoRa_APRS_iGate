@@ -25,6 +25,7 @@
 #include "battery_utils.h"
 #include "aprs_is_utils.h"
 #include "board_pinout.h"
+#include "power_utils.h"
 #include "syslog_utils.h"
 #include "A7670_utils.h"
 #include "lora_utils.h"
@@ -168,6 +169,9 @@ namespace Utils {
         #endif
 
         if (beaconUpdate) {
+            #ifdef SOLAR_CHARGE_PIN
+                POWER_Utils::checkSolarCharge();    // solar boards: enable/disable charging by board temperature
+            #endif
             if (!Config.display.alwaysOn && Config.display.timeout != 0) displayToggle(true);
 
             TELEMETRY_Utils::checkEUPInterval();
@@ -437,11 +441,16 @@ namespace Utils {
                 displayToggle(false);
             }
             #ifdef VEXT_CTRL_PIN
-                #ifndef HELTEC_WSL_V3
-                    digitalWrite(VEXT_CTRL_PIN, LOW);
-                #endif
+                digitalWrite(VEXT_CTRL_PIN, !VEXT_CTRL_ON_STATE);   // VEXT off before deep sleep (always, regardless of ecoMode)
             #endif
             LoRa_Utils::sleepRadio();
+            #ifdef RADIO_VCC_PIN
+                digitalWrite(RADIO_VCC_PIN, LOW);   // cut LoRa module power (QRP Labs LightGateway) so it draws nothing while sleeping
+            #endif
+            #ifdef SOLAR_CHARGE_PIN
+                gpio_hold_en((gpio_num_t)SOLAR_CHARGE_PIN);     // keep charge on/off decided by temperature while sleeping
+                gpio_deep_sleep_hold_en();
+            #endif
             transmitFlag = true;
             delay(100);
             esp_deep_sleep_start();

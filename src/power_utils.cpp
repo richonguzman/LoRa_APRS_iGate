@@ -20,6 +20,7 @@
 #include "battery_utils.h"
 #include "board_pinout.h"
 #include "power_utils.h"
+#include "wx_utils.h"
 #include "utils.h"
 
 #if defined(HAS_AXP192) || defined(HAS_AXP2101)
@@ -210,6 +211,23 @@ namespace POWER_Utils {
         #endif
     }
 
+    #ifdef SOLAR_CHARGE_PIN
+        void checkSolarCharge() {       // called on each beacon: disable solar charging when too cold for Li-Ion
+            static bool chargingEnabled = true;
+            float boardTemp = WX_Utils::readBoardTemperature();
+            if (isnan(boardTemp)) {
+                chargingEnabled = true;                         // sensor failure: keep charging (previous behaviour)
+            } else if (chargingEnabled && boardTemp < SOLAR_CHARGE_DISABLE_TEMP) {
+                chargingEnabled = false;
+                Serial.println("[SOLAR] Charging disabled, board temp: " + String(boardTemp, 1) + "C");
+            } else if (!chargingEnabled && boardTemp > SOLAR_CHARGE_ENABLE_TEMP) {
+                chargingEnabled = true;
+                Serial.println("[SOLAR] Charging enabled, board temp: " + String(boardTemp, 1) + "C");
+            }
+            digitalWrite(SOLAR_CHARGE_PIN, chargingEnabled ? SOLAR_CHARGE_ENABLED_STATE : !SOLAR_CHARGE_ENABLED_STATE);
+        }
+    #endif
+
     void setup() {
         #ifdef HAS_AXP192
             Wire.begin(SDA, SCL);
@@ -252,6 +270,12 @@ namespace POWER_Utils {
 
         #ifdef BATTERY_PIN
             pinMode(BATTERY_PIN, INPUT);
+        #endif
+
+        #ifdef SOLAR_CHARGE_PIN
+            pinMode(SOLAR_CHARGE_PIN, OUTPUT);
+            digitalWrite(SOLAR_CHARGE_PIN, SOLAR_CHARGE_ENABLED_STATE);    // solar charging enabled by default
+            gpio_hold_dis((gpio_num_t)SOLAR_CHARGE_PIN);                    // release hold kept during deep sleep (if any)
         #endif
 
         #ifdef INTERNAL_LED_PIN

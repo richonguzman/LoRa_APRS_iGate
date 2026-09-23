@@ -29,7 +29,7 @@
 
 namespace POWER_Utils {
 
-    #ifdef VEXT_CTRL
+    #ifdef VEXT_CTRL_PIN
         void vext_ctrl_ON();
         void vext_ctrl_OFF();
     #endif
@@ -46,6 +46,9 @@ namespace POWER_Utils {
     void    activateLoRa();
     void    deactivateLoRa();
     bool    begin(TwoWire &port);
+    #ifdef SOLAR_CHARGE_PIN
+        void checkSolarCharge();
+    #endif
     void    setup();
 
 }
