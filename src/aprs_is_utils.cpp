@@ -93,7 +93,9 @@ namespace APRS_IS_Utils {
         }
     }
 
-    void checkStatus() {
+    void updateWiFiAPRSISDisplayInfo() {
+        static String lastWifiState     = "";
+        static String lastAprsisState   = "";
         String wifiState, aprsisState;
         if (networkManager->isWiFiConnected()) {
             wifiState = "OK";
@@ -103,10 +105,6 @@ namespace APRS_IS_Utils {
             } else {
                 wifiState = "AP";
             }
-            if (!Config.display.alwaysOn && Config.display.timeout != 0) {
-                displayToggle(true);
-            }
-            lastScreenOn = millis();
         }
 
         if (!Config.aprs_is.active) {
@@ -125,11 +123,15 @@ namespace APRS_IS_Utils {
                     aprsisState = "--";
                 }
             #endif
-            if(aprsisState == "--" && !Config.display.alwaysOn && Config.display.timeout != 0) {
-                displayToggle(true);
-                lastScreenOn = millis();
-            }
         }
+
+        if (wifiState != lastWifiState || aprsisState != lastAprsisState) {     // wake display only on status change (not every loop) so display timeout works
+            if (!Config.display.alwaysOn && Config.display.timeout != 0) displayToggle(true);
+            lastScreenOn    = millis();
+            lastWifiState   = wifiState;
+            lastAprsisState = aprsisState;
+        }
+
         secondLine = "WiFi: ";
         secondLine += wifiState;
         secondLine += " APRS-IS: ";

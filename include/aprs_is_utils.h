@@ -27,7 +27,7 @@ namespace APRS_IS_Utils {
     void    upload(const String& line);
     void    connect();
 
-    void    checkStatus();
+    void    updateWiFiAPRSISDisplayInfo();
 
     String  buildPacketToUpload(const String& packet);
     bool    processReceivedLoRaMessage(const String& sender, const String& packet);

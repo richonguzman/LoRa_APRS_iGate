@@ -184,7 +184,7 @@ void loop() {
         Utils::checkDisplayInterval();
         Utils::checkBeaconInterval();
 
-        APRS_IS_Utils::checkStatus(); // Need that to update display, maybe split this and send APRSIS status to display func?
+        APRS_IS_Utils::updateWiFiAPRSISDisplayInfo();   // WiFi / APRS-IS status line (wakes display only on status change)
 
         String packet = "";
         if (Config.loramodule.rxActive) {
