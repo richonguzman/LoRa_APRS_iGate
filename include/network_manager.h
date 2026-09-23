@@ -84,7 +84,6 @@ public:
     // Ethernet methods
     bool ethernetConnect(eth_phy_type_t type, uint8_t phy_addr, uint8_t mdc, uint8_t mdio, int power, eth_clock_mode_t clock_mode, bool use_mac_from_efuse = false);
     bool setEthernetIP(const String& staticIP, const String& gateway, const String& subnet, const String& dns1, const String& dns2);
-    bool ethernetDisconnect();
     IPAddress getEthernetIP() const;
     String getEthernetMACAddress() const;
 

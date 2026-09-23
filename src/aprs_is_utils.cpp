@@ -199,7 +199,7 @@ namespace APRS_IS_Utils {
                 if (lastAprsPacket.header == "" && lastAprsPacket.path.indexOf("TCPIP") == -1) {
                     if (lastAprsPacket.sender != Config.callsign && Utils::callsignIsValid(lastAprsPacket.sender)) {
                         STATION_Utils::updateLastHeard(lastAprsPacket.sender);
-                        Utils::typeOfPacket(packet.substring(3), 0);  // LoRa-APRS
+                        Utils::updateLoRaPacketDisplayInfo(lastAprsPacket, 0);  // LoRa-APRS
                         bool queryMessage = false;
                         if (lastAprsPacket.type == 1 && lastAprsPacket.addressee == Config.callsign) {      // its a message for me!
                             String AddresseeAndMessage = lastAprsPacket.addressee + ":" + lastAprsPacket.payload;
@@ -358,7 +358,7 @@ namespace APRS_IS_Utils {
                             STATION_Utils::addToOutputPacketBuffer(buildPacketToTx(packet, 1));
                             displayToggle(true);
                             lastScreenOn = currentTime;
-                            Utils::typeOfPacket(packet, 1); // APRS-LoRa
+                            Utils::updateAPRSISPacketDisplayInfo(packet); // APRS-LoRa
                             displayShow(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
                         }
                     }
@@ -368,7 +368,7 @@ namespace APRS_IS_Utils {
                         STATION_Utils::addToOutputPacketBuffer(buildPacketToTx(packet, 5));
                         displayToggle(true);
                         lastScreenOn = currentTime;
-                        Utils::typeOfPacket(packet, 1); // APRS-LoRa
+                        Utils::updateAPRSISPacketDisplayInfo(packet); // APRS-LoRa
                         Serial.println();
                     } else {
                         Serial.println(" ---> Rejected (Time): No Tx");

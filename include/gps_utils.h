@@ -25,13 +25,7 @@
 namespace GPS_Utils {
 
     String  getiGateLoRaBeaconPacket();
-    char    *ax25_base91enc(char *s, uint8_t n, uint32_t v);
-    String  encodeGPS(float latitude, float longitude, const String& overlay, const String& symbol);
-    void    generateBeaconFirstPart();
     void    generateBeacons();
-    String  decodeEncodedGPS(const String& packet);
-    String  getReceivedGPS(const String& packet);
-    String  getDistanceAndComment(const String& packet);
     String  buildDistanceAndComment(float latitude, float longitude, const String& comment);
 
     void    setup();

@@ -201,12 +201,12 @@ namespace DIGI_Utils {
         if (STATION_Utils::isIn25SegHashBuffer(lastAprsPacket.sender, temp.substring(temp.indexOf(":") + 2))) return;
 
         STATION_Utils::updateLastHeard(lastAprsPacket.sender);
-        Utils::typeOfPacket(temp, 2);               // Digi
+        Utils::updateLoRaPacketDisplayInfo(lastAprsPacket, 1);               // Digi
         bool queryMessage = false;
         if (lastAprsPacket.type == 1) {   // MESSAGE
             if (lastAprsPacket.addressee == stationCallsign) {     // it's a message for me!
                 String AddresseeAndMessage = lastAprsPacket.addressee + ":" + lastAprsPacket.payload;
-                queryMessage = APRS_IS_Utils::processReceivedLoRaMessage(lastAprsPacket.sender, AddresseeAndMessage);
+                queryMessage = APRS_IS_Utils::processReceivedLoRaMessage(lastAprsPacket.sender, APRSPacketLib::checkForStartingBytes(AddresseeAndMessage));
             }
         }
         if (queryMessage) return;                   // answer should not be repeated.
