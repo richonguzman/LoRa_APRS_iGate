@@ -37,19 +37,19 @@ jobs:
                       chip: esp32s3
                     - name: heltec_wireless_bridge
                       chip: esp32
-                    - name: ESP32_DIY_LoRa
+                    - name: ESP32_DIY_LoRa_SX1278
                       chip: esp32
-                    - name: ESP32_DIY_LoRa_915
+                    - name: ESP32_DIY_LoRa_915_SX1276
                       chip: esp32
-                    - name: ESP32_DIY_1W_LoRa
+                    - name: ESP32_DIY_1W_LoRa_E22_400M30S
                       chip: esp32
-                    - name: ESP32_DIY_1W_LoRa_915
+                    - name: ESP32_DIY_1W_LoRa_915_E22_900M30S
                       chip: esp32
-                    - name: ESP32_DIY_1W_LoRa_LLCC68
+                    - name: ESP32_DIY_1W_LoRa_E220_400M30S
                       chip: esp32
                     - name: ESP32_DIY_1W_LoRa_E32_400M30S
                       chip: esp32
-                    - name: ESP32_DIY_1W_LoRa_Mesh_V1_2
+                    - name: ESP32_DIY_1W_LoRa_Mesh_V1_2_E22_400M30S
                       chip: esp32
                     - name: ttgo-t-beam-v1_2
                       chip: esp32
@@ -71,9 +71,9 @@ jobs:
                       chip: esp32s3
                     - name: ttgo_t_beam_s3_SUPREME_v3
                       chip: esp32s3
-                    - name: ESP32_DIY_LoRa_A7670
+                    - name: ESP32_DIY_LoRa_A7670_SX1278
                       chip: esp32
-                    - name: ESP32_DIY_LoRa_A7670_915
+                    - name: ESP32_DIY_LoRa_A7670_915_SX1276
                       chip: esp32
                     - name: heltec_wireless_tracker
                       chip: esp32s3
@@ -87,17 +87,17 @@ jobs:
                       chip: esp32s3
                     - name: OE5HWN_MeshCom
                       chip: esp32
-                    - name: WEMOS-LOLIN32-OLED-DIY
+                    - name: WEMOS_LOLIN32_OLED_DIY_LoRa_SX1278
                       chip: esp32
-                    - name: WEMOS-D1-R32-RA02
+                    - name: WEMOS_D1_R32_DIY_LoRa_SX1278
                       chip: esp32
-                    - name: WEMOS_S2_MINI_DIY_LoRa
+                    - name: WEMOS_S2_MINI_DIY_LoRa_SX1278
                       chip: esp32s2
-                    - name: esp32c3_DIY_1W_LoRa
+                    - name: ESP32C3_DIY_1W_LoRa_E22_400M30S
                       chip: esp32c3
-                    - name: esp32c3_DIY_1W_LoRa_915
+                    - name: ESP32C3_DIY_1W_LoRa_915_E22_900M30S
                       chip: esp32c3
-                    - name: ESP32_C3_OctopusLab_LoRa
+                    - name: ESP32C3_OctopusLab_LoRa
                       chip: esp32c3
                     - name: QRPLabs_LightGateway_1_0
                       chip: esp32s3
@@ -113,7 +113,7 @@ jobs:
                       chip: esp32s3
                     - name: TROY_LoRa_APRS
                       chip: esp32
-                    - name: ESP32_9M2IBR_1W_LoRa_GPS
+                    - name: ESP32_9M2IBR_1W_LoRa_GPS_E22_400M30S
                       chip: esp32
         steps:
             - uses: actions/checkout@v3

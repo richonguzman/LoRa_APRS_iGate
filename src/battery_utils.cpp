@@ -160,7 +160,7 @@ namespace BATTERY_Utils {
 
             int sampleSum = 0;
             for (int i = 0; i < adcReadings; i++) {
-                #if defined(ESP32_DIY_LoRa) || defined(ESP32_DIY_LoRa_915) || defined(ESP32_DIY_1W_LoRa) || defined(ESP32_DIY_1W_LoRa_915) || defined(ESP32_DIY_1W_LoRa_E32_400M30S)
+                #if defined(ESP32_DIY_LoRa_SX1278) || defined(ESP32_DIY_LoRa_915_SX1276) || defined(ESP32_DIY_1W_LoRa_E22_400M30S) || defined(ESP32_DIY_1W_LoRa_915_E22_900M30S) || defined(ESP32_DIY_1W_LoRa_E32_400M30S)
                     sampleSum = 0;
                 #else
                     #ifdef HAS_ADC_CALIBRATION
