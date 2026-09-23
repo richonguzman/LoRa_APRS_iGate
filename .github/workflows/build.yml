@@ -105,6 +105,10 @@ jobs:
                       chip: esp32
                     - name: XIAO_ESP32S3_WIO_SX1262
                       chip: esp32s3
+                    - name: RAK3312
+                      chip: esp32s3
+                    - name: RAK3112
+                      chip: esp32s3
                     - name: TROY_LoRa_APRS
                       chip: esp32
                     - name: ESP32_9M2IBR_1W_LoRa_GPS
