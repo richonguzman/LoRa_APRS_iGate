@@ -99,6 +99,8 @@ jobs:
                       chip: esp32c3
                     - name: ESP32C3_OctopusLab_LoRa
                       chip: esp32c3
+                    - name: ESP32C3_SuperMini_DIY_LoRa_SX1278
+                      chip: esp32c3
                     - name: QRPLabs_LightGateway_1_0
                       chip: esp32s3
                     - name: QRPLabs_LightGateway_Plus_1_0

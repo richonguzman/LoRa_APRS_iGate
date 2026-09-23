@@ -53,6 +53,8 @@ ____________________________________________________
 
 - ESP32C3 + Ebyte 400M30S(or 900M30S) 1W LoRa Module for another DIY version.
 
+- ESP32C3 SuperMini + SX1278 (RA-01/RA-02) LoRa Module DIY version.
+
 - ESP32 + 4G/LTE A7670 Modem + SX1278 DIY Version.
 
 - Wemos Lolin32 Oled + SX1278 DIY Version.
