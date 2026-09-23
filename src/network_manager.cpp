@@ -339,6 +339,10 @@ bool NetworkManager::isWifiAPActive() const {
     return _wifiAPmode;
 }
 
+bool NetworkManager::hasActiveInterface() const {
+    return _wifiSTAmode || _wifiAPmode || _ethernetMode;
+}
+
 // Check if Ethernet is connected
 bool NetworkManager::isEthernetConnected() const {
     return _ethernetMode && _ethernetConnected && ETH.linkUp();

@@ -18,6 +18,7 @@
 
 #include <WiFi.h>
 #include "ESPmDNS.h"
+#include "network_manager.h"
 #include "configuration.h"
 #include "station_utils.h"
 #include "kiss_protocol.h"
@@ -28,6 +29,7 @@
 
 
 extern Configuration    Config;
+extern NetworkManager   *networkManager;
 extern WiFiClient       aprsIsClient;
 extern bool             passcodeValid;
 
@@ -47,7 +49,7 @@ String inputSerialBuffer = "";
 namespace TNC_Utils {
 
     void setup() {
-        if (Config.tnc.enableServer && Config.digi.ecoMode == 0) {
+        if (Config.tnc.enableServer && Config.digi.ecoMode == 0 && networkManager->hasActiveInterface()) {   // no WiFi STA/AP or Ethernet started = no TCP/IP stack
             tncServer.stop();
             tncServer.begin();
             String host = "igate-" + Config.callsign;

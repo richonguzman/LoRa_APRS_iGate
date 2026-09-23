@@ -96,4 +96,7 @@ public:
     bool isModemConnected() const;
 
     bool isWifiAPActive() const;
+
+    // Check if any network interface was started (lwip TCP/IP stack is initialized)
+    bool hasActiveInterface() const;
 };
