@@ -459,6 +459,7 @@ namespace Utils {
 
     bool callsignIsValid(const String& callsign) {
         if (callsign == "WLNK-1") return true;
+        if (Config.allowAnyCallsign) return callsign.length() >= 3 && callsign.length() <= 9;
         int totalCallsignLength = callsign.length();
         if (totalCallsignLength < 4) return false;
 
