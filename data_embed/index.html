@@ -1008,13 +1008,38 @@ body{background:var(--msh-bg);color:var(--msh-text);font-family:"Inter",system-u
                                         >
                                             <option value="0" selected>OFF</option>
                                             <option value="1">WIDE1 (fill-in) Digi</option>
-                                            <option value="2">WIDE2 (+WIDE1) Digi</option>
+                                            <option value="2">Regional aliases (+WIDE1) Digi</option>
                                             <option value="3">Own Callsign Path Digi</option>
                                         </select>
                                     </div>
-                                    <div class="col-12 mt-2">
-+                                        <small class="text-muted">Mode 4 digipeats packets whose path already contains your callsign, preserving the path and appending a * to your callsign.</small>
-+                                   </div>
+                                    <div class="col-12 mt-3">
+                                        <label for="digi.regionalAliases" class="form-label"
+                                            >Regional alias bases</label>
+                                        <input
+                                            type="text"
+                                            name="digi.regionalAliases"
+                                            id="digi.regionalAliases"
+                                            class="form-control"
+                                            maxlength="64"
+                                            placeholder="WIDE ARIEG"
+                                            oninput="this.value = this.value.toUpperCase();"
+                                        />
+                                        <small class="text-muted"
+                                            >Space-separated bases without hop numbers. Example: WIDE ARIEG accepts WIDE2-1 and ARIEG2-1.</small>
+                                    </div>
+                                    <div class="col-12 mt-3">
+                                        <label for="digi.regionalMaxHops" class="form-label"
+                                            >Maximum regional hops</label>
+                                        <input
+                                            type="number"
+                                            name="digi.regionalMaxHops"
+                                            id="digi.regionalMaxHops"
+                                            class="form-control"
+                                            min="1"
+                                            max="9"
+                                            value="2"
+                                        />
+                                    </div>
                                     <div class="col-12 mt-3">
                                         <label
                                             for="digi.ecoMode"

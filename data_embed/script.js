@@ -141,6 +141,8 @@ function loadSettings(settings) {
     document.getElementById("digi.mode").value                          = settings.digi.mode;
     document.getElementById("digi.ecoMode").value                       = settings.digi.ecoMode;
     document.getElementById("digi.backupDigiMode").checked              = settings.digi.backupDigiMode;
+    document.getElementById("digi.regionalAliases").value               = settings.digi.regionalAliases || "WIDE";
+    document.getElementById("digi.regionalMaxHops").value               = settings.digi.regionalMaxHops || 2;
 
     // LoRa
     document.getElementById("lora.rxActive").checked                    = settings.lora.rxActive;
