@@ -121,6 +121,15 @@ int main() {
     check("ARIEG2-1 consumed", 2,
           "F4MLV-7>APLRT1,F6DEV-10*,ARIEG2-1:=/8gk=NmQF[LWQ",
           "F4MLV-7>APLRT1,F6DEV-10*,F4MLV-10*:=/8gk=NmQF[LWQ", ariege);
+    check("own starred callsign before regional alias refused", 2,
+          "F4MLV-7>APLRT1,F4MLV-10*,ARIEG2-1:=/8gk=NmQF[LWQ",
+          NONE, ariege);
+    check("own canonical earlier callsign before regional alias refused", 2,
+          "F4MLV-7>APLRT1,F4MLV-10,F6DEV-10*,ARIEG2-1:=/8gk=NmQF[LWQ",
+          NONE, ariege);
+    check("similar callsign does not trigger loop guard", 2,
+          "F4MLV-7>APLRT1,F4MLV-1*,ARIEG2-1:=/8gk=NmQF[LWQ",
+          "F4MLV-7>APLRT1,F4MLV-1*,F4MLV-10*:=/8gk=NmQF[LWQ", ariege);
     check("fill-in before regional alias", 2,
           "F4MLV-7>APLRT1,WIDE1-1,ARIEG1-1:=/8gk=NmQF[LWQ",
           "F4MLV-7>APLRT1,F4MLV-10*,ARIEG1-1:=/8gk=NmQF[LWQ", ariege);

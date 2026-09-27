@@ -74,6 +74,22 @@ namespace DIGI_Utils {
         return -1;
     }
 
+    static bool pathContainsCallsign(const String& path, const String& callsign) {
+        String expected = callsign;
+        expected.toUpperCase();
+        unsigned int start = 0;
+        while (start < path.length()) {
+            int end = path.indexOf(',', start);
+            if (end == -1) end = path.length();
+            String token = path.substring(start, end);
+            if (token.endsWith("*")) token = token.substring(0, token.length() - 1);
+            token.toUpperCase();
+            if (token == expected) return true;
+            start = end + 1;
+        }
+        return false;
+    }
+
     static bool isDecimal(const String& text) {
         if (text.length() == 0) return false;
         for (unsigned int i = 0; i < text.length(); i++) {
@@ -213,6 +229,13 @@ namespace DIGI_Utils {
         if (!crossFreq) {
             int digiMode        = Config.digi.mode;
             String tempPath     = path;
+
+            // A digi must never consume another alias after its own identity
+            // has already appeared in the used path. The time-based duplicate
+            // cache is not an anti-loop mechanism: the same frame may return
+            // after its window has expired or after a restart.
+            if ((digiMode == 1 || digiMode == 2) &&
+                pathContainsCallsign(tempPath, stationCallsign)) return "";
 
             int wide1Index = pathTokenIndex(tempPath, "WIDE1-1");
             if (wide1Index != -1 && (digiMode == 1 || digiMode == 2)) {                     // WIDE1-1
