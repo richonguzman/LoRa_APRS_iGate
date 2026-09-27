@@ -8,3 +8,4 @@
 installer/firmware
 installer/*.bin
 **/__pycache__/
+.claude/
