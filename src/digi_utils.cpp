@@ -131,8 +131,10 @@ namespace DIGI_Utils {
             packetToRepeat = packet.substring(0, packet.indexOf(",") + 1);
             packetToRepeat += tempPath;
         } else {   // CrossFreq Digipeater
+            String cleanedPath = cleanPath(path);
+            if (pathTokenIndex(cleanedPath, stationCallsign) != -1 ||
+                pathTokenIndex(cleanedPath, stationCallsign + "*") != -1) return "";         // stationCallsign shouldn't be in path (exact token, path only)
             packetToRepeat = cleanPath(packet.substring(0, suffixIndex));
-            if (packetToRepeat.indexOf(stationCallsign) != -1) return "";                   // stationCallsign shouldn't be in path
             packetToRepeat += ",";
             packetToRepeat += stationCallsign;
             packetToRepeat += "*";
