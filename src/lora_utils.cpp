@@ -41,6 +41,8 @@ bool transmitFlag       = true;
 
 #define DIFS_SLOTS      2       // Number of secuential CAD slots to consider a free channel to Tx
 int  backoffMax         = 4;    // Max Backoff value (number of CAD slots to wait before Tx)
+#define CAD_MAX_WAIT_MS 10000   // Max total time waiting for a free channel, then the packet is dropped
+unsigned long cadStartTime = 0;
 
 #ifdef HAS_SX1262
     SX1262 radio = new Module(RADIO_CS_PIN, RADIO_DIO1_PIN, RADIO_RST_PIN, RADIO_BUSY_PIN);
@@ -195,8 +197,13 @@ namespace LoRa_Utils {
         return true;
     }
 
+    bool cadTimedOut() {
+        return millis() - cadStartTime > CAD_MAX_WAIT_MS;
+    }
+
     void waitForDIFS() {
         while (!doDIFS()) {
+            if (cadTimedOut()) return;
             Serial.println("CAD/DIFS failed, retry...");
         }
     }
@@ -204,6 +211,7 @@ namespace LoRa_Utils {
     void doBEB() {
         int backoffCounter = random(1, backoffMax + 1);
         while (backoffCounter > 0) {
+            if (cadTimedOut()) return;
             if (doCAD()) {
                 waitForDIFS();  // busy channel: freeze backoff and restart DIFS
             } else {
@@ -225,22 +233,30 @@ namespace LoRa_Utils {
             if (Config.digi.ecoMode != 1) digitalWrite(INTERNAL_LED_PIN, HIGH);     // disabled in Ultra Eco Mode
         #endif
 
+        bool cadDropped = false;
         if (Config.loramodule.cadActive) {
+            cadStartTime = millis();
             waitForDIFS();  // DIFS (Distributed Inter-Frame Space)
             doBEB();        // BEB  (Binary Exponential Backoff)
+            if (cadTimedOut()) {
+                Utils::println("CAD timeout, packet dropped: " + newPacket);
+                cadDropped = true;
+            }
         }
 
-        int state = radio.transmit("\x3c\xff\x01" + newPacket);
-        transmitFlag = true;
-        if (state == RADIOLIB_ERR_NONE) {
-            if (Config.syslog.active && networkManager->isConnected()) {
-                SYSLOG_Utils::logLoRaTx(newPacket);
+        if (!cadDropped) {
+            int state = radio.transmit("\x3c\xff\x01" + newPacket);
+            transmitFlag = true;
+            if (state == RADIOLIB_ERR_NONE) {
+                if (Config.syslog.active && networkManager->isConnected()) {
+                    SYSLOG_Utils::logLoRaTx(newPacket);
+                }
+                Utils::print("---> LoRa Packet Tx : ");
+                Utils::println(newPacket);
+            } else {
+                Utils::print(F("failed, code "));
+                Utils::println(String(state));
             }
-            Utils::print("---> LoRa Packet Tx : ");
-            Utils::println(newPacket);
-        } else {
-            Utils::print(F("failed, code "));
-            Utils::println(String(state));
         }
         #ifdef INTERNAL_LED_PIN
             if (Config.digi.ecoMode != 1) digitalWrite(INTERNAL_LED_PIN, LOW);      // disabled in Ultra Eco Mode
@@ -250,6 +266,7 @@ namespace LoRa_Utils {
                 changeFreqRx();
             }
         }
+        if (cadDropped) radio.startReceive();   // no Tx end IRQ will restart Rx
     }
 
     String receivePacketFromSleep() {
