@@ -7,11 +7,12 @@
 // belong to the iGate/TNC paths). Read-only on Config; keeps its own small dedup
 // ring buffer to break repeater loops.
 //
-// Modes (Config.digi.mode, matching the web UI):
+// Modes (Config.digi.mode, matching the web UI since V4.0.0):
 //   0  OFF
-//   2  WIDE1 (fill-in) digi  — consume WIDE1-1 only
-//   3  WIDE2 (+WIDE1) digi   — consume WIDE1-1 and WIDE2-n
-// Config.digi.backupDigiMode forces fill-in (mode-2) behaviour even when mode==0.
+//   1  WIDE1 (fill-in) digi  — consume WIDE1-1 only
+//   2  WIDE2 (+WIDE1) digi   — consume WIDE1-1 and WIDE2-n
+//   3  own-callsign digi     — repeat only when our callsign is next in the path
+// Config.digi.backupDigiMode forces fill-in (mode-1) behaviour even when mode==0.
 namespace Digi {
     // True when digipeating is enabled (so the caller can skip the work entirely).
     bool enabled();

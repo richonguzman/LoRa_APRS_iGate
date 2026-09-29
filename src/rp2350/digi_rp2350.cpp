@@ -46,13 +46,36 @@ String checkForStartingBytes(const String& packet) {
     return (idx != -1) ? packet.substring(0, idx) : packet;
 }
 
-String cleanPath(String path) {
-    const char* terms[] = {"WIDE1*,", "WIDE2*,", "*"};
-    for (const char* term : terms) {
-        int idx = path.indexOf(term);
-        if (idx != -1) path.remove(idx, strlen(term));
+// Drop used WIDE1*/WIDE2* hops, matching whole path tokens only (port of
+// DIGI_Utils::cleanPath).
+String cleanPath(const String& path) {
+    String result;
+    unsigned int start = 0;
+    while (true) {
+        int delim = path.indexOf(',', start);
+        int end = (delim == -1) ? path.length() : delim;
+        String token = path.substring(start, end);
+        if (token != "WIDE1*" && token != "WIDE2*") {
+            if (result.length() > 0) result += ",";
+            result += token;
+        }
+        if (delim == -1) break;
+        start = delim + 1;
     }
-    return path;
+    return result;
+}
+
+// Offset of `token` as a whole comma-separated path element, or -1 (port of
+// DIGI_Utils' pathTokenIndex).
+int pathTokenIndex(const String& path, const String& token) {
+    unsigned int start = 0;
+    while (start < path.length()) {
+        int end = path.indexOf(",", start);
+        if (end == -1) end = path.length();
+        if (path.substring(start, end) == token) return start;
+        start = end + 1;
+    }
+    return -1;
 }
 
 // Port of DIGI_Utils::processMode3Path: digipeat only when our own callsign is
@@ -97,15 +120,17 @@ String buildPacket(const String& path, const String& packet) {
 
     if (tempPath.indexOf("WIDE1-1") != -1 && (digiMode == 1 || digiMode == 2 || Config.digi.backupDigiMode)) {
         if (tempPath.indexOf('*') != -1) return "";          // '*' shouldn't precede WIDE1-1
-        tempPath.replace("WIDE1-1", call + "*");
+        if (pathTokenIndex(tempPath, "WIDE1-1") != 0) return "";  // WIDE1-1 must be the first hop
+        tempPath = call + "*" + tempPath.substring(7);
     } else if (tempPath.indexOf("WIDE2-") != -1 && digiMode == 2) {
         tempPath = cleanPath(path);
-        if (tempPath.indexOf("WIDE2-1") != -1) {
-            tempPath.replace("WIDE2-1", call + "*");
-        } else if (tempPath.indexOf("WIDE2-2") != -1) {
-            tempPath.replace("WIDE2-2", call + "*,WIDE2-1");
+        int idx = pathTokenIndex(tempPath, "WIDE2-1");
+        if (idx != -1) {
+            tempPath = tempPath.substring(0, idx) + call + "*" + tempPath.substring(idx + 7);
         } else {
-            return "";                                       // WIDE2-3+ unsupported
+            idx = pathTokenIndex(tempPath, "WIDE2-2");
+            if (idx == -1) return "";                        // WIDE2-3+ unsupported
+            tempPath = tempPath.substring(0, idx) + call + "*,WIDE2-1" + tempPath.substring(idx + 7);
         }
     } else if (digiMode == 3) {                              // own-callsign path digi
         tempPath = processMode3Path(tempPath, call);
