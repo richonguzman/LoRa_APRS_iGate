@@ -202,6 +202,7 @@ bool applyConfigForm(const String &contentType, const String &body) {
         Config.tnc.enableSerial             = fHas("tnc.enableSerial");
         Config.tnc.acceptOwn                = fHas("tnc.acceptOwn");
         Config.tnc.aprsBridgeActive         = fHas("tnc.aprsBridgeActive");
+        Config.tnc.kissProtocol             = getParamStringSafe("tnc.kissProtocol", Config.tnc.kissProtocol ? "KISS" : "TNC2") != "TNC2";
 
         Config.mqtt.active                  = fHas("mqtt.active");
         if (Config.mqtt.active) {

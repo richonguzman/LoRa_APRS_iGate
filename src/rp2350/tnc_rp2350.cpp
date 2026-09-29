@@ -1,8 +1,10 @@
 /*
- * RP2350 KISS TNC server — replaces the ESP32 tnc_utils.cpp (WiFiServer/mDNS)
- * with an EthernetServer on the W5500. The KISS framing/codec is reused as-is
- * from src/kiss_utils.cpp. Runs entirely in netTask (W5500 owner); frames bound
- * for RF are handed to loraTask via enqueueRfFrame() (txMsgQueue -> Station buffer).
+ * RP2350 TNC server — replaces the ESP32 tnc_utils.cpp (WiFiServer/mDNS) with an
+ * EthernetServer on the W5500. Speaks KISS (codec reused as-is from
+ * src/kiss_utils.cpp) or, with tnc.kissProtocol = false, plain TNC2 text lines
+ * terminated by CR LF, as tnc_utils.cpp does. Runs entirely in netTask (W5500
+ * owner); frames bound for RF are handed to loraTask via enqueueRfFrame()
+ * (txMsgQueue -> Station buffer).
  */
 #include "tnc_rp2350.h"
 #include <Ethernet.h>
@@ -25,9 +27,38 @@ static bool           tncStarted = false;
 
 namespace {
 
-// Decode a complete KISS frame from client `idx` and act on it: TX over RF
-// (honoring acceptOwn / txActive) and optionally bridge to APRS-IS.
-void handleByte(int idx, char ch) {
+const char *protocolLabel() {
+    return Config.tnc.kissProtocol ? "KISS" : "TNC2";
+}
+
+// Act on one complete TNC2 frame from a client: TX over RF (honoring acceptOwn /
+// txActive) and optionally bridge to APRS-IS.
+void processFrame(const String &frame) {
+    int gt = frame.indexOf('>');
+    String sender = (gt > 0) ? frame.substring(0, gt) : "";
+    if (!Config.tnc.acceptOwn && sender == Config.callsign) {
+        Serial.printf("[tnc] ignored own frame from %s client\n", protocolLabel());
+        return;
+    }
+    Serial.printf("[tnc] <- (%s) ", protocolLabel());
+    Serial.println(frame);
+    if (Config.loramodule.txActive) enqueueRfFrame(frame);  // -> loraTask -> RF
+
+    if (Config.tnc.aprsBridgeActive && Config.aprs_is.active && AprsIs::connected()) {
+        int colon = frame.indexOf(':');
+        if (gt > 0 && colon > gt) {                     // SENDER>PATH,qAO,IGATE:payload
+            String line = frame.substring(0, colon);
+            line += ",qAO,";
+            line += Config.callsign;
+            line += frame.substring(colon);
+            AprsIs::send(line);
+            Serial.println("[tnc] -> APRS-IS: " + line);
+        }
+    }
+}
+
+// KISS: collect bytes between FENDs, then decode.
+void handleByteKISS(int idx, char ch) {
     String &buf = tncBuf[idx];
     if (buf.length() == 0 && ch != (char)FEND) return;     // wait for a frame start
     buf += ch;
@@ -36,30 +67,32 @@ void handleByte(int idx, char ch) {
         bool isData = false;
         String frame = decodeKISS(buf, isData);
         buf = "";
-        if (!isData || frame.length() == 0) return;
-
-        int gt = frame.indexOf('>');
-        String sender = (gt > 0) ? frame.substring(0, gt) : "";
-        if (!Config.tnc.acceptOwn && sender == Config.callsign) {
-            Serial.println("[tnc] ignored own frame from client");
-            return;
-        }
-        Serial.println("[tnc] <- " + frame);
-        if (Config.loramodule.txActive) enqueueRfFrame(frame);  // -> loraTask -> RF
-
-        if (Config.tnc.aprsBridgeActive && Config.aprs_is.active && AprsIs::connected()) {
-            int colon = frame.indexOf(':');
-            if (gt > 0 && colon > gt) {                     // SENDER>PATH,qAO,IGATE:payload
-                String line = frame.substring(0, colon);
-                line += ",qAO,";
-                line += Config.callsign;
-                line += frame.substring(colon);
-                AprsIs::send(line);
-                Serial.println("[tnc] -> APRS-IS: " + line);
-            }
-        }
+        if (isData && frame.length() > 0) processFrame(frame);
     }
     if (buf.length() > TNC_MAX_BUF) buf = "";
+}
+
+// TNC2: one frame per line; CR is ignored, LF ends it. Lines that are not
+// SENDER>PATH:payload are dropped, as tnc_utils.cpp does.
+void handleByteTNC2(int idx, char ch) {
+    String &buf = tncBuf[idx];
+    if (ch == '\r') return;
+
+    if (ch == '\n') {
+        String frame = buf;
+        frame.trim();
+        buf = "";
+        if (frame.length() > 0 && frame.indexOf(':') != -1 && frame.indexOf('>') != -1) processFrame(frame);
+        return;
+    }
+
+    buf += ch;
+    if (buf.length() > TNC_MAX_BUF) buf = "";
+}
+
+void handleByte(int idx, char ch) {
+    if (Config.tnc.kissProtocol) handleByteKISS(idx, ch);
+    else                         handleByteTNC2(idx, ch);
 }
 
 }  // namespace
@@ -70,7 +103,7 @@ void setup() {
     if (!Config.tnc.enableServer) return;
     tncServer.begin();
     tncStarted = true;
-    Serial.printf("[tnc] KISS server on :%d\n", TNC_PORT);
+    Serial.printf("[tnc] %s server on :%d\n", protocolLabel(), TNC_PORT);
 }
 
 void poll() {
@@ -101,10 +134,10 @@ void poll() {
 
 void broadcast(const String &tnc2frame) {
     if (!tncStarted || tnc2frame.length() == 0) return;
-    String kiss = encodeKISS(tnc2frame);
+    String encoded = Config.tnc.kissProtocol ? encodeKISS(tnc2frame) : (tnc2frame + "\r\n");
     for (int i = 0; i < TNC_MAX_CLIENTS; i++) {
         if (tncClients[i] && tncClients[i].connected()) {
-            tncClients[i].print(kiss);
+            tncClients[i].print(encoded);
             tncClients[i].flush();
         }
     }
