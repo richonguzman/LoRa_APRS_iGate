@@ -17,11 +17,11 @@
  */
 
 #include <TinyGPS++.h>
-#ifdef LIGHTGATEWAY_PLUS_1_0
-#include "Adafruit_SHTC3.h"
-#endif
 #include "configuration.h"
 #include "board_pinout.h"
+#ifdef HAS_SHTC3
+#include "Adafruit_SHTC3.h"
+#endif
 #include "wx_utils.h"
 #include "display.h"
 
@@ -51,8 +51,9 @@ Adafruit_BMP280     bmp280;
 Adafruit_BME680     bme680;
 Adafruit_Si7021     si7021  = Adafruit_Si7021();
 #endif
-#ifdef LIGHTGATEWAY_PLUS_1_0
+#ifdef HAS_SHTC3
 Adafruit_SHTC3      shtc3   = Adafruit_SHTC3();
+bool                boardTempSensorFound    = false;    // onboard SHTC3 (solar charge protection), independent of WX telemetry
 #endif
 
 
@@ -66,7 +67,7 @@ namespace WX_Utils {
                 err = SENSOR_I2C_BUS.endTransmission();
             #else
                 Wire.beginTransmission(addr);
-                #ifdef LIGHTGATEWAY_PLUS_1_0
+                #ifdef HAS_SHTC3
                     Wire.write(0x35);
                     Wire.write(0x17);
                 #endif
@@ -90,6 +91,15 @@ namespace WX_Utils {
     }
 
     void setup() {
+        #ifdef HAS_SHTC3
+            Wire.beginTransmission(0x70);       // SHTC3 wakeup (0x3517): it sleeps between reads and ignores its address while asleep (e.g. after deep sleep)
+            Wire.write(0x35);
+            Wire.write(0x17);
+            Wire.endTransmission();
+            delay(1);
+            boardTempSensorFound = shtc3.begin();
+            Serial.println(boardTempSensorFound ? "init : SHTC3 (onboard) ...     done!" : "SHTC3 (onboard) not found!");
+        #endif
         if (Config.wxsensor.active) {
             getWxModuleAddres();
             if (wxModuleAddress != 0x00) {
@@ -133,7 +143,7 @@ namespace WX_Utils {
                         wxModuleFound   = true;
                     }
                 }
-                #ifdef LIGHTGATEWAY_PLUS_1_0
+                #ifdef HAS_SHTC3
                 else if (wxModuleAddress == 0x70) {
                     if (shtc3.begin()) {
                         Serial.println("SHTC3 sensor found");
@@ -238,6 +248,16 @@ namespace WX_Utils {
         #endif
     }
 
+    float readBoardTemperature() {      // onboard SHTC3 (no WX correction applied), NAN if not available
+        #ifdef HAS_SHTC3
+            if (boardTempSensorFound) {
+                sensors_event_t humidity, temp;
+                if (shtc3.getEvent(&humidity, &temp)) return temp.temperature;
+            }
+        #endif
+        return NAN;
+    }
+
     String readDataSensor() {
         switch (wxModuleType) {
             case 1: // BME280
@@ -271,7 +291,7 @@ namespace WX_Utils {
                 break;
             case 5: // SHTC3
                 {
-                    #ifdef LIGHTGATEWAY_PLUS_1_0
+                    #ifdef HAS_SHTC3
                         sensors_event_t humidity, temp;
                         shtc3.getEvent(&humidity, &temp);
                         newTemp     = temp.temperature;

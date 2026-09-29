@@ -54,5 +54,12 @@
     #define INTERNAL_LED_PIN        16
     #define BATTERY_PIN             1
     #define BUTTON_PIN              0
+    #define SOLAR_CHARGE_PIN        48      // HIGH = solar charging disabled / LOW = enabled
+    #define SOLAR_CHARGE_ENABLED_STATE  LOW
+    #define SOLAR_CHARGE_DISABLE_TEMP   -4.0    // °C: below this, stop charging (Li-Ion must not charge below 0°C)
+    #define SOLAR_CHARGE_ENABLE_TEMP    -3.0    // °C: above this, charge again (1°C hysteresis)
+
+    //  Onboard Sensors
+    #define HAS_SHTC3                           // temperature/humidity (I2C 0x70), used for solar charge protection
 
 #endif

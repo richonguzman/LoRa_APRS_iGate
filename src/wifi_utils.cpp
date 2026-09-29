@@ -99,6 +99,9 @@ namespace WIFI_Utils {
             if (Config.wifiAutoAP.enabled) {
                 Serial.println("Starting AP fallback...");
                 startAutoAP();
+            } else {
+                Serial.println("AutoAP disabled: no network, WebUI/TNC server not started (reconfigure over USB)");
+                displayShow("", "  No WiFi / No AP", "  WebUI disabled", "     loading ...", 2000);
             }
             return;
         }

@@ -96,7 +96,7 @@ function loadSettings(settings) {
         networksContainer.appendChild(networkElement);
         networkCount++;
     });
-    document.getElementById("startupDelay").value                       = settings.startupDelay;
+    document.getElementById("startupDelay").value                       = settings.other.startupDelay;
 
     // APRS-IS
     document.getElementById("aprs_is.active").checked                   = settings.aprs_is.active;
@@ -226,6 +226,7 @@ function loadSettings(settings) {
         document.getElementById("tnc.enableSerial").checked             = settings.tnc.enableSerial;
         document.getElementById("tnc.acceptOwn").checked                = settings.tnc.acceptOwn;
         document.getElementById("tnc.aprsBridgeActive").checked         = settings.tnc.aprsBridgeActive;
+        document.getElementById("tnc.kissProtocol").value                = settings.tnc.kissProtocol ? "KISS" : "TNC2";
     }
 
     // MQTT
@@ -1357,11 +1358,12 @@ if (otaUploadButton) {
 
 
 /* ------------------------------------------------- keeping the form submittable
- * A control that fails HTML5 validation blocks the whole form. When it sits in a
- * panel that is not the visible one the browser cannot show its bubble either, so
- * pressing Save just does nothing at all -- no message, no request, no clue. Two
+ * A control that fails HTML5 validation blocks the whole form, and when it sits in
+ * a panel that is not the visible one the browser cannot show its bubble either:
+ * pressing Save then does nothing at all -- no message, no request, no clue. Two
  * guards against that: pull stored values back inside the allowed range on load,
- * and, if something still fails, open the offending section and say what is wrong.
+ * and, if validation still fails, open the section holding the offending control
+ * and show what is wrong.
  */
 function clampOutOfRangeInputs() {
     const fixed = [];

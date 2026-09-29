@@ -25,6 +25,7 @@
 #include "battery_utils.h"
 #include "aprs_is_utils.h"
 #include "board_pinout.h"
+#include "power_utils.h"
 #include "syslog_utils.h"
 #include "A7670_utils.h"
 #include "lora_utils.h"
@@ -89,7 +90,7 @@ namespace Utils {
 
         if (sendOverAPRSIS) {
             APRS_IS_Utils::upload(statusPacket);
-            SYSLOG_Utils::log(2, statusPacket, 0, 0.0, 0);              // APRSIS TX
+            SYSLOG_Utils::logAPRSISTx(statusPacket);
         } else {
             STATION_Utils::addToOutputPacketBuffer(statusPacket, true); // treated also as beacon on Tx Freq
         }
@@ -168,6 +169,9 @@ namespace Utils {
         #endif
 
         if (beaconUpdate) {
+            #ifdef SOLAR_CHARGE_PIN
+                POWER_Utils::checkSolarCharge();    // solar boards: enable/disable charging by board temperature
+            #endif
             if (!Config.display.alwaysOn && Config.display.timeout != 0) displayToggle(true);
 
             TELEMETRY_Utils::checkEUPInterval();
@@ -288,7 +292,7 @@ namespace Utils {
                 #else
                     APRS_IS_Utils::upload(beaconPacket);
                 #endif
-                if (Config.syslog.logBeaconOverTCPIP) SYSLOG_Utils::log(1, "tcp" + beaconPacket, 0, 0.0, 0);   // APRSIS TX
+                if (Config.syslog.logBeaconOverTCPIP) SYSLOG_Utils::logAPRSISTx(beaconPacket);
             }
 
             if (Config.beacon.sendViaRF || backupDigiMode) {
@@ -325,21 +329,65 @@ namespace Utils {
         }
     }
 
-    void typeOfPacket(const String& packet, const uint8_t packetType) {
+    void updateLoRaPacketDisplayInfo(APRSPacket& aprsPacket, const uint8_t packetType) {
         switch (packetType) {
             case 0: // LoRa-APRS
                 fifthLine = "LoRa Rx ----> APRS-IS";
                 break;
-            case 1: // APRS-LoRa
-                fifthLine = "APRS-IS ----> LoRa Tx";
-                break;
-            case 2: // Digipeater
+            case 1: // Digipeater
                 fifthLine = "LoRa Rx ----> LoRa Tx";
                 break;
         }
 
-        int firstColonIndex = packet.indexOf(":");
-        char nextChar       = packet[firstColonIndex + 1];
+        String sender = aprsPacket.sender;
+        for (int i = sender.length(); i < 9; i++) {
+            sender += " ";
+        }
+        sixthLine = sender;
+
+        switch (aprsPacket.type) {
+            case 1:     // MESSAGE
+                sixthLine += "> MESSAGE";
+                break;
+            case 2:     // STATUS
+                sixthLine += "> NEW STATUS";
+                break;
+            case 0:     // GPS
+                sixthLine += "> GPS BEACON";
+                if (!Config.syslog.active) GPS_Utils::buildDistanceAndComment(aprsPacket.latitude, aprsPacket.longitude, aprsPacket.payload);
+                seventhLine = "RSSI:";
+                seventhLine += String(rssi);
+                seventhLine += "dBm";
+                seventhLine += (rssi <= -100) ? " " : "  ";
+                if (distance.indexOf(".") == 1) seventhLine += " ";
+                seventhLine += "D:";
+                seventhLine += distance;
+                seventhLine += "km";
+                break;
+            case 3:     // TELEMETRY
+                sixthLine += "> TELEMETRY";
+                break;
+            case 4:     // MIC-E
+                sixthLine += ">  MIC-E";
+                break;
+            case 5:     // OBJECT
+                sixthLine += ">  OBJECT";
+                break;
+            default:    // unrecognized
+                sixthLine += "> ?????????";
+                break;
+        }
+        if (aprsPacket.type != 0) {    // Common assignment for non-GPS cases
+            seventhLine = "RSSI:";
+            seventhLine += String(rssi);
+            seventhLine += "dBm SNR: ";
+            seventhLine += String(snr);
+            seventhLine += "dBm";
+        }
+    }
+
+    void updateAPRSISPacketDisplayInfo(const String& packet) {
+        fifthLine = "APRS-IS ----> LoRa Tx";
 
         String sender = packet.substring(0,packet.indexOf(">"));
         for (int i = sender.length(); i < 9; i++) {
@@ -347,37 +395,12 @@ namespace Utils {
         }
         sixthLine = sender;
 
-        if (nextChar == ':') {
+        if (packet.indexOf("::") > 0) {
             sixthLine += "> MESSAGE";
-        } else if (nextChar == '>') {
-            sixthLine += "> NEW STATUS";
-        } else if (nextChar == '!' || nextChar == '=' || nextChar == '@') {
-            sixthLine += "> GPS BEACON";
-            if (!Config.syslog.active) GPS_Utils::getDistanceAndComment(packet);       // to be checked!!!
-            seventhLine = "RSSI:";
-            seventhLine += String(rssi);
-            seventhLine += "dBm";
-            seventhLine += (rssi <= -100) ? " " : "  ";
-            if (distance.indexOf(".") == 1) seventhLine += " ";
-            seventhLine += "D:";
-            seventhLine += distance;
-            seventhLine += "km";
-        } else if (nextChar == '`' || nextChar == '\'') {
-            sixthLine += ">  MIC-E";
-        } else if (nextChar == ';') {
-            sixthLine += ">  OBJECT";
-        } else if (packet.indexOf(":T#") >= 10 && packet.indexOf(":=/") == -1) {
-            sixthLine += "> TELEMETRY";
         } else {
-            sixthLine += "> ??????????";
+            sixthLine += ">  OBJECT";
         }
-        if (nextChar != '!' && nextChar != '=' && nextChar != '@') {    // Common assignment for non-GPS cases
-            seventhLine = "RSSI:";
-            seventhLine += String(rssi);
-            seventhLine += "dBm SNR: ";
-            seventhLine += String(snr);
-            seventhLine += "dBm";
-        }
+        seventhLine = "";
     }
 
     void print(const String& text) {
@@ -418,11 +441,16 @@ namespace Utils {
                 displayToggle(false);
             }
             #ifdef VEXT_CTRL_PIN
-                #ifndef HELTEC_WSL_V3
-                    digitalWrite(VEXT_CTRL_PIN, LOW);
-                #endif
+                digitalWrite(VEXT_CTRL_PIN, !VEXT_CTRL_ON_STATE);   // VEXT off before deep sleep (always, regardless of ecoMode)
             #endif
             LoRa_Utils::sleepRadio();
+            #ifdef RADIO_VCC_PIN
+                digitalWrite(RADIO_VCC_PIN, LOW);   // cut LoRa module power (QRP Labs LightGateway) so it draws nothing while sleeping
+            #endif
+            #ifdef SOLAR_CHARGE_PIN
+                gpio_hold_en((gpio_num_t)SOLAR_CHARGE_PIN);     // keep charge on/off decided by temperature while sleeping
+                gpio_deep_sleep_hold_en();
+            #endif
             transmitFlag = true;
             delay(100);
             esp_deep_sleep_start();

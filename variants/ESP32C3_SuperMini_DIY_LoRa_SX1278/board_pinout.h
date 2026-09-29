@@ -1,4 +1,4 @@
-/* Copyright (C) 2026 Ricardo Guzman - CA2RXU
+/* Copyright (C) 2025 Ricardo Guzman - CA2RXU
  *
  * This file is part of LoRa APRS iGate.
  *
@@ -16,21 +16,31 @@
  * along with LoRa APRS iGate. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef SYSLOG_H_
-#define SYSLOG_H_
+#ifndef BOARD_PINOUT_H_
+#define BOARD_PINOUT_H_
 
-#include <APRSPacketLib.h>
-#include <Arduino.h>
+    #define HAS_SX1278
+    #define RADIO_SCLK_PIN          4
+    #define RADIO_MISO_PIN          5
+    #define RADIO_MOSI_PIN          6
+    #define RADIO_CS_PIN            7
+    #define RADIO_RST_PIN           3
+    #define RADIO_BUSY_PIN          2
+    #define RADIO_WAKEUP_PIN        RADIO_BUSY_PIN
+    #define GPIO_WAKEUP_PIN         GPIO_NUM_2
 
+    //  Display
+    #define HAS_DISPLAY
 
-namespace SYSLOG_Utils {
+    #undef  OLED_SDA
+    #undef  OLED_SCL
+    #undef  OLED_RST
 
-    void logLoRaRx(APRSPacket& aprsPacket, const String& packet, const int rssi, const float snr, const int freqError);
-    void logAPRSISTx(const String& packet);
-    void logLoRaTx(const String& packet);
-    void logCRCError(const String& packet, const int rssi, const float snr, const int freqError);
-    void setup();
+    #define OLED_SDA            8
+    #define OLED_SCL            9
+    #define OLED_RST            10
 
-}
+    //  I2C
+    #define USE_WIRE_WITH_OLED_PINS
 
 #endif

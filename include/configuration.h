@@ -132,6 +132,7 @@ public:
     bool    enableSerial;
     bool    acceptOwn;
     bool    aprsBridgeActive;
+    bool    kissProtocol;    // true = KISS, false = TNC2 -- applies to both Serial and TCP server
 };
 
 class OTA {

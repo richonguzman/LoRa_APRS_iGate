@@ -20,7 +20,7 @@ ____________________________________________________
 
 | New Menu | Map |
 | --- | --- |
-| ![new menu](images/1.png) | ![map](images/2.png) |
+| ![new menu](images/1.png) | ![map](images/2.jpg) |
 
 ____________________________________________________
 
@@ -43,15 +43,17 @@ ____________________________________________________
 
 - HELTEC V2, V3, V3.2, V4, T114, Wireless Stick, Wireless Stick Lite V3/V3.2, HT-CT62, Wireless Tracker, Wireless Paper.
 
-- RAK Wireless 4631 + 19007(or 19003)
+- RAK Wireless 4631 + 19007(or 19003), RAK3312 and RAK3112.
 
 - Faketec V3 (NRF52840 + Heltec HTRA62(SX1262))
 
 - QRP Labs LightGateway 1.0 and Plus 1.0.
 
-- ESP32 + SX1278 LoRa Module or Ebyte 400M30S (or 900M30S) 1W LoRa Module for a DIY Versions.
+- ESP32 + SX1278 LoRa Module or Ebyte 400M30S (or 900M30S) or Ebyte E32 400M30S 1W LoRa Module for a DIY Versions.
 
 - ESP32C3 + Ebyte 400M30S(or 900M30S) 1W LoRa Module for another DIY version.
+
+- ESP32C3 SuperMini + SX1278 (RA-01/RA-02) LoRa Module DIY version.
 
 - ESP32 + 4G/LTE A7670 Modem + SX1278 DIY Version.
 
@@ -118,6 +120,8 @@ DIO3; W5500 SPI0: MISO16/SCK18/MOSI19/CS17/RST20). Web assets are regenerated wi
 <br />
 
 # Timeline (Versions):
+- 2026-09-23 APRSPacketLib V1.0.7 update and many code cleaning with this.
+- 2026-09-17 Real APRS Symbols added to map and TNC2 output as a posibility in TNC mode.
 - 2026-08-16 New UI (Web) and also Live View over a Map to see Rx stations.
 - 2026-08-10 CAD (Channel Activity Detection) and DIFS (Distributed Inter-Frame Space) added.
 - 2026-03-25 More Boards, SDK update, OTA fix, GPS process update.

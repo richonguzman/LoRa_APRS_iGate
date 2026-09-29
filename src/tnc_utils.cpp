@@ -18,6 +18,7 @@
 
 #include <WiFi.h>
 #include "ESPmDNS.h"
+#include "network_manager.h"
 #include "configuration.h"
 #include "station_utils.h"
 #include "kiss_protocol.h"
@@ -28,6 +29,7 @@
 
 
 extern Configuration    Config;
+extern NetworkManager   *networkManager;
 extern WiFiClient       aprsIsClient;
 extern bool             passcodeValid;
 
@@ -47,7 +49,7 @@ String inputSerialBuffer = "";
 namespace TNC_Utils {
 
     void setup() {
-        if (Config.tnc.enableServer && Config.digi.ecoMode == 0) {
+        if (Config.tnc.enableServer && Config.digi.ecoMode == 0 && networkManager->hasActiveInterface()) {   // no WiFi STA/AP or Ethernet started = no TCP/IP stack
             tncServer.stop();
             tncServer.begin();
             String host = "igate-" + Config.callsign;
@@ -78,7 +80,23 @@ namespace TNC_Utils {
         }
     }
 
-    void handleInputData(char character, int bufferIndex) {
+    void processInputFrame(const String& frame, int bufferIndex, const String& protocolLabel) {
+        if (bufferIndex != -1) {
+            Utils::print("<--- Got from TNC (" + protocolLabel + ") : ");
+            Utils::println(frame);
+        }
+
+        String sender = frame.substring(0,frame.indexOf(">"));
+
+        if (Config.tnc.acceptOwn || sender != Config.callsign) {
+            if (Config.loramodule.txActive) STATION_Utils::addToOutputPacketBuffer(frame);
+            if (Config.tnc.aprsBridgeActive && Config.aprs_is.active && passcodeValid && aprsIsClient.connected()) APRS_IS_Utils::upload(frame);
+        } else {
+            Utils::println("Ignored own frame from " + protocolLabel);
+        }
+    }
+
+    void handleInputDataKISS(char character, int bufferIndex) {
         String* data = (bufferIndex == -1) ? &inputSerialBuffer : &inputServerBuffer[bufferIndex];
         if (data->length() == 0 && character != (char)FEND) return;
 
@@ -89,25 +107,43 @@ namespace TNC_Utils {
             const String& frame = decodeKISS(*data, isDataFrame);
 
             if (isDataFrame) {
-                if (bufferIndex != -1) {
-                    Utils::print("<--- Got from TNC      : ");
-                    Utils::println(frame);
-                }
-
-                String sender = frame.substring(0,frame.indexOf(">"));
-
-                if (Config.tnc.acceptOwn || sender != Config.callsign) {
-                    if (Config.loramodule.txActive) STATION_Utils::addToOutputPacketBuffer(frame);
-                    if (Config.tnc.aprsBridgeActive && Config.aprs_is.active && passcodeValid && aprsIsClient.connected()) APRS_IS_Utils::upload(frame);
-                } else {
-                    Utils::println("Ignored own frame from KISS");
-                }
+                processInputFrame(frame, bufferIndex, "KISS");
             }
             data->clear();
         }
 
         if (data->length() > 255) {
             data->clear();
+        }
+    }
+
+    void handleInputDataTNC2(char character, int bufferIndex) {
+        String* data = (bufferIndex == -1) ? &inputSerialBuffer : &inputServerBuffer[bufferIndex];
+
+        if (character == '\r') return;
+
+        if (character == '\n') {
+            String frame = *data;
+            frame.trim();
+            data->clear();
+
+            if (frame.length() > 0 && frame.indexOf(':') != -1 && frame.indexOf('>') != -1) {
+                processInputFrame(frame, bufferIndex, "TNC2");
+            }
+            return;
+        }
+
+        data->concat(character);
+        if (data->length() > 255) {
+            data->clear();
+        }
+    }
+
+    void handleInputData(char character, int bufferIndex) {
+        if (Config.tnc.kissProtocol) {
+            handleInputDataKISS(character, bufferIndex);
+        } else {
+            handleInputDataTNC2(character, bufferIndex);
         }
     }
 
@@ -138,13 +174,13 @@ namespace TNC_Utils {
     void sendToClients(const String& packet, bool stripBytes) {
         String cleanPacket = stripBytes ? packet.substring(3): packet;
 
-        const String kissEncoded = encodeKISS(cleanPacket);
+        const String encoded = Config.tnc.kissProtocol ? encodeKISS(cleanPacket) : (cleanPacket + "\r\n");
 
         for (int i = 0; i < MAX_CLIENTS; i++) {
             auto client = clients[i];
             if (client != nullptr) {
                 if (client->connected()) {
-                    client->print(kissEncoded);
+                    client->print(encoded);
                     client->flush();
                 } else {
                     delete client;
@@ -158,7 +194,7 @@ namespace TNC_Utils {
 
     void sendToSerial(const String& packet, bool stripBytes) {
         String cleanPacket = stripBytes ? packet.substring(3): packet;
-        Serial.print(encodeKISS(cleanPacket));
+        Serial.print(Config.tnc.kissProtocol ? encodeKISS(cleanPacket) : (cleanPacket + "\r\n"));
         Serial.flush();
     }
 

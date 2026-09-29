@@ -19,8 +19,8 @@
 #ifndef UTILS_H_
 #define UTILS_H_
 
+#include <APRSPacketLib.h>
 #include <Arduino.h>
-
 
 class ReceivedPacket {
 public:
@@ -39,7 +39,8 @@ namespace Utils {
     void    checkBeaconInterval();
     void    checkDisplayInterval();
     void    validateFreqs();
-    void    typeOfPacket(const String& packet, const uint8_t packetType);
+    void    updateLoRaPacketDisplayInfo(APRSPacket& aprsPacket, const uint8_t packetType);
+    void    updateAPRSISPacketDisplayInfo(const String& packet);
     void    print(const String& text);
     void    println(const String& text);
     void    checkRebootMode();

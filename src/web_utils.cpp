@@ -17,6 +17,7 @@
  */
 
 #include <ArduinoJson.h>
+#include "network_manager.h"
 #include "configuration.h"
 #include "ota_utils.h"
 #include "web_utils.h"
@@ -26,6 +27,7 @@
 
 
 extern Configuration               Config;
+extern NetworkManager              *networkManager;
 extern uint32_t                    lastBeaconTx;
 extern std::vector<ReceivedPacket> receivedPackets;
 
@@ -322,6 +324,7 @@ namespace WEB_Utils {
         Config.tnc.enableSerial             = request->hasParam("tnc.enableSerial", true);
         Config.tnc.acceptOwn                = request->hasParam("tnc.acceptOwn", true);
         Config.tnc.aprsBridgeActive         = request->hasParam("tnc.aprsBridgeActive", true);
+        Config.tnc.kissProtocol             = getParamStringSafe("tnc.kissProtocol", Config.tnc.kissProtocol ? "KISS" : "TNC2") != "TNC2";
 
         Config.mqtt.active                  = request->hasParam("mqtt.active", true);
         if (Config.mqtt.active) {
@@ -434,7 +437,7 @@ namespace WEB_Utils {
     }
 
     void setup() {
-        if (Config.digi.ecoMode == 0) {
+        if (Config.digi.ecoMode == 0 && networkManager->hasActiveInterface()) {  // no WiFi STA/AP or Ethernet started = no TCP/IP stack
             server.on("/", HTTP_GET, handleHome);
             server.on("/status", HTTP_GET, handleStatus);
             server.on("/received-packets.json", HTTP_GET, handleReceivedPackets);
