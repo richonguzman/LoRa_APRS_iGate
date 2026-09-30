@@ -122,7 +122,10 @@ jobs:
 
             - uses: actions/setup-python@v7
               with:
-                  python-version: "3.9"
+                  python-version: "3.13"
+
+            - name: Install esptool
+              run: pip install "esptool>=5,<6"
 
             - name: Install PlatformIO Core
               run: pip install --upgrade platformio
@@ -148,44 +151,44 @@ jobs:
             - name: Merge for web flashing
               run: |
                   if [ "${{ matrix.target.chip }}" == "esp32" ]; then
-                    python installer/bin/esptool/esptool.py --chip esp32 merge_bin \
+                    esptool --chip esp32 merge-bin \
                       -o installer/web_factory.bin \
-                      --flash_mode dio \
-                      --flash_freq 40m \
-                      --flash_size 4MB \
+                      --flash-mode dio \
+                      --flash-freq 40m \
+                      --flash-size 4MB \
                       0x1000 installer/firmware/bootloader.bin \
                       0x8000 installer/firmware/partitions.bin \
                       0xe000 installer/firmware/boot_app0.bin \
                       0x10000 installer/firmware/firmware.bin \
                       0x3D0000 installer/firmware/spiffs.bin
                   elif [ "${{ matrix.target.chip }}" == "esp32s2" ]; then
-                    python installer/bin/esptool/esptool.py --chip esp32s2 merge_bin \
+                    esptool --chip esp32s2 merge-bin \
                       -o installer/web_factory.bin \
-                      --flash_mode dio \
-                      --flash_freq 40m \
-                      --flash_size 4MB \
+                      --flash-mode dio \
+                      --flash-freq 40m \
+                      --flash-size 4MB \
                       0x1000 installer/firmware/bootloader.bin \
                       0x8000 installer/firmware/partitions.bin \
                       0xe000 installer/firmware/boot_app0.bin \
                       0x10000 installer/firmware/firmware.bin \
                       0x3D0000 installer/firmware/spiffs.bin
                   elif [ "${{ matrix.target.chip }}" == "esp32s3" ]; then
-                    python installer/bin/esptool/esptool.py --chip esp32s3 merge_bin \
+                    esptool --chip esp32s3 merge-bin \
                       -o installer/web_factory.bin \
-                      --flash_mode dio \
-                      --flash_freq 40m \
-                      --flash_size 8MB \
+                      --flash-mode dio \
+                      --flash-freq 40m \
+                      --flash-size 8MB \
                       0x0000 installer/firmware/bootloader.bin \
                       0x8000 installer/firmware/partitions.bin \
                       0xe000 installer/firmware/boot_app0.bin \
                       0x10000 installer/firmware/firmware.bin \
                       0x3D0000 installer/firmware/spiffs.bin
                   elif [ "${{ matrix.target.chip }}" == "esp32c3" ]; then
-                    python installer/bin/esptool/esptool.py --chip esp32c3 merge_bin \
+                    esptool --chip esp32c3 merge-bin \
                       -o installer/web_factory.bin \
-                      --flash_mode dio \
-                      --flash_freq 40m \
-                      --flash_size 4MB \
+                      --flash-mode dio \
+                      --flash-freq 40m \
+                      --flash-size 4MB \
                       0x1000 installer/firmware/bootloader.bin \
                       0x8000 installer/firmware/partitions.bin \
                       0xe000 installer/firmware/boot_app0.bin \
