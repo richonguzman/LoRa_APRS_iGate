@@ -118,9 +118,9 @@ jobs:
                     - name: ESP32_9M2IBR_1W_LoRa_GPS_E22_400M30S
                       chip: esp32
         steps:
-            - uses: actions/checkout@v3
+            - uses: actions/checkout@v7
 
-            - uses: actions/setup-python@v4
+            - uses: actions/setup-python@v7
               with:
                   python-version: "3.9"
 
@@ -199,12 +199,12 @@ jobs:
             - name: Archive Files
               run: zip -r installer.zip installer/
 
+            - name: Rename zip for upload
+              run: mv installer.zip ${{ matrix.target.name }}.zip
+
             - name: Upload Release Asset
-              uses: actions/upload-release-asset@v1
+              uses: softprops/action-gh-release@v3
+              with:
+                  files: ${{ matrix.target.name }}.zip
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              with:
-                  upload_url: ${{ github.event.release.upload_url }}
-                  asset_path: ./installer.zip
-                  asset_name: ${{ matrix.target.name }}.zip
-                  asset_content_type: application/zip
