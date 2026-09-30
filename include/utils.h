@@ -24,6 +24,7 @@
 
 class ReceivedPacket {
 public:
+    String  rxDate;
     String  rxTime;
     String  packet;
     int     RSSI;

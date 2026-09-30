@@ -607,6 +607,7 @@ function loadReceivedPackets(packets) {
             const element = document.createElement("tr");
 
             element.innerHTML = `
+                        <td>${packet.rxDate}</td>
                         <td>${packet.rxTime}</td>
                         <td>${packet.packet}</td>
                         <td>${packet.RSSI}</td>

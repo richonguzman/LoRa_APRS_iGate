@@ -305,6 +305,7 @@ namespace LoRa_Utils {
                                     receivedPackets.erase(receivedPackets.begin());
                                 }
                                 ReceivedPacket receivedPacket;
+                                receivedPacket.rxDate   = NTP_Utils::getFormatedDate();
                                 receivedPacket.rxTime   = NTP_Utils::getFormatedTime();
                                 receivedPacket.packet   = sanitizeForWeb(packet.substring(3));
                                 receivedPacket.RSSI     = rssi;
