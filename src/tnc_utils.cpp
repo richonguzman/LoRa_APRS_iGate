@@ -58,8 +58,11 @@ namespace TNC_Utils {
                 tncServer.stop();
                 return;
             }
-            if (!MDNS.addService("tnc", "tcp", TNC_PORT)) {
-                Serial.println("Error: Could not add mDNS service");
+            if (Config.tnc.kissProtocol) {      // "_kiss-tnc._tcp" (TCP-KISS-DNS-SD spec): only announce when the server really talks KISS
+                MDNS.setInstanceName("LoRa APRS iGate " + Config.callsign);     // user-friendly name shown by DNS-SD clients (aprs.fi iOS)
+                if (!MDNS.addService("kiss-tnc", "tcp", TNC_PORT)) {
+                    Serial.println("Error: Could not add mDNS service");
+                }
             }
             Serial.println("TNC server started successfully");
             Serial.println("mDNS Host: " + host + ".local");
