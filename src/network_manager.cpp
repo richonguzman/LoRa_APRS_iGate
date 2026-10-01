@@ -51,12 +51,14 @@ bool NetworkManager::_connectWiFi(const WiFiNetwork& network) {
     WiFi.mode(_wifiAPmode ? WIFI_AP_STA : WIFI_STA);
 
     Serial.println("[NM] Attempting to connect to WiFi: " + network.ssid);
+    _lastWiFiDisconnectReason = 0;
     WiFi.begin(network.ssid.c_str(), network.psk.c_str());
 
     Serial.print("[NM] Connecting ");
 
     int attempts = 0;
     while (!isWiFiConnected() && attempts < 10) {
+        if (_lastWiFiDisconnectReason == WIFI_REASON_AUTH_FAIL) break;
         delay(500);
         #ifdef INTERNAL_LED_PIN
             digitalWrite(INTERNAL_LED_PIN,HIGH);
@@ -72,8 +74,17 @@ bool NetworkManager::_connectWiFi(const WiFiNetwork& network) {
 
     if (isWiFiConnected()) return true;
 
+    if (_isWiFiAuthFailure()) {
+        Serial.println("[NM] Wrong WiFi password for SSID: " + network.ssid);
+        if (_wifiAuthFailSSID.isEmpty()) _wifiAuthFailSSID = network.ssid;
+    }
     Serial.println("[NM] Failed to connect to WiFi after " + String(attempts) + " attempts. SSID: " + network.ssid);
     return false;
+}
+
+bool NetworkManager::_isWiFiAuthFailure() const {
+    uint8_t reason = _lastWiFiDisconnectReason;
+    return reason == WIFI_REASON_AUTH_FAIL || reason == WIFI_REASON_4WAY_HANDSHAKE_TIMEOUT || reason == WIFI_REASON_HANDSHAKE_TIMEOUT;
 }
 
 void NetworkManager::_processAPTimeout() {
@@ -93,8 +104,11 @@ void NetworkManager::_processAPTimeout() {
     }
 }
 
-void NetworkManager::_onNetworkEvent(arduino_event_id_t event, arduino_event_info_t /*info*/) {
+void NetworkManager::_onNetworkEvent(arduino_event_id_t event, arduino_event_info_t info) {
     switch (event) {
+        case ARDUINO_EVENT_WIFI_STA_DISCONNECTED:
+            _lastWiFiDisconnectReason = info.wifi_sta_disconnected.reason;
+            break;
         case ARDUINO_EVENT_ETH_START:
             Serial.println("[NM] ETH Started");
             if (!_hostName.isEmpty()) {
@@ -224,6 +238,7 @@ bool NetworkManager::connectWiFi() {
     if (_wifiNetworks.empty()) {
         return false;
     }
+    _wifiAuthFailSSID = "";
 
     for (size_t i = 0; i < _wifiNetworks.size(); i++) {
         disconnectWiFi();
@@ -254,6 +269,10 @@ String NetworkManager::getWiFiSSID() const {
 
 String NetworkManager::getWiFiAPSSID() const {
     return WiFi.softAPSSID();
+}
+
+String NetworkManager::getWiFiAuthFailSSID() const {
+    return _wifiAuthFailSSID;
 }
 
 IPAddress NetworkManager::getWiFiIP() const {

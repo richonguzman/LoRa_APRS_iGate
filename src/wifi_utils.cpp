@@ -34,6 +34,7 @@ extern uint32_t         lastServerCheck;
 uint8_t     wifiCounter         = 0;
 uint32_t    lastBackupDigiTime  = millis();
 uint32_t    lastWiFiCheck       = 0;
+bool        firstWiFiAttempt    = true;
 
 
 namespace WIFI_Utils {
@@ -108,6 +109,8 @@ namespace WIFI_Utils {
 
         displayShow("", "Connecting to WiFi:", "", "     loading ...", 0);
         networkManager->connectWiFi();
+        bool showAuthError = firstWiFiAttempt;
+        firstWiFiAttempt = false;
 
         #ifdef INTERNAL_LED_PIN
             digitalWrite(INTERNAL_LED_PIN, LOW);
@@ -120,6 +123,10 @@ namespace WIFI_Utils {
             displayShow("", "     Connected!!", "" , "     loading ...", 1000);
         } else {
             Serial.println("[WiFi] Not connected to WiFi!");
+            String authFailSSID = networkManager->getWiFiAuthFailSSID();
+            if (showAuthError && !authFailSSID.isEmpty()) {
+                displayShow("", "SSID: " + authFailSSID.substring(0, 15), "Bad WiFi password", "Double check settings", 5000);
+            }
             if (Config.wifiAutoAP.enabled) {
                 Serial.println("Starting AP fallback...");
                 displayShow("", " WiFi Not Connected!", "" , "     loading ...", 1000);

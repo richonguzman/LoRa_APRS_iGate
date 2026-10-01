@@ -43,9 +43,12 @@ private:
 
     String _hostName = "";
     std::vector<WiFiNetwork> _wifiNetworks;
+    volatile uint8_t _lastWiFiDisconnectReason = 0;
+    String _wifiAuthFailSSID = "";
 
     int _findWiFiNetworkIndex(const String& ssid) const;
     bool _connectWiFi(const WiFiNetwork& network);
+    bool _isWiFiAuthFailure() const;
     void _processAPTimeout();
     void _onNetworkEvent(arduino_event_id_t event, arduino_event_info_t /*info*/);
 
@@ -75,6 +78,7 @@ public:
     bool disconnectWiFi();
     String getWiFiSSID() const;
     String getWiFiAPSSID() const;
+    String getWiFiAuthFailSSID() const;
     IPAddress getWiFiIP() const;
     IPAddress getWiFiAPIP() const;
     wifi_mode_t getWiFiMode() const;
