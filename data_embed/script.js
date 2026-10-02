@@ -606,13 +606,11 @@ function loadReceivedPackets(packets) {
         packets.forEach((packet) => {
             const element = document.createElement("tr");
 
-            element.innerHTML = `
-                        <td>${packet.rxDate}</td>
-                        <td>${packet.rxTime}</td>
-                        <td>${packet.packet}</td>
-                        <td>${packet.RSSI}</td>
-                        <td>${packet.SNR}</td>
-                    `;
+            ['rxDate', 'rxTime', 'packet', 'RSSI', 'SNR'].forEach((field) => {
+                const cell = document.createElement("td");
+                cell.textContent = String(packet[field]);
+                element.appendChild(cell);
+            });
 
             container.appendChild(element);
         })
