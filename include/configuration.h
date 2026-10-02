@@ -42,6 +42,7 @@ public:
     double  latitude;
     double  longitude;
     String  comment;
+    int     rfCommentEveryXBeacons;
     int     interval;
     String  overlay;
     String  symbol;

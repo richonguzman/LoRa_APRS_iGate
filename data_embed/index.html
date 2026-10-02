@@ -305,6 +305,30 @@ body{background:var(--msh-bg);color:var(--msh-text);font-family:"Inter",system-u
                                             placeholder=""
                                         />
                                     </div>
+                                    <div class="col-6 mt-3">
+                                        <label
+                                            for="beacon.rfCommentEveryXBeacons"
+                                            class="form-label"
+                                            >Send Comment on RF every</label
+                                        >
+                                        <div class="input-group">
+                                            <input
+                                                type="number"
+                                                name="beacon.rfCommentEveryXBeacons"
+                                                id="beacon.rfCommentEveryXBeacons"
+                                                class="form-control"
+                                                value="1"
+                                                min="1"
+                                                max="100"
+                                                step="1"
+                                                required
+                                            />
+                                            <span class="input-group-text"
+                                                >beacons
+                                            </span>
+                                        </div>
+                                        <small>(1 = every beacon. APRS-IS beacon always includes the comment)</small>
+                                    </div>
                                     <div class="col-12 mt-3">
                                         <label
                                             for="beacon.path"

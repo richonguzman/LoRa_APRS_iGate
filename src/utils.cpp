@@ -71,6 +71,7 @@ uint32_t    lastStatusTx            = 0;
 bool        stationCallsignIsValid  = false;
 String      beaconPacket;
 String      secondaryBeaconPacket;
+uint32_t    rfBeaconCounter         = 0;
 
 
 namespace Utils {
@@ -214,8 +215,9 @@ namespace Utils {
                 beaconPacket            += sensorData;
                 secondaryBeaconPacket   += sensorData;
             }
-            beaconPacket            += Config.beacon.comment;
-            secondaryBeaconPacket   += Config.beacon.comment;
+            beaconPacket            += Config.beacon.comment;                           // APRS-IS beacon always carries the comment
+            int commentEveryX       = max(1, Config.beacon.rfCommentEveryXBeacons);   // safety: 0 or negative behaves as "every beacon"
+            if (rfBeaconCounter % commentEveryX == 0) secondaryBeaconPacket += Config.beacon.comment;
             if (stationCallsignIsValid && Config.tacticalCallsign != "") {
                 beaconPacket            += " de ";
                 beaconPacket            += Config.callsign;
@@ -300,6 +302,7 @@ namespace Utils {
                 displayShow(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING DIGI BEACON", 0);
                 seventhLine = "     listening...";
                 STATION_Utils::addToOutputPacketBuffer(secondaryBeaconPacket, true);
+                rfBeaconCounter++;
             }
 
             lastBeaconTx = millis();
