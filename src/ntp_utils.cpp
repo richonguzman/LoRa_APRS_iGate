@@ -70,4 +70,13 @@ namespace NTP_Utils {
         return String(formatedTime);
     }
 
+    String getFormatedDate() {
+        if (Config.digi.ecoMode != 0) return "";
+        struct tm timeinfo;
+        if (!ntpStarted || !getLocalTime(&timeinfo, 0)) return "";     // 0 ms: don't wait (default timeout would block 5 s)
+        char formatedDate[11];
+        strftime(formatedDate, sizeof(formatedDate), "%Y-%m-%d", &timeinfo);
+        return String(formatedDate);
+    }
+
 }

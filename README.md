@@ -120,6 +120,7 @@ DIO3; W5500 SPI0: MISO16/SCK18/MOSI19/CS17/RST20). Web assets are regenerated wi
 <br />
 
 # Timeline (Versions):
+- 2026-09-30 GPS baud rate auto-detection, CAD timeout (packet dropped after 10s of busy channel)
 - 2026-09-23 APRSPacketLib V1.0.7 update and many code cleaning with this.
 - 2026-09-17 Real APRS Symbols added to map and TNC2 output as a posibility in TNC mode.
 - 2026-08-16 New UI (Web) and also Live View over a Map to see Rx stations.

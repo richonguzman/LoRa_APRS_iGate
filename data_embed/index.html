@@ -61,7 +61,7 @@ body{background:var(--msh-bg);color:var(--msh-text);font-family:"Inter",system-u
 #received-packets{max-width:none;padding-left:0;padding-right:0;}
 #received-packets .table{--bs-table-color:var(--msh-text);--bs-table-border-color:var(--msh-border);color:var(--msh-text);}
 #received-packets th{white-space:nowrap;}
-#received-packets td:nth-child(1),#received-packets td:nth-child(3),#received-packets td:nth-child(4){white-space:nowrap;}
+#received-packets td:nth-child(1),#received-packets td:nth-child(2),#received-packets td:nth-child(4),#received-packets td:nth-child(5){white-space:nowrap;}
 @media(max-width:768px){.app-sidebar{width:60px;padding:12px 6px;}.side-link .label,.nav-group-label{display:none;}.app-main{padding:14px;}}
 </style>
 </head>
@@ -198,6 +198,7 @@ body{background:var(--msh-bg);color:var(--msh-text);font-family:"Inter",system-u
                         <table class="table mt-4">
                             <thead>
                                 <tr>
+                                    <th scope="col">Date</th>
                                     <th scope="col">Time</th>
                                     <th scope="col">Frame</th>
                                     <th scope="col">RSSI</th>

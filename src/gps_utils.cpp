@@ -18,6 +18,7 @@
 
 #include <APRSPacketLib.h>
 #include <TinyGPS++.h>
+#include <SPIFFS.h>
 #include <WiFi.h>
 #include "configuration.h"
 #include "board_pinout.h"
@@ -31,6 +32,10 @@
     #define GPS_BAUD    9600
 #endif
 
+#define GPS_BAUD_FILE           "/gps_baud.dat"
+#define GPS_BAUD_PROBE_TIME_MS  1500
+const uint32_t gpsBaudRates[] = {9600, 115200, 38400, 4800, 57600};     // most common first
+
 extern Configuration    Config;
 extern HardwareSerial   gpsSerial;
 extern TinyGPSPlus      gps;
@@ -39,6 +44,76 @@ String                  distance, iGateBeaconPacket, iGateLoRaBeaconPacket;
 
 
 namespace GPS_Utils {
+
+#ifdef HAS_GPS
+    bool isKnownBaudRate(uint32_t baud) {
+        if (baud == GPS_BAUD) return true;
+        for (uint32_t knownBaud : gpsBaudRates) {
+            if (knownBaud == baud) return true;
+        }
+        return false;
+    }
+
+    uint32_t readSavedBaudRate() {
+        File file = SPIFFS.open(GPS_BAUD_FILE, "r");
+        if (!file) return 0;
+        uint32_t baud = file.readString().toInt();
+        file.close();
+        return isKnownBaudRate(baud) ? baud : 0;
+    }
+
+    void saveBaudRate(uint32_t baud) {
+        File file = SPIFFS.open(GPS_BAUD_FILE, "w");
+        if (!file) {
+            Utils::println("GPS: could not save baud rate");
+            return;
+        }
+        file.print(baud);
+        file.close();
+    }
+
+    bool probeBaudRate(uint32_t baud) {
+        gpsSerial.end();
+        delay(50);
+        gpsSerial.begin(baud, SERIAL_8N1, GPS_TX, GPS_RX);
+        uint32_t validSentences = gps.passedChecksum();
+        uint32_t probeStart     = millis();
+        while (millis() - probeStart < GPS_BAUD_PROBE_TIME_MS) {
+            while (gpsSerial.available() > 0) gps.encode(gpsSerial.read());
+            if (gps.passedChecksum() > validSentences) return true;   // NMEA with valid checksum
+            delay(10);
+        }
+        return false;
+    }
+
+    uint32_t detectBaudRate() {
+        uint32_t savedBaud = readSavedBaudRate();
+
+        uint32_t candidates[2 + sizeof(gpsBaudRates) / sizeof(gpsBaudRates[0])];
+        size_t   count = 0;
+        auto addCandidate = [&](uint32_t baud) {
+            if (baud == 0) return;
+            for (size_t i = 0; i < count; i++) {
+                if (candidates[i] == baud) return;
+            }
+            candidates[count++] = baud;
+        };
+        addCandidate(savedBaud);                                // saved first, then board default, then common ones
+        addCandidate(GPS_BAUD);
+        for (uint32_t baud : gpsBaudRates) addCandidate(baud);
+
+        for (size_t i = 0; i < count; i++) {
+            if (i == 1) displayShow("GPS", "Searching", "baud rate...", "", 0);
+            bool found = probeBaudRate(candidates[i]);
+            if (!found && i == 0) found = probeBaudRate(candidates[i]);    // retry first one: GPS may be slow to start
+            if (found) {
+                if (candidates[i] != savedBaud) saveBaudRate(candidates[i]);
+                return candidates[i];
+            }
+        }
+        return 0;
+    }
+#endif
 
     String getiGateLoRaBeaconPacket() {
         return iGateLoRaBeaconPacket;
@@ -104,7 +179,15 @@ namespace GPS_Utils {
     void setup() {
         #ifdef HAS_GPS
             if (Config.beacon.gpsActive && Config.digi.ecoMode != 1) {
-                gpsSerial.begin(GPS_BAUD, SERIAL_8N1, GPS_TX, GPS_RX);
+                uint32_t detectedBaud = detectBaudRate();
+                if (detectedBaud != 0) {
+                    Utils::println("GPS: baud rate detected: " + String(detectedBaud));
+                } else {
+                    Utils::println("GPS: no NMEA data found, using default baud rate: " + String(GPS_BAUD));
+                    gpsSerial.end();
+                    delay(50);
+                    gpsSerial.begin(GPS_BAUD, SERIAL_8N1, GPS_TX, GPS_RX);
+                }
             }
         #endif
         generateBeacons();

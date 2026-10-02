@@ -160,6 +160,7 @@ namespace WEB_Utils {
         JsonDocument data;
 
         for (int i = 0; i < receivedPackets.size(); i++) {
+            data[i]["rxDate"]   = receivedPackets[i].rxDate;
             data[i]["rxTime"]   = receivedPackets[i].rxTime;
             data[i]["packet"]   = receivedPackets[i].packet;
             data[i]["RSSI"]     = receivedPackets[i].RSSI;
