@@ -245,15 +245,17 @@ String receivePacketFromSleep() { return receivePacket(); }
 void changeFreqTx() { radio.standby(); radio.setFrequency(txFreqMHz); }
 void changeFreqRx() { radio.standby(); radio.setFrequency(rxFreqMHz); radio.startReceive(); }
 
-// --- CAD / DIFS / BEB (port of the V4.0.0 channel access in src/lora_utils.cpp) --
+// --- CAD / DIFS / BEB (port of the channel access in src/lora_utils.cpp) --------
 // Listen before transmitting: DIFS = N consecutive free CAD slots, then a binary
 // exponential backoff of free slots. Enabled per config (LoRa -> "Channel Activity
-// Detection"). Unlike upstream this wait is BOUNDED: loraTask also services RX and
-// the TX buffer, so it must never block forever on a permanently busy channel.
+// Detection"). Bounded like upstream (V4.0.2): after CAD_MAX_WAIT_MS of busy
+// channel the packet is dropped, so loraTask (which also services RX and the TX
+// buffer) never blocks forever on a permanently busy channel.
 #define DIFS_SLOTS      2
-#define CAD_MAX_WAIT_MS 3000
+#define CAD_MAX_WAIT_MS 10000
 
 static const int CAD_BACKOFF_MAX = 4;
+static uint32_t  cadStartTime    = 0;
 
 static bool doCAD() { return radio.scanChannel() != RADIOLIB_CHANNEL_FREE; }   // true = busy
 
@@ -264,25 +266,20 @@ static bool doDIFS() {
     return true;
 }
 
-// Returns false when the deadline expired with the channel still busy (caller
-// transmits anyway rather than dropping the packet).
-static bool waitForDIFS(uint32_t deadline) {
+static bool cadTimedOut() { return millis() - cadStartTime > CAD_MAX_WAIT_MS; }
+
+static void waitForDIFS() {
     while (!doDIFS()) {
-        if ((int32_t)(millis() - deadline) >= 0) {
-            Serial.println("[lora] CAD: channel busy, transmitting anyway");
-            return false;
-        }
+        if (cadTimedOut()) return;
     }
-    return true;
 }
 
-static void channelAccess() {
-    uint32_t deadline = millis() + CAD_MAX_WAIT_MS;
-    if (!waitForDIFS(deadline)) return;
+static void doBEB() {
     int backoff = random(1, CAD_BACKOFF_MAX + 1);
     while (backoff > 0) {
+        if (cadTimedOut()) return;
         if (doCAD()) {
-            if (!waitForDIFS(deadline)) return;
+            waitForDIFS();      // busy channel: freeze backoff and restart DIFS
         } else {
             backoff--;
         }
@@ -292,7 +289,17 @@ static void channelAccess() {
 void sendNewPacket(const String& newPacket) {
     if (!Config.loramodule.txActive) return;   // RF TX disabled (RX-only iGate / ?TX=OFF)
     changeFreqTx();
-    if (Config.loramodule.cadActive) channelAccess();   // listen before transmit
+    if (Config.loramodule.cadActive) {         // listen before transmit
+        cadStartTime = millis();
+        waitForDIFS();
+        doBEB();
+        if (cadTimedOut()) {
+            Serial.println("[lora] CAD timeout, packet dropped: " + newPacket);
+            changeFreqRx();
+            rxFlag = false;                    // DIO1 also fires on CAD done: don't read that back as RX
+            return;
+        }
+    }
 #if RADIO_TXEN < 0
     digitalWrite(RADIO_RXEN, LOW);             // bridged: RX path off; DIO2 drives TXEN during transmit
 #endif
