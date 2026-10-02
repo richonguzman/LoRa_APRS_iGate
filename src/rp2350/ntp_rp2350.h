@@ -10,4 +10,5 @@ namespace Ntp {
     bool     synced();               // true once a reply has been received
     uint32_t nowEpoch();             // current LOCAL unix epoch, 0 if not synced
     String   hms(uint32_t epoch);    // "HH:MM:SS" from a local epoch
+    String   ymd(uint32_t epoch);    // "YYYY-MM-DD" from a local epoch
 }

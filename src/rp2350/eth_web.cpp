@@ -360,8 +360,12 @@ static void handleClient(EthernetClient &c) {
             String ago = age < 60 ? String(age) + "s" : String(age / 60) + "m";
             // real wall-clock = NTP-now minus this packet's age (works even for
             // packets received before the NTP sync); fall back to "ago" if no NTP
-            String rxTime = Ntp::synced() ? Ntp::hms(Ntp::nowEpoch() - age) : ago;
-            body += "{\"rxTime\":\""; body += rxTime;
+            // (and no date, like upstream's empty getFormatedDate())
+            uint32_t rxEpoch = Ntp::nowEpoch() - age;
+            String rxDate = Ntp::synced() ? Ntp::ymd(rxEpoch) : "";
+            String rxTime = Ntp::synced() ? Ntp::hms(rxEpoch) : ago;
+            body += "{\"rxDate\":\""; body += rxDate;
+            body += "\",\"rxTime\":\""; body += rxTime;
             body += "\",\"packet\":\""; body += jsonEscape(p.frame);
             body += "\",\"RSSI\":";     body += String(p.rssi);
             body += ",\"SNR\":";        body += String(p.snr, 1);

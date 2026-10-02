@@ -77,4 +77,20 @@ String hms(uint32_t epoch) {
     return String(b);
 }
 
+String ymd(uint32_t epoch) {
+    // days since 1970-01-01 -> civil date (Howard Hinnant's civil_from_days)
+    int32_t  z   = (int32_t)(epoch / 86400UL) + 719468;
+    int32_t  era = z / 146097;
+    uint32_t doe = (uint32_t)(z - era * 146097);
+    uint32_t yoe = (doe - doe / 1460 + doe / 36524 - doe / 146096) / 365;
+    uint32_t doy = doe - (365 * yoe + yoe / 4 - yoe / 100);
+    uint32_t mp  = (5 * doy + 2) / 153;
+    uint32_t d   = doy - (153 * mp + 2) / 5 + 1;
+    uint32_t m   = mp < 10 ? mp + 3 : mp - 9;
+    int32_t  y   = (int32_t)yoe + era * 400 + (m <= 2 ? 1 : 0);
+    char b[11];
+    snprintf(b, sizeof(b), "%04d-%02u-%02u", (int)y, (unsigned)m, (unsigned)d);
+    return String(b);
+}
+
 }  // namespace Ntp
