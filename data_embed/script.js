@@ -653,6 +653,15 @@ let mapTileErrShown = false;
 let iGateLatLng    = null;
 let mapAutoFitDone = false;
 
+function escapeHtml(value) {    // shows received data as text inside HTML strings (map popups / icons)
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+}
+
 function setMapMessage(text) {
     const el = document.getElementById("map");
     if (el) {
@@ -831,7 +840,7 @@ function getAprsSymbolIcon(symbol, callsign = "") {
                         -1px  1px 0 #fff,
                          1px  1px 0 #fff;
                     pointer-events:none;
-                ">${callsign}</span>
+                ">${escapeHtml(callsign)}</span>
             </div>
         `,
         iconSize: [24, 24],
@@ -933,12 +942,12 @@ function loadMapStations(stations) {
     (stations || []).forEach((s) => {
         if (s.lat === 0 && s.lon === 0) return;     // descartar estaciones sin fix
 
-        const popup = `<b>${s.callsign}</b>`
-            + (s.lastHeard ? `<br>Last: ${s.lastHeard}` : "")
+        const popup = `<b>${escapeHtml(s.callsign)}</b>`
+            + (s.lastHeard ? `<br>Last: ${escapeHtml(s.lastHeard)}` : "")
             + `<br>RSSI ${s.RSSI} / SNR ${s.SNR}`
             + `<br>Packets: ${s.count}`
-            + `<br><b>${describeMapPath(s)}</b>`
-            + (s.path ? `<br><small>Path: ${s.path}</small>` : "");
+            + `<br><b>${escapeHtml(describeMapPath(s))}</b>`
+            + (s.path ? `<br><small>Path: ${escapeHtml(s.path)}</small>` : "");
 
         const aprsIcon =
             getAprsSymbolIcon(s.symbol, s.callsign);
