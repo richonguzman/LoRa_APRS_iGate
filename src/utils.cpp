@@ -48,7 +48,7 @@ extern String               fourthLine;
 extern String               fifthLine;
 extern String               sixthLine;
 extern String               seventhLine;
-extern String               iGateBeaconPacket;
+extern String               iGateAPRSISBeaconPacket;
 extern String               iGateLoRaBeaconPacket;
 extern int                  rssi;
 extern float                snr;
@@ -188,7 +188,7 @@ namespace Utils {
 
             showActiveStations();
 
-            beaconPacket            = iGateBeaconPacket;
+            beaconPacket            = iGateAPRSISBeaconPacket;
             secondaryBeaconPacket   = iGateLoRaBeaconPacket;
             #ifdef HAS_GPS
                 if (Config.beacon.gpsActive && Config.digi.ecoMode == 0) {
@@ -198,7 +198,7 @@ namespace Utils {
                         String encodedGPS   = APRSPacketLib::encodeGPSIntoBase91(gps.location.lat(),gps.location.lng(), 0, 0, Config.beacon.symbol, false, 0, true, Config.beacon.ambiguityLevel);
 
                         beaconPacket    = basePacket;
-                        beaconPacket    += ",qAC:!";
+                        beaconPacket    += ",qAC:=";
                         beaconPacket    += Config.beacon.overlay;
                         beaconPacket    += encodedGPS;
 

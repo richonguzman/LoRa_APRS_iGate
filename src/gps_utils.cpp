@@ -40,7 +40,7 @@ extern Configuration    Config;
 extern HardwareSerial   gpsSerial;
 extern TinyGPSPlus      gps;
 extern bool             stationCallsignIsValid;
-String                  distance, iGateBeaconPacket, iGateLoRaBeaconPacket;
+String                  distance, iGateAPRSISBeaconPacket, iGateLoRaBeaconPacket;
 
 
 namespace GPS_Utils {
@@ -143,10 +143,10 @@ namespace GPS_Utils {
             Config.beacon.sendViaRF     = false;
         }
 
-        iGateBeaconPacket       = beaconPacket;
-        iGateBeaconPacket       += ",qAC:=";
-        iGateBeaconPacket       += Config.beacon.overlay;
-        iGateBeaconPacket       += encodedGPS;
+        iGateAPRSISBeaconPacket = beaconPacket;
+        iGateAPRSISBeaconPacket += ",qAC:=";
+        iGateAPRSISBeaconPacket += Config.beacon.overlay;
+        iGateAPRSISBeaconPacket += encodedGPS;
 
         iGateLoRaBeaconPacket   = beaconPacket;
         iGateLoRaBeaconPacket   += ":=";

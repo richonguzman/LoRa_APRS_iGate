@@ -31,7 +31,6 @@
 extern Configuration    Config;
 extern uint32_t         lastScreenOn;
 extern APRSPacket       lastAprsPacket;
-extern String           iGateBeaconPacket;
 extern String           firstLine;
 extern String           secondLine;
 extern String           thirdLine;
