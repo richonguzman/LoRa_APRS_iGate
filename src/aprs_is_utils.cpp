@@ -275,7 +275,7 @@ namespace APRS_IS_Utils {
 
     void processAckMessage(const String& sender, const String& message) {
         String ackPacket = Config.callsign;
-        ackPacket += ">APLRG1,TCPIP,qAC::";
+        ackPacket += ">APLRG1,TCPIP*::";
 
         String senderCallsign = sender;
         for (int i = sender.length(); i < 9; i++) {

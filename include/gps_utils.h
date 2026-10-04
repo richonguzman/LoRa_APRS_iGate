@@ -24,7 +24,6 @@
 
 namespace GPS_Utils {
 
-    String  getiGateLoRaBeaconPacket();
     void    generateBeacons();
     String  buildDistanceAndComment(float latitude, float longitude, const String& comment);
 

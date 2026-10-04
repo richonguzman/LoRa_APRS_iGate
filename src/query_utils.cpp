@@ -142,7 +142,7 @@ namespace QUERY_Utils {
         String queryAnswer = (Config.tacticalCallsign == "" ? Config.callsign : Config.tacticalCallsign);
         queryAnswer += ">APLRG1";
         if (queryFromAPRSIS) {
-            queryAnswer += ",TCPIP,qAC";
+            queryAnswer += ",TCPIP*";
         } else {
             if (!thirdParty) queryAnswer += ",RFONLY";
             if (Config.beacon.path != "") {
