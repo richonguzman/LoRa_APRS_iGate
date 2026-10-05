@@ -62,6 +62,12 @@ body{background:var(--msh-bg);color:var(--msh-text);font-family:"Inter",system-u
 #received-packets .table{--bs-table-color:var(--msh-text);--bs-table-border-color:var(--msh-border);color:var(--msh-text);}
 #received-packets th{white-space:nowrap;}
 #received-packets td:nth-child(1),#received-packets td:nth-child(2),#received-packets td:nth-child(4),#received-packets td:nth-child(5){white-space:nowrap;}
+#received-packets th:nth-child(1){width:calc(10ch + 1rem);min-width:calc(10ch + 1rem);}
+#received-packets th:nth-child(2){width:calc(8ch + 1rem);min-width:calc(8ch + 1rem);}
+#received-packets th:nth-child(4){width:calc(4ch + 1rem);min-width:calc(4ch + 1rem);}
+#received-packets th:nth-child(5){width:calc(6ch + 1rem);min-width:calc(6ch + 1rem);}
+#received-packets td:nth-child(1),#received-packets td:nth-child(2),#received-packets td:nth-child(4),#received-packets td:nth-child(5){font-variant-numeric:tabular-nums;}
+#received-packets td:nth-child(3){overflow-wrap:anywhere;}
 @media(max-width:768px){.app-sidebar{width:60px;padding:12px 6px;}.side-link .label,.nav-group-label{display:none;}.app-main{padding:14px;}}
 </style>
 </head>
@@ -200,7 +206,7 @@ body{background:var(--msh-bg);color:var(--msh-text);font-family:"Inter",system-u
                                 <tr>
                                     <th scope="col">Date</th>
                                     <th scope="col">Time</th>
-                                    <th scope="col">Frame</th>
+                                    <th scope="col">Packet</th>
                                     <th scope="col">RSSI</th>
                                     <th scope="col">SNR</th>
                                 </tr>
@@ -383,7 +389,7 @@ body{background:var(--msh-bg);color:var(--msh-text);font-family:"Inter",system-u
                                             oninput="this.value = this.value.toUpperCase();"
                                         />
                                     </div>
-                                    <div class="col-12 mt-3">
+                                    <div class="col-12 col-md-9 mt-3">
                                         <label
                                             for="beacon.comment"
                                             class="form-label"
@@ -396,6 +402,30 @@ body{background:var(--msh-bg);color:var(--msh-text);font-family:"Inter",system-u
                                             class="form-control"
                                             placeholder=""
                                         />
+                                    </div>
+                                    <div class="col-12 col-md-3 mt-3">
+                                        <label
+                                            for="beacon.rfCommentEveryXBeacons"
+                                            class="form-label"
+                                            >RF Comment every</label
+                                        >
+                                        <div class="input-group">
+                                            <input
+                                                type="number"
+                                                name="beacon.rfCommentEveryXBeacons"
+                                                id="beacon.rfCommentEveryXBeacons"
+                                                class="form-control"
+                                                value="1"
+                                                min="1"
+                                                max="100"
+                                                step="1"
+                                                required
+                                            />
+                                            <span class="input-group-text"
+                                                >beacons
+                                            </span>
+                                        </div>
+                                        <small>(1 = every beacon, RF only)</small>
                                     </div>
                                     <div class="col-12 mt-3">
                                         <label

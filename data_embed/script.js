@@ -56,6 +56,7 @@ function loadSettings(settings) {
     document.getElementById("callsign").value                           = settings.callsign;
     document.getElementById("tacticalCallsign").value                   = settings.tacticalCallsign;
     document.getElementById("beacon.comment").value                     = settings.beacon.comment;
+    document.getElementById("beacon.rfCommentEveryXBeacons").value      = settings.beacon.rfCommentEveryXBeacons;
     document.getElementById("beacon.path").value                        = settings.beacon.path;
     document.getElementById("beacon.symbol").value                      = settings.beacon.symbol;
     document.getElementById("beacon.overlay").value                     = settings.beacon.overlay;
@@ -607,13 +608,11 @@ function loadReceivedPackets(packets) {
         packets.forEach((packet) => {
             const element = document.createElement("tr");
 
-            element.innerHTML = `
-                        <td>${packet.rxDate}</td>
-                        <td>${packet.rxTime}</td>
-                        <td>${packet.packet}</td>
-                        <td>${packet.RSSI}</td>
-                        <td>${packet.SNR}</td>
-                    `;
+            ['rxDate', 'rxTime', 'packet', 'RSSI', 'SNR'].forEach((field) => {
+                const cell = document.createElement("td");
+                cell.textContent = String(packet[field]);
+                element.appendChild(cell);
+            });
 
             container.appendChild(element);
         })
@@ -655,6 +654,15 @@ let mapTimer       = null;
 let mapTileErrShown = false;
 let iGateLatLng    = null;
 let mapAutoFitDone = false;
+
+function escapeHtml(value) {    // shows received data as text inside HTML strings (map popups / icons)
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+}
 
 function setMapMessage(text) {
     const el = document.getElementById("map");
@@ -834,7 +842,7 @@ function getAprsSymbolIcon(symbol, callsign = "") {
                         -1px  1px 0 #fff,
                          1px  1px 0 #fff;
                     pointer-events:none;
-                ">${callsign}</span>
+                ">${escapeHtml(callsign)}</span>
             </div>
         `,
         iconSize: [24, 24],
@@ -936,12 +944,12 @@ function loadMapStations(stations) {
     (stations || []).forEach((s) => {
         if (s.lat === 0 && s.lon === 0) return;     // descartar estaciones sin fix
 
-        const popup = `<b>${s.callsign}</b>`
-            + (s.lastHeard ? `<br>Last: ${s.lastHeard}` : "")
+        const popup = `<b>${escapeHtml(s.callsign)}</b>`
+            + (s.lastHeard ? `<br>Last: ${escapeHtml(s.lastHeard)}` : "")
             + `<br>RSSI ${s.RSSI} / SNR ${s.SNR}`
             + `<br>Packets: ${s.count}`
-            + `<br><b>${describeMapPath(s)}</b>`
-            + (s.path ? `<br><small>Path: ${s.path}</small>` : "");
+            + `<br><b>${escapeHtml(describeMapPath(s))}</b>`
+            + (s.path ? `<br><small>Path: ${escapeHtml(s.path)}</small>` : "");
 
         const aprsIcon =
             getAprsSymbolIcon(s.symbol, s.callsign);

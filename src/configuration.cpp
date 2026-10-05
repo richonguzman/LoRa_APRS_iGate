@@ -75,6 +75,7 @@ bool Configuration::writeFile() {
         data["aprs_is"]["objectsToRF"]              = aprs_is.objectsToRF;
 
         data["beacon"]["comment"]                   = beacon.comment;
+        data["beacon"]["rfCommentEveryXBeacons"]    = beacon.rfCommentEveryXBeacons;
         data["beacon"]["interval"]                  = beacon.interval;
         data["beacon"]["latitude"]                  = beacon.latitude;
         data["beacon"]["longitude"]                 = beacon.longitude;
@@ -269,6 +270,7 @@ bool Configuration::readFile() {
         if (data["beacon"]["latitude"].isNull() ||
             data["beacon"]["longitude"].isNull() ||
             data["beacon"]["comment"].isNull() ||
+            data["beacon"]["rfCommentEveryXBeacons"].isNull() ||
             data["beacon"]["interval"].isNull() ||
             data["beacon"]["overlay"].isNull() ||
             data["beacon"]["symbol"].isNull() ||
@@ -283,6 +285,7 @@ bool Configuration::readFile() {
         beacon.latitude                 = data["beacon"]["latitude"] | 0.0;
         beacon.longitude                = data["beacon"]["longitude"] | 0.0;
         beacon.comment                  = data["beacon"]["comment"] | "LoRa APRS";
+        beacon.rfCommentEveryXBeacons   = data["beacon"]["rfCommentEveryXBeacons"] | 1;
         beacon.interval                 = data["beacon"]["interval"] | 15;
         beacon.overlay                  = data["beacon"]["overlay"] | "L";
         beacon.symbol                   = data["beacon"]["symbol"] | "a";
@@ -501,6 +504,7 @@ void Configuration::setDefaultValues() {
     aprs_is.objectsToRF             = false;
 
     beacon.comment                  = "LoRa APRS";
+    beacon.rfCommentEveryXBeacons   = 1;
     beacon.latitude                 = 0.0;
     beacon.longitude                = 0.0;
     beacon.interval                 = 15;
