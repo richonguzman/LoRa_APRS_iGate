@@ -71,8 +71,11 @@ void poll() {
             pending    = false;
             udp.stop();
             Serial.println("[ntp] synced " + hms(baseEpoch) + " (" + Config.ntp.server + ")");
-        } else if (now - sentAt > 3000) {
-            pending = false;                        // timeout — retry next interval
+        } else if (millis() - sentAt > 3000) {
+            // timeout — retry next interval. Not `now - sentAt`: sentAt is stamped after
+            // `now`, past the DNS lookup, so that difference wrapped and every request
+            // timed out in the same poll it was sent, before the reply could arrive.
+            pending = false;
             udp.stop();
         }
     }
