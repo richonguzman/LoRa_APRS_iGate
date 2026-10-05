@@ -55,6 +55,10 @@ String buildAprsisLine() {
     return line;
 }
 
+// RF beacons built so far. buildRfLine() is called once per RF beacon queued
+// (loraTask), so counting here matches upstream's rfBeaconCounter in utils.cpp.
+static uint32_t rfBeaconCounter = 0;
+
 String buildRfLine() {
     // Built from loraTask — must NOT touch the BMP280 (Wire/I2C0 is owned by
     // netTask via buildAprsisLine), so no WX field here. Position + comment only.
@@ -62,7 +66,10 @@ String buildRfLine() {
     line += ":=";
     line += Config.beacon.overlay;
     line += encodedPosition();
-    line += Config.beacon.comment;
+    // RF carries the comment only every Nth beacon (APRS-IS always does).
+    int commentEveryX = max(1, Config.beacon.rfCommentEveryXBeacons);   // 0 or negative = every beacon
+    if (rfBeaconCounter % commentEveryX == 0) line += Config.beacon.comment;
+    rfBeaconCounter++;
     line += battField();
     return line;
 }

@@ -124,6 +124,7 @@ bool applyConfigForm(const String &contentType, const String &body) {
         Config.beacon.latitude              = getParamDoubleSafe("beacon.latitude", Config.beacon.latitude);
         Config.beacon.longitude             = getParamDoubleSafe("beacon.longitude", Config.beacon.longitude);
         Config.beacon.comment               = getParamStringSafe("beacon.comment", Config.beacon.comment);
+        Config.beacon.rfCommentEveryXBeacons = getParamIntSafe("beacon.rfCommentEveryXBeacons", Config.beacon.rfCommentEveryXBeacons);
         Config.beacon.overlay               = getParamStringSafe("beacon.overlay", Config.beacon.overlay);
         Config.beacon.symbol                = getParamStringSafe("beacon.symbol", Config.beacon.symbol);
         Config.beacon.path                  = getParamStringSafe("beacon.path", Config.beacon.path);
