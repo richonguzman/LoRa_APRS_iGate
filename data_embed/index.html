@@ -69,6 +69,9 @@ body{background:var(--msh-bg);color:var(--msh-text);font-family:"Inter",system-u
 #received-packets td:nth-child(1),#received-packets td:nth-child(2),#received-packets td:nth-child(4),#received-packets td:nth-child(5){font-variant-numeric:tabular-nums;}
 #received-packets td:nth-child(3){overflow-wrap:anywhere;}
 @media(max-width:768px){.app-sidebar{width:60px;padding:12px 6px;}.side-link .label,.nav-group-label{display:none;}.app-main{padding:14px;}}
+/* phones: the fixed Date/Time/RSSI/SNR widths left Packet ~90 px wide (and made the page scroll sideways):
+   each packet becomes two lines, date/time/RSSI/SNR on top and the packet across the full width below */
+@media(max-width:768px){#received-packets table,#received-packets tbody{display:block;}#received-packets thead{display:none;}#received-packets tr{display:flex;flex-wrap:wrap;column-gap:.6rem;row-gap:.15rem;padding:.6rem 0;border-bottom:var(--bs-border-width) solid var(--msh-border);}#received-packets td{border:0;padding:0;font-size:.8rem;color:var(--msh-text-dim);}#received-packets td:nth-child(3){flex-basis:100%;order:1;font-size:.95rem;color:var(--msh-text);}#received-packets td:nth-child(4)::after{content:" dBm";}#received-packets td:nth-child(5)::after{content:" dB";}}
 </style>
 </head>
     <body>
