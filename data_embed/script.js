@@ -36,11 +36,19 @@ document.querySelector("input[type=file]").onchange = function () {
     };
 };
 
-function fetchSettings() {
+function fetchSettings(retries = 2) {
     fetch("/configuration.json")
         .then((response) => response.json())
         .then((settings) => {
             loadSettings(settings);
+        }, (err) => {
+            // fetch or JSON failed: a board short of sockets (RP2350 + W5100S) refuses
+            // connections while it serves another one, so try again before giving up
+            if (retries > 0) {
+                setTimeout(() => fetchSettings(retries - 1), 1000);
+                return;
+            }
+            throw err;
         })
         .catch((err) => {
             console.error(err);

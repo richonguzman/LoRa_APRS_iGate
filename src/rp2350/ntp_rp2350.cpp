@@ -2,16 +2,20 @@
  * RP2350 SNTP client over EthernetUDP (W5500). Non-blocking request/reply; keeps
  * a (baseEpoch, baseMillis) pair so nowEpoch() interpolates with millis() between
  * syncs. Local time = UTC + Config.ntp.gmtCorrection hours. netTask only.
+ *
+ * The UDP socket is only held from the request to the reply (or its timeout):
+ * the W5100S has 4 sockets, and one kept open here for good left the web server
+ * a single one, so a browser loading the page got connections refused.
  */
 #include "ntp_rp2350.h"
 #include <Ethernet.h>
 #include <EthernetUdp.h>
+#include <Dns.h>
 #include "configuration.h"
 
 extern Configuration Config;
 
 static EthernetUDP udp;
-static bool     started     = false;
 static bool     isSynced    = false;
 static uint32_t baseEpoch   = 0;     // local unix epoch at last sync
 static uint32_t baseMillis  = 0;     // millis() at last sync
@@ -22,27 +26,37 @@ static uint32_t sentAt      = 0;
 static const uint16_t LOCAL_PORT     = 2390;
 static const uint32_t SYNC_INTERVAL  = 15UL * 60UL * 1000UL;  // resync every 15 min
 static const uint32_t RETRY_INTERVAL = 5UL * 1000UL;          // retry quickly while unsynced (DNS may not be ready at boot)
+static const uint32_t RESYNC_RETRY   = 60UL * 1000UL;         // a failed resync is retried this often, not on every poll
 static const uint32_t NTP_UNIX_DELTA = 2208988800UL;          // seconds 1900 -> 1970
 
 namespace Ntp {
 
 static void sendRequest() {
+    // Resolve BEFORE taking our socket: the DNS lookup needs a socket of its own.
+    IPAddress server;
+    if (!server.fromString(Config.ntp.server)) {
+        DNSClient dns;
+        dns.begin(Ethernet.dnsServerIP());
+        if (dns.getHostByName(Config.ntp.server.c_str(), server) != 1) return;
+    }
+    if (udp.begin(LOCAL_PORT) != 1) return;         // no free socket now: try again later
     byte pkt[48] = {0};
     pkt[0] = 0x1B;                                  // LI=0, VN=3, Mode=3 (client)
-    if (udp.beginPacket(Config.ntp.server.c_str(), 123) == 1) {
+    if (udp.beginPacket(server, 123) == 1) {
         udp.write(pkt, 48);
         udp.endPacket();
         pending = true;
         sentAt  = millis();
+    } else {
+        udp.stop();
     }
 }
 
 void poll() {
-    if (!started) { udp.begin(LOCAL_PORT); started = true; }
     uint32_t now = millis();
 
     bool due = !isSynced ? (lastAttempt == 0 || now - lastAttempt > RETRY_INTERVAL)
-                         : (now - baseMillis > SYNC_INTERVAL);
+                         : (now - baseMillis > SYNC_INTERVAL && now - lastAttempt > RESYNC_RETRY);
     if (!pending && due) { lastAttempt = now; sendRequest(); }
 
     if (pending) {
@@ -55,9 +69,11 @@ void poll() {
             baseMillis = millis();
             isSynced   = true;
             pending    = false;
+            udp.stop();
             Serial.println("[ntp] synced " + hms(baseEpoch) + " (" + Config.ntp.server + ")");
         } else if (now - sentAt > 3000) {
             pending = false;                        // timeout — retry next interval
+            udp.stop();
         }
     }
 }

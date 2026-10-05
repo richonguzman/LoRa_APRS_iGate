@@ -197,7 +197,9 @@ static void cors(EthernetClient &c) {
 // but EthernetClient::write() returns the size it was ASKED for, not what it sent,
 // so a single print() of a longer body silently loses the tail: a /stations.json of
 // 2616 bytes reached the browser cut at 2048, mid-JSON, and the map stayed empty.
-// Always hand the socket chunks that fit, and give up if the peer goes away.
+// Always hand the socket chunks that fit, and give up if the peer goes away or
+// stops reading for 5 s (an idle timeout, not a total one: the page is one ~185 KB
+// response now, see tools/gen_web_assets_rp2350.py, and a slow client may need longer).
 static void sendBody(EthernetClient &c, const uint8_t *data, size_t len) {
     size_t   sent     = 0;
     uint32_t deadline = millis() + 5000;
@@ -207,6 +209,7 @@ static void sendBody(EthernetClient &c, const uint8_t *data, size_t len) {
         size_t w = c.write(data + sent, chunk);
         if (w == 0) { delay(1); continue; }        // TX buffer full: let it drain
         sent += w;
+        deadline = millis() + 5000;
     }
     if (sent < len) Serial.printf("[web] short send: %u of %u bytes\n", (unsigned)sent, (unsigned)len);
 }
