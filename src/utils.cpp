@@ -83,7 +83,8 @@ namespace Utils {
             return;
         }
 
-        String statusPacket = APRSPacketLib::generateStatusPacket(Config.callsign, "APLRG1", Config.beacon.path, Config.beacon.statusPacket);
+        String statusCallsign   = (Config.tacticalCallsign == "") ? Config.callsign : Config.tacticalCallsign;
+        String statusPacket     = APRSPacketLib::generateStatusPacket(statusCallsign, "APLRG1", Config.beacon.path, Config.beacon.statusPacket);
 
         if (sendOverAPRSIS) {
             String aprsisStatusPacket = APRSPacketLib::generateAPRSISPacket(statusPacket);
@@ -322,6 +323,12 @@ namespace Utils {
         }
     }
 
+    String padForDisplay(const String& text) {      // left-aligned, 9 chars wide (callsign column on screen)
+        char buffer[10];
+        snprintf(buffer, sizeof(buffer), "%-9s", text.c_str());
+        return String(buffer);
+    }
+
     void updateLoRaPacketDisplayInfo(APRSPacket& aprsPacket, const uint8_t packetType) {
         switch (packetType) {
             case 0: // LoRa-APRS
@@ -332,11 +339,7 @@ namespace Utils {
                 break;
         }
 
-        String sender = aprsPacket.sender;
-        for (int i = sender.length(); i < 9; i++) {
-            sender += " ";
-        }
-        sixthLine = sender;
+        sixthLine = padForDisplay(aprsPacket.sender);
 
         switch (aprsPacket.type) {
             case 1:     // MESSAGE
@@ -382,11 +385,7 @@ namespace Utils {
     void updateAPRSISPacketDisplayInfo(const String& packet) {
         fifthLine = "APRS-IS ----> LoRa Tx";
 
-        String sender = packet.substring(0,packet.indexOf(">"));
-        for (int i = sender.length(); i < 9; i++) {
-            sender += " ";
-        }
-        sixthLine = sender;
+        sixthLine = padForDisplay(packet.substring(0,packet.indexOf(">")));
 
         if (packet.indexOf("::") > 0) {
             sixthLine += "> MESSAGE";

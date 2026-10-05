@@ -197,6 +197,7 @@
         }
 
         void uploadToAPRSIS(const String& packet) {
+            if (packet == "") return;               // never send an empty line to APRS-IS
             beaconBytesSent = checkATResponse("AT+CIPSEND=0," + String(packet.length()+1));
             delay(2000);
             if (beaconBytesSent) {
