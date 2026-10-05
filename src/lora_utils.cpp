@@ -142,7 +142,7 @@ namespace LoRa_Utils {
         #endif
         #if defined(HAS_SX1278) || defined(HAS_SX1276)
             state = radio.setOutputPower(Config.loramodule.power); // max value 20dB for 400M30S as it has Low Noise Amp
-            radio.setCurrentLimit(100); // to be validated (80 , 100)?
+            radio.setCurrentLimit(120); // OCP ceiling for SX127x: ~120mA needed at +20dBm (not a fixed consumption)
         #endif
         #if (defined(HAS_SX1268) || defined(HAS_SX1262)) && !defined(HAS_1W_LORA)
             state = radio.setOutputPower(Config.loramodule.power + 2); // values available: 10, 17, 22 --> if 20 in tracker_conf.json it will be updated to 22.
