@@ -19,6 +19,7 @@
 #include <ArduinoJson.h>
 #include "network_manager.h"
 #include "configuration.h"
+#include "lora_utils.h"
 #include "ota_utils.h"
 #include "web_utils.h"
 #include "map_utils.h"
@@ -277,7 +278,7 @@ namespace WEB_Utils {
         Config.loramodule.txSpreadingFactor = getParamIntSafe("lora.txSpreadingFactor", Config.loramodule.txSpreadingFactor);
         Config.loramodule.txCodingRate4     = getParamIntSafe("lora.txCodingRate4", Config.loramodule.txCodingRate4);
         Config.loramodule.txSignalBandwidth = getParamIntSafe("lora.txSignalBandwidth", Config.loramodule.txSignalBandwidth);
-        Config.loramodule.power             = getParamIntSafe("lora.power", Config.loramodule.power);
+        Config.loramodule.power             = LoRa_Utils::validPower(getParamIntSafe("lora.power", Config.loramodule.power));  // saved as the power the radio chip really uses
         if (Config.loramodule.txActive)
             Config.loramodule.cadActive     = request->hasParam("lora.cadActive", true);
 
