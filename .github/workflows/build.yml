@@ -218,6 +218,8 @@ jobs:
         # for the web OTA. If one does not build, the release goes on without its zip
         # and this run stays green with a warning.
         runs-on: ubuntu-latest
+        permissions:
+            contents: write     # upload the zips to the release
         strategy:
             fail-fast: false
             matrix:
