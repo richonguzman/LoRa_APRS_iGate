@@ -211,3 +211,58 @@ jobs:
                   files: ${{ matrix.target.name }}.zip
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    build-rp2350:
+        # RP2350 boards (src/rp2350/, maintained by @cvaldess): one zip per board with
+        # firmware.uf2 for the first install (BOOTSEL USB drive) and ota_update.bin
+        # for the web OTA. If one does not build, the release goes on without its zip
+        # and this run stays green with a warning.
+        runs-on: ubuntu-latest
+        strategy:
+            fail-fast: false
+            matrix:
+                target:
+                    - name: pico2_w5500_e22
+                    - name: wiznet_5500_evb_pico2_e22p
+                    - name: wiznet_5100s_evb_pico2_e22p
+        steps:
+            - uses: actions/checkout@v7
+
+            - uses: actions/setup-python@v7
+              with:
+                  python-version: "3.13"
+
+            - name: Install PlatformIO Core
+              run: pip install --upgrade platformio
+
+            - name: Build target
+              id: build
+              continue-on-error: true
+              run: pio run -e ${{ matrix.target.name }}
+
+            - name: Report
+              if: steps.build.outcome == 'failure'
+              run: echo "::warning title=RP2350::${{ matrix.target.name }} did not build, so this release has no zip for it. The RP2350 boards (src/rp2350/) are maintained by @cvaldess."
+
+            - name: Move Files
+              if: steps.build.outcome == 'success'
+              run: |
+                  mkdir -p installer/firmware
+                  cp .pio/build/${{ matrix.target.name }}/firmware.bin installer/ota_update.bin
+                  cp .pio/build/${{ matrix.target.name }}/firmware.uf2 installer/firmware/
+
+            - name: Install Zip
+              if: steps.build.outcome == 'success'
+              run: sudo apt-get install zip
+
+            - name: Archive Files
+              if: steps.build.outcome == 'success'
+              run: zip -r ${{ matrix.target.name }}.zip installer/
+
+            - name: Upload Release Asset
+              if: steps.build.outcome == 'success'
+              uses: softprops/action-gh-release@v3
+              with:
+                  files: ${{ matrix.target.name }}.zip
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
