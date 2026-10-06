@@ -56,7 +56,7 @@ String dataPacket() {
     int a5 = Config.battery.sendVoltageAsTelemetry       // Vbat     EQNS 0,0.1,0   -> V (VSYS)
                  ? clamp255((long)(Battery::vsys() * 10.0f)) : 0;
 
-    char seq[4];
+    char seq[6];
     snprintf(seq, sizeof(seq), "%03u", sequence);
     sequence = (sequence + 1) % 1000;
 

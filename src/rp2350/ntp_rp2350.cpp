@@ -107,7 +107,7 @@ String ymd(uint32_t epoch) {
     uint32_t d   = doy - (153 * mp + 2) / 5 + 1;
     uint32_t m   = mp < 10 ? mp + 3 : mp - 9;
     int32_t  y   = (int32_t)yoe + era * 400 + (m <= 2 ? 1 : 0);
-    char b[11];
+    char b[32];
     snprintf(b, sizeof(b), "%04d-%02u-%02u", (int)y, (unsigned)m, (unsigned)d);
     return String(b);
 }
