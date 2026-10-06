@@ -48,7 +48,7 @@ extern String               fourthLine;
 extern String               fifthLine;
 extern String               sixthLine;
 extern String               seventhLine;
-extern String               iGateBeaconPacket;
+extern String               iGateAPRSISBeaconPacket;
 extern String               iGateLoRaBeaconPacket;
 extern int                  rssi;
 extern float                snr;
@@ -69,8 +69,6 @@ uint32_t    lastBeaconTx            = 0;
 uint32_t    lastScreenOn            = millis();
 uint32_t    lastStatusTx            = 0;
 bool        stationCallsignIsValid  = false;
-String      beaconPacket;
-String      secondaryBeaconPacket;
 uint32_t    rfBeaconCounter         = 0;
 
 
@@ -85,13 +83,13 @@ namespace Utils {
             return;
         }
 
-        String statusPacket = APRSPacketLib::generateBasePacket(Config.callsign, "APLRG1", Config.beacon.path);
-        statusPacket += sendOverAPRSIS ? ",qAC:>" : ":>";
-        statusPacket += Config.beacon.statusPacket;
+        String statusCallsign   = (Config.tacticalCallsign == "") ? Config.callsign : Config.tacticalCallsign;
+        String statusPacket     = APRSPacketLib::generateStatusPacket(statusCallsign, "APLRG1", Config.beacon.path, Config.beacon.statusPacket);
 
         if (sendOverAPRSIS) {
-            APRS_IS_Utils::upload(statusPacket);
-            SYSLOG_Utils::logAPRSISTx(statusPacket);
+            String aprsisStatusPacket = APRSPacketLib::generateAPRSISPacket(statusPacket);
+            APRS_IS_Utils::upload(aprsisStatusPacket);
+            SYSLOG_Utils::logAPRSISTx(aprsisStatusPacket);
         } else {
             STATION_Utils::addToOutputPacketBuffer(statusPacket, true); // treated also as beacon on Tx Freq
         }
@@ -188,49 +186,42 @@ namespace Utils {
 
             showActiveStations();
 
-            beaconPacket            = iGateBeaconPacket;
-            secondaryBeaconPacket   = iGateLoRaBeaconPacket;
+            String aprsisBeaconPacket   = iGateAPRSISBeaconPacket;
+            String loraBeaconPacket     = iGateLoRaBeaconPacket;
             #ifdef HAS_GPS
                 if (Config.beacon.gpsActive && Config.digi.ecoMode == 0) {
                     GPS_Utils::getData();
                     if (gps.location.isUpdated() && gps.location.lat() != 0.0 && gps.location.lng() != 0.0) {
-                        String basePacket   = APRSPacketLib::generateBasePacket(Config.callsign, "APLRG1", Config.beacon.path);
-                        String encodedGPS   = APRSPacketLib::encodeGPSIntoBase91(gps.location.lat(),gps.location.lng(), 0, 0, Config.beacon.symbol, false, 0, true, Config.beacon.ambiguityLevel);
+                        String beaconCallsign   = (stationCallsignIsValid && Config.tacticalCallsign != "") ? Config.tacticalCallsign : Config.callsign;
+                        String encodedGPS       = APRSPacketLib::encodeGPSIntoBase91(gps.location.lat(),gps.location.lng(), 0, 0, Config.beacon.symbol, false, 0, true, Config.beacon.ambiguityLevel);
 
-                        beaconPacket    = basePacket;
-                        beaconPacket    += ",qAC:!";
-                        beaconPacket    += Config.beacon.overlay;
-                        beaconPacket    += encodedGPS;
-
-                        secondaryBeaconPacket   = basePacket;
-                        secondaryBeaconPacket   += ":=";
-                        secondaryBeaconPacket   += Config.beacon.overlay;
-                        secondaryBeaconPacket   += encodedGPS;
+                        loraBeaconPacket    = APRSPacketLib::generateBase91GPSBeaconPacket(beaconCallsign, "APLRG1", Config.beacon.path, Config.beacon.overlay, encodedGPS);
+                        aprsisBeaconPacket  = APRSPacketLib::generateAPRSISPacket(loraBeaconPacket);
                     }
                 }
             #endif
 
             if (Config.wxsensor.active) {
                 String sensorData = (wxModuleType == 0) ? ".../...g...t..." : WX_Utils::readDataSensor();
-                beaconPacket            += sensorData;
-                secondaryBeaconPacket   += sensorData;
+                aprsisBeaconPacket  += sensorData;
+                loraBeaconPacket    += sensorData;
             }
-            beaconPacket            += Config.beacon.comment;                           // APRS-IS beacon always carries the comment
+            aprsisBeaconPacket      += Config.beacon.comment;                           // APRS-IS beacon always carries the comment
             int commentEveryX       = max(1, Config.beacon.rfCommentEveryXBeacons);   // safety: 0 or negative behaves as "every beacon"
-            if (rfBeaconCounter % commentEveryX == 0) secondaryBeaconPacket += Config.beacon.comment;
+            if (rfBeaconCounter % commentEveryX == 0) loraBeaconPacket += Config.beacon.comment;
             if (stationCallsignIsValid && Config.tacticalCallsign != "") {
-                beaconPacket            += " de ";
-                beaconPacket            += Config.callsign;
-                secondaryBeaconPacket   += " de ";
-                secondaryBeaconPacket   += Config.callsign;
+                aprsisBeaconPacket  += " de ";
+                aprsisBeaconPacket  += Config.callsign;
+                loraBeaconPacket    += " de ";
+                loraBeaconPacket    += Config.callsign;
             }
 
             #if defined(BATTERY_PIN) || defined(HAS_AXP192) || defined(HAS_AXP2101)
                 if (Config.battery.sendInternalVoltage || Config.battery.monitorInternalVoltage) {
                     float internalVoltage       = BATTERY_Utils::checkInternalVoltage();
                     if (Config.battery.monitorInternalVoltage && internalVoltage < Config.battery.internalSleepVoltage) {
-                        beaconPacket            += " **IntBatWarning:SLEEP**";
-                        secondaryBeaconPacket   += " **IntBatWarning:SLEEP**";
+                        aprsisBeaconPacket      += " **IntBatWarning:SLEEP**";
+                        loraBeaconPacket        += " **IntBatWarning:SLEEP**";
                         shouldSleepLowVoltage   = true;
                     }
 
@@ -243,10 +234,10 @@ namespace Utils {
                         sixthLine = sixthLineBuffer;
 
                         if (!Config.battery.sendVoltageAsTelemetry) {
-                            beaconPacket            += " Batt=";
-                            beaconPacket            += internalVoltageInfo;
-                            secondaryBeaconPacket   += " Batt=";
-                            secondaryBeaconPacket   += internalVoltageInfo;
+                            aprsisBeaconPacket  += " Batt=";
+                            aprsisBeaconPacket  += internalVoltageInfo;
+                            loraBeaconPacket    += " Batt=";
+                            loraBeaconPacket    += internalVoltageInfo;
                         }
                     }
                 }
@@ -256,8 +247,8 @@ namespace Utils {
                 if (Config.battery.sendExternalVoltage || Config.battery.monitorExternalVoltage) {
                     float externalVoltage       = BATTERY_Utils::checkExternalVoltage();
                     if (Config.battery.monitorExternalVoltage && externalVoltage < Config.battery.externalSleepVoltage) {
-                        beaconPacket            += " **ExtBatWarning:SLEEP**";
-                        secondaryBeaconPacket   += " **ExtBatWarning:SLEEP**";
+                        aprsisBeaconPacket      += " **ExtBatWarning:SLEEP**";
+                        loraBeaconPacket        += " **ExtBatWarning:SLEEP**";
                         shouldSleepLowVoltage   = true;
                     }
 
@@ -270,10 +261,10 @@ namespace Utils {
                         sixthLine = sixthLineBuffer;
 
                         if (!Config.battery.sendVoltageAsTelemetry) {
-                            beaconPacket            += " Ext=";
-                            beaconPacket            += externalVoltageInfo;
-                            secondaryBeaconPacket   += " Ext=";
-                            secondaryBeaconPacket   += externalVoltageInfo;
+                            aprsisBeaconPacket  += " Ext=";
+                            aprsisBeaconPacket  += externalVoltageInfo;
+                            loraBeaconPacket    += " Ext=";
+                            loraBeaconPacket    += externalVoltageInfo;
                         }
                     }
                 }
@@ -281,8 +272,8 @@ namespace Utils {
 
             if (Config.battery.sendVoltageAsTelemetry && !Config.wxsensor.active && (Config.battery.sendInternalVoltage || Config.battery.sendExternalVoltage)){
                 String encodedTelemetry = TELEMETRY_Utils::generateEncodedTelemetry();
-                beaconPacket += encodedTelemetry;
-                secondaryBeaconPacket += encodedTelemetry;
+                aprsisBeaconPacket  += encodedTelemetry;
+                loraBeaconPacket    += encodedTelemetry;
             }
 
             if (Config.beacon.sendViaAPRSIS && Config.aprs_is.active && passcodeValid && !backupDigiMode) {
@@ -290,18 +281,18 @@ namespace Utils {
                 displayShow(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING IGATE BEACON", 0);
                 seventhLine = "     listening...";
                 #ifdef HAS_A7670
-                    A7670_Utils::uploadToAPRSIS(beaconPacket);
+                    A7670_Utils::uploadToAPRSIS(aprsisBeaconPacket);
                 #else
-                    APRS_IS_Utils::upload(beaconPacket);
+                    APRS_IS_Utils::upload(aprsisBeaconPacket);
                 #endif
-                if (Config.syslog.logBeaconOverTCPIP) SYSLOG_Utils::logAPRSISTx(beaconPacket);
+                if (Config.syslog.logBeaconOverTCPIP) SYSLOG_Utils::logAPRSISTx(aprsisBeaconPacket);
             }
 
             if (Config.beacon.sendViaRF || backupDigiMode) {
                 Utils::println("-- Sending Beacon to RF --");
                 displayShow(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, "SENDING DIGI BEACON", 0);
                 seventhLine = "     listening...";
-                STATION_Utils::addToOutputPacketBuffer(secondaryBeaconPacket, true);
+                STATION_Utils::addToOutputPacketBuffer(loraBeaconPacket, true);
                 rfBeaconCounter++;
             }
 
@@ -332,6 +323,12 @@ namespace Utils {
         }
     }
 
+    String padForDisplay(const String& text) {      // left-aligned, 9 chars wide (callsign column on screen)
+        char buffer[10];
+        snprintf(buffer, sizeof(buffer), "%-9s", text.c_str());
+        return String(buffer);
+    }
+
     void updateLoRaPacketDisplayInfo(APRSPacket& aprsPacket, const uint8_t packetType) {
         switch (packetType) {
             case 0: // LoRa-APRS
@@ -342,11 +339,7 @@ namespace Utils {
                 break;
         }
 
-        String sender = aprsPacket.sender;
-        for (int i = sender.length(); i < 9; i++) {
-            sender += " ";
-        }
-        sixthLine = sender;
+        sixthLine = padForDisplay(aprsPacket.sender);
 
         switch (aprsPacket.type) {
             case 1:     // MESSAGE
@@ -392,11 +385,7 @@ namespace Utils {
     void updateAPRSISPacketDisplayInfo(const String& packet) {
         fifthLine = "APRS-IS ----> LoRa Tx";
 
-        String sender = packet.substring(0,packet.indexOf(">"));
-        for (int i = sender.length(); i < 9; i++) {
-            sender += " ";
-        }
-        sixthLine = sender;
+        sixthLine = padForDisplay(packet.substring(0,packet.indexOf(">")));
 
         if (packet.indexOf("::") > 0) {
             sixthLine += "> MESSAGE";

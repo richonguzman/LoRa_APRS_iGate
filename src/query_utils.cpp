@@ -16,6 +16,7 @@
  * along with LoRa APRS iGate. If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <APRSPacketLib.h>
 #include "configuration.h"
 #include "battery_utils.h"
 #include "station_utils.h"
@@ -36,11 +37,17 @@ extern String                           versionNumber;
 
 namespace QUERY_Utils {
 
+    bool isQuery(const String& message) {   // "?..." queries, plus "HELP" (any case) without the "?"
+        String queryQuestion = message;
+        queryQuestion.toUpperCase();
+        return queryQuestion.startsWith("?") || queryQuestion == "HELP";
+    }
+
     String process(const String& query, const String& station, bool queryFromAPRSIS, bool thirdParty) {
         String answer;
         String queryQuestion = query;
         queryQuestion.toUpperCase();
-        if (queryQuestion == "?APRS?" || queryQuestion == "H" || queryQuestion == "HELP" || queryQuestion=="?") {
+        if (queryQuestion == "?APRS?" || queryQuestion == "?" || queryQuestion == "HELP") {
             answer.concat("?APRSV ?APRSP ?APRSL ?APRSSR ?EM=? ?TX=? "); // ?APRSH ?WHERE callsign
         } else if (queryQuestion == "?APRSV") {
             answer.concat("CA2RXU_LoRa_iGate v");
@@ -139,32 +146,15 @@ namespace QUERY_Utils {
 
         if (answer == "") return "";
 
-        String queryAnswer = (Config.tacticalCallsign == "" ? Config.callsign : Config.tacticalCallsign);
-        queryAnswer += ">APLRG1";
-        if (queryFromAPRSIS) {
-            queryAnswer += ",TCPIP,qAC";
-        } else {
-            if (!thirdParty) queryAnswer += ",RFONLY";
-            if (Config.beacon.path != "") {
-                queryAnswer += ",";
-                queryAnswer += Config.beacon.path;
-            }
-        }
-        queryAnswer += "::";
+        answer += " *";
+        answer += char(random(97, 123));
+        answer += char(random(97, 123));
+        answer += "*";
 
-        String processedStation = station;
-        for (int i = station.length(); i < 9; i++) {
-            processedStation += ' ';
-        }
-        queryAnswer += processedStation;
-        queryAnswer += ":";
-        queryAnswer += answer;
-
-        queryAnswer += " *";
-        queryAnswer += char(random(97, 123));
-        queryAnswer += char(random(97, 123));
-        queryAnswer += "*";
-        return queryAnswer;
+        String queryCallsign    = (Config.tacticalCallsign == "") ? Config.callsign : Config.tacticalCallsign;
+        String queryPath        = queryFromAPRSIS ? "" : (thirdParty ? Config.beacon.path : "RFONLY," + Config.beacon.path);
+        String queryAnswer      = APRSPacketLib::generateMessagePacket(queryCallsign, "APLRG1", queryPath, station, answer);
+        return queryFromAPRSIS ? APRSPacketLib::generateAPRSISPacket(queryAnswer) : queryAnswer;
     }
 
 }

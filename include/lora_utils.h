@@ -24,6 +24,7 @@
 
 namespace LoRa_Utils {
 
+    int     validPower(int requested);
     void    setup();
     void    sendNewPacket(const String& newPacket);
     String  receivePacketFromSleep();

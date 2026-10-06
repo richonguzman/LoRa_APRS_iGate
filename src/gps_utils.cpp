@@ -40,7 +40,7 @@ extern Configuration    Config;
 extern HardwareSerial   gpsSerial;
 extern TinyGPSPlus      gps;
 extern bool             stationCallsignIsValid;
-String                  distance, iGateBeaconPacket, iGateLoRaBeaconPacket;
+String                  distance, iGateAPRSISBeaconPacket, iGateLoRaBeaconPacket;
 
 
 namespace GPS_Utils {
@@ -115,13 +115,8 @@ namespace GPS_Utils {
     }
 #endif
 
-    String getiGateLoRaBeaconPacket() {
-        return iGateLoRaBeaconPacket;
-    }
-
     void generateBeacons() {
-        String beaconPacket = APRSPacketLib::generateBasePacket(Config.callsign, "APLRG1", Config.beacon.path);
-        String encodedGPS   = APRSPacketLib::encodeGPSIntoBase91(Config.beacon.latitude, Config.beacon.longitude, 0, 0, Config.beacon.symbol, false, 0, true, Config.beacon.ambiguityLevel);
+        String beaconCallsign = Config.callsign;
 
         if (Config.callsign.indexOf("NOCALL-10") != 0) {
             if (!stationCallsignIsValid) {
@@ -133,7 +128,7 @@ namespace GPS_Utils {
                 Config.digi.mode            = 0;
                 Config.digi.backupDigiMode  = false;
             } else if (stationCallsignIsValid && Config.tacticalCallsign != "") {
-                beaconPacket = APRSPacketLib::generateBasePacket(Config.tacticalCallsign, "APLRG1", Config.beacon.path);
+                beaconCallsign              = Config.tacticalCallsign;
                 Config.aprs_is.active       = false;
                 Config.beacon.sendViaAPRSIS = false;
                 Config.digi.backupDigiMode  = false;
@@ -143,15 +138,10 @@ namespace GPS_Utils {
             Config.beacon.sendViaRF     = false;
         }
 
-        iGateBeaconPacket       = beaconPacket;
-        iGateBeaconPacket       += ",qAC:=";
-        iGateBeaconPacket       += Config.beacon.overlay;
-        iGateBeaconPacket       += encodedGPS;
+        String encodedGPS       = APRSPacketLib::encodeGPSIntoBase91(Config.beacon.latitude, Config.beacon.longitude, 0, 0, Config.beacon.symbol, false, 0, true, Config.beacon.ambiguityLevel);
 
-        iGateLoRaBeaconPacket   = beaconPacket;
-        iGateLoRaBeaconPacket   += ":=";
-        iGateLoRaBeaconPacket   += Config.beacon.overlay;
-        iGateLoRaBeaconPacket   += encodedGPS;
+        iGateLoRaBeaconPacket   = APRSPacketLib::generateBase91GPSBeaconPacket(beaconCallsign, "APLRG1", Config.beacon.path, Config.beacon.overlay, encodedGPS);
+        iGateAPRSISBeaconPacket = APRSPacketLib::generateAPRSISPacket(iGateLoRaBeaconPacket);
     }
 
     double calculateDistanceTo(double latitude, double longitude) {

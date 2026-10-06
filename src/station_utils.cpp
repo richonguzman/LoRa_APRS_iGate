@@ -234,6 +234,7 @@ namespace STATION_Utils {
     }
 
     void addToOutputPacketBuffer(const String& packet, bool flag) {
+        if (packet == "") return;                   // never queue an empty packet
         outputPacketBuffer.emplace_back(OutputPacketBuffer{packet, flag});
     }
 

@@ -1579,7 +1579,7 @@ body{background:var(--msh-bg);color:var(--msh-text);font-family:"Inter",system-u
                                         <label
                                             for="lora.power"
                                             class="form-label">
-                                            Power
+                                            Power <small>(SX127X Max 20dBm / SX126X Max 22dBm)</small>
                                         </label>
                                         <div class="input-group">
                                             <input
@@ -1587,8 +1587,8 @@ body{background:var(--msh-bg);color:var(--msh-text);font-family:"Inter",system-u
                                                 name="lora.power"
                                                 id="lora.power"
                                                 placeholder="20"
-                                                min="0"
-                                                max="20"
+                                                min="2"
+                                                max="22"
                                                 step="1"
                                                 class="form-control"
                                                 required=""
@@ -2647,7 +2647,7 @@ body{background:var(--msh-bg);color:var(--msh-text);font-family:"Inter",system-u
     if(window.fetchReceivedPackets)window.fetchReceivedPackets();
   });
   var bi=document.getElementById("buildInfo");
-  if(bi){var h=bi.innerHTML; if(/Version date/i.test(h)){h=h.replace(/(<br\s*\/?>)[\s\S]*?(?=Version date)/i,"$1");bi.innerHTML="Board / Environment = "+h;}}
+  if(bi){var h=bi.innerHTML; if(/Version date/i.test(h)){h=h.replace(/(<br\s*\/?>)[\s\S]*?(?=Version: )/i,"$1");bi.innerHTML="Board / Environment = "+h;}}
   if(window.loadReceivedPackets){var _o=window.loadReceivedPackets;window.loadReceivedPackets=function(p){if(p&&p.slice){p=p.slice().reverse();}return _o(p);};}
 })();
 </script>

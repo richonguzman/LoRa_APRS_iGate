@@ -60,6 +60,7 @@ uint32_t    lastServerCheck = 0;
 namespace APRS_IS_Utils {
 
     void upload(const String& line) {
+        if (line == "") return;                     // never send an empty line to APRS-IS
         aprsIsClient.print(line + "\r\n");
     }
 
@@ -156,37 +157,19 @@ namespace APRS_IS_Utils {
         int leftCurlyBraceIndex = packet.indexOf("{");
         int colonIndex          = packet.indexOf(":");
         if (leftCurlyBraceIndex > 0) {     // ack?
-            String ackMessage = "ack";
-            ackMessage.concat(packet.substring(leftCurlyBraceIndex + 1));
-            ackMessage.trim();
-            //Serial.println(ackMessage);
-
-            String addToBuffer = Config.callsign;
-            addToBuffer += ">APLRG1";
-            if (lastAprsPacket.header == "") addToBuffer += ",RFONLY";
-            if (Config.beacon.path != "") {
-                addToBuffer += ",";
-                addToBuffer += Config.beacon.path;
-            }
-            addToBuffer += "::";
-
-            String processedSender = sender;
-            for (int i = sender.length(); i < 9; i++) {
-                processedSender += ' ';
-            }
-            addToBuffer += processedSender;
-
-            addToBuffer += ":";
-            addToBuffer += ackMessage;
-            STATION_Utils::addToOutputPacketBuffer(addToBuffer);
+            String ackCallsign  = (Config.tacticalCallsign == "") ? Config.callsign : Config.tacticalCallsign;     // ack from the callsign the message was addressed to
+            String ackPath      = (lastAprsPacket.header == "") ? "RFONLY," + Config.beacon.path : Config.beacon.path;
+            String ackPacket    = APRSPacketLib::generateAckPacket(ackCallsign, "APLRG1", ackPath, sender, packet);
+            if (ackPacket != "") STATION_Utils::addToOutputPacketBuffer(ackPacket);
             receivedMessage = packet.substring(colonIndex + 1, leftCurlyBraceIndex);
         } else {
             receivedMessage = packet.substring(colonIndex + 1);
         }
-        if (receivedMessage.indexOf("?") == 0) {
+        if (QUERY_Utils::isQuery(receivedMessage)) {
             if (!Config.display.alwaysOn && Config.display.timeout != 0) displayToggle(true);
 
-            STATION_Utils::addToOutputPacketBuffer(QUERY_Utils::process(receivedMessage, sender, false, lastAprsPacket.header != ""));
+            String queryAnswer = QUERY_Utils::process(receivedMessage, sender, false, lastAprsPacket.header != "");
+            if (queryAnswer != "") STATION_Utils::addToOutputPacketBuffer(queryAnswer);     // unknown query: no answer
             lastScreenOn = millis();
             displayShow(firstLine, secondLine, thirdLine, fourthLine, fifthLine, "Callsign = " + sender, "TYPE --> QUERY", 0);
             return true;
@@ -274,21 +257,9 @@ namespace APRS_IS_Utils {
     }
 
     void processAckMessage(const String& sender, const String& message) {
-        String ackPacket = Config.callsign;
-        ackPacket += ">APLRG1,TCPIP,qAC::";
-
-        String senderCallsign = sender;
-        for (int i = sender.length(); i < 9; i++) {
-            senderCallsign += ' ';
-        }
-        ackPacket += senderCallsign;
-        ackPacket += ":";
-
-        String ackMessage = "ack";
-        ackMessage += message.substring(message.indexOf("{") + 1);
-        ackMessage.trim();
-        ackPacket += ackMessage;
-
+        String ackPacket = APRSPacketLib::generateAckPacket(Config.callsign, "APLRG1", "", sender, message);
+        if (ackPacket == "") return;
+        ackPacket = APRSPacketLib::generateAPRSISPacket(ackPacket);
         #ifdef HAS_A7670
             A7670_Utils::uploadToAPRSIS(ackPacket);
         #else
@@ -314,7 +285,7 @@ namespace APRS_IS_Utils {
                 if (Config.digi.backupDigiMode) lastServerCheck = currentTime;
             } else {
                 int doubleColonIndex = packet.indexOf("::");
-                if (Config.aprs_is.messagesToRF && doubleColonIndex > 0) {
+                if (doubleColonIndex > 0) {     // messages for this station are always answered; messagesToRF only gates forwarding to RF
                     String Sender = packet.substring(0, packet.indexOf(">"));
                     const String& AddresseeAndMessage = packet.substring(doubleColonIndex + 2);
                     int colonIndex = AddresseeAndMessage.indexOf(":");
@@ -329,7 +300,7 @@ namespace APRS_IS_Utils {
                         } else {
                             receivedMessage = AddresseeAndMessage.substring(colonIndex + 1);
                         }
-                        if (receivedMessage.indexOf("?") == 0) {
+                        if (QUERY_Utils::isQuery(receivedMessage)) {
                             Utils::println("Rx Query (APRS-IS)  : " + packet);
                             String queryAnswer = QUERY_Utils::process(receivedMessage, Sender, true, false);
                             //Serial.println("---> QUERY Answer : " + queryAnswer.substring(0,queryAnswer.indexOf("\n")));
@@ -337,24 +308,23 @@ namespace APRS_IS_Utils {
                                 displayToggle(true);
                             }
                             lastScreenOn = currentTime;
-                            #ifdef HAS_A7670
-                                A7670_Utils::uploadToAPRSIS(queryAnswer);
-                            #else
-                                upload(queryAnswer);
-                            #endif
-                            SYSLOG_Utils::logAPRSISTx(queryAnswer);
-                            fifthLine = "APRS-IS ----> APRS-IS";
-                            sixthLine = Config.callsign;
-                            for (int j = sixthLine.length();j < 9;j++) {
-                                sixthLine += " ";
+                            if (queryAnswer != "") {                                // unknown query: no answer
+                                #ifdef HAS_A7670
+                                    A7670_Utils::uploadToAPRSIS(queryAnswer);
+                                #else
+                                    upload(queryAnswer);
+                                #endif
+                                SYSLOG_Utils::logAPRSISTx(queryAnswer);
                             }
+                            fifthLine = "APRS-IS ----> APRS-IS";
+                            sixthLine = Utils::padForDisplay(Config.callsign);
                             sixthLine += "> ";
                             sixthLine += Sender;
                             seventhLine = "QUERY = ";
                             seventhLine += receivedMessage;
                         }
                         displayShow(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
-                    } else {
+                    } else if (Config.aprs_is.messagesToRF) {
                         Utils::print("Rx Message (APRS-IS): " + packet);
                         if (STATION_Utils::wasHeard(Addressee) && packet.indexOf("EQNS.") == -1 && packet.indexOf("UNIT.") == -1 && packet.indexOf("PARM.") == -1) {
                             STATION_Utils::addToOutputPacketBuffer(buildPacketToTx(packet, 1));
