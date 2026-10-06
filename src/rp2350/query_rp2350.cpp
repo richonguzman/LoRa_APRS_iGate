@@ -48,7 +48,7 @@ String answerFor(const String& query, const String& sender) {
     String q = query;
     q.toUpperCase();
     // --- public queries ---
-    if (q == "?APRS?" || q == "H" || q == "HELP" || q == "?")
+    if (q == "?APRS?" || q == "?" || q == "HELP")
         return "?APRSV ?APRSP ?APRSL ?APRSSR";
     if (q == "?APRSV")
         return String(IGATE_VERSION);
@@ -129,9 +129,11 @@ bool handleMessage(const String& body, const String& sender) {
     String msgText = (brace > 0) ? text.substring(0, brace) : text;
 
     onIncomingMessage(from, msgText);                        // log it for the web UI
-    if (brace > 0) {
-        String ackId = text.substring(brace + 1);
-        ackId.trim();
+    // ack id = text after the LAST '{' ("hola{MM}AA" -> "MM}AA", APRS 1.2c reply-acks);
+    // an empty id means no ack was requested (upstream's generateAckMessage)
+    String ackId = (brace > 0) ? text.substring(text.lastIndexOf('{') + 1) : "";
+    ackId.trim();
+    if (ackId.length()) {
         String ack = envelope(from, thirdParty);
         ack += "ack";
         ack += ackId;
@@ -139,8 +141,11 @@ bool handleMessage(const String& body, const String& sender) {
         Serial.println("[query] ack -> " + from + (thirdParty ? " (3rd party, " : " (") + ackId + ")");
     }
 
-    if (msgText.indexOf('?') == 0) {                         // it's a query
+    String upperText = msgText;
+    upperText.toUpperCase();
+    if (msgText.startsWith("?") || upperText == "HELP") {   // it's a query ("HELP" needs no '?')
         String answer = answerFor(msgText, from);
+        answer.trim();
         if (answer.length()) {
             String reply = envelope(from, thirdParty);
             reply += answer;

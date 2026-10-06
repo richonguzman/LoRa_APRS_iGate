@@ -131,6 +131,7 @@ bool isDuplicate(const String& station, const String& payload) {
 }
 
 void enqueueTx(const String& packet, bool isBeacon) {
+    if (packet.length() == 0) return;                       // never queue an empty packet
     outBuffer.push_back({packet, isBeacon});
 }
 

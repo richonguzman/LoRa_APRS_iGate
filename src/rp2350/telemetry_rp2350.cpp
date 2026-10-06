@@ -32,10 +32,10 @@ String selfCall() {
     return Config.tacticalCallsign.length() ? Config.tacticalCallsign : Config.callsign;
 }
 
-// self-addressed message envelope for EQNS/UNIT/PARM (TCPIP, qAC)
+// self-addressed message envelope for EQNS/UNIT/PARM (TCPIP*: the server adds qAC)
 String defEnvelope(const String &call, const String &payload) {
     String s = call;
-    s += ">APLRG1,TCPIP,qAC::";
+    s += ">APLRG1,TCPIP*::";
     String padded = call;
     for (int i = call.length(); i < 9; i++) padded += ' ';
     s += padded;
@@ -61,7 +61,7 @@ String dataPacket() {
     sequence = (sequence + 1) % 1000;
 
     String line = selfCall();
-    line += ">APLRG1,TCPIP,qAC:T#";
+    line += ">APLRG1,TCPIP*:T#";
     line += seq;  line += ',';
     line += pad3(a1); line += ',';
     line += pad3(a2); line += ',';

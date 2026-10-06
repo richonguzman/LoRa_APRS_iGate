@@ -45,8 +45,10 @@ static String wxField() {
 }
 
 String buildAprsisLine() {
-    String line = APRSPacketLib::generateBasePacket(Config.callsign, "APLRG1", Config.beacon.path);
-    line += ",qAC:=";                 // q-construct for APRS-IS-injected, position w/ messaging
+    // Own packet uploaded to APRS-IS: TCPIP* only, no RF path and no q construct
+    // (the server appends qAC itself) -- upstream's generateAPRSISPacket().
+    String line = Config.callsign;
+    line += ">APLRG1,TCPIP*:=";       // position w/ messaging
     line += Config.beacon.overlay;
     line += encodedPosition();
     line += wxField();

@@ -39,7 +39,24 @@ static float txFreqMHz = 433.775f;
 
 static void onLoraDio1() { rxFlag = true; }
 
+#define CHIP_MIN_POWER  -9              // SX1262 / SX1268
+#define CHIP_MAX_POWER  22
+
+// The E22(P)-xxxM30S carries its own 30 dBm PA; driving the SX126x above 20 dBm
+// overdrives it -> ~690 mA current spike -> supply brownout that wedges the
+// module in a low-sensitivity state until a physical power cycle (verified on
+// the .243 W5100S: power=22 went deaf, cold-boot recovered ~10 dB). Cap the
+// SX126x drive at 20 dBm — no useful range is gained above it on this front-end.
+#ifndef RADIO_MAX_POWER
+    #define RADIO_MAX_POWER 20
+#endif
+
 namespace LoRa_Utils {
+
+int validPower(int requested) {
+    const int maxPower = (RADIO_MAX_POWER < CHIP_MAX_POWER) ? RADIO_MAX_POWER : CHIP_MAX_POWER;
+    return constrain(requested, CHIP_MIN_POWER, maxPower);
+}
 
 // Undocumented Heltec/Semtech-recommended SX126x register patch (bit 0 of 0x8B5)
 // that measurably reduces packet loss. Needs RADIOLIB_LOW_LEVEL=1 for getMod().
@@ -168,20 +185,17 @@ void setup() {
     txFreqMHz = (float)Config.loramodule.txFreq / 1000000.0f;
     float bw  = (float)Config.loramodule.rxSignalBandwidth / 1000.0f;
 
-    // The E22(P)-xxxM30S carries its own 30 dBm PA; driving the SX126x above 20 dBm
-    // overdrives it -> ~690 mA current spike -> supply brownout that wedges the
-    // module in a low-sensitivity state until a physical power cycle (verified on
-    // the .243 W5100S: power=22 went deaf, cold-boot recovered ~10 dB). Cap the
-    // SX126x drive at 20 dBm — no useful range is gained above it on this front-end.
-    if (Config.loramodule.power > 20) Config.loramodule.power = 20;
+    int power = validPower(Config.loramodule.power);
+    if (power != Config.loramodule.power)
+        Serial.printf("[lora] power adjusted: %d -> %d dBm\n", Config.loramodule.power, power);
 
     int st = radio.begin(rxFreqMHz, bw, Config.loramodule.rxSpreadingFactor,
-                         Config.loramodule.rxCodingRate4, 0x12, Config.loramodule.power,
+                         Config.loramodule.rxCodingRate4, 0x12, power,
                          8, SX126X_DIO3_TCXO_VOLTAGE, false);
     if (st != RADIOLIB_ERR_NONE) {            // some E22 modules need the LDO regulator
         Serial.printf("[lora] begin %d -> retry LDO\n", st);
         st = radio.begin(rxFreqMHz, bw, Config.loramodule.rxSpreadingFactor,
-                         Config.loramodule.rxCodingRate4, 0x12, Config.loramodule.power,
+                         Config.loramodule.rxCodingRate4, 0x12, power,
                          8, SX126X_DIO3_TCXO_VOLTAGE, true);
     }
 #if RADIO_TXEN < 0

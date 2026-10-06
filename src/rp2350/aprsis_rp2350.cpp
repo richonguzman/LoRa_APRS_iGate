@@ -30,9 +30,10 @@ static void processAprsisLine(const String &line) {
     String msg   = (brace > 0) ? text.substring(0, brace) : text;
     ethWebAddMessage(from, msg, "IS");
 
-    if (brace > 0 && aprsClient.connected()) {              // ack it over APRS-IS
-        String id = text.substring(brace + 1);
-        id.trim();
+    // ack id = text after the LAST '{'; empty = no ack requested (generateAckMessage)
+    String id = (brace > 0) ? text.substring(text.lastIndexOf('{') + 1) : "";
+    id.trim();
+    if (id.length() && aprsClient.connected()) {            // ack it over APRS-IS
         String ack = Config.callsign;
         ack += ">APLRG1,TCPIP*::";
         String padded = from;
@@ -84,6 +85,7 @@ void poll() {
 }
 
 void send(const String &line) {
+    if (line.length() == 0) return;                         // never send an empty line to APRS-IS
     if (aprsClient.connected()) aprsClient.print(line + "\r\n");
 }
 
