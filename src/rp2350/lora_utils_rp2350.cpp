@@ -13,16 +13,15 @@
 
 extern Configuration Config;
 
-// File-scope (static) so it doesn't clash with the inline radio still in
-// rp2350/main.cpp until the iGate loop replaces it.
-// HAS_SX1268 selects the EBYTE E22-400M30S (433 MHz, SX1268 silicon); the
-// default is the SX1262 used by the E22(P)-868/900M30S modules. Both RadioLib
-// classes share the SX126x command set, so the rest of this file is identical.
-#if defined(HAS_SX1268)
-static SX1268 radio = new Module(RADIO_CS_PIN, RADIO_DIO1_PIN, RADIO_RST_PIN, RADIO_BUSY_PIN, SPI1);
-#else
-static SX1262 radio = new Module(RADIO_CS_PIN, RADIO_DIO1_PIN, RADIO_RST_PIN, RADIO_BUSY_PIN, SPI1);
-#endif
+// The same E22 / E22P footprint takes a 433 MHz (SX1268) or an 868/915 MHz (SX1262)
+// module, and the version string the die reports varies by batch (an E22-400M30S
+// here reports "SX1262", an E22P-433M30S "SX1268"). RadioLib's begin() rejects a
+// mismatch with RADIOLIB_ERR_CHIP_NOT_FOUND, so setup() tries one class and falls
+// back to the other. Both share the SX126x command set: everything else goes
+// through `radio`.
+static SX1262  radio1262 = new Module(RADIO_CS_PIN, RADIO_DIO1_PIN, RADIO_RST_PIN, RADIO_BUSY_PIN, SPI1);
+static SX1268  radio1268 = new Module(RADIO_CS_PIN, RADIO_DIO1_PIN, RADIO_RST_PIN, RADIO_BUSY_PIN, SPI1);
+static SX126x* radio     = &radio1262;
 static volatile bool rxFlag = false;
 
 // How often to warm-reset the SX126x analog frontend / AGC state (see resetAGC).
@@ -62,7 +61,7 @@ int validPower(int requested) {
 // that measurably reduces packet loss. Needs RADIOLIB_LOW_LEVEL=1 for getMod().
 // Calibrate(0x7F) clears it, so resetAGC() re-applies it after every calibration.
 static void applyRxSensitivityPatch() {
-    if (radio.getMod()->SPIsetRegValue(0x8B5, 0x01, 0, 0) == RADIOLIB_ERR_NONE)
+    if (radio->getMod()->SPIsetRegValue(0x8B5, 0x01, 0, 0) == RADIOLIB_ERR_NONE)
         Serial.println("[lora] applied SX126x 0x8B5 RX-sensitivity patch");
     else
         Serial.println("[lora] FAILED to apply SX126x 0x8B5 RX-sensitivity patch");
@@ -72,33 +71,33 @@ static void applyRxSensitivityPatch() {
 // Periodically warm-reset it (warm sleep + full calibration), skipping if a packet
 // is actively arriving. Called from receivePacket() only (loraTask owns SPI1).
 static void resetAGC() {
-    uint32_t irqFlags = radio.getIrqFlags();
+    uint32_t irqFlags = radio->getIrqFlags();
     if (irqFlags & (RADIOLIB_SX126X_IRQ_HEADER_VALID | RADIOLIB_SX126X_IRQ_PREAMBLE_DETECTED))
         return;  // packet actively arriving, don't disturb it
 
-    radio.sleep(true);                                  // warm sleep - resets the analog frontend / AGC state
-    radio.standby(RADIOLIB_SX126X_STANDBY_RC, true);    // wake to RC standby for stable calibration
+    radio->sleep(true);                                  // warm sleep - resets the analog frontend / AGC state
+    radio->standby(RADIOLIB_SX126X_STANDBY_RC, true);    // wake to RC standby for stable calibration
 
     uint8_t calData = RADIOLIB_SX126X_CALIBRATE_ALL;
-    radio.getMod()->SPIwriteStream(RADIOLIB_SX126X_CMD_CALIBRATE, &calData, 1, true, false);
+    radio->getMod()->SPIwriteStream(RADIOLIB_SX126X_CMD_CALIBRATE, &calData, 1, true, false);
 
-    radio.getMod()->hal->delay(5);
+    radio->getMod()->hal->delay(5);
     uint32_t calibrationStart = millis();
-    while (radio.getMod()->hal->digitalRead(radio.getMod()->getGpio())) {
+    while (radio->getMod()->hal->digitalRead(radio->getMod()->getGpio())) {
         if (millis() - calibrationStart > 50) {
             Serial.println("[lora] SX126x AGC reset: calibration did not complete within 50ms");
             break;
         }
-        radio.getMod()->hal->yield();
+        radio->getMod()->hal->yield();
     }
 
     float freq = (float)Config.loramodule.rxFreq / 1000000;
-    radio.calibrateImage(freq);         // Calibrate(0x7F) defaults image cal to the wrong band otherwise
+    radio->calibrateImage(freq);         // Calibrate(0x7F) defaults image cal to the wrong band otherwise
 
-    radio.setRxBoostedGainMode(true);   // re-apply settings that Calibrate(0x7F) resets
+    radio->setRxBoostedGainMode(true);   // re-apply settings that Calibrate(0x7F) resets
     applyRxSensitivityPatch();
 
-    radio.startReceive();
+    radio->startReceive();
 }
 
 void setup() {
@@ -107,10 +106,9 @@ void setup() {
     //                       §4.1/§5.2): TXEN and RXEN are separate MCU-driven lines,
     //                       DIO2 floating. RadioLib toggles both switch pins around
     //                       every RX/TX transition (LNA off in TX, PA off in RX).
-    //   RADIO_TXEN <  0  -> bridged front-end (on-module DIO2->TXEN): a single RFEN
-    //                       (RXEN) line held HIGH, dropped by hand during transmit.
-    //                       Used on carriers where TXEN can't get its own MCU pin
-    //                       (e.g. the W5100S-EVB carrier, which can't be rewired).
+    //   RADIO_TXEN <  0  -> bridged front-end (DIO2->TXEN): a single RFEN (RXEN)
+    //                       line held HIGH, dropped by hand during transmit. The
+    //                       default on the boards, whose DIO2-TXEN jumper ships fitted.
 #if RADIO_TXEN < 0
     pinMode(RADIO_RXEN, OUTPUT);
     digitalWrite(RADIO_RXEN, HIGH);            // bridged: RFEN held HIGH while active
@@ -189,27 +187,34 @@ void setup() {
     if (power != Config.loramodule.power)
         Serial.printf("[lora] power adjusted: %d -> %d dBm\n", Config.loramodule.power, power);
 
-    int st = radio.begin(rxFreqMHz, bw, Config.loramodule.rxSpreadingFactor,
-                         Config.loramodule.rxCodingRate4, 0x12, power,
-                         8, SX126X_DIO3_TCXO_VOLTAGE, false);
+    auto begin = [&](auto& chip, bool useLDO) {
+        return chip.begin(rxFreqMHz, bw, Config.loramodule.rxSpreadingFactor,
+                          Config.loramodule.rxCodingRate4, 0x12, power,
+                          8, SX126X_DIO3_TCXO_VOLTAGE, useLDO);
+    };
+    radio  = &radio1262;
+    int st = begin(radio1262, false);
+    if (st == RADIOLIB_ERR_CHIP_NOT_FOUND) {  // die reports itself as SX1268
+        radio = &radio1268;
+        st    = begin(radio1268, false);
+    }
     if (st != RADIOLIB_ERR_NONE) {            // some E22 modules need the LDO regulator
         Serial.printf("[lora] begin %d -> retry LDO\n", st);
-        st = radio.begin(rxFreqMHz, bw, Config.loramodule.rxSpreadingFactor,
-                         Config.loramodule.rxCodingRate4, 0x12, power,
-                         8, SX126X_DIO3_TCXO_VOLTAGE, true);
+        st = (radio == &radio1268) ? begin(radio1268, true) : begin(radio1262, true);
     }
 #if RADIO_TXEN < 0
-    radio.setDio2AsRfSwitch(true);             // bridged: DIO2 -> TXEN on-module (DIO2 wired)
+    radio->setDio2AsRfSwitch(true);             // bridged: DIO2 -> TXEN on-module (DIO2 wired)
 #else
     // Canonical front-end: DIO2 is left floating; RadioLib drives the external
     // TXEN/RXEN switch pins itself (mutually exclusive) on every RX/TX transition.
-    radio.setRfSwitchPins(RADIO_RXEN, RADIO_TXEN);
+    radio->setRfSwitchPins(RADIO_RXEN, RADIO_TXEN);
 #endif
-    radio.setRxBoostedGainMode(true);          // boosted LNA gain (higher RX sensitivity)
+    radio->setRxBoostedGainMode(true);          // boosted LNA gain (higher RX sensitivity)
     applyRxSensitivityPatch();                 // undocumented 0x8B5 RX patch (upstream PR #440)
-    radio.setDio1Action(onLoraDio1);
-    radio.startReceive();
-    Serial.printf("[lora] %s @%.4f MHz SF%d BW%.0f CR4:%d (state %d)\n",
+    radio->setDio1Action(onLoraDio1);
+    radio->startReceive();
+    Serial.printf("[lora] %s %s @%.4f MHz SF%d BW%.0f CR4:%d (state %d)\n",
+                  radio == &radio1268 ? "SX1268" : "SX1262",
                   st == RADIOLIB_ERR_NONE ? "RX listening" : "FAILED", rxFreqMHz,
                   Config.loramodule.rxSpreadingFactor, bw, Config.loramodule.rxCodingRate4, st);
 }
@@ -220,7 +225,7 @@ String receivePacket() {
     // (RxDone) packet waiting in the FIFO. It also bails internally if one is
     // mid-arrival (HEADER_VALID / PREAMBLE_DETECTED).
 #ifdef LORA_RX_POLL
-    bool rxPending = radio.getIrqFlags() & RADIOLIB_SX126X_IRQ_RX_DONE;
+    bool rxPending = radio->getIrqFlags() & RADIOLIB_SX126X_IRQ_RX_DONE;
 #else
     bool rxPending = rxFlag;
 #endif
@@ -237,17 +242,17 @@ String receivePacket() {
     // the W5100S carrier was verified (isr fires on TxDone and RxDone, GP14 goes
     // high) to deliver the DIO1 IRQ once the DIO2->TXEN bridge was cut and the
     // canonical RF switch (setRfSwitchPins) is used.
-    if (!(radio.getIrqFlags() & RADIOLIB_SX126X_IRQ_RX_DONE)) return "";
+    if (!(radio->getIrqFlags() & RADIOLIB_SX126X_IRQ_RX_DONE)) return "";
 #else
     if (!rxFlag) return "";
 #endif
     rxFlag = false;
     String str;
-    int st = radio.readData(str);
-    rssi      = (int)radio.getRSSI();
-    snr       = radio.getSNR();
-    freqError = (int)radio.getFrequencyError();
-    radio.startReceive();                       // re-arm
+    int st = radio->readData(str);
+    rssi      = (int)radio->getRSSI();
+    snr       = radio->getSNR();
+    freqError = (int)radio->getFrequencyError();
+    radio->startReceive();                       // re-arm
     if (st != RADIOLIB_ERR_NONE) return "";
     // Return the RAW packet WITH its 3-byte LoRa-APRS header ('<' 0xFF 0x01) —
     // the iGate processing/qAR build does packet.substring(3) to skip it.
@@ -256,8 +261,8 @@ String receivePacket() {
 
 String receivePacketFromSleep() { return receivePacket(); }
 
-void changeFreqTx() { radio.standby(); radio.setFrequency(txFreqMHz); }
-void changeFreqRx() { radio.standby(); radio.setFrequency(rxFreqMHz); radio.startReceive(); }
+void changeFreqTx() { radio->standby(); radio->setFrequency(txFreqMHz); }
+void changeFreqRx() { radio->standby(); radio->setFrequency(rxFreqMHz); radio->startReceive(); }
 
 // --- CAD / DIFS / BEB (port of the channel access in src/lora_utils.cpp) --------
 // Listen before transmitting: DIFS = N consecutive free CAD slots, then a binary
@@ -271,7 +276,7 @@ void changeFreqRx() { radio.standby(); radio.setFrequency(rxFreqMHz); radio.star
 static const int CAD_BACKOFF_MAX = 4;
 static uint32_t  cadStartTime    = 0;
 
-static bool doCAD() { return radio.scanChannel() != RADIOLIB_CHANNEL_FREE; }   // true = busy
+static bool doCAD() { return radio->scanChannel() != RADIOLIB_CHANNEL_FREE; }   // true = busy
 
 static bool doDIFS() {
     for (uint8_t i = DIFS_SLOTS; i > 0; i--) {
@@ -323,7 +328,7 @@ void sendNewPacket(const String& newPacket) {
     tx += (char)0xFF;
     tx += (char)0x01;
     tx += newPacket;
-    int st = radio.transmit(tx);
+    int st = radio->transmit(tx);
     Serial.printf("[lora] TX %d B (state %d)\n", (int)tx.length(), st);
 #if RADIO_TXEN < 0
     digitalWrite(RADIO_RXEN, HIGH);            // bridged: restore RX path
@@ -335,7 +340,7 @@ void sendNewPacket(const String& newPacket) {
     rxFlag = false;
 }
 
-void wakeRadio()  { radio.standby(); radio.startReceive(); }
-void sleepRadio() { radio.sleep(); }
+void wakeRadio()  { radio->standby(); radio->startReceive(); }
+void sleepRadio() { radio->sleep(); }
 
 }  // namespace LoRa_Utils
