@@ -95,27 +95,29 @@ scheduled auto-reboot, VSYS monitor, and network OTA (web UI with progress). Con
 is the same web SPA served from flash (including the live stations map, served from
 `/stations.json`), persisted to LittleFS.
 
-**Boards / build:**
+**Boards / build:** the three boards share one pinout; only the Ethernet chip
+and where it sits change.
 
-| Env | Board | Ethernet |
+| Env | Board | Hardware |
 | --- | --- | --- |
-| `rp2350_igate` | WIZnet W5500-EVB-Pico2 (on-board W5500) + E22P-433M30S | integrated |
-| `rp2350_igate_e22` | Raspberry Pi Pico 2 + external W5500 carrier + E22-400M30S | external (carrier) |
+| `pico2_w5500_e22` | Raspberry Pi Pico 2 + W5500 Ethernet module + E22 / E22P | [Pico2_W5500_E22](https://github.com/cvaldess/Pico2_W5500_E22) |
+| `wiznet_5500_evb_pico2_e22p` | WIZnet W5500-EVB-Pico2 + E22 / E22P carrier | [Wiznet_5500_EVB_Pico2_E22P](https://github.com/cvaldess/Wiznet_5500_EVB_Pico2_E22P) |
+| `wiznet_5100s_evb_pico2_e22p` | WIZnet W5100S-EVB-Pico2 on the same carrier | [Wiznet_5500_EVB_Pico2_E22P](https://github.com/cvaldess/Wiznet_5500_EVB_Pico2_E22P) |
 
 ```
-pio run -e rp2350_igate          # WIZnet W5500-EVB-Pico2
-pio run -e rp2350_igate_e22      # Pico 2 + W5500 carrier
+pio run -e wiznet_5500_evb_pico2_e22p
 ```
 
-Pinout per variant under `variants/RP2350_*/board_pinout.h` (radio SPI1:
-SCK10/MOSI11/MISO12/CS13/RST15/DIO1 14/BUSY2, RFEN GP3, DIO2→TXEN bridge, TCXO on
-DIO3; W5500 SPI0: MISO16/SCK18/MOSI19/CS17/RST20). Web assets are regenerated with
-`tools/gen_web_assets_rp2350.py` after editing `data_embed/*`.
+Each board lives in `variants/<env>/` like the ESP32 ones (`platformio.ini` +
+`board_pinout.h`). Radio on SPI1: SCK10/MOSI11/MISO12/CS13/RST15/DIO1 14/BUSY2,
+RXEN GP3, TCXO on DIO3; Ethernet on SPI0: MISO16/CS17/SCK18/MOSI19/RST20. The
+DIO2-TXEN jumper ships fitted (DIO2 keys the PA); with it moved, TXEN is on GPIO6
+(`-D RADIO_TXEN=6`). The 433 MHz (SX1268) and 868/915 MHz (SX1262) E22 / E22P
+modules use the same footprint; the firmware detects which one is fitted.
 
-> Note: the E22-400M30S is marketed as SX1268 but its die reports "SX1262" in the
-> version-string register, so RadioLib must use the **SX1262** class for it (the
-> SX1268 class rejects it with `-2`). The SX1262 class drives the same command set
-> and covers 433 MHz.
+The web page is built from `data_embed/*` at compile time by
+`tools/gen_web_assets_rp2350.py` (the RP2350 counterpart of `tools/compress.py`),
+so a change to the web needs nothing extra for these boards.
 
 <br />
 

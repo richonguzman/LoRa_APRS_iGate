@@ -3,6 +3,7 @@
 #include <Adafruit_BMP280.h>
 #include <Adafruit_BME680.h>
 #include "configuration.h"
+#include "board_pinout.h"     // PIN_WX_SDA / PIN_WX_SCL
 
 extern Configuration Config;
 

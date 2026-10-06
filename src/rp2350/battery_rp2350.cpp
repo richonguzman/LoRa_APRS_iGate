@@ -5,6 +5,7 @@
  * to call from whichever task builds the beacon/telemetry.
  */
 #include "battery_rp2350.h"
+#include "board_pinout.h"     // VSYS_CAL per board
 
 #ifndef PIN_VSYS_ADC
 #define PIN_VSYS_ADC A3        // GP29 = ADC3 = VSYS/3 on Pico2 / W5500-EVB-Pico2

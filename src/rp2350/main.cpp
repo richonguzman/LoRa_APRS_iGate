@@ -17,6 +17,7 @@
 #include <SPI.h>
 #include <Ethernet.h>
 #include "configuration.h"
+#include "board_pinout.h"   // PIN_ETH_* (W5500 / W5100S on SPI0)
 #include "lora_utils.h"
 #include "eth_web.h"
 #include "aprsis_rp2350.h"

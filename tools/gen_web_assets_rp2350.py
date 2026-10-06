@@ -1,21 +1,20 @@
 #!/usr/bin/env python3
-# Generate src/rp2350/web_assets.h from data_embed/* for the RP2350 iGate build.
-# Each SPA asset is gzipped and embedded as a byte array; eth_web.cpp serves them
-# with Content-Encoding: gzip. Run after editing any data_embed/* file:
+# Generates web_assets.h from data_embed/* for the RP2350 iGate build: each SPA
+# asset is gzipped and embedded as a byte array that eth_web.cpp serves with
+# Content-Encoding: gzip.
+#
+# It is the RP2350 counterpart of tools/compress.py and runs the same way, as a
+# PlatformIO pre: script of every RP2350 env, so the web is rebuilt from
+# data_embed/* on every build. The header goes to the build directory, never to
+# src/. Run by hand it only writes a preview to .pio/web_assets_preview/:
 #
 #     python tools/gen_web_assets_rp2350.py
-#
-# (Standalone — unlike tools/compress.py, which is the ESP32 PlatformIO script
-# that emits .gz files instead of this C header.)
 
 import base64
 import gzip
 import os
 import datetime
 import re
-
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-OUT  = os.path.join(ROOT, "src", "rp2350", "web_assets.h")
 
 # The page and everything it loads at start-up go out as ONE response: the
 # stylesheets, scripts and favicon index.html links are inlined into it. The
@@ -71,10 +70,10 @@ def inline_page(html):
                         b'<link rel="icon" href="data:image/png;base64,' + icon + b'" type="image/png">')
     return html
 
-def main():
+def main(out):
     lines = [
         "#pragma once",
-        "// AUTO-GENERATED from data_embed/* by tools/gen_web_assets_rp2350.py — do not edit.",
+        "// AUTO-GENERATED at build time from data_embed/* by tools/gen_web_assets_rp2350.py — do not edit.",
         "// Gzipped SPA assets embedded in flash; served with Content-Encoding: gzip.",
         "#include <Arduino.h>",
         "#include <stddef.h>",
@@ -98,9 +97,22 @@ def main():
     lines.append("static const size_t WEB_ASSETS_N = sizeof(WEB_ASSETS)/sizeof(WEB_ASSETS[0]);")
     lines.append("")
 
-    with open(OUT, "w", encoding="utf-8", newline="\n") as f:
+    os.makedirs(os.path.dirname(out), exist_ok=True)
+    with open(out, "w", encoding="utf-8", newline="\n") as f:
         f.write("\n".join(lines))
-    print(f"wrote {OUT} ({os.path.getsize(OUT)} bytes)")
+    print(f"wrote {out} ({os.path.getsize(out)} bytes)")
 
-if __name__ == "__main__":
-    main()
+try:
+    Import("env")       # run by PlatformIO (extra_scripts = pre:...)
+except NameError:
+    env = None
+
+if env is not None:
+    # PlatformIO does not set __file__ for extra scripts: take the paths from the env
+    ROOT    = env.subst("$PROJECT_DIR")
+    out_dir = os.path.join(env.subst("$BUILD_DIR"), "web_assets")
+    env.Append(CPPPATH=[out_dir])
+    main(os.path.join(out_dir, "web_assets.h"))
+elif __name__ == "__main__":
+    ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    main(os.path.join(ROOT, ".pio", "web_assets_preview", "web_assets.h"))
