@@ -66,7 +66,7 @@ namespace POWER_Utils {
         }
 
         void vext_ctrl_OFF() {
-            digitalWrite(VEXT_CTRL_PIN, Config.digi.ecoMode == 1 ? VEXT_CTRL_ON_STATE : !VEXT_CTRL_ON_STATE);
+            digitalWrite(VEXT_CTRL_PIN, !VEXT_CTRL_ON_STATE);       // always off, regardless of ecoMode
         }
     #endif
 
@@ -111,9 +111,7 @@ namespace POWER_Utils {
                 PMU.enableALDO3();
             #endif
         #endif
-        #ifdef HELTEC_WIRELESS_TRACKER
-            adc_ctrl_ON();
-        #endif
+        // HELTEC_WIRELESS_TRACKER: GPS shares Vext (GPIO3) with the TFT, so it follows the display power (not controlled here)
         //gpsIsActive = true;
     }
 
@@ -129,9 +127,7 @@ namespace POWER_Utils {
                 PMU.disableALDO3();
             #endif
         #endif
-        #ifdef HELTEC_WIRELESS_TRACKER
-            adc_ctrl_OFF();
-        #endif
+        // HELTEC_WIRELESS_TRACKER: GPS shares Vext with the TFT, turned off with it (see activateGPS)
         //gpsIsActive = false;
     }
 

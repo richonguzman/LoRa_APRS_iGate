@@ -433,7 +433,7 @@ namespace Utils {
                 displayToggle(false);
             }
             #ifdef VEXT_CTRL_PIN
-                digitalWrite(VEXT_CTRL_PIN, !VEXT_CTRL_ON_STATE);   // VEXT off before deep sleep (always, regardless of ecoMode)
+                POWER_Utils::vext_ctrl_OFF();       // VEXT off before deep sleep (always, regardless of ecoMode)
             #endif
             LoRa_Utils::sleepRadio();
             POWER_Utils::deactivateGPS();       // GPS rail off (AXP boards), otherwise it keeps draining the low battery while sleeping
