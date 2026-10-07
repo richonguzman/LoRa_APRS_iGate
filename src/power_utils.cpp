@@ -199,7 +199,10 @@ namespace POWER_Utils {
                 PMU.setDC1Voltage(3300);
                 PMU.enableDC1();
                 #ifdef TTGO_T_Beam_S3_SUPREME_V3
-                    PMU.setALDO1Voltage(3300);
+                    PMU.setALDO1Voltage(3300);      // BME280, QMC6310, QMI8658, OLED
+                    PMU.enableALDO1();
+                    PMU.setALDO2Voltage(3300);      // sensors/OLED I2C + RTC PCF8563 (must stay on)
+                    PMU.enableALDO2();
                 #endif
                 PMU.setButtonBatteryChargeVoltage(3300);
                 PMU.enableButtonBatteryCharge();
