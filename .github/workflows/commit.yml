@@ -29,3 +29,33 @@ jobs:
 
             - name: Build FS
               run: pio run --target buildfs -e ${{ matrix.target.name }}
+
+    build-rp2350:
+        # RP2350 boards (src/rp2350/, maintained by @cvaldess). The W5500 and W5100S
+        # boards cover both Ethernet drivers. Informative only: if one does not
+        # build, this run stays green and leaves a warning.
+        runs-on: ubuntu-latest
+        strategy:
+            fail-fast: false
+            matrix:
+              target:
+                - name: wiznet_5500_evb_pico2_e22p
+                - name: wiznet_5100s_evb_pico2_e22p
+        steps:
+            - uses: actions/checkout@v7
+
+            - uses: actions/setup-python@v7
+              with:
+                  python-version: "3.13"
+
+            - name: Install PlatformIO Core
+              run: pip install --upgrade platformio
+
+            - name: Build target
+              id: build
+              continue-on-error: true
+              run: pio run -e ${{ matrix.target.name }}
+
+            - name: Report
+              if: steps.build.outcome == 'failure'
+              run: echo "::warning title=RP2350::${{ matrix.target.name }} did not build. The RP2350 boards (src/rp2350/) are maintained by @cvaldess."
