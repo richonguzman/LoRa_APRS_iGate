@@ -52,6 +52,7 @@ ___________________________________________________________________*/
 #include "syslog_utils.h"
 #include "power_utils.h"
 #include "sleep_utils.h"
+#include "thermal_utils.h"
 #include "mqtt_utils.h"
 #include "lora_utils.h"
 #include "wifi_utils.h"
@@ -68,7 +69,7 @@ ___________________________________________________________________*/
 #endif
 
 
-String              versionDate             = "2026-10-07";
+String              versionDate             = "2026-10-09";
 String              versionNumber           = "4.0.3";
 Configuration       Config;
 WiFiClient          aprsIsClient;
@@ -108,6 +109,9 @@ void setup() {
     }
     networkManager->setHostName("iGATE-" + Config.callsign);
     POWER_Utils::setup();
+    #ifdef FAN_CTRL_PIN
+        THERMAL_Utils::setup();
+    #endif
     Utils::setupDisplay();
     LoRa_Utils::setup();
     Utils::validateFreqs();
@@ -135,6 +139,9 @@ void loop() {
         SLEEP_Utils::checkWakeUpFlag();
         Utils::checkBeaconInterval();
         STATION_Utils::processOutputPacketBufferUltraEcoMode();
+        #ifdef FAN_CTRL_PIN
+            THERMAL_Utils::monitor();
+        #endif
         Utils::checkSleepByLowBatteryVoltage(1);
         SLEEP_Utils::startSleeping();
     } else {
@@ -222,6 +229,9 @@ void loop() {
             displayShow(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
         #endif
 
+        #ifdef FAN_CTRL_PIN
+            THERMAL_Utils::monitor();
+        #endif
         Utils::checkRebootTime();
         Utils::checkSleepByLowBatteryVoltage(1);
     }

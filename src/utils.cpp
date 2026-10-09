@@ -27,6 +27,7 @@
 #include "board_pinout.h"
 #include "power_utils.h"
 #include "syslog_utils.h"
+#include "thermal_utils.h"
 #include "A7670_utils.h"
 #include "lora_utils.h"
 #include "wifi_utils.h"
@@ -434,6 +435,9 @@ namespace Utils {
             }
             #ifdef VEXT_CTRL_PIN
                 POWER_Utils::vext_ctrl_OFF();       // VEXT off before deep sleep (always, regardless of ecoMode)
+            #endif
+            #ifdef FAN_CTRL_PIN
+                THERMAL_Utils::turnOffFan();
             #endif
             LoRa_Utils::sleepRadio();
             POWER_Utils::deactivateGPS();       // GPS rail off (AXP boards), otherwise it keeps draining the low battery while sleeping

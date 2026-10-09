@@ -21,6 +21,7 @@
 #include "sleep_utils.h"
 #include "digi_utils.h"
 #include "lora_utils.h"
+#include "thermal_utils.h"
 
 
 extern  Configuration   Config;
@@ -75,6 +76,9 @@ namespace SLEEP_Utils {
             Serial.print("(Sleeping : "); Serial.print(timeToSleep); Serial.println("seconds)");
             delay(100);
             LoRa_Utils::wakeRadio();
+            #ifdef FAN_CTRL_PIN
+                THERMAL_Utils::turnOffFan();     // GPIOs keep their level in light sleep
+            #endif
             esp_light_sleep_start();
         }
     }
