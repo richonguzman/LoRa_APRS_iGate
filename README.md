@@ -59,7 +59,65 @@ ____________________________________________________
 
 - Wemos Lolin32 Oled + SX1278 DIY Version.
 
+- **RP2350 (Raspberry Pi Pico 2) + WIZnet W5500 Ethernet + Ebyte E22 1W LoRa Module** — wired, headless DIY version (see the section below).
+
 - and many more...
+
+<br />
+
+____________________________________________________
+
+## RP2350 + Ethernet (WIZnet W5500) port
+
+A wired, headless iGate variant for the **Raspberry Pi RP2350 (Pico 2)** with a
+**WIZnet W5500 hardwired-TCP/IP Ethernet** front-end and an **Ebyte E22 (SX1262)**
+1 W LoRa module. Aimed at fixed-site / always-on installations on the 433.775 MHz
+LoRa-APRS network — no WiFi, no display, just Ethernet.
+
+**Why RP2350 + W5500:** the W5500 runs the full TCP/IP stack in silicon (8 hardware
+sockets), so the two Cortex-M33 cores and 520 KB of RAM stay free for LoRa
+timing/decode instead of a software IP stack. Runs on the Earle Philhower
+arduino-pico core with FreeRTOS SMP; radio on SPI1, W5500 on SPI0 (no bus
+contention).
+
+**The port is additive and isolated:** all new code lives under `src/rp2350/` and
+is selected by `build_src_filter` in dedicated PlatformIO envs — existing ESP32
+boards are untouched. Hardware-agnostic logic (KISS codec, APRSPacketLib usage) is
+shared; the ESP32-specific WiFi/ESPAsyncWebServer/Update.h paths are replaced with
+lean equivalents over `EthernetClient`/`EthernetServer`/`EthernetUDP`.
+
+**Features:** iGate RX→APRS-IS (qAR), position beacon (RF + APRS-IS), digipeater
+(WIDEn-N, own-callsign path and anti-loop), CAD/DIFS channel access before TX,
+station blacklist/dedup/last-heard, APRS queries + bidirectional messaging, KISS TNC
+server (TCP :8001), structured T# telemetry, WX (BMP280 / BME680 / SHT40), optional
+GPS, SNTP time, remote syslog, MQTT bridge, DHCP or static IP, HTTP Basic web auth,
+scheduled auto-reboot, VSYS monitor, and network OTA (web UI with progress). Config
+is the same web SPA served from flash (including the live stations map, served from
+`/stations.json`), persisted to LittleFS.
+
+**Boards / build:** the three boards share one pinout; only the Ethernet chip
+and where it sits change.
+
+| Env | Board | Hardware |
+| --- | --- | --- |
+| `pico2_w5500_e22` | Raspberry Pi Pico 2 + W5500 Ethernet module + E22 / E22P | [Pico2_W5500_E22](https://github.com/cvaldess/Pico2_W5500_E22) |
+| `wiznet_5500_evb_pico2_e22p` | WIZnet W5500-EVB-Pico2 + E22 / E22P carrier | [Wiznet_5500_EVB_Pico2_E22P](https://github.com/cvaldess/Wiznet_5500_EVB_Pico2_E22P) |
+| `wiznet_5100s_evb_pico2_e22p` | WIZnet W5100S-EVB-Pico2 on the same carrier | [Wiznet_5500_EVB_Pico2_E22P](https://github.com/cvaldess/Wiznet_5500_EVB_Pico2_E22P) |
+
+```
+pio run -e wiznet_5500_evb_pico2_e22p
+```
+
+Each board lives in `variants/<env>/` like the ESP32 ones (`platformio.ini` +
+`board_pinout.h`). Radio on SPI1: SCK10/MOSI11/MISO12/CS13/RST15/DIO1 14/BUSY2,
+RXEN GP3, TCXO on DIO3; Ethernet on SPI0: MISO16/CS17/SCK18/MOSI19/RST20. The
+DIO2-TXEN jumper ships fitted (DIO2 keys the PA); with it moved, TXEN is on GPIO6
+(`-D RADIO_TXEN=6`). The 433 MHz (SX1268) and 868/915 MHz (SX1262) E22 / E22P
+modules use the same footprint; the firmware detects which one is fitted.
+
+The web page is built from `data_embed/*` at compile time by
+`tools/gen_web_assets_rp2350.py` (the RP2350 counterpart of `tools/compress.py`),
+so a change to the web needs nothing extra for these boards.
 
 <br />
 
