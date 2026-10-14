@@ -71,6 +71,8 @@ jobs:
                       chip: esp32s3
                     - name: ttgo_t_beam_s3_SUPREME_v3
                       chip: esp32s3
+                    - name: ttgo-t-beam-1W
+                      chip: esp32s3
                     - name: ESP32_DIY_LoRa_A7670_SX1278
                       chip: esp32
                     - name: ESP32_DIY_LoRa_A7670_915_SX1276
