@@ -37,7 +37,7 @@ ____________________________________________________
 
 - TTGO Lilygo LoRa32 LoRa32 V2.1 (V1.6 is the same) and T3S3 V1.2.
 
-- TTGO T-Beam V1.0 , V1.1, V1.2 (also variations with SX1262 and SX1268 LoRa Modules) and Supreme V3.
+- TTGO T-Beam V1.0 , V1.1, V1.2 (also variations with SX1262 and SX1268 LoRa Modules), Supreme V3 and T-Beam 1W.
 
 - T-Deck Plus (and also regular T-Deck with/without GPS).
 
@@ -122,6 +122,8 @@ so a change to the web needs nothing extra for these boards.
 <br />
 
 # Timeline (Versions):
+- 2026-10-14 T-Beam 1W board added (with fan control and Tx over-temperature protection).
+- 2026-10-05 Fix for stored XSS in received packets, Wifi warning with bad password, date on Rx packets, mDNS kiss-tnc for phone apps, APRSPacketLib V1.0.10 update.
 - 2026-09-30 GPS baud rate auto-detection, CAD timeout (packet dropped after 10s of busy channel)
 - 2026-09-23 APRSPacketLib V1.0.7 update and many code cleaning with this.
 - 2026-09-17 Real APRS Symbols added to map and TNC2 output as a posibility in TNC mode.

@@ -28,6 +28,7 @@
 #include "ntp_utils.h"
 #include "display.h"
 #include "utils.h"
+#include "thermal_utils.h"
 
 
 extern Configuration    Config;
@@ -107,9 +108,11 @@ namespace LoRa_Utils {
     }
 
     void setup() {
+        #ifdef RADIO_VCC_PIN        // LoRa module power switch (QRP Labs LightGateway, T-Beam 1W)
+            pinMode(RADIO_VCC_PIN, OUTPUT);
+            digitalWrite(RADIO_VCC_PIN, HIGH);
+        #endif
         #if defined (LIGHTGATEWAY_1_0) || defined(LIGHTGATEWAY_PLUS_1_0)
-            pinMode(RADIO_VCC_PIN,OUTPUT);
-            digitalWrite(RADIO_VCC_PIN,HIGH);
             loraSPI.begin(RADIO_SCLK_PIN, RADIO_MISO_PIN, RADIO_MOSI_PIN, RADIO_CS_PIN);
         #else
             SPI.begin(RADIO_SCLK_PIN, RADIO_MISO_PIN, RADIO_MOSI_PIN);
@@ -124,6 +127,8 @@ namespace LoRa_Utils {
         #endif
         #if (defined(RADIO_RXEN) && defined(RADIO_TXEN))    // before begin() so RF switch is driven from start (Ebyte E22/E32 1W, QRP Labs LightGateway)
             radio.setRfSwitchPins(RADIO_RXEN, RADIO_TXEN);
+        #elif defined(RADIO_RXEN)                           // T-Beam 1W: RXEN = LNA only, DIO2 drives the PA
+            radio.setRfSwitchPins(RADIO_RXEN, RADIOLIB_NC);
         #endif
         int state = radio.begin(freq);
         if (state != RADIOLIB_ERR_NONE) {
@@ -152,11 +157,6 @@ namespace LoRa_Utils {
         radio.setBandwidth(signalBandwidth);
         radio.setCRC(true);
 
-        /*#ifdef SX126X_DIO2_AS_RF_SWITCH
-        radio.setRfSwitchPins(RADIO_RXEN, RADIOLIB_NC);
-        radio.setDio2AsRfSwitch(true);
-        #endif*/
-
         int power = validPower(Config.loramodule.power);
         if (power != Config.loramodule.power) {
             Utils::println("LoRa power adjusted: " + String(Config.loramodule.power) + " -> " + String(power));
@@ -177,6 +177,10 @@ namespace LoRa_Utils {
 
         #if defined(HAS_TCXO) && !defined(HAS_1W_LORA)
             radio.setDio2AsRfSwitch();
+        #endif
+        #if defined(TTGO_T_BEAM_1W)
+            radio.setDio2AsRfSwitch(true);                          // DIO2 drives the 1W PA
+            radio.setPaRampTime(RADIOLIB_SX126X_PA_RAMP_800U);      // PA needs >800us to settle (default 200us)
         #endif
         #ifdef HAS_TCXO
             radio.setTCXO(1.8);
@@ -239,6 +243,12 @@ namespace LoRa_Utils {
 
     void sendNewPacket(const String& newPacket) {
         if (!Config.loramodule.txActive) return;
+        #ifdef FAN_CTRL_PIN
+            if (THERMAL_Utils::isTxBlocked()) {
+                Utils::println("Thermal: Tx blocked (over-temperature), packet dropped: " + newPacket);
+                return;
+            }
+        #endif
 
         if (Config.loramodule.txFreq != Config.loramodule.rxFreq) {
             if (!packetIsBeacon || (packetIsBeacon && Config.beacon.beaconFreq == 1)) {
@@ -262,7 +272,13 @@ namespace LoRa_Utils {
         }
 
         if (!cadDropped) {
+            #ifdef FAN_CTRL_PIN
+                THERMAL_Utils::onTxStart();
+            #endif
             int state = radio.transmit("\x3c\xff\x01" + newPacket);
+            #ifdef FAN_CTRL_PIN
+                THERMAL_Utils::onTxEnd();
+            #endif
             transmitFlag = true;
             if (state == RADIOLIB_ERR_NONE) {
                 if (Config.syslog.active && networkManager->isConnected()) {
