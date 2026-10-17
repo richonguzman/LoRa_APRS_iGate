@@ -61,23 +61,34 @@ extern int   rssi;
 extern float snr;
 volatile bool g_beaconNow = false;   // set by POST /action?type=send-beacon (eth_web)
 volatile bool g_rfBeaconNow = false; // set by POST /action?type=send-rf-beacon (eth_web)
+// Backup digi running (RP2350 counterpart of the ESP32 runtime backupDigiMode):
+// written by netTask, read by loraTask and the digi.
+volatile bool g_backupDigi = false;
 
 // Called from netTask (eth_web /action handler) to originate an APRS message.
 // We build here (Config is read-only) and hand the packet to loraTask, the sole
 // owner of the Station output buffer (no cross-task race on outBuffer).
 // Called from netTask (eth_web /action). RF goes via the queue to loraTask; the
-// APRS-IS copy is sent right here (netTask owns the socket).
-void webSendMessage(const String &to, const String &text, bool viaRF, bool viaTCP) {
+// APRS-IS copy is sent right here (netTask owns the socket). sentRF / sentTCP say
+// which copies actually went out, for the reply to the web page.
+void webSendMessage(const String &to, const String &text, bool viaRF, bool viaTCP,
+                    bool &sentRF, bool &sentTCP) {
+    sentRF = sentTCP = false;
     if (viaRF) {
         String pkt = Message::buildRF(to, text);
         if (pkt.length()) {
             String *p = new String(pkt);
-            if (xQueueSend(txMsgQueue, &p, 0) != pdTRUE) delete p;
+            if (xQueueSend(txMsgQueue, &p, 0) == pdTRUE) sentRF = true;
+            else delete p;
         }
     }
     if (viaTCP && AprsIs::connected()) {
         String line = Message::buildAprsis(to, text);
-        if (line.length()) { AprsIs::send(line); Serial.println("[msg] APRS-IS: " + line); }
+        if (line.length()) {
+            AprsIs::send(line);
+            sentTCP = true;
+            Serial.println("[msg] APRS-IS: " + line);
+        }
     }
 }
 
@@ -98,15 +109,15 @@ void enqueueRfFrame(const String &frame) {
 }
 
 // --------------------------------------------------------------- LoRa RX/TX task
-// Owns the radio (SPI1): transmits the RF beacon (when Config.beacon.sendViaRF)
-// and receives LoRa-APRS packets. Both run from THIS task so the radio is never
-// touched concurrently.
+// Owns the radio (SPI1): transmits the RF beacon (when Config.beacon.sendViaRF or
+// while the backup digi runs, as the ESP32 does) and receives LoRa-APRS packets.
+// Both run from THIS task so the radio is never touched concurrently.
 void loraTask(void *) {
     LoRa_Utils::setup();
     uint32_t lastRfBeacon = 0;
     for (;;) {
         // --- RF beacon TX: enqueue into the anti-collision output buffer ---
-        if (Config.beacon.sendViaRF) {
+        if (Config.beacon.sendViaRF || g_backupDigi) {
             bool locOk = !(Config.beacon.latitude == 0.0 && Config.beacon.longitude == 0.0);
 #ifdef HAS_GPS
             if (Config.beacon.gpsActive && Gps::hasFix()) locOk = true;   // GPS fix supplies the position
@@ -246,6 +257,17 @@ void netTask(void *) {
                 AprsIs::connect();
             }
             AprsIs::poll();
+            // Backup digi (WIFI_Utils::checkWiFi on ESP32): with the option ticked,
+            // 30 s without a line from the server = APRS-IS down -> repeat WIDE1-1
+            // and beacon over RF; back to normal as soon as the server talks again.
+            bool backup = Config.digi.backupDigiMode && AprsIs::silentFor(30000);
+            if (backup != g_backupDigi) {
+                g_backupDigi = backup;
+                const char *note = backup ? "*** APRS-IS down -> Backup Digi Mode ***"
+                                          : "*** APRS-IS back -> Stopping Backup Digi Mode ***";
+                Serial.println(note);
+                Syslog::logTx(note);
+            }
             // telemetry channel definitions (EQNS/UNIT/PARM) at boot + ~daily
             if (AprsIs::connected() && Telemetry::dueDefinitions()) Telemetry::sendDefinitions();
             // periodic position beacon over APRS-IS (config has sendViaAPRSIS)
@@ -253,7 +275,7 @@ void netTask(void *) {
 #ifdef HAS_GPS
             if (Config.beacon.gpsActive && Gps::hasFix()) locOk = true;   // GPS fix supplies the position
 #endif
-            if (Config.beacon.sendViaAPRSIS && AprsIs::connected() && locOk &&
+            if (Config.beacon.sendViaAPRSIS && AprsIs::connected() && !g_backupDigi && locOk &&
                 (lastBeacon == 0 || g_beaconNow ||
                  (millis() - lastBeacon >= (uint32_t)Config.beacon.interval * 60000UL))) {
                 lastBeacon = millis();

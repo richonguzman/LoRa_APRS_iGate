@@ -15,6 +15,7 @@ namespace Station {
 
     bool   isBlacklisted(const String& callsign);
     bool   isManager(const String& callsign);
+    bool   callsignIsValid(const String& callsign);   // port of Utils::callsignIsValid; pure, safe from any task
 
     void   updateLastHeard(const String& station);    // record/refresh a heard station
     bool   wasHeard(const String& station);           // heard within rememberStationTime?

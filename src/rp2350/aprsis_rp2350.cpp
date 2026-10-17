@@ -1,6 +1,8 @@
 #include "aprsis_rp2350.h"
 #include <Ethernet.h>
+#include <APRSPacketLib.h>
 #include "configuration.h"
+#include "station_rp2350.h"
 
 extern Configuration Config;
 // Inbox store (eth_web.cpp) — poll() runs in netTask, same task that owns it.
@@ -8,6 +10,12 @@ extern void ethWebAddMessage(const String &from, const String &text, const Strin
 
 static EthernetClient aprsClient;
 static const char *IGATE_VERS = "RP2350iGate 0.1";
+static uint32_t lastLineMs  = 0;     // last line of any kind from the server ("#" keepalives too)
+static uint32_t connectedAt = 0;     // when the current connection was opened
+
+// APRS-IS servers send a "#" keepalive about every 20 s. A connection that stays
+// quiet this long is dead even if the socket still reports it as connected.
+static const uint32_t SILENT_DROP_MS = 60000;
 
 // Parse one APRS-IS line; if it's a message addressed to our callsign, record it
 // in the inbox and ack it (if it carries a {msgid}).
@@ -70,6 +78,7 @@ bool connect() {
         login += Config.aprs_is.filter;
     }
     aprsClient.print(login + "\r\n");
+    connectedAt = millis();
     Serial.println("[aprsis] connected, logged in as " + Config.callsign);
     return true;
 }
@@ -79,29 +88,51 @@ void poll() {
     static String lineBuf;
     while (aprsClient.available()) {
         char ch = (char)aprsClient.read();
-        if (ch == '\n') { processAprsisLine(lineBuf); lineBuf = ""; }
+        if (ch == '\n') { lastLineMs = millis(); processAprsisLine(lineBuf); lineBuf = ""; }
         else if (ch != '\r') { if (lineBuf.length() < 512) lineBuf += ch; }
     }
+    // a server that went quiet leaves the socket "connected" forever: drop it so
+    // netTask reconnects
+    if (aprsClient.connected() && millis() - lastLineMs > SILENT_DROP_MS &&
+        millis() - connectedAt > SILENT_DROP_MS) {
+        Serial.println("[aprsis] server silent, reconnecting");
+        aprsClient.stop();
+    }
 }
+
+bool silentFor(uint32_t ms) { return millis() - lastLineMs > ms; }
 
 void send(const String &line) {
     if (line.length() == 0) return;                         // never send an empty line to APRS-IS
     if (aprsClient.connected()) aprsClient.print(line + "\r\n");
 }
 
+// Gate rules of APRS_IS_Utils::processLoRaPacket. This build never gates APRS-IS
+// back to RF (no messagesToRF/objectsToRF), so it is a receive-only iGate and
+// uses qAO, like the ESP32 with messagesToRF off (buildPacketToUpload).
 void forward(const String &packet) {
     if (!aprsClient.connected()) return;
     if (packet.length() < 5) return;
-    if (packet.indexOf("NOGATE") >= 0 || packet.indexOf("RFONLY") >= 0) return;
-    if (packet.indexOf("TCPIP") >= 0) return;     // already gated, don't loop it back
-    int gt    = packet.indexOf('>');
-    int colon = packet.indexOf(':');
-    if (gt <= 3 || colon <= gt) return;           // not a valid "SENDER>PATH:payload"
-    // skip the 3-byte LoRa-APRS header; build  SENDER>PATH,qAR,IGATECALL:payload
-    String line = packet.substring(3, colon);     // SENDER>PATH
-    line += ",qAR,";
+    String body = packet.substring(3);            // skip the 3-byte LoRa-APRS header
+    int gt    = body.indexOf('>');
+    int colon = body.indexOf(':');
+    if (gt <= 0 || colon <= gt) return;           // not a valid "SENDER>PATH:payload"
+    if (colon + 1 < (int)body.length() && body[colon + 1] == '}') return;   // third-party packet
+
+    String sender = body.substring(0, gt);
+    if (sender == Config.callsign || !Station::callsignIsValid(sender)) return;
+
+    // NOGATE / RFONLY / TCPIP count only in the path, not in the payload
+    String hdr  = body.substring(gt + 1, colon);  // "TOCALL,PATH"
+    int comma   = hdr.indexOf(',');
+    String path = (comma > 2) ? hdr.substring(comma + 1) : "";
+    if (path.indexOf("NOGATE") >= 0 || path.indexOf("RFONLY") >= 0 || path.indexOf("TCPIP") >= 0) return;
+
+    // SENDER>TOCALL,PATH,qAO,IGATECALL:payload
+    String line = body.substring(0, colon);
+    line += ",qAO,";
     line += Config.callsign;
-    line += packet.substring(colon);              // ":payload"
+    line += APRSPacketLib::checkForStartingBytes(body.substring(colon));
     aprsClient.print(line + "\r\n");
     Serial.println("[aprsis] up: " + line);
 }

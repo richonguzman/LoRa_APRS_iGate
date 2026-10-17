@@ -6,35 +6,15 @@
  */
 #include "digi_rp2350.h"
 #include "configuration.h"
+#include "station_rp2350.h"
 
 extern Configuration Config;
+// Backup digi running right now (Config.digi.backupDigiMode ticked and APRS-IS
+// down); set by netTask in main.cpp, the RP2350 counterpart of the ESP32 global
+// backupDigiMode in LoRa_APRS_iGate.cpp.
+extern volatile bool g_backupDigi;
 
 namespace {
-
-// --- lean port of Utils::callsignIsValid (src/utils.cpp) ---
-bool callsignIsValid(const String& callsign) {
-    if (callsign == "WLNK-1") return true;
-    int totalLen = callsign.length();
-    if (totalLen < 4) return false;
-
-    int hyphen   = callsign.indexOf('-');
-    int baseLen  = (hyphen > 0) ? hyphen : totalLen;
-
-    if (hyphen > 0) {                                   // SSID validation
-        if (hyphen < 4) return false;                   // base call >= 4 chars
-        int ssidStart  = hyphen + 1;
-        int ssidLen    = totalLen - ssidStart;
-        if (ssidLen == 0 || ssidLen > 2) return false;
-        if (callsign.indexOf('-', ssidStart) != -1) return false;
-        if (ssidLen == 2 && callsign[ssidStart] == '0') return false;
-        for (int i = ssidStart; i < totalLen; i++)
-            if (!isDigit(callsign[i])) return false;
-    }
-    if (baseLen < 4 || baseLen > 6) return false;
-    for (int i = 0; i < baseLen; i++)
-        if (!isAlphaNumeric(callsign[i])) return false;
-    return true;
-}
 
 String stationCall() {
     return Config.tacticalCallsign.length() ? Config.tacticalCallsign : Config.callsign;
@@ -118,7 +98,7 @@ String buildPacket(const String& path, const String& packet) {
     int    digiMode  = Config.digi.mode;
     String tempPath  = path;
 
-    if (tempPath.indexOf("WIDE1-1") != -1 && (digiMode == 1 || digiMode == 2 || Config.digi.backupDigiMode)) {
+    if (tempPath.indexOf("WIDE1-1") != -1 && (digiMode == 1 || digiMode == 2 || g_backupDigi)) {
         if (tempPath.indexOf('*') != -1) return "";          // '*' shouldn't precede WIDE1-1
         if (pathTokenIndex(tempPath, "WIDE1-1") != 0) return "";  // WIDE1-1 must be the first hop
         tempPath = call + "*" + tempPath.substring(7);
@@ -153,7 +133,7 @@ String generateDigipeatedPacket(const String& packet) {
     String hdr = packet.substring(gt + 1, colon);    // "APxxxx,WIDE1-1,..."
     int comma  = hdr.indexOf(',');
     int digiMode = Config.digi.mode;
-    bool backup  = Config.digi.backupDigiMode;
+    bool backup  = g_backupDigi;
 
     if (comma <= 2) return "";                        // no path -> nothing to consume
     String path = hdr.substring(comma + 1);
@@ -181,7 +161,7 @@ namespace Digi {
 bool enabled() {
     // Digi modes (upstream V4.0.0 numbering): 1 = WIDE1-1 fill-in, 2 = WIDE2-n,
     // 3 = own-callsign path. CrossFreq digipeating is not ported.
-    return (Config.digi.mode >= 1 && Config.digi.mode <= 3) || Config.digi.backupDigiMode;
+    return (Config.digi.mode >= 1 && Config.digi.mode <= 3) || g_backupDigi;
 }
 
 String process(const String& rawPacket) {
@@ -191,19 +171,22 @@ String process(const String& rawPacket) {
     String packet = rawPacket.substring(3);                 // drop 3-byte LoRa-APRS header
     int gt = packet.indexOf('>');
     if (gt < 3) return "";
+    int colon = packet.indexOf(':');
+    if (colon < gt) return "";
     String sender = packet.substring(0, gt);
 
-    // exclusions handled like the iGate path
-    if (packet.indexOf("NOGATE") >= 0 || packet.indexOf("RFONLY") >= 0) return "";
+    // NOGATE in the path is not repeated (as DIGI_Utils::processLoRaPacket). RFONLY
+    // only keeps a packet off APRS-IS, so it is still digipeated.
+    String hdr = packet.substring(gt + 1, colon);           // "APxxxx,WIDE1-1,..."
+    int comma  = hdr.indexOf(',');
+    if (comma > 2 && hdr.substring(comma + 1).indexOf("NOGATE") >= 0) return "";
 
     String call = stationCall();
     if (sender == call) return "";                          // never repeat ourselves
-    if (Config.tacticalCallsign.length() == 0 && !callsignIsValid(sender)) return "";
+    if (Config.tacticalCallsign.length() == 0 && !Station::callsignIsValid(sender)) return "";
 
     // NOTE: duplicate filtering + blacklist are applied upstream in loraTask
     // (Station::isDuplicate / isBlacklisted), shared with the gate path.
-    if (packet.indexOf(':') < 0) return "";
-
     return generateDigipeatedPacket(packet);
 }
 

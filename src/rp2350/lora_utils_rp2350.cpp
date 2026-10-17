@@ -255,7 +255,7 @@ String receivePacket() {
     radio->startReceive();                       // re-arm
     if (st != RADIOLIB_ERR_NONE) return "";
     // Return the RAW packet WITH its 3-byte LoRa-APRS header ('<' 0xFF 0x01) —
-    // the iGate processing/qAR build does packet.substring(3) to skip it.
+    // the iGate processing (gate + digi) does packet.substring(3) to skip it.
     return str;
 }
 

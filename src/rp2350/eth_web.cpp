@@ -18,11 +18,14 @@ extern bool applyConfigForm(const String &contentType, const String &body);
 extern volatile bool g_beaconNow;
 // Set by POST /action?type=send-rf-beacon; loraTask sends an RF beacon and clears it.
 extern volatile bool g_rfBeaconNow;
-// Originate an APRS message (RF via loraTask and/or APRS-IS via the socket).
-extern void webSendMessage(const String &to, const String &text, bool viaRF, bool viaTCP);
+// Originate an APRS message (RF via loraTask and/or APRS-IS via the socket);
+// sentRF / sentTCP report which copies actually went out.
+extern void webSendMessage(const String &to, const String &text, bool viaRF, bool viaTCP,
+                           bool &sentRF, bool &sentTCP);
 
 static const int    WEB_PORT        = 80;
 static const size_t MAX_LINE_LEN    = 512;
+static const long   MAX_CONFIG_BODY = 64 * 1024;   // POST /configuration.json; bigger = 413
 static const size_t MAX_HEADER_LINES = 40;
 static const char  *CONFIG_PATH     = "/igate_conf.json";
 
@@ -188,11 +191,6 @@ static bool parseRequest(EthernetClient &c, Request &req, uint32_t deadlineMs) {
 static void sendStatus(EthernetClient &c, int code, const char *reason) {
     c.print("HTTP/1.1 "); c.print(code); c.print(' '); c.print(reason); c.print("\r\n");
 }
-static void cors(EthernetClient &c) {
-    c.print("Access-Control-Allow-Origin: *\r\n");
-    c.print("Access-Control-Allow-Headers: Content-Type\r\n");
-    c.print("Access-Control-Allow-Methods: GET, POST, OPTIONS\r\n");
-}
 // WIZnet's socketSend() clamps a write to the socket TX buffer (SSIZE, 2 KB here)
 // but EthernetClient::write() returns the size it was ASKED for, not what it sent,
 // so a single print() of a longer body silently loses the tail: a /stations.json of
@@ -217,7 +215,6 @@ static void sendBody(EthernetClient &c, const uint8_t *data, size_t len) {
 static void sendText(EthernetClient &c, int code, const char *reason, const char *ctype, const String &body) {
     sendStatus(c, code, reason);
     c.print("Content-Type: "); c.print(ctype); c.print("\r\n");
-    cors(c);
     c.print("Content-Length: "); c.print(body.length()); c.print("\r\n");
     c.print("Connection: close\r\n\r\n");
     sendBody(c, (const uint8_t *)body.c_str(), body.length());
@@ -228,7 +225,6 @@ static void serveConfig(EthernetClient &c) {
     if (!f) { sendText(c, 200, "OK", "application/json", "{}"); return; }
     sendStatus(c, 200, "OK");
     c.print("Content-Type: application/json\r\n");
-    cors(c);
     c.print("Content-Length: "); c.print((uint32_t)f.size()); c.print("\r\n");
     c.print("Connection: close\r\n\r\n");
     uint8_t buf[256];
@@ -258,7 +254,6 @@ static void serveAsset(EthernetClient &c, const WebAsset &a, const String &ifNon
         sendStatus(c, 304, "Not Modified");
         c.print("ETag: "); c.print(etag); c.print("\r\n");
         c.print("Cache-Control: no-cache\r\n");
-        cors(c);
         c.print("Content-Length: 0\r\nConnection: close\r\n\r\n");
         return;
     }
@@ -267,7 +262,6 @@ static void serveAsset(EthernetClient &c, const WebAsset &a, const String &ifNon
     c.print("Content-Encoding: gzip\r\n");
     c.print("Cache-Control: no-cache\r\n");
     c.print("ETag: "); c.print(etag); c.print("\r\n");
-    cors(c);
     c.print("Content-Length: "); c.print((uint32_t)a.len); c.print("\r\n");
     c.print("Connection: close\r\n\r\n");
     sendBody(c, a.data, a.len);                     // RP2350: flash is directly addressable
@@ -276,8 +270,13 @@ static void serveAsset(EthernetClient &c, const WebAsset &a, const String &ifNon
 // POST /configuration.json : read the urlencoded body, apply to Config, persist,
 // then redirect + reboot (mirrors the original web_utils flow).
 static void handleConfigPost(EthernetClient &c, const Request &req) {
+    if (req.contentLength > MAX_CONFIG_BODY) {
+        sendText(c, 413, "Payload Too Large", "text/plain", "config form too large");
+        c.flush();
+        return;
+    }
     String body;
-    if (req.contentLength > 0 && req.contentLength < 65536) body.reserve(req.contentLength);
+    if (req.contentLength > 0) body.reserve(req.contentLength);
     uint32_t dl = millis() + 8000;
     while ((long)body.length() < req.contentLength && (int32_t)(millis() - dl) < 0) {
         int avail = c.available();
@@ -291,7 +290,6 @@ static void handleConfigPost(EthernetClient &c, const Request &req) {
     if (applyConfigForm(req.contentType, body)) {
         sendStatus(c, 302, "Found");
         c.print("Location: /?success=1\r\n");
-        cors(c);
         c.print("Content-Length: 0\r\nConnection: close\r\n\r\n");
         c.flush();
         delay(500);
@@ -309,19 +307,11 @@ static void handleClient(EthernetClient &c) {
     if (!parseRequest(c, req, deadline)) return;
     Serial.printf("[web] %s %s\n", req.method.c_str(), req.path.c_str());
 
-    if (req.method == "OPTIONS") {
-        sendStatus(c, 204, "No Content");
-        cors(c);
-        c.print("Content-Length: 0\r\nConnection: close\r\n\r\n");
-        c.flush();
-        return;
-    }
     // web-interface auth (HTTP Basic) when enabled. /status (version probe) and
     // /update (its own OTA auth) are exempt to avoid breaking probes / double-auth.
     if (req.path != "/status" && req.path != "/update" && !webAuthOk(req.authorization)) {
         sendStatus(c, 401, "Unauthorized");
         c.print("WWW-Authenticate: Basic realm=\"iGate Admin\"\r\n");
-        cors(c);
         c.print("Content-Length: 0\r\nConnection: close\r\n\r\n");
         c.flush();
         return;
@@ -394,6 +384,11 @@ static void handleClient(EthernetClient &c) {
         return;
     }
     if (req.path == "/action") {            // POST /action?type=send-beacon | send-rf-beacon | send-message | reboot
+        if (req.method != "POST") {         // POST only, as on ESP32 (web_utils.cpp)
+            sendText(c, 405, "Method Not Allowed", "text/plain", "POST only");
+            c.flush();
+            return;
+        }
         if (req.query.indexOf("send-message") >= 0) {
             String to   = getQueryParam(req.query, "to");
             String text = getQueryParam(req.query, "text");
@@ -403,8 +398,18 @@ static void handleClient(EthernetClient &c) {
             if (to.length() == 0 || text.length() == 0) {
                 sendText(c, 400, "Bad Request", "text/plain", "need to= and text=");
             } else {
-                webSendMessage(to, text, viaRF, viaTCP);
-                sendText(c, 200, "OK", "text/plain", "message queued");
+                bool sentRF, sentTCP;
+                webSendMessage(to, text, viaRF, viaTCP, sentRF, sentTCP);
+                // tell the page which copies really went out (it shows this text)
+                String sent, failed;
+                if (sentRF)  sent = "RF";
+                if (sentTCP) sent += sent.length() ? " + APRS-IS" : "APRS-IS";
+                if (viaRF && !sentRF)   failed = "RF (TX queue full)";
+                if (viaTCP && !sentTCP) failed += failed.length() ? ", APRS-IS (not connected)" : "APRS-IS (not connected)";
+                String reply = sent.length() ? String("queued (") + sent + ")" : String("not sent");
+                if (failed.length()) reply += String(sent.length() ? "; not sent: " : ": ") + failed;
+                if (sent.length()) sendText(c, 200, "OK", "text/plain", reply);
+                else               sendText(c, 503, "Service Unavailable", "text/plain", reply);
             }
         } else if (req.query.indexOf("send-rf-beacon") >= 0) {
             g_rfBeaconNow = true;
