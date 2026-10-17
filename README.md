@@ -86,14 +86,19 @@ boards are untouched. Hardware-agnostic logic (KISS codec, APRSPacketLib usage) 
 shared; the ESP32-specific WiFi/ESPAsyncWebServer/Update.h paths are replaced with
 lean equivalents over `EthernetClient`/`EthernetServer`/`EthernetUDP`.
 
-**Features:** iGate RX→APRS-IS (qAR), position beacon (RF + APRS-IS), digipeater
-(WIDEn-N, own-callsign path and anti-loop), CAD/DIFS channel access before TX,
-station blacklist/dedup/last-heard, APRS queries + bidirectional messaging, KISS TNC
-server (TCP :8001), structured T# telemetry, WX (BMP280 / BME680 / SHT40), optional
-GPS, SNTP time, remote syslog, MQTT bridge, DHCP or static IP, HTTP Basic web auth,
-scheduled auto-reboot, VSYS monitor, and network OTA (web UI with progress). Config
-is the same web SPA served from flash (including the live stations map, served from
-`/stations.json`), persisted to LittleFS.
+**Features:** receive-only iGate RX→APRS-IS (qAO), position beacon (RF + APRS-IS),
+digipeater (WIDEn-N, own-callsign path and anti-loop), backup digipeater (WIDE1-1
+only, while APRS-IS is down), CAD/DIFS channel access before TX, station
+blacklist/dedup/last-heard, APRS queries, sending and receiving messages addressed
+to the iGate, KISS TNC server (TCP :8001), structured T# telemetry, WX (BMP280 /
+BME680 / SHT40), optional GPS, SNTP time, remote syslog, MQTT bridge, DHCP or static
+IP, HTTP Basic web auth, scheduled auto-reboot, VSYS monitor, and network OTA (web UI
+with progress). Config is the same web SPA served from flash (including the live
+stations map, served from `/stations.json`), persisted to LittleFS.
+
+**Not ported:** gating from APRS-IS to RF (the *Gate APRS-IS Messages / Objects to
+RF* options are disabled in the web page on these boards) and the CrossFreq
+digipeater.
 
 **Boards / build:** the three boards share one pinout; only the Ethernet chip
 and where it sits change.

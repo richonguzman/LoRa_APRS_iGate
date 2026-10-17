@@ -1170,12 +1170,28 @@ function applyWiredBuildUi(settings) {
     document.getElementById("ip-config-hr").style.display      = "";
     document.getElementById("static-ip-config").style.display  = net.dhcp ? "none" : "";
 
-    // --- sidebar: this build has its own Messages + OTA views, and no ElegantOTA
-    document.querySelectorAll(".side-link.rp2350-only").forEach(function (el) {
+    // --- sidebar: this build has its own Messages + OTA views, and no ElegantOTA;
+    //     the footer credits the port
+    document.querySelectorAll(".rp2350-only").forEach(function (el) {
         el.style.display = "";
     });
     const elegantOta = document.querySelector(".side-link.side-ota");
     if (elegantOta) elegantOta.style.display = "none";
+
+    // --- APRS-IS -> RF gating is not ported: this build is a receive-only iGate (qAO).
+    //     Kept disabled when "Enable APRS-IS connection" is toggled, too.
+    const disableGateToRf = function () {
+        ["aprs_is.messagesToRF", "aprs_is.objectsToRF"].forEach(function (id) {
+            const el = document.getElementById(id);
+            if (el) el.checked = false;
+            markUnavailable(id, "Not available on this board: it only gates RF to APRS-IS");
+        });
+    };
+    disableGateToRf();
+    document.getElementById("aprs_is.active").addEventListener("change", disableGateToRf);
+    describeSection("aprs_is.active",
+        "Enter your APRS-IS server and credentials.<br><br>This board only gates RF &rarr; APRS-IS "
+        + "(receive-only iGate): <b>Gate APRS-IS Messages / Objects to RF</b> are not available.");
 
     // --- WiFi: not present on this board
     ["wifi.autoAP.enabled", "wifi.autoAP.password", "wifi.autoAP.timeout"].forEach(function (id) {
@@ -1252,11 +1268,13 @@ if (sendMessageButton) {
 
         const params = "to=" + encodeURIComponent(to) + "&text=" + encodeURIComponent(text)
             + "&rf=" + (viaRF ? "1" : "0") + "&tcp=" + (viaTCP ? "1" : "0");
-        fetch("/action?type=send-message&" + params, { method: "POST" });
-
-        const via = [viaRF ? "RF" : null, viaTCP ? "APRS-IS" : null].filter(Boolean).join(" + ");
-        showToast("Message to <b>" + to + "</b> queued (" + via + ").");
-        document.getElementById("message.text").value = "";
+        // the iGate answers with what really went out, e.g. "queued (RF); not sent: APRS-IS (not connected)"
+        fetch("/action?type=send-message&" + params, { method: "POST" })
+            .then((r) => r.text().then((reply) => {
+                showToast("Message to <b>" + escapeHtml(to) + "</b>: " + escapeHtml(reply) + ".");
+                if (r.ok) document.getElementById("message.text").value = "";
+            }))
+            .catch(() => showToast("Could not reach the iGate: message not sent."));
     });
 }
 
