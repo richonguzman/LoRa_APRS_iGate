@@ -234,6 +234,7 @@ namespace WEB_Utils {
         if (Config.aprs_is.active) {
             Config.aprs_is.messagesToRF     = request->hasParam("aprs_is.messagesToRF", true);
             Config.aprs_is.objectsToRF      = request->hasParam("aprs_is.objectsToRF", true);
+            Config.aprs_is.is2Metadata      = request->hasParam("aprs_is.is2Metadata", true);
             Config.aprs_is.server           = getParamStringSafe("aprs_is.server", Config.aprs_is.server);
             Config.aprs_is.passcode         = getParamStringSafe("aprs_is.passcode", Config.aprs_is.passcode);
             Config.aprs_is.port             = getParamIntSafe("aprs_is.port", Config.aprs_is.port);

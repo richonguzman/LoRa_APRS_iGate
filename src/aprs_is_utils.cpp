@@ -152,6 +152,18 @@ namespace APRS_IS_Utils {
         return packetToUpload;
     }
 
+    String buildIS2Meta() {
+        static String fixedTail;                    // rx_modem + rx_bitrate + rx_frequency: RX config doesn't change at runtime
+        if (fixedTail == "") {
+            // LoRa bit rate = SF * (BW / 2^SF) * 4/CR   (CR = denominator: 5..8)
+            uint32_t bitrate = (uint32_t)(Config.loramodule.rxSpreadingFactor
+                               * ((float)Config.loramodule.rxSignalBandwidth / (1 << Config.loramodule.rxSpreadingFactor))
+                               * (4.0 / Config.loramodule.rxCodingRate4));
+            fixedTail = " rx_modem=2 rx_bitrate=" + String(bitrate) + " rx_frequency=" + String(Config.loramodule.rxFreq);
+        }
+        return "#is2-meta rx_rssi_dbm=" + String(lastAprsPacket.rssi) + " rx_snr_db=" + String(lastAprsPacket.snr, 1) + fixedTail;
+    }
+
     bool processReceivedLoRaMessage(const String& sender, const String& packet) {
         String receivedMessage;
         int leftCurlyBraceIndex = packet.indexOf("{");
@@ -202,7 +214,11 @@ namespace APRS_IS_Utils {
                             A7670_Utils::uploadToAPRSIS(aprsPacketToUpload);
                             stationBeacon = false;
                         #else
-                            upload(aprsPacketToUpload);
+                            if (Config.aprs_is.is2Metadata && aprsPacketToUpload != "") {
+                                upload(buildIS2Meta() + "\r\n" + aprsPacketToUpload);     // IS2PLAIN: meta line right before the packet, same write
+                            } else {
+                                upload(aprsPacketToUpload);
+                            }
                         #endif
                         Utils::println("(Uploaded to APRS-IS)");
                         displayShow(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);

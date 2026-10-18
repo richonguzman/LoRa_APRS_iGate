@@ -103,6 +103,7 @@ function loadSettings(settings) {
     document.getElementById("aprs_is.active").checked                   = settings.aprs_is.active;
     document.getElementById("aprs_is.messagesToRF").checked             = settings.aprs_is.messagesToRF;
     document.getElementById("aprs_is.objectsToRF").checked              = settings.aprs_is.objectsToRF;
+    document.getElementById("aprs_is.is2Metadata").checked              = settings.aprs_is.is2Metadata;
     document.getElementById("aprs_is.server").value                     = settings.aprs_is.server;
     document.getElementById("aprs_is.port").value                       = settings.aprs_is.port;
     document.getElementById("aprs_is.filter").value                     = settings.aprs_is.filter;
@@ -110,6 +111,7 @@ function loadSettings(settings) {
     APRSISCheckbox.checked      = settings.aprs_is.active;
     APRSISGateMessages.disabled = !APRSISCheckbox.checked;
     APRSISGateObjects.disabled  = !APRSISCheckbox.checked;
+    APRSISMetadata.disabled     = !APRSISCheckbox.checked;
     APRSISServer.disabled       = !APRSISCheckbox.checked;
     APRSISPort.disabled         = !APRSISCheckbox.checked;
     APRSISPasscode.disabled     = !APRSISCheckbox.checked;
@@ -350,6 +352,7 @@ StatusCheckbox.addEventListener("change", function() {
 const APRSISCheckbox            = document.querySelector('input[name="aprs_is.active"]');
 const APRSISGateMessages        = document.querySelector('input[name="aprs_is.messagesToRF"]');
 const APRSISGateObjects         = document.querySelector('input[name="aprs_is.objectsToRF"]');
+const APRSISMetadata            = document.querySelector('input[name="aprs_is.is2Metadata"]');
 const APRSISServer              = document.querySelector('input[name="aprs_is.server"]');
 const APRSISPort                = document.querySelector('input[name="aprs_is.port"]');
 const APRSISPasscode            = document.querySelector('input[name="aprs_is.passcode"]');
@@ -357,6 +360,7 @@ const APRSISFilter              = document.querySelector('input[name="aprs_is.fi
 APRSISCheckbox.addEventListener("change", function() {
     APRSISGateMessages.disabled = !this.checked;
     APRSISGateObjects.disabled  = !this.checked;
+    APRSISMetadata.disabled     = !this.checked;
     APRSISServer.disabled       = !this.checked;
     APRSISPort.disabled         = !this.checked;
     APRSISPasscode.disabled     = !this.checked;

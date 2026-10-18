@@ -27,6 +27,7 @@
         "active": false,
         "messagesToRF": false,
         "objectsToRF": false,
+        "is2Metadata": false,
         "server": "rotate.aprs2.net",
         "passcode": "XYZVW",
         "port": 14580,

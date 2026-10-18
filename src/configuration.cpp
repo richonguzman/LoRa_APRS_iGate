@@ -63,6 +63,7 @@ bool Configuration::writeFile() {
         data["aprs_is"]["filter"]                   = aprs_is.filter;
         data["aprs_is"]["messagesToRF"]             = aprs_is.messagesToRF;
         data["aprs_is"]["objectsToRF"]              = aprs_is.objectsToRF;
+        data["aprs_is"]["is2Metadata"]              = aprs_is.is2Metadata;
 
         data["beacon"]["comment"]                   = beacon.comment;
         data["beacon"]["rfCommentEveryXBeacons"]    = beacon.rfCommentEveryXBeacons;
@@ -238,7 +239,8 @@ bool Configuration::readFile() {
             data["aprs_is"]["port"].isNull() ||
             data["aprs_is"]["filter"].isNull() ||
             data["aprs_is"]["messagesToRF"].isNull() ||
-            data["aprs_is"]["objectsToRF"].isNull()) needsRewrite = true;
+            data["aprs_is"]["objectsToRF"].isNull() ||
+            data["aprs_is"]["is2Metadata"].isNull()) needsRewrite = true;
         aprs_is.active                  = data["aprs_is"]["active"] | false;
         aprs_is.passcode                = data["aprs_is"]["passcode"] | "XYZWV";
         aprs_is.server                  = data["aprs_is"]["server"] | "rotate.aprs2.net";
@@ -246,6 +248,7 @@ bool Configuration::readFile() {
         aprs_is.filter                  = data["aprs_is"]["filter"] | "m/10";
         aprs_is.messagesToRF            = data["aprs_is"]["messagesToRF"] | false;
         aprs_is.objectsToRF             = data["aprs_is"]["objectsToRF"] | false;
+        aprs_is.is2Metadata             = data["aprs_is"]["is2Metadata"] | false;
 
         if (data["beacon"]["latitude"].isNull() ||
             data["beacon"]["longitude"].isNull() ||
@@ -473,6 +476,7 @@ void Configuration::setDefaultValues() {
     aprs_is.filter                  = "m/10";
     aprs_is.messagesToRF            = false;
     aprs_is.objectsToRF             = false;
+    aprs_is.is2Metadata             = false;
 
     beacon.comment                  = "LoRa APRS";
     beacon.rfCommentEveryXBeacons   = 1;

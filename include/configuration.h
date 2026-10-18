@@ -65,6 +65,7 @@ public:
     String  filter;
     bool    messagesToRF;
     bool    objectsToRF;
+    bool    is2Metadata;
 };
 
 class DIGI {
