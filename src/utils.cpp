@@ -221,8 +221,8 @@ namespace Utils {
                 if (Config.battery.sendInternalVoltage || Config.battery.monitorInternalVoltage) {
                     float internalVoltage       = BATTERY_Utils::checkInternalVoltage();
                     if (Config.battery.monitorInternalVoltage && internalVoltage < Config.battery.internalSleepVoltage) {
-                        aprsisBeaconPacket      += " **IntBatWarning:SLEEP**";
-                        loraBeaconPacket        += " **IntBatWarning:SLEEP**";
+                        aprsisBeaconPacket      += " **IntBattWarning:SLEEP**";
+                        loraBeaconPacket        += " **IntBattWarning:SLEEP**";
                         shouldSleepLowVoltage   = true;
                     }
 
@@ -248,8 +248,8 @@ namespace Utils {
                 if (Config.battery.sendExternalVoltage || Config.battery.monitorExternalVoltage) {
                     float externalVoltage       = BATTERY_Utils::checkExternalVoltage();
                     if (Config.battery.monitorExternalVoltage && externalVoltage < Config.battery.externalSleepVoltage) {
-                        aprsisBeaconPacket      += " **ExtBatWarning:SLEEP**";
-                        loraBeaconPacket        += " **ExtBatWarning:SLEEP**";
+                        aprsisBeaconPacket      += " **ExtBattWarning:SLEEP**";
+                        loraBeaconPacket        += " **ExtBattWarning:SLEEP**";
                         shouldSleepLowVoltage   = true;
                     }
 
@@ -428,7 +428,7 @@ namespace Utils {
             if (mode == 0) {    // at startup
                 delay(3000);
             }
-            Serial.println("\n\n*** Sleeping Low Battey Voltage ***\n\n");
+            Serial.println("\n\n*** Sleeping Low Battery Voltage ***\n\n");
             esp_sleep_enable_timer_wakeup(30 * 60 * 1000000); // sleep 30 min
             if (mode == 1) {    // low voltage detected after a while
                 displayToggle(false);
