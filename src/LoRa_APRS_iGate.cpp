@@ -180,7 +180,7 @@ void loop() {
             WIFI_Utils::checkWiFi();
             if (networkManager->isConnected()) {
                 if (Config.aprs_is.active && !aprsIsClient.connected()) APRS_IS_Utils::connect();
-                if (Config.mqtt.active && !mqttClient.connected()) MQTT_Utils::connect();
+                if (Config.mqtt.active && !MQTT_Utils::isConnected()) MQTT_Utils::connect();
             }
         #endif
 
