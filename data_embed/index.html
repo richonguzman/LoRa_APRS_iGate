@@ -22,8 +22,9 @@
 [data-variant="night"] .btn-save{background:#000;border-color:#000;color:#ff6b6b;}
 [data-variant="night"] .btn-save:hover{background:#1a0000;color:#ff8a8a;}
 body{background:var(--msh-bg);color:var(--msh-text);font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;}
-.app-topbar{background:#b21d1d;border-bottom:1px solid rgba(0,0,0,.25);height:56px;z-index:1030;}
+.app-topbar{background:#b21d1d;border-bottom:1px solid rgba(0,0,0,.25);min-height:56px;padding-top:.35rem;padding-bottom:.35rem;z-index:1030;}
 .app-topbar .brand{font-weight:600;color:#fff;font-size:1.1rem;}
+@media(max-width:575.98px){.app-topbar{flex-wrap:wrap;row-gap:.35rem;}.app-topbar .brand{flex:1 1 100%;font-size:.95rem;line-height:1.25;}}
 .btn-icon{background:transparent;border:1px solid rgba(255,255,255,.45);color:#fff;display:inline-flex;align-items:center;}
 .btn-icon:hover{background:rgba(255,255,255,.15);color:#fff;}
 .btn-save{background:#fff;border:1px solid #fff;color:#b21d1d;font-weight:600;}
