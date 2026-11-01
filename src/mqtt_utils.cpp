@@ -16,6 +16,7 @@
  * along with LoRa APRS iGate. If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <atomic>
 #include <WiFiClient.h>
 #include <PubSubClient.h>
 #include "configuration.h"
@@ -31,8 +32,23 @@ PubSubClient    pubSub;
 
 namespace MQTT_Utils {
 
+    static const uint32_t   RETRY_FIRST_MS  = 15000;        // after a failed connect: wait this long, then twice as long each time, up to RETRY_MAX_MS
+    static const uint32_t   RETRY_MAX_MS    = 300000;
+    static uint32_t         nextTry         = 0;            // earliest time of the next connect attempt
+    static uint32_t         retryDelayMs    = RETRY_FIRST_MS;
+    static std::atomic<bool> connecting(false);             // the connect task is running: the main loop must not touch the MQTT client
+
+    // The client may be used only while no connect is in progress (the connect task owns it then), and only when it is connected.
+    static bool usable() {
+        return !connecting.load() && pubSub.connected();
+    }
+
+    bool isConnected() {
+        return usable();
+    }
+
     void sendToMqtt(const String& packet) {
-        if (!pubSub.connected()) {
+        if (!usable()) {
             Serial.println("Can not send to MQTT because it is not connected");
             return;
         }
@@ -57,38 +73,60 @@ namespace MQTT_Utils {
         STATION_Utils::addToOutputPacketBuffer(String(payload, length));
     }
 
-    void connect() {
-        if (pubSub.connected()) return;
-        if (Config.mqtt.server.isEmpty() || Config.mqtt.port <= 0) {
-            Serial.println("Connect to MQTT server KO because no host or port given");
-            return;
-        }
-        pubSub.setServer(Config.mqtt.server.c_str(), Config.mqtt.port);
-        Serial.print("Trying to connect with MQTT Server: " + String(Config.mqtt.server) + " MqttServerPort: " + String(Config.mqtt.port));
+    // Connecting is slow when something is wrong: a DNS lookup, a TCP connect that times out, and up to 15 s waiting for a broker that accepts the
+    // connection but never answers. Done in the main loop, that stalls the radio for as long as it takes, and the loop retried on every pass.
+    // It now runs in its own task; while it runs the main loop leaves the MQTT client alone (usable() is false). After a failure the next
+    // attempt waits 15 s, then 30, 60 ... up to 5 minutes.
+    static void connectTask(void*) {
+        const String server = Config.mqtt.server;
+        const int    port   = Config.mqtt.port;
+        const String call   = Config.callsign;
+        const String user   = Config.mqtt.username;
+        const String pass   = Config.mqtt.password;
+        const String topic  = Config.mqtt.topic;
 
+        pubSub.setServer(server.c_str(), port);
         bool connected = false;
-        if (!Config.mqtt.username.isEmpty()) {
-            connected = pubSub.connect(Config.callsign.c_str(), Config.mqtt.username.c_str(), Config.mqtt.password.c_str());
+        if (!user.isEmpty()) {
+            connected = pubSub.connect(call.c_str(), user.c_str(), pass.c_str());
         } else {
-            connected = pubSub.connect(Config.callsign.c_str());
+            connected = pubSub.connect(call.c_str());
         }
 
         if (connected) {
-            Serial.println(" -> Connected !");
-            const String subscribedTopic = Config.mqtt.topic + "/" + Config.callsign + "/#";
+            mqttClient.setTimeout(2);                       // seconds: a write on a dead socket must not hold the main loop for long
+            retryDelayMs = RETRY_FIRST_MS;
+            Serial.println("Trying to connect with MQTT Server: " + server + " MqttServerPort: " + String(port) + " -> Connected !");
+            const String subscribedTopic = topic + "/" + call + "/#";
             if (!pubSub.subscribe(subscribedTopic.c_str())) {
                 Serial.println("Subscribed to MQTT Failed");
             }
             Serial.print("Subscribed to MQTT topic : ");
             Serial.println(subscribedTopic);
         } else {
-            Serial.println(" -> Not Connected (Retry in a few secs)");
+            nextTry = millis() + retryDelayMs;
+            Serial.println("Trying to connect with MQTT Server: " + server + " MqttServerPort: " + String(port) + " -> Not Connected (retry in " + String(retryDelayMs / 1000) + " s)");
+            retryDelayMs = retryDelayMs * 2 > RETRY_MAX_MS ? RETRY_MAX_MS : retryDelayMs * 2;
+        }
+        connecting.store(false);
+        vTaskDelete(nullptr);
+    }
+
+    void connect() {
+        if (connecting.load() || pubSub.connected()) return;
+        if (Config.mqtt.server.isEmpty() || Config.mqtt.port <= 0) return;      // nothing to connect to
+        if ((int32_t)(millis() - nextTry) < 0) return;                          // still waiting after a failure
+        connecting.store(true);
+        if (xTaskCreatePinnedToCore(connectTask, "mqttconn", 8192, nullptr, 1, nullptr, 0) != pdPASS) {
+            connecting.store(false);
+            nextTry = millis() + retryDelayMs;                                  // no memory for the task right now: try again later
+            Serial.println("MQTT: could not start the connect task, will retry");
         }
     }
 
     void loop() {
         if (!Config.mqtt.active) return;
-        if (!pubSub.connected()) return;
+        if (!usable()) return;
         pubSub.loop();
     }
 

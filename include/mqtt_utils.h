@@ -25,7 +25,8 @@
 namespace MQTT_Utils {
 
     void sendToMqtt(const String& packet);
-    void connect();
+    bool isConnected();             // connected, and no connect attempt is running
+    void connect();                 // starts a connect attempt in the background (if one is due)
     void loop();
     void setup();
 
