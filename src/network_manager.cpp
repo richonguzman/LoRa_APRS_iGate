@@ -120,7 +120,7 @@ void NetworkManager::_onNetworkEvent(arduino_event_id_t event, arduino_event_inf
             Serial.println("[NM] ETH Connected");
             break;
         case ARDUINO_EVENT_ETH_GOT_IP:
-            Serial.println("[NM] ETH Got IP");
+            Serial.println("[NM] ETH Got IP: " + ETH.localIP().toString());
             _ethernetConnected = true;
             break;
         case ARDUINO_EVENT_ETH_DISCONNECTED:

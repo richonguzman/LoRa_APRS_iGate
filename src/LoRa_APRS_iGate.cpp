@@ -108,6 +108,16 @@ void setup() {
         networkManager->setAPTimeout(Config.wifiAutoAP.timeout * 60 * 1000); // Convert minutes to milliseconds
     }
     networkManager->setHostName("iGATE-" + Config.callsign);
+    #ifdef HAS_ETH
+        pinMode(ETH_CFG_PHY_POWER_PIN, OUTPUT);     // reset the PHY before starting Ethernet
+        digitalWrite(ETH_CFG_PHY_POWER_PIN, LOW);
+        delay(300);
+        digitalWrite(ETH_CFG_PHY_POWER_PIN, HIGH);
+        delay(300);
+        if (!networkManager->ethernetConnect(ETH_CFG_PHY_TYPE, ETH_CFG_PHY_ADDR, ETH_CFG_MDC_PIN, ETH_CFG_MDIO_PIN, ETH_CFG_PHY_POWER_PIN, ETH_CFG_CLK_MODE)) {
+            Serial.println("Ethernet init failed");
+        }
+    #endif
     POWER_Utils::setup();
     #ifdef FAN_CTRL_PIN
         THERMAL_Utils::setup();
