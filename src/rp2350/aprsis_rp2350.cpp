@@ -3,6 +3,7 @@
 #include <APRSPacketLib.h>
 #include "configuration.h"
 #include "station_rp2350.h"
+#include "syslog_rp2350.h"
 
 extern Configuration Config;
 // Inbox store (eth_web.cpp) — poll() runs in netTask, same task that owns it.
@@ -20,6 +21,18 @@ static const uint32_t SILENT_DROP_MS = 60000;
 // Parse one APRS-IS line; if it's a message addressed to our callsign, record it
 // in the inbox and ack it (if it carries a {msgid}).
 static void processAprsisLine(const String &line) {
+    // Login answer: "# logresp CALL verified, server T2XXX" / "... unverified, ...".
+    // Like the ESP32 (APRS_IS_Utils::processAPRSISPacket), a rejected passcode stops APRS-IS
+    // (until the next boot or config save) instead of reconnecting every 10 s and uploading
+    // packets the server ignores. Only an explicit "unverified" blocks: if a server never
+    // answers, behaviour stays as before. "unverified" contains "verified", so test it first.
+    if (line.startsWith("# logresp") && line.indexOf(Config.callsign) >= 0 && line.indexOf("unverified") >= 0) {
+        Serial.println("\n****APRS PASSCODE NOT VALID****\n");
+        Syslog::logTx("*** APRS-IS passcode NOT valid -> APRS-IS stopped ***");
+        aprsClient.stop();
+        Config.aprs_is.active = false;      // in memory only: the saved config keeps APRS-IS enabled
+        return;
+    }
     if (line.length() == 0 || line[0] == '#') return;       // server comment / keepalive
     int gt = line.indexOf('>');
     int dc = line.indexOf("::");
