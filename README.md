@@ -59,6 +59,8 @@ ____________________________________________________
 
 - Wemos Lolin32 Oled + SX1278 DIY Version.
 
+- RP2350 (Raspberry Pi Pico 2) + WIZnet W5500 Ethernet + Ebyte E22 LoRa Module, wired DIY version (see [Wiznet_5500_EVB_Pico2_E22P](https://github.com/cvaldess/Wiznet_5500_EVB_Pico2_E22P)).
+
 - and many more...
 
 <br />
