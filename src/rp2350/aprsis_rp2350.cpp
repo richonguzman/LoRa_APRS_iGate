@@ -110,7 +110,22 @@ void send(const String &line) {
 // Gate rules of APRS_IS_Utils::processLoRaPacket. This build never gates APRS-IS
 // back to RF (no messagesToRF/objectsToRF), so it is a receive-only iGate and
 // uses qAO, like the ESP32 with messagesToRF off (buildPacketToUpload).
-void forward(const String &packet) {
+// IS2PLAIN metadata line sent right before the gated packet (same as buildIS2Meta()
+// in the ESP32 aprs_is_utils.cpp). rx_modem=2 is LoRa; the bit rate is derived from
+// the RX SF/BW/CR, which only change with a config save (= reboot), so it is cached.
+static String buildIS2Meta(int rssi, float snr) {
+    static String fixedTail;
+    if (fixedTail == "") {
+        // LoRa bit rate = SF * (BW / 2^SF) * 4/CR   (CR = denominator: 5..8)
+        uint32_t bitrate = (uint32_t)(Config.loramodule.rxSpreadingFactor
+                           * ((float)Config.loramodule.rxSignalBandwidth / (1 << Config.loramodule.rxSpreadingFactor))
+                           * (4.0 / Config.loramodule.rxCodingRate4));
+        fixedTail = " rx_modem=2 rx_bitrate=" + String(bitrate) + " rx_frequency=" + String(Config.loramodule.rxFreq);
+    }
+    return "#is2-meta rx_rssi_dbm=" + String(rssi) + " rx_snr_db=" + String(snr, 1) + fixedTail;
+}
+
+void forward(const String &packet, int rssi, float snr) {
     if (!aprsClient.connected()) return;
     if (packet.length() < 5) return;
     String body = packet.substring(3);            // skip the 3-byte LoRa-APRS header
@@ -133,7 +148,8 @@ void forward(const String &packet) {
     line += ",qAO,";
     line += Config.callsign;
     line += APRSPacketLib::checkForStartingBytes(body.substring(colon));
-    aprsClient.print(line + "\r\n");
+    if (Config.aprs_is.is2Metadata) aprsClient.print(buildIS2Meta(rssi, snr) + "\r\n" + line + "\r\n");   // meta line + packet in one write
+    else                            aprsClient.print(line + "\r\n");
     Serial.println("[aprsis] up: " + line);
 }
 

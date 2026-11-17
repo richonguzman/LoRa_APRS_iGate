@@ -112,6 +112,7 @@ bool applyConfigForm(const String &contentType, const String &body) {
         if (Config.aprs_is.active) {
             Config.aprs_is.messagesToRF     = fHas("aprs_is.messagesToRF");
             Config.aprs_is.objectsToRF      = fHas("aprs_is.objectsToRF");
+            Config.aprs_is.is2Metadata      = fHas("aprs_is.is2Metadata");
             Config.aprs_is.server           = getParamStringSafe("aprs_is.server", Config.aprs_is.server);
             Config.aprs_is.passcode         = getParamStringSafe("aprs_is.passcode", Config.aprs_is.passcode);
             Config.aprs_is.port             = getParamIntSafe("aprs_is.port", Config.aprs_is.port);

@@ -11,5 +11,5 @@ namespace AprsIs {
     void poll();                          // drain incoming server lines (keepalive); drops a silent connection
     bool silentFor(uint32_t ms);          // no line from the server for `ms` (feeds the backup digi)
     void send(const String &line);        // send a raw APRS-IS line (e.g. beacon)
-    void forward(const String &loraPacket); // RX LoRa packet -> APRS-IS (qAO: receive-only iGate)
+    void forward(const String &loraPacket, int rssi, float snr); // RX LoRa packet -> APRS-IS (qAO: receive-only iGate); rssi/snr feed the IS2 meta line
 }

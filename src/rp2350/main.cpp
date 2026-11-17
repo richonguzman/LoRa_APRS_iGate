@@ -167,7 +167,8 @@ void loraTask(void *) {
                 // it was a query addressed to us — answered over RF, don't gate/digi
             } else {
                 // gate to APRS-IS (handed to netTask, the W5500 owner)
-                String *p = new String(pkt);
+                // "rssi\tsnr\tframe": the signal stats travel with the frame for the IS2 meta line
+                String *p = new String(String(rssi) + "\t" + String(snr, 1) + "\t" + pkt);
                 if (xQueueSend(rxQueue, &p, 0) != pdTRUE) delete p;   // drop if full
                 // digipeat: rewrite WIDEn-N and enqueue for anti-collision TX
                 if (Digi::enabled()) {
@@ -293,7 +294,11 @@ void netTask(void *) {
         // forward any LoRa packets handed over by loraTask
         String *p;
         while (xQueueReceive(rxQueue, &p, 0) == pdTRUE) {
-            if (Config.aprs_is.active) AprsIs::forward(*p);
+            if (Config.aprs_is.active) {
+                int t1 = p->indexOf('\t');
+                int t2 = (t1 >= 0) ? p->indexOf('\t', t1 + 1) : -1;
+                if (t2 > t1) AprsIs::forward(p->substring(t2 + 1), p->substring(0, t1).toInt(), p->substring(t1 + 1, t2).toFloat());
+            }
             delete p;
         }
         // store any incoming messages addressed to us (for GET /messages.json)
