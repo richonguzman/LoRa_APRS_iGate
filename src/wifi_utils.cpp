@@ -139,7 +139,6 @@ namespace WIFI_Utils {
 
     void setup() {
         if (Config.digi.ecoMode == 0) startWiFi();
-        btStop();
     }
 
 }
