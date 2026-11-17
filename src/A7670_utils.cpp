@@ -215,7 +215,7 @@
 
         void listenAPRSIS() {
             if (SerialAT.available()) {
-                String packetAPRSIS = SerialAT.readStringUntil('\r');
+                String packetAPRSIS = SerialAT.readStringUntil('\n');   // modem lines end with "\r\n": reading up to '\r' left the '\n' and the next call stalled for the 1 s stream timeout (same fix as listenAPRSIS in aprs_is_utils.cpp); trim() removes the '\r'
                 packetAPRSIS.trim();
                 if (!packetAPRSIS.startsWith("#") && packetAPRSIS.indexOf("+IPD") == -1 && packetAPRSIS.indexOf("RECV") == -1 && packetAPRSIS.length() > 0) {
                     APRS_IS_Utils::processAPRSISPacket(packetAPRSIS);
