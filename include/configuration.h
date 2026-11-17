@@ -173,6 +173,15 @@ public:
     bool    beaconOverMqtt;
 };
 
+class NETWORK {                     // IP configuration (Ethernet boards)
+public:
+    bool    dhcp;                   // true = DHCP, false = static IP below
+    String  ip;
+    String  gateway;
+    String  subnet;
+    String  dns;                    // one or more servers, space/comma-separated
+};
+
 class Configuration {
 public:
     String                  callsign;
@@ -199,6 +208,7 @@ public:
     NTP                     ntp;
     REMOTE_MANAGEMENT       remoteManagement;
     MQTT                    mqtt;
+    NETWORK                 network;
 
     void setup();
     void setDefaultValues();
