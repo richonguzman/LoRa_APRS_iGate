@@ -57,13 +57,24 @@ namespace MQTT_Utils {
         STATION_Utils::addToOutputPacketBuffer(String(payload, length));
     }
 
+    // Connecting blocks the main loop for as long as it takes (DNS, TCP connect, wait for the broker's CONNACK), and the loop used to retry on every
+    // pass. Now: after a failed attempt wait 15 s before the next one, then twice as long each time, up to 5 minutes (a success starts over at 15 s);
+    // and each attempt is shorter (TCP connect 3 s, CONNACK wait 5 s, instead of 3 s and 15 s).
+    static const uint32_t   RETRY_FIRST_MS  = 15000;
+    static const uint32_t   RETRY_MAX_MS    = 300000;
+    static uint32_t         nextTry         = 0;            // earliest time of the next connect attempt
+    static uint32_t         retryDelayMs    = RETRY_FIRST_MS;
+
     void connect() {
         if (pubSub.connected()) return;
         if (Config.mqtt.server.isEmpty() || Config.mqtt.port <= 0) {
             Serial.println("Connect to MQTT server KO because no host or port given");
             return;
         }
+        if ((int32_t)(millis() - nextTry) < 0) return;          // still waiting after a failed attempt
         pubSub.setServer(Config.mqtt.server.c_str(), Config.mqtt.port);
+        mqttClient.setTimeout(3);                               // seconds: TCP connect (same as the WiFiClient default, kept explicit)
+        pubSub.setSocketTimeout(5);                             // seconds: wait for the broker's CONNACK, and for the rest of a partly received packet (default 15)
         Serial.print("Trying to connect with MQTT Server: " + String(Config.mqtt.server) + " MqttServerPort: " + String(Config.mqtt.port));
 
         bool connected = false;
@@ -74,6 +85,7 @@ namespace MQTT_Utils {
         }
 
         if (connected) {
+            retryDelayMs = RETRY_FIRST_MS;                      // the next drop starts again at 15 s
             Serial.println(" -> Connected !");
             const String subscribedTopic = Config.mqtt.topic + "/" + Config.callsign + "/#";
             if (!pubSub.subscribe(subscribedTopic.c_str())) {
@@ -82,7 +94,9 @@ namespace MQTT_Utils {
             Serial.print("Subscribed to MQTT topic : ");
             Serial.println(subscribedTopic);
         } else {
-            Serial.println(" -> Not Connected (Retry in a few secs)");
+            nextTry         = millis() + retryDelayMs;          // counted from the end of the attempt
+            Serial.println(" -> Not Connected (retry in " + String(retryDelayMs / 1000) + " s)");
+            retryDelayMs    = (retryDelayMs * 2 > RETRY_MAX_MS) ? RETRY_MAX_MS : retryDelayMs * 2;
         }
     }
 
