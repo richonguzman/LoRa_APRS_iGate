@@ -1170,7 +1170,7 @@ function applyWiredBuildUi(settings) {
     document.getElementById("network.gateway").value   = net.gateway || "";
     document.getElementById("network.subnet").value    = net.subnet || "255.255.255.0";
     document.getElementById("network.dns").value       = net.dns || "";
-    document.getElementById("ip-config-section").style.display = "";
+    document.getElementById("ip-config-section").classList.remove("d-none");    // d-flex would override an inline display:none (!important), so the row hides with d-none
     document.getElementById("ip-config-hr").style.display      = "";
     document.getElementById("static-ip-config").style.display  = net.dhcp ? "none" : "";
 
