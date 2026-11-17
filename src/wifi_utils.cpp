@@ -49,12 +49,12 @@ namespace WIFI_Utils {
         uint32_t currentTime = millis();
 
         if (backupDigiMode) {
-            if (!networkManager->isWiFiConnected() && ((currentTime - lastBackupDigiTime) >= 15 * 60 * 1000)) {
-                Serial.println("*** Stopping BackUp Digi Mode ***");
+            if (lastServerCheck > lastBackupDigiTime) {     // APRS-IS server spoke after entering backup (with or without a WiFi drop)
+                Serial.println("*** APRS-IS Server Back (Stopping Backup Digi Mode) ***");
                 backupDigiMode = false;
                 wifiCounter = 0;
-            } else if (networkManager->isWiFiConnected()) {
-                Serial.println("*** WiFi Reconnect Success (Stopping Backup Digi Mode) ***");
+            } else if (!networkManager->isWiFiConnected() && ((currentTime - lastBackupDigiTime) >= 15 * 60 * 1000)) {
+                Serial.println("*** Stopping BackUp Digi Mode ***");    // no WiFi for 15 min: leave backup to retry WiFi
                 backupDigiMode = false;
                 wifiCounter = 0;
             }
