@@ -158,7 +158,8 @@ bool applyConfigForm(const String &contentType, const String &body) {
         Config.loramodule.txCodingRate4     = getParamIntSafe("lora.txCodingRate4", Config.loramodule.txCodingRate4);
         Config.loramodule.txSignalBandwidth = getParamIntSafe("lora.txSignalBandwidth", Config.loramodule.txSignalBandwidth);
         Config.loramodule.power             = LoRa_Utils::validPower(getParamIntSafe("lora.power", Config.loramodule.power));  // saved as the power the radio chip really uses
-        Config.loramodule.cadActive         = fHas("lora.cadActive");
+        if (Config.loramodule.txActive)     // the CAD checkbox is disabled (not sent) while TX is off
+            Config.loramodule.cadActive     = fHas("lora.cadActive");
 
         Config.display.alwaysOn             = fHas("display.alwaysOn");
         if (!Config.display.alwaysOn) {
