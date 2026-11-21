@@ -1,4 +1,4 @@
-/* Copyright (C) 2025 Ricardo Guzman - CA2RXU
+/* Copyright (C) 2026 Ricardo Guzman - CA2RXU
  *
  * This file is part of LoRa APRS iGate.
  *
@@ -24,7 +24,8 @@
 
 namespace QUERY_Utils {
 
-    String process(const String& query, const String& station, bool queryFromAPRSIS, bool thirdParty);
+    bool    isQuery(const String& message);
+    String  process(const String& query, const String& station, bool queryFromAPRSIS, bool thirdParty);
 
 }
 

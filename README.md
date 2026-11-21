@@ -16,41 +16,63 @@ ____________________________________________________
 
 ____________________________________________________
 
+## New Web/UI
+
+| New Menu | Map |
+| --- | --- |
+| ![new menu](images/1.png) | ![map](images/2.jpg) |
+
+____________________________________________________
+
 ## You can support this project to continue to grow:
 
 [<img src="https://github.com/richonguzman/LoRa_APRS_Tracker/raw/main/images/github-sponsors.png">](https://github.com/sponsors/richonguzman)     [<img src="https://github.com/richonguzman/LoRa_APRS_Tracker/raw/main/images/paypalme.png">](http://paypal.me/richonguzman)
 
 ____________________________________________________
 
+
 ## SUPPORTED BOARDS (<a href="https://github.com/richonguzman/LoRa_APRS_iGate/wiki/Supported-Boards-and-Buying-Links" target="_blank">Buying links</a>).
 
 (NOTE: all boards with 433-868-915 MHz versions)
 
-- TTGO Lilygo LoRa32 T3S3 V1.2 and LoRa32 V2.1 (V1.6 is the same).
+- TTGO Lilygo LoRa32 LoRa32 V2.1 (V1.6 is the same) and T3S3 V1.2.
 
-- TTGO T-Beam V1.0 , V1.1, V1.2 (also variations with SX1262 and SX1268 LoRa Modules) and Supreme V3.
+- TTGO T-Beam V1.0 , V1.1, V1.2 (also variations with SX1262 and SX1268 LoRa Modules), Supreme V3 and T-Beam 1W.
 
 - T-Deck Plus (and also regular T-Deck with/without GPS).
 
-- HELTEC V2, V3, V3.2, T114, Wireless Stick, Wireless Stick Lite V3/V3.2, HT-CT62, Wireless Tracker, Wireless Paper.
+- HELTEC V2, V3, V3.2, V4, T114, Wireless Stick, Wireless Stick Lite V3/V3.2, HT-CT62, Wireless Tracker, Wireless Paper.
 
-- RAK Wireless 4631 + 19007(or 19003)
+- RAK Wireless 4631 + 19007(or 19003), RAK3312 and RAK3112.
 
 - Faketec V3 (NRF52840 + Heltec HTRA62(SX1262))
 
 - QRP Labs LightGateway 1.0 and Plus 1.0.
 
-- ESP32 + SX1278 LoRa Module or Ebyte 400M30S (or 900M30S) 1W LoRa Module for a DIY Versions.
+- ESP32 + SX1278 LoRa Module or Ebyte 400M30S (or 900M30S) or Ebyte E32 400M30S 1W LoRa Module for a DIY Versions.
 
 - ESP32C3 + Ebyte 400M30S(or 900M30S) 1W LoRa Module for another DIY version.
+
+- ESP32C3 SuperMini + SX1278 (RA-01/RA-02) LoRa Module DIY version.
 
 - ESP32 + 4G/LTE A7670 Modem + SX1278 DIY Version.
 
 - Wemos Lolin32 Oled + SX1278 DIY Version.
 
+- RP2350 (Raspberry Pi Pico 2) + WIZnet W5500 Ethernet + Ebyte E22 LoRa Module, wired DIY version (see [Wiznet_5500_EVB_Pico2_E22P](https://github.com/cvaldess/Wiznet_5500_EVB_Pico2_E22P) and [Pico2_W5500_E22](https://github.com/cvaldess/Pico2_W5500_E22)).
+
+- and many more...
+
 <br />
 
 # Timeline (Versions):
+- 2026-10-14 T-Beam 1W board added (with fan control and Tx over-temperature protection).
+- 2026-10-05 Fix for stored XSS in received packets, Wifi warning with bad password, date on Rx packets, mDNS kiss-tnc for phone apps, APRSPacketLib V1.0.10 update.
+- 2026-09-30 GPS baud rate auto-detection, CAD timeout (packet dropped after 10s of busy channel)
+- 2026-09-23 APRSPacketLib V1.0.7 update and many code cleaning with this.
+- 2026-09-17 Real APRS Symbols added to map and TNC2 output as a posibility in TNC mode.
+- 2026-08-16 New UI (Web) and also Live View over a Map to see Rx stations.
+- 2026-08-10 CAD (Channel Activity Detection) and DIFS (Distributed Inter-Frame Space) added.
 - 2026-03-25 More Boards, SDK update, OTA fix, GPS process update.
 - 2026-02-26 9M2IBR ESP32 1W (400M30S) + GPS board added.
 - 2026-02-25 Code Improvements: reduced String comparisons and improved logic for faster code execution.

@@ -36,11 +36,19 @@ document.querySelector("input[type=file]").onchange = function () {
     };
 };
 
-function fetchSettings() {
+function fetchSettings(retries = 2) {
     fetch("/configuration.json")
         .then((response) => response.json())
         .then((settings) => {
             loadSettings(settings);
+        }, (err) => {
+            // fetch or JSON failed: a board short of sockets (RP2350 + W5100S) refuses
+            // connections while it serves another one, so try again before giving up
+            if (retries > 0) {
+                setTimeout(() => fetchSettings(retries - 1), 1000);
+                return;
+            }
+            throw err;
         })
         .catch((err) => {
             console.error(err);
@@ -56,6 +64,7 @@ function loadSettings(settings) {
     document.getElementById("callsign").value                           = settings.callsign;
     document.getElementById("tacticalCallsign").value                   = settings.tacticalCallsign;
     document.getElementById("beacon.comment").value                     = settings.beacon.comment;
+    document.getElementById("beacon.rfCommentEveryXBeacons").value      = settings.beacon.rfCommentEveryXBeacons;
     document.getElementById("beacon.path").value                        = settings.beacon.path;
     document.getElementById("beacon.symbol").value                      = settings.beacon.symbol;
     document.getElementById("beacon.overlay").value                     = settings.beacon.overlay;
@@ -96,12 +105,13 @@ function loadSettings(settings) {
         networksContainer.appendChild(networkElement);
         networkCount++;
     });
-    document.getElementById("startupDelay").value                       = settings.startupDelay;
+    document.getElementById("startupDelay").value                       = settings.other.startupDelay;
 
     // APRS-IS
     document.getElementById("aprs_is.active").checked                   = settings.aprs_is.active;
     document.getElementById("aprs_is.messagesToRF").checked             = settings.aprs_is.messagesToRF;
     document.getElementById("aprs_is.objectsToRF").checked              = settings.aprs_is.objectsToRF;
+    document.getElementById("aprs_is.is2Metadata").checked              = settings.aprs_is.is2Metadata;
     document.getElementById("aprs_is.server").value                     = settings.aprs_is.server;
     document.getElementById("aprs_is.port").value                       = settings.aprs_is.port;
     document.getElementById("aprs_is.filter").value                     = settings.aprs_is.filter;
@@ -109,6 +119,7 @@ function loadSettings(settings) {
     APRSISCheckbox.checked      = settings.aprs_is.active;
     APRSISGateMessages.disabled = !APRSISCheckbox.checked;
     APRSISGateObjects.disabled  = !APRSISCheckbox.checked;
+    APRSISMetadata.disabled     = !APRSISCheckbox.checked;
     APRSISServer.disabled       = !APRSISCheckbox.checked;
     APRSISPort.disabled         = !APRSISCheckbox.checked;
     APRSISPasscode.disabled     = !APRSISCheckbox.checked;
@@ -118,7 +129,7 @@ function loadSettings(settings) {
     document.getElementById("beacon.latitude").value                    = settings.beacon.latitude;
     document.getElementById("beacon.longitude").value                   = settings.beacon.longitude;
     document.getElementById("beacon.interval").value                    = settings.beacon.interval;
-    document.getElementById("other.rememberStationTime").value          = settings.other.rememberStationTime;   
+    document.getElementById("other.rememberStationTime").value          = settings.other.rememberStationTime;
     document.getElementById("beacon.sendViaAPRSIS").checked             = settings.beacon.sendViaAPRSIS;
 
     document.getElementById("beacon.sendViaRF").checked                 = settings.beacon.sendViaRF;
@@ -148,12 +159,26 @@ function loadSettings(settings) {
     document.getElementById("lora.rxSpreadingFactor").value             = settings.lora.rxSpreadingFactor;
     document.getElementById("lora.rxCodingRate4").value                 = settings.lora.rxCodingRate4;
     document.getElementById("lora.rxSignalBandwidth").value             = settings.lora.rxSignalBandwidth;
+    LoRaRxCheckbox.checked = settings.lora.rxActive;
+    LoRaRxFreq.disabled             = !LoRaRxCheckbox.checked;
+    LoRaRxSpreadingFactor.disabled  = !LoRaRxCheckbox.checked;
+    LoRaRxCodingRate.disabled       = !LoRaRxCheckbox.checked;
+    LoRaRxSignalBandwidth.disabled  = !LoRaRxCheckbox.checked;
+
     document.getElementById("lora.txActive").checked                    = settings.lora.txActive;
     document.getElementById("lora.txFreq").value                        = settings.lora.txFreq;
     document.getElementById("lora.txSpreadingFactor").value             = settings.lora.txSpreadingFactor;
     document.getElementById("lora.txCodingRate4").value                 = settings.lora.txCodingRate4;
-    document.getElementById("lora.txSignalBandwidth").value             = settings.lora.txSignalBandwidth;    
+    document.getElementById("lora.txSignalBandwidth").value             = settings.lora.txSignalBandwidth;
     document.getElementById("lora.power").value                         = settings.lora.power;
+    document.getElementById("lora.cadActive").checked                   = settings.lora.cadActive;
+    LoRaTxCheckbox.checked = settings.lora.txActive;
+    LoRaTxFreq.disabled             = !LoRaTxCheckbox.checked;
+    LoRaTxSpreadingFactor.disabled  = !LoRaTxCheckbox.checked;
+    LoRaTxCodingRate.disabled       = !LoRaTxCheckbox.checked;
+    LoRaTxSignalBandwidth.disabled  = !LoRaTxCheckbox.checked;
+    LoRaPower.disabled              = !LoRaTxCheckbox.checked;
+    LoRaCadActive.disabled          = !LoRaTxCheckbox.checked;
 
     // Display
     document.getElementById("display.alwaysOn").checked                 = settings.display.alwaysOn;
@@ -195,7 +220,7 @@ function loadSettings(settings) {
     TelemetryCheckbox.checked           = settings.wxsensor.active;
     TelemetryHeightCorrection.disabled  = !TelemetryCheckbox.checked;
     TelemetryTempCorrection.disabled    = !TelemetryCheckbox.checked;
-    
+
     // SYSLOG
     document.getElementById("syslog.active").checked                    = settings.syslog.active;
     document.getElementById("syslog.server").value                      = settings.syslog.server;
@@ -205,13 +230,14 @@ function loadSettings(settings) {
     SyslogServer.disabled           = !SyslogCheckbox.checked;
     SyslogPort.disabled             = !SyslogCheckbox.checked;
     SyslogBeaconOverTCPIP.disabled  = !SyslogCheckbox.checked;
-    
+
     // TNC
     if (settings.tnc) {
         document.getElementById("tnc.enableServer").checked             = settings.tnc.enableServer;
         document.getElementById("tnc.enableSerial").checked             = settings.tnc.enableSerial;
         document.getElementById("tnc.acceptOwn").checked                = settings.tnc.acceptOwn;
         document.getElementById("tnc.aprsBridgeActive").checked         = settings.tnc.aprsBridgeActive;
+        document.getElementById("tnc.kissProtocol").value                = settings.tnc.kissProtocol ? "KISS" : "TNC2";
     }
 
     // MQTT
@@ -261,6 +287,9 @@ function loadSettings(settings) {
     // NTP
     document.getElementById("ntp.server").value                         = settings.ntp.server;
     document.getElementById("ntp.gmtCorrection").value                  = settings.ntp.gmtCorrection;
+
+    applyWiredBuildUi(settings);    // RP2350 + Ethernet build (see bottom of this file)
+    clampOutOfRangeInputs();        // keep the form submittable (see bottom of this file)
 
     updateImage();
 }
@@ -332,6 +361,7 @@ StatusCheckbox.addEventListener("change", function() {
 const APRSISCheckbox            = document.querySelector('input[name="aprs_is.active"]');
 const APRSISGateMessages        = document.querySelector('input[name="aprs_is.messagesToRF"]');
 const APRSISGateObjects         = document.querySelector('input[name="aprs_is.objectsToRF"]');
+const APRSISMetadata            = document.querySelector('input[name="aprs_is.is2Metadata"]');
 const APRSISServer              = document.querySelector('input[name="aprs_is.server"]');
 const APRSISPort                = document.querySelector('input[name="aprs_is.port"]');
 const APRSISPasscode            = document.querySelector('input[name="aprs_is.passcode"]');
@@ -339,6 +369,7 @@ const APRSISFilter              = document.querySelector('input[name="aprs_is.fi
 APRSISCheckbox.addEventListener("change", function() {
     APRSISGateMessages.disabled = !this.checked;
     APRSISGateObjects.disabled  = !this.checked;
+    APRSISMetadata.disabled     = !this.checked;
     APRSISServer.disabled       = !this.checked;
     APRSISPort.disabled         = !this.checked;
     APRSISPasscode.disabled     = !this.checked;
@@ -388,6 +419,36 @@ const TelemetryTempCorrection           = document.querySelector('input[name="wx
 TelemetryCheckbox.addEventListener("change", function () {
     TelemetryHeightCorrection.disabled  = !this.checked;
     TelemetryTempCorrection.disabled    = !this.checked;
+});
+
+// LoRa Rx Switch
+const LoRaRxCheckbox                = document.querySelector('input[name="lora.rxActive"]');
+const LoRaRxFreq                    = document.querySelector('[name="lora.rxFreq"]');
+const LoRaRxSpreadingFactor         = document.querySelector('[name="lora.rxSpreadingFactor"]');
+const LoRaRxCodingRate              = document.querySelector('[name="lora.rxCodingRate4"]');
+const LoRaRxSignalBandwidth         = document.querySelector('[name="lora.rxSignalBandwidth"]');
+LoRaRxCheckbox.addEventListener("change", function () {
+    LoRaRxFreq.disabled             = !this.checked;
+    LoRaRxSpreadingFactor.disabled  = !this.checked;
+    LoRaRxCodingRate.disabled       = !this.checked;
+    LoRaRxSignalBandwidth.disabled  = !this.checked;
+});
+
+// LoRa Tx Switch
+const LoRaTxCheckbox                = document.querySelector('input[name="lora.txActive"]');
+const LoRaTxFreq                    = document.querySelector('[name="lora.txFreq"]');
+const LoRaTxSpreadingFactor         = document.querySelector('[name="lora.txSpreadingFactor"]');
+const LoRaTxCodingRate              = document.querySelector('[name="lora.txCodingRate4"]');
+const LoRaTxSignalBandwidth         = document.querySelector('[name="lora.txSignalBandwidth"]');
+const LoRaPower                     = document.querySelector('[name="lora.power"]');
+const LoRaCadActive                 = document.querySelector('[name="lora.cadActive"]');
+LoRaTxCheckbox.addEventListener("change", function () {
+    LoRaTxFreq.disabled             = !this.checked;
+    LoRaTxSpreadingFactor.disabled  = !this.checked;
+    LoRaTxCodingRate.disabled       = !this.checked;
+    LoRaTxSignalBandwidth.disabled  = !this.checked;
+    LoRaPower.disabled              = !this.checked;
+    LoRaCadActive.disabled          = !this.checked;
 });
 
 // Syslog Switches
@@ -445,7 +506,6 @@ function toggleWiFiAutoAPFields() {
     const autoAPConfig = document.getElementById('wifi-autoap-config');
     if (autoAPConfig) autoAPConfig.style.display = isEnabled ? 'block' : 'none';
 }
-
 
 document.querySelector(".new button").addEventListener("click", function () {
     const networksContainer = document.querySelector(".list-networks");
@@ -559,13 +619,12 @@ function loadReceivedPackets(packets) {
 
         packets.forEach((packet) => {
             const element = document.createElement("tr");
-        
-            element.innerHTML = `
-                        <td>${packet.rxTime}</td>
-                        <td>${packet.packet}</td>
-                        <td>${packet.RSSI}</td>
-                        <td>${packet.SNR}</td>
-                    `;
+
+            ['rxDate', 'rxTime', 'packet', 'RSSI', 'SNR'].forEach((field) => {
+                const cell = document.createElement("td");
+                cell.textContent = String(packet[field]);
+                element.appendChild(cell);
+            });
 
             container.appendChild(element);
         })
@@ -592,8 +651,813 @@ document.querySelector('a[href="/received-packets"]').addEventListener('click', 
 
     document.getElementById('received-packets').classList.remove('d-none');
     document.getElementById('configuration').classList.add('d-none');
-    
+
     document.querySelector('button[type=submit]').remove();
 
     fetchReceivedPackets();
 })
+
+
+/* ---------- Stations Map (Leaflet, CDN) ---------- */
+
+let mapInstance    = null;
+let mapMarkers     = null;
+let mapTimer       = null;
+let mapTileErrShown = false;
+let iGateLatLng    = null;
+let mapAutoFitDone = false;
+
+function escapeHtml(value) {    // shows received data as text inside HTML strings (map popups / icons)
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+}
+
+function setMapMessage(text) {
+    const el = document.getElementById("map");
+    if (el) {
+        el.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--msh-text-dim,#8b949e);text-align:center;padding:20px;">${text}</div>`;
+    }
+}
+
+
+/*
+ * APRS symbol renderer for Stations Map
+ *
+ * s.symbol contains APRS table + symbol code, for example:
+ *   "/>"  Primary table
+ *   "\\>" Alternate table
+ *   "L&"  Alternate table with overlay
+ *
+ * Sprite layout:
+ *   aprs-symbols-24-0.png = Primary table
+ *   aprs-symbols-24-1.png = Alternate table
+ *   aprs-symbols-24-2.png = Overlay characters
+ */
+
+function getAprsSymbolIcon(symbol, callsign = "") {
+
+    if (!symbol || String(symbol).length < 2) {
+        return null;
+    }
+
+    const value = String(symbol);
+
+    let table = value.charAt(0);
+    let code  = value.charAt(1);
+    let overlay = null;
+
+    /*
+     * Standard APRS:
+     * "/"  = Primary
+     * "\\" = Alternate
+     *
+     * A-Z / 0-9 / a-j in table position are overlays
+     * for the Alternate table.
+     */
+    if (
+        table !== "/" &&
+        table !== "\\"
+    ) {
+        overlay = table;
+        table = "\\";
+    }
+
+    const ascii = code.charCodeAt(0);
+
+    /*
+     * APRS printable symbol codes are ASCII 33..126.
+     */
+    if (
+        ascii < 33 ||
+        ascii > 126
+    ) {
+        return null;
+    }
+
+    const index = ascii - 33;
+
+    /*
+     * Sprite sheet contains 16 columns x 6 rows.
+     * Each cell occupies 24x24 CSS px; the
+     * "background-size" below tells the browser to scale the sheet back
+     * down to its original 24px-per-cell layout, so all position math
+     * stays in 24px units regardless of source resolution.
+     */
+    const columns = 16;
+    const sheetSize = "384px 144px"; // 16*24 x 6*24, same for all 3 sheets
+
+    const col = index % columns;
+    const row = Math.floor(index / columns);
+
+    const sprite =
+        table === "/"
+            ? "/aprs-symbols-24-0.png"
+            : "/aprs-symbols-24-1.png";
+
+    const x = -(col * 24);
+    const y = -(row * 24);
+
+    let overlayHtml = "";
+
+    if (overlay) {
+
+        let displayOverlay = overlay;
+
+        /*
+         * APRS compressed numeric overlay:
+         * a-j -> 0-9
+         */
+        if (
+            overlay >= "a" &&
+            overlay <= "j"
+        ) {
+            displayOverlay =
+                String(
+                    overlay.charCodeAt(0) -
+                    "a".charCodeAt(0)
+                );
+        }
+
+        /*
+         * The overlay sprite sheet does NOT follow the ascii-33 layout used
+         * by the primary/alternate tables above; it has its own grid:
+         * "0" at row 0 col 15, "1".."9" at row 1 col 0-8, "A".."P" at row 2,
+         * "Q".."Z" at row 3 col 0-9. Verified by hand against the PNG.
+         */
+        let overlayCol = null;
+        let overlayRow = null;
+
+        if (displayOverlay === "0") {
+            overlayCol = 15;
+            overlayRow = 0;
+        } else if (displayOverlay >= "1" && displayOverlay <= "9") {
+            overlayCol = displayOverlay.charCodeAt(0) - "1".charCodeAt(0);
+            overlayRow = 1;
+        } else if (displayOverlay >= "A" && displayOverlay <= "P") {
+            overlayCol = displayOverlay.charCodeAt(0) - "A".charCodeAt(0);
+            overlayRow = 2;
+        } else if (displayOverlay >= "Q" && displayOverlay <= "Z") {
+            overlayCol = displayOverlay.charCodeAt(0) - "Q".charCodeAt(0);
+            overlayRow = 3;
+        }
+
+        if (overlayCol !== null) {
+            const ox = -(overlayCol * 24);
+            const oy = -(overlayRow * 24);
+
+            overlayHtml = `
+                <span style="
+                    position:absolute;
+                    left:0;
+                    top:0;
+                    width:24px;
+                    height:24px;
+                    background-image:url('/aprs-symbols-24-2.png');
+                    background-repeat:no-repeat;
+                    background-position:${ox}px ${oy}px;
+                    background-size:${sheetSize};
+                    pointer-events:none;
+                "></span>
+            `;
+        }
+    }
+
+    return L.divIcon({
+        className: "",
+        html: `
+            <div style="
+                position:relative;
+                width:24px;
+                height:24px;
+                background-image:url('${sprite}');
+                background-repeat:no-repeat;
+                background-position:${x}px ${y}px;
+                background-size:${sheetSize};
+            ">
+                ${overlayHtml}
+
+                <span style="
+                    position:absolute;
+                    left:27px;
+                    top:6px;
+                    font:600 10px Arial,sans-serif;
+                    line-height:12px;
+                    white-space:nowrap;
+                    color:#111;
+                    text-shadow:
+                        -1px -1px 0 #fff,
+                         1px -1px 0 #fff,
+                        -1px  1px 0 #fff,
+                         1px  1px 0 #fff;
+                    pointer-events:none;
+                ">${escapeHtml(callsign)}</span>
+            </div>
+        `,
+        iconSize: [24, 24],
+        iconAnchor: [12, 12],
+        popupAnchor: [0, -12]
+    });
+}
+
+
+let mapStationsCache = [];
+let mapRouteLayer = null;
+
+function getUsedDigipeaters(path) {
+    if (!path) return [];
+
+    return path
+        .split(",")
+        .map((x) => x.trim())
+        .filter((x) => x.endsWith("*"))
+        .map((x) => x.replace(/\*+$/, ""))
+        .filter((x) =>
+            x &&
+            !x.startsWith("WIDE") &&
+            !x.startsWith("TRACE") &&
+            !x.startsWith("TCPIP") &&
+            !x.startsWith("TCPXX") &&
+            !x.startsWith("qA")
+        );
+}
+
+
+function describeMapPath(station) {
+    const digis = getUsedDigipeaters(station.path);
+
+    // heardDirect viene del firmware: true si ALGUNA VEZ se oyo directo,
+    // aunque el ultimo paquete haya llegado repetido.
+    if (station.heardDirect && digis.length) {
+        return "Direct+Via: " + digis.join(" → ");
+    }
+
+    if (digis.length) {
+        return "Via: " + digis.join(" → ");
+    }
+
+    return "Direct";
+}
+
+
+function clearMapRoute() {
+    if (mapRouteLayer && mapInstance) {
+        mapInstance.removeLayer(mapRouteLayer);
+    }
+    mapRouteLayer = null;
+}
+
+
+function drawStationRoute(station) {
+    if (!mapInstance || !iGateLatLng) return;
+
+    clearMapRoute();
+
+    const points = [
+        L.latLng(station.lat, station.lon)
+    ];
+
+    const digis = getUsedDigipeaters(station.path);
+
+    digis.forEach((digiCall) => {
+        const digi = mapStationsCache.find((s) =>
+            String(s.callsign || "").toUpperCase() === digiCall.toUpperCase()
+        );
+
+        if (digi && !(digi.lat === 0 && digi.lon === 0)) {
+            points.push(L.latLng(digi.lat, digi.lon));
+        }
+    });
+
+    points.push(iGateLatLng);
+
+    const routeColor = digis.length > 0 ? "#2e7d32" : "#1565c0";
+
+    mapRouteLayer = L.polyline(points, {
+        color: routeColor,
+        weight: 3,
+        opacity: 0.9
+    }).addTo(mapInstance);
+}
+
+
+function loadMapStations(stations) {
+    if (!mapMarkers) return;
+
+    mapStationsCache = stations || [];
+
+    mapMarkers.clearLayers();
+    clearMapRoute();
+
+    let drawn = 0;
+    (stations || []).forEach((s) => {
+        if (s.lat === 0 && s.lon === 0) return;     // descartar estaciones sin fix
+
+        const popup = `<b>${escapeHtml(s.callsign)}</b>`
+            + (s.lastHeard ? `<br>Last: ${escapeHtml(s.lastHeard)}` : "")
+            + `<br>RSSI ${s.RSSI} / SNR ${s.SNR}`
+            + `<br>Packets: ${s.count}`
+            + `<br><b>${escapeHtml(describeMapPath(s))}</b>`
+            + (s.path ? `<br><small>Path: ${escapeHtml(s.path)}</small>` : "");
+
+        const aprsIcon =
+            getAprsSymbolIcon(s.symbol, s.callsign);
+
+        if (aprsIcon) {
+
+            const marker = L.marker(
+                [s.lat, s.lon],
+                {
+                    icon: aprsIcon
+                }
+            )
+            .bindPopup(popup)
+            .addTo(mapMarkers);
+
+            marker.on("mouseover", function () {
+                drawStationRoute(s);
+            });
+
+            marker.on("mouseout", function () {
+                clearMapRoute();
+            });
+
+        } else {    // Fallback: station with missing or invalid APRS symbol
+            const marker = L.circleMarker([s.lat, s.lon], {
+                radius: 6,
+                color: "#1d6fe0",
+                weight: 2,
+                fillColor: "#3b8cff",
+                fillOpacity: 0.9
+            })
+            .bindPopup(popup)
+            .addTo(mapMarkers);
+
+            marker.on("mouseover", function () {
+                drawStationRoute(s);
+            });
+
+            marker.on("mouseout", function () {
+                clearMapRoute();
+            });
+        }
+
+        drawn++;
+    });
+
+    if (!mapAutoFitDone && drawn > 0) {             // auto-fit la 1ª vez que hay estaciones tras abrir
+        fitMapToStations();
+        mapAutoFitDone = true;
+    }
+}
+
+// Encuadra el mapa para que entren todas las estaciones (+ el iGate). 100% navegador.
+function fitMapToStations() {
+    if (!mapInstance) return false;
+
+    const pts = [];
+    if (mapMarkers) {
+        mapMarkers.eachLayer((layer) => {
+            if (layer.getLatLng) pts.push(layer.getLatLng());
+        });
+    }
+    if (iGateLatLng) pts.push(iGateLatLng);
+
+    if (!pts.length) return false;
+    mapInstance.fitBounds(L.latLngBounds(pts), { padding: [30, 30], maxZoom: 14 });
+    return true;
+}
+
+function fetchMapStations() {
+    fetch("/stations.json")
+    .then((response) => response.json())
+    .then((stations) => {
+        loadMapStations(stations);
+    })
+    .catch((err) => {
+        console.error(err);
+
+        console.error(`Failed to load stations`);
+    });
+}
+
+window.showMap = function () {
+    if (typeof L === "undefined") {                 // sin internet el CDN de Leaflet no cargó
+        setMapMessage("Map unavailable &mdash; no internet connection.<br>The map needs internet to load (OpenStreetMap).");
+        return;
+    }
+
+    mapAutoFitDone = false;                          // re-encuadrar en cada apertura del Map
+
+    if (!mapInstance) {
+        mapInstance = L.map("map");
+
+        const tiles = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            maxZoom: 19,
+            attribution: "&copy; OpenStreetMap"
+        }).addTo(mapInstance);
+
+        tiles.on("tileerror", function () {         // tiles no cargan (sin salida a internet)
+            if (!mapTileErrShown) {
+                mapTileErrShown = true;
+                if (window.showToast) showToast("Map tiles could not load — check internet connection.");
+            }
+        });
+
+        mapMarkers = L.layerGroup().addTo(mapInstance);
+
+        const FitControl = L.Control.extend({       // botón "Fit All Stations" (control nativo de Leaflet)
+            options: { position: "topright" },
+            onAdd: function () {
+                const btn = L.DomUtil.create("button", "");
+                btn.type = "button";
+                btn.title = "Fit all stations";
+                btn.textContent = "Fit All Stations";
+                btn.style.cssText = "background:#fff;color:#333;border:2px solid rgba(0,0,0,.2);border-radius:4px;padding:5px 9px;cursor:pointer;font:600 12px sans-serif;box-shadow:0 1px 4px rgba(0,0,0,.3);";
+                L.DomEvent.on(btn, "click", (e) => {
+                    L.DomEvent.stop(e);
+                    fitMapToStations();
+                });
+                return btn;
+            }
+        });
+        mapInstance.addControl(new FitControl());
+
+        fetch("/configuration.json")                // centrar y marcar el iGate
+        .then((response) => response.json())
+        .then((config) => {
+            const lat = (config.beacon && config.beacon.latitude)  || 0;
+            const lon = (config.beacon && config.beacon.longitude) || 0;
+            const callsign = config.callsign || "iGate";
+            mapInstance.setView([lat, lon], (lat || lon) ? 12 : 2);
+
+            if (lat || lon) {                       // rombo rojo en la posición del iGate
+                iGateLatLng = L.latLng(lat, lon);   // guardar para incluirlo en el auto-fit
+                const iGateIcon = L.divIcon({
+                    className: "igate-marker",
+                    html: '<div style="width:14px;height:14px;background:#e23b3b;border:2px solid #fff;transform:rotate(45deg);box-shadow:0 0 4px rgba(0,0,0,.6);"></div>',
+                    iconSize: [18, 18],
+                    iconAnchor: [9, 9]
+                });
+                L.marker([lat, lon], { icon: iGateIcon })
+                    .bindPopup(`<b>${callsign}</b><br>This station`)
+                    .addTo(mapInstance);        // directo al mapa: no se borra en los refrescos
+            }
+        })
+        .catch(() => {
+            mapInstance.setView([0, 0], 2);
+        });
+    }
+
+    setTimeout(function () {                         // el div estuvo oculto: recalcular tamaño
+        if (mapInstance) mapInstance.invalidateSize();
+    }, 0);
+
+    fetchMapStations();
+
+    if (mapTimer) clearInterval(mapTimer);
+
+    mapTimer = setInterval(function () {            // refrescar solo si la sección está visible
+        const section = document.getElementById("sec-maps");
+        if (section && section.classList.contains("active")) {
+            fetchMapStations();
+        }
+    }, 15000);
+}
+
+
+/* --------------------------------------------------------------- wired (RP2350) build
+ * The RP2350 + WIZnet W5500 port serves this same page, but that board has no
+ * WiFi, no display and no ElegantOTA page, and it adds a wired IP configuration,
+ * an APRS "Messages" view and its own OTA uploader. All of it is feature-detected
+ * from the configuration ("network" only exists on the wired build), so on ESP32
+ * boards nothing below changes the UI.
+ */
+function isWiredBuild(settings) {
+    return !!(settings && settings.network);
+}
+
+function markUnavailable(id, note) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.disabled = true;
+    el.title = note || "Not available on this board";
+}
+
+// Replace the description of the settings block a control belongs to.
+function describeSection(id, html) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const row = el.closest(".row.my-5") || el.closest(".row");
+    if (!row) return;
+    const small = row.querySelector("small");
+    if (small && !small.dataset.wiredNote) {
+        small.innerHTML = html;
+        small.dataset.wiredNote = "1";
+    }
+}
+
+function applyWiredBuildUi(settings) {
+    if (!isWiredBuild(settings)) return;
+
+    // --- wired IP configuration (DHCP or static), shown only on this build
+    const net = settings.network;
+    document.getElementById("network.dhcp").checked    = net.dhcp;
+    document.getElementById("network.ip").value        = net.ip || "";
+    document.getElementById("network.gateway").value   = net.gateway || "";
+    document.getElementById("network.subnet").value    = net.subnet || "255.255.255.0";
+    document.getElementById("network.dns").value       = net.dns || "";
+    document.getElementById("ip-config-section").classList.remove("d-none");    // d-flex would override an inline display:none (!important), so the row hides with d-none
+    document.getElementById("ip-config-hr").style.display      = "";
+    document.getElementById("static-ip-config").style.display  = net.dhcp ? "none" : "";
+
+    // --- sidebar: this build has its own Messages + OTA views, and no ElegantOTA;
+    //     the footer credits the port
+    document.querySelectorAll(".rp2350-only").forEach(function (el) {
+        el.style.display = "";
+    });
+    const elegantOta = document.querySelector(".side-link.side-ota");
+    if (elegantOta) elegantOta.style.display = "none";
+
+    // --- APRS-IS -> RF gating is not ported: this build is a receive-only iGate (qAO).
+    //     Kept disabled when "Enable APRS-IS connection" is toggled, too.
+    const disableGateToRf = function () {
+        ["aprs_is.messagesToRF", "aprs_is.objectsToRF"].forEach(function (id) {
+            const el = document.getElementById(id);
+            if (el) el.checked = false;
+            markUnavailable(id, "Not available on this board: it only gates RF to APRS-IS");
+        });
+    };
+    disableGateToRf();
+    document.getElementById("aprs_is.active").addEventListener("change", disableGateToRf);
+    describeSection("aprs_is.active",
+        "Enter your APRS-IS server and credentials.<br><br>This board only gates RF &rarr; APRS-IS "
+        + "(receive-only iGate): <b>Gate APRS-IS Messages / Objects to RF</b> are not available.");
+
+    // --- WiFi: not present on this board
+    ["wifi.autoAP.enabled", "wifi.autoAP.password", "wifi.autoAP.timeout"].forEach(function (id) {
+        markUnavailable(id, "This board connects over Ethernet, it has no WiFi");
+    });
+    const addAp = document.querySelector('[data-bs-target="#add-ap"]');
+    if (addAp) addAp.disabled = true;
+    describeSection("wifi.autoAP.enabled", "<b>Not available</b> &mdash; this board connects via Ethernet (W5500), it has no WiFi.");
+
+    // --- Display: headless iGate
+    ["display.alwaysOn", "display.turn180", "display.timeout"].forEach(function (id) {
+        markUnavailable(id, "Headless build, no display");
+    });
+    describeSection("display.alwaysOn", "<b>Not available</b> &mdash; this is a headless iGate (no display).");
+
+    // --- Battery: only the internal (VSYS) reading exists here
+    ["battery.monitorInternalVoltage", "battery.internalSleepVoltage", "battery.sendExternalVoltage",
+     "battery.useExternalI2CSensor", "battery.monitorExternalVoltage", "battery.externalSleepVoltage",
+     "battery.externalVoltagePin", "battery.voltageDividerR1", "battery.voltageDividerR2"].forEach(function (id) {
+        markUnavailable(id, "Needs hardware this iGate does not have");
+    });
+    describeSection("battery.sendInternalVoltage",
+        "Supply-voltage (VSYS) monitor.<br><br>Only <b>Send Internal Voltage</b> (adds <code>Batt=</code> to the beacon) "
+        + "and <b>Send Voltage As Telemetry</b> are available &mdash; the external-voltage / health-sleep options need "
+        + "hardware this iGate does not have and are disabled.");
+}
+
+const dhcpCheckbox = document.getElementById("network.dhcp");
+if (dhcpCheckbox) {
+    dhcpCheckbox.addEventListener("change", function () {
+        document.getElementById("static-ip-config").style.display = this.checked ? "none" : "";
+    });
+}
+
+/* ------------------------------------------------------------------- Messages view */
+let receivedMessagesTimer = null;
+
+function loadReceivedMessages() {
+    fetch("/messages.json")
+        .then((r) => r.json())
+        .then((msgs) => {
+            const tbody = document.getElementById("received-messages");
+            if (!tbody) return;
+            if (!msgs.length) {
+                tbody.innerHTML = '<tr><td colspan="4" class="text-muted">No messages received yet.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = msgs.map((m) => {
+                const ago = m.age < 60 ? m.age + "s" : Math.floor(m.age / 60) + "m";
+                const esc = (t) => t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                return "<tr><td>" + ago + "</td><td>" + esc(m.from) + "</td><td>" + esc(m.via || "") + "</td><td>" + esc(m.text) + "</td></tr>";
+            }).join("");
+        })
+        .catch((err) => console.error("Failed to load messages", err));
+}
+
+const sendMessageButton = document.getElementById("send-message");
+if (sendMessageButton) {
+    sendMessageButton.addEventListener("click", function (e) {
+        e.preventDefault();
+
+        const to = document.getElementById("message.to").value.trim();
+        const text = document.getElementById("message.text").value.trim();
+        const viaRF = document.getElementById("message.viaRF").checked;
+        const viaTCP = document.getElementById("message.viaTCP").checked;
+        if (!to || !text) {
+            showToast("Enter both a destination callsign and a message.");
+            return;
+        }
+        if (!viaRF && !viaTCP) {
+            showToast("Pick at least one path: RF and/or APRS-IS.");
+            return;
+        }
+
+        const params = "to=" + encodeURIComponent(to) + "&text=" + encodeURIComponent(text)
+            + "&rf=" + (viaRF ? "1" : "0") + "&tcp=" + (viaTCP ? "1" : "0");
+        // the iGate answers with what really went out, e.g. "queued (RF); not sent: APRS-IS (not connected)"
+        fetch("/action?type=send-message&" + params, { method: "POST" })
+            .then((r) => r.text().then((reply) => {
+                showToast("Message to <b>" + escapeHtml(to) + "</b>: " + escapeHtml(reply) + ".");
+                if (r.ok) document.getElementById("message.text").value = "";
+            }))
+            .catch(() => showToast("Could not reach the iGate: message not sent."));
+    });
+}
+
+const messagesLink = document.querySelector('.side-link[data-target="sec-messages"]');
+if (messagesLink) {
+    messagesLink.addEventListener("click", function () {
+        loadReceivedMessages();
+        if (!receivedMessagesTimer) {
+            receivedMessagesTimer = setInterval(function () {      // refresh only while visible
+                const section = document.getElementById("sec-messages");
+                if (section && section.classList.contains("active")) loadReceivedMessages();
+            }, 10000);
+        }
+    });
+}
+
+/* ------------------------------------------------------------ OTA (firmware update) */
+let otaPrevBuild = "";
+
+function loadOtaStatus() {
+    const el = document.getElementById("ota.current");
+    if (!el) return;
+    fetch("/status", { cache: "no-store" })
+        .then((r) => r.text())
+        .then((text) => { otaPrevBuild = text.trim(); el.innerHTML = "Current firmware: <b>" + otaPrevBuild + "</b>"; })
+        .catch(() => { el.textContent = "Current firmware: (could not read /status)"; });
+}
+
+// after an update: poll /status until the device is back, then confirm
+function waitForReboot(prev, attempt) {
+    attempt = attempt || 0;
+    const status = document.getElementById("ota.status");
+    const el = document.getElementById("ota.current");
+    if (attempt > 25) {
+        status.innerHTML = '<span class="text-warning">Device did not respond after the update &mdash; please check it manually.</span>';
+        return;
+    }
+    const controller = new AbortController();
+    const t = setTimeout(() => controller.abort(), 1500);
+    fetch("/status", { cache: "no-store", signal: controller.signal })
+        .then((r) => r.text())
+        .then((text) => {
+            clearTimeout(t);
+            const now = text.trim();
+            el.innerHTML = "Current firmware: <b>" + now + "</b>";
+            if (now !== prev) {
+                status.innerHTML = '<span class="text-success"><b>&#10003; Update complete.</b> Now running the new firmware.</span>';
+            } else {
+                status.innerHTML = '<span class="text-success"><b>&#10003; Device is back online</b> (firmware version unchanged).</span>';
+            }
+        })
+        .catch(() => {
+            clearTimeout(t);
+            status.textContent = "Waiting for the device to reboot... (" + (attempt + 1) + ")";
+            setTimeout(() => waitForReboot(prev, attempt + 1), 2000);
+        });
+}
+
+const otaLink = document.querySelector('.side-link[data-target="sec-ota"]');
+if (otaLink) otaLink.addEventListener("click", loadOtaStatus);
+
+const otaUploadButton = document.getElementById("ota.upload");
+if (otaUploadButton) {
+    otaUploadButton.addEventListener("click", function (e) {
+        e.preventDefault();
+
+        const file = document.getElementById("ota.file").files[0];
+        if (!file) { showToast("Pick a firmware.bin file first."); return; }
+
+        const user = document.getElementById("ota.user").value.trim();
+        const pass = document.getElementById("ota.pass").value;
+        const wrap = document.getElementById("ota.progresswrap");
+        const bar = document.getElementById("ota.progress");
+        const status = document.getElementById("ota.status");
+
+        wrap.classList.remove("d-none");
+        bar.style.width = "0%"; bar.textContent = "0%";
+        status.textContent = "Uploading " + file.name + " (" + file.size + " bytes)...";
+
+        let bodySent = false;
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", "/update", true);
+        if (user) xhr.setRequestHeader("Authorization", "Basic " + btoa(user + ":" + pass));
+
+        xhr.upload.onprogress = function (ev) {
+            if (ev.lengthComputable) {
+                const pct = Math.round(ev.loaded * 100 / ev.total);
+                bar.style.width = pct + "%"; bar.textContent = pct + "%";
+            }
+        };
+        xhr.upload.onload = function () { bodySent = true; };
+
+        xhr.onload = function () {
+            if (xhr.status === 200) {
+                bar.style.width = "100%"; bar.textContent = "100%";
+                status.innerHTML = "Update staged &mdash; waiting for the device to reboot...";
+                setTimeout(() => waitForReboot(otaPrevBuild, 0), 4000);
+            } else if (xhr.status === 401) {
+                status.innerHTML = '<span class="text-danger">Unauthorized &mdash; check the OTA user/password.</span>';
+            } else {
+                status.innerHTML = '<span class="text-danger">Update failed: ' + xhr.status + " " + xhr.responseText + "</span>";
+            }
+        };
+        xhr.onerror = function () {
+            if (bodySent) {   // socket dropped after the full upload = device rebooting
+                bar.style.width = "100%"; bar.textContent = "100%";
+                status.innerHTML = "Update sent &mdash; waiting for the device to reboot...";
+                setTimeout(() => waitForReboot(otaPrevBuild, 0), 4000);
+            } else {
+                status.innerHTML = '<span class="text-danger">Upload failed (connection error before the firmware was fully sent).</span>';
+            }
+        };
+        xhr.send(file);
+    });
+}
+
+
+/* ------------------------------------------------- keeping the form submittable
+ * A control that fails HTML5 validation blocks the whole form, and when it sits in
+ * a panel that is not the visible one the browser cannot show its bubble either:
+ * pressing Save then does nothing at all -- no message, no request, no clue. Two
+ * guards against that: pull stored values back inside the allowed range on load,
+ * and, if validation still fails, open the section holding the offending control
+ * and show what is wrong.
+ */
+function clampOutOfRangeInputs() {
+    const fixed = [];
+
+    document.querySelectorAll("#configuration input[type=number]").forEach((el) => {
+        if (el.disabled || el.value === "") return;
+
+        const value = parseFloat(el.value);
+        if (isNaN(value)) return;
+
+        const min = el.min !== "" ? parseFloat(el.min) : null;
+        const max = el.max !== "" ? parseFloat(el.max) : null;
+
+        let clamped = value;
+        if (max !== null && value > max) clamped = max;
+        if (min !== null && value < min) clamped = min;
+
+        if (clamped !== value) {
+            el.value = clamped;
+            fixed.push((el.name || el.id) + ": " + value + " &rarr; " + clamped);
+        }
+    });
+
+    if (fixed.length) {
+        showToast("Stored values outside the allowed range, adjusted:<br>" + fixed.join("<br>")
+                  + "<br><small>Save to keep them.</small>");
+    }
+}
+
+let invalidFieldReported = false;
+
+form.addEventListener("invalid", function (event) {
+    const el = event.target;
+
+    if (!invalidFieldReported) {          // only the first one: the rest would pile up toasts
+        invalidFieldReported = true;
+        setTimeout(() => { invalidFieldReported = false; }, 500);
+
+        const section = el.closest(".panel-section");
+        if (section) {
+            const link = document.querySelector('.side-link[data-target="' + section.id + '"]');
+            if (link) {
+                link.click();             // reuses the sidebar switcher (also shows the config view)
+            } else {
+                document.querySelectorAll(".panel-section").forEach((s) => s.classList.remove("active"));
+                section.classList.add("active");
+                document.getElementById("configuration").classList.remove("d-none");
+            }
+        }
+
+        showToast("<b>" + (el.name || el.id) + "</b>: " + (el.validationMessage || "invalid value"));
+
+        setTimeout(() => {
+            el.focus();
+            el.scrollIntoView({ block: "center", behavior: "smooth" });
+        }, 0);
+    }
+}, true);

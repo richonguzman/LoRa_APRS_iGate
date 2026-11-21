@@ -1,4 +1,4 @@
-/* Copyright (C) 2025 Ricardo Guzman - CA2RXU
+/* Copyright (C) 2026 Ricardo Guzman - CA2RXU
  *
  * This file is part of LoRa APRS iGate.
  *
@@ -20,6 +20,7 @@
 #include "battery_utils.h"
 #include "board_pinout.h"
 #include "power_utils.h"
+#include "wx_utils.h"
 #include "utils.h"
 
 #if defined(HAS_AXP192) || defined(HAS_AXP2101)
@@ -65,7 +66,7 @@ namespace POWER_Utils {
         }
 
         void vext_ctrl_OFF() {
-            digitalWrite(VEXT_CTRL_PIN, Config.digi.ecoMode == 1 ? VEXT_CTRL_ON_STATE : !VEXT_CTRL_ON_STATE);
+            digitalWrite(VEXT_CTRL_PIN, !VEXT_CTRL_ON_STATE);       // always off, regardless of ecoMode
         }
     #endif
 
@@ -110,9 +111,7 @@ namespace POWER_Utils {
                 PMU.enableALDO3();
             #endif
         #endif
-        #ifdef HELTEC_WIRELESS_TRACKER
-            adc_ctrl_ON();
-        #endif
+        // HELTEC_WIRELESS_TRACKER: GPS shares Vext (GPIO3) with the TFT, so it follows the display power (not controlled here)
         //gpsIsActive = true;
     }
 
@@ -128,9 +127,7 @@ namespace POWER_Utils {
                 PMU.disableALDO3();
             #endif
         #endif
-        #ifdef HELTEC_WIRELESS_TRACKER
-            adc_ctrl_OFF();
-        #endif
+        // HELTEC_WIRELESS_TRACKER: GPS shares Vext with the TFT, turned off with it (see activateGPS)
         //gpsIsActive = false;
     }
 
@@ -198,7 +195,10 @@ namespace POWER_Utils {
                 PMU.setDC1Voltage(3300);
                 PMU.enableDC1();
                 #ifdef TTGO_T_Beam_S3_SUPREME_V3
-                    PMU.setALDO1Voltage(3300);
+                    PMU.setALDO1Voltage(3300);      // BME280, QMC6310, QMI8658, OLED
+                    PMU.enableALDO1();
+                    PMU.setALDO2Voltage(3300);      // sensors/OLED I2C + RTC PCF8563 (must stay on)
+                    PMU.enableALDO2();
                 #endif
                 PMU.setButtonBatteryChargeVoltage(3300);
                 PMU.enableButtonBatteryCharge();
@@ -209,6 +209,23 @@ namespace POWER_Utils {
             return true;
         #endif
     }
+
+    #ifdef SOLAR_CHARGE_PIN
+        void checkSolarCharge() {       // called on each beacon: disable solar charging when too cold for Li-Ion
+            static bool chargingEnabled = true;
+            float boardTemp = WX_Utils::readBoardTemperature();
+            if (isnan(boardTemp)) {
+                chargingEnabled = true;                         // sensor failure: keep charging (previous behaviour)
+            } else if (chargingEnabled && boardTemp < SOLAR_CHARGE_DISABLE_TEMP) {
+                chargingEnabled = false;
+                Serial.println("[SOLAR] Charging disabled, board temp: " + String(boardTemp, 1) + "C");
+            } else if (!chargingEnabled && boardTemp > SOLAR_CHARGE_ENABLE_TEMP) {
+                chargingEnabled = true;
+                Serial.println("[SOLAR] Charging enabled, board temp: " + String(boardTemp, 1) + "C");
+            }
+            digitalWrite(SOLAR_CHARGE_PIN, chargingEnabled ? SOLAR_CHARGE_ENABLED_STATE : !SOLAR_CHARGE_ENABLED_STATE);
+        }
+    #endif
 
     void setup() {
         #ifdef HAS_AXP192
@@ -252,6 +269,12 @@ namespace POWER_Utils {
 
         #ifdef BATTERY_PIN
             pinMode(BATTERY_PIN, INPUT);
+        #endif
+
+        #ifdef SOLAR_CHARGE_PIN
+            pinMode(SOLAR_CHARGE_PIN, OUTPUT);
+            digitalWrite(SOLAR_CHARGE_PIN, SOLAR_CHARGE_ENABLED_STATE);    // solar charging enabled by default
+            gpio_hold_dis((gpio_num_t)SOLAR_CHARGE_PIN);                    // release hold kept during deep sleep (if any)
         #endif
 
         #ifdef INTERNAL_LED_PIN

@@ -1,4 +1,4 @@
-/* Copyright (C) 2025 Ricardo Guzman - CA2RXU
+/* Copyright (C) 2026 Ricardo Guzman - CA2RXU
  *
  * This file is part of LoRa APRS iGate.
  *
@@ -74,7 +74,7 @@ namespace OTA_Utils {
         Serial.println(success ? "OTA update finished successfully!" : "There was an error during OTA update!");
         displayShow("", "", statusMessage, "", rebootMessage, "", "", 4000);
 
-        isUpdatingOTA = false;
+        if (!success) isUpdatingOTA = false;
     }
 
 }

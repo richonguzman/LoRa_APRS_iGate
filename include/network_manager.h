@@ -1,3 +1,21 @@
+/* Copyright (C) 2026 Ricardo Guzman - CA2RXU
+ *
+ * This file is part of LoRa APRS iGate.
+ *
+ * LoRa APRS iGate is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * LoRa APRS iGate is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with LoRa APRS iGate. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 #include <Arduino.h>
 #include <SPI.h>
 #include <WiFi.h>
@@ -25,9 +43,12 @@ private:
 
     String _hostName = "";
     std::vector<WiFiNetwork> _wifiNetworks;
+    volatile uint8_t _lastWiFiDisconnectReason = 0;
+    String _wifiAuthFailSSID = "";
 
     int _findWiFiNetworkIndex(const String& ssid) const;
     bool _connectWiFi(const WiFiNetwork& network);
+    bool _isWiFiAuthFailure() const;
     void _processAPTimeout();
     void _onNetworkEvent(arduino_event_id_t event, arduino_event_info_t /*info*/);
 
@@ -57,6 +78,7 @@ public:
     bool disconnectWiFi();
     String getWiFiSSID() const;
     String getWiFiAPSSID() const;
+    String getWiFiAuthFailSSID() const;
     IPAddress getWiFiIP() const;
     IPAddress getWiFiAPIP() const;
     wifi_mode_t getWiFiMode() const;
@@ -66,7 +88,6 @@ public:
     // Ethernet methods
     bool ethernetConnect(eth_phy_type_t type, uint8_t phy_addr, uint8_t mdc, uint8_t mdio, int power, eth_clock_mode_t clock_mode, bool use_mac_from_efuse = false);
     bool setEthernetIP(const String& staticIP, const String& gateway, const String& subnet, const String& dns1, const String& dns2);
-    bool ethernetDisconnect();
     IPAddress getEthernetIP() const;
     String getEthernetMACAddress() const;
 
@@ -79,4 +100,7 @@ public:
     bool isModemConnected() const;
 
     bool isWifiAPActive() const;
+
+    // Check if any network interface was started (lwip TCP/IP stack is initialized)
+    bool hasActiveInterface() const;
 };

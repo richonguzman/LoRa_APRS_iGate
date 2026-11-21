@@ -1,4 +1,4 @@
-/* Copyright (C) 2025 Ricardo Guzman - CA2RXU
+/* Copyright (C) 2026 Ricardo Guzman - CA2RXU
  *
  * This file is part of LoRa APRS iGate.
  *
@@ -52,6 +52,7 @@ ___________________________________________________________________*/
 #include "syslog_utils.h"
 #include "power_utils.h"
 #include "sleep_utils.h"
+#include "thermal_utils.h"
 #include "mqtt_utils.h"
 #include "lora_utils.h"
 #include "wifi_utils.h"
@@ -68,8 +69,8 @@ ___________________________________________________________________*/
 #endif
 
 
-String              versionDate             = "2026-03-25";
-String              versionNumber           = "3.2.3";
+String              versionDate             = "2026-11-17";
+String              versionNumber           = "4.0.5";
 Configuration       Config;
 WiFiClient          aprsIsClient;
 WiFiClient          mqttClient;
@@ -108,6 +109,9 @@ void setup() {
     }
     networkManager->setHostName("iGATE-" + Config.callsign);
     POWER_Utils::setup();
+    #ifdef FAN_CTRL_PIN
+        THERMAL_Utils::setup();
+    #endif
     Utils::setupDisplay();
     LoRa_Utils::setup();
     Utils::validateFreqs();
@@ -135,6 +139,9 @@ void loop() {
         SLEEP_Utils::checkWakeUpFlag();
         Utils::checkBeaconInterval();
         STATION_Utils::processOutputPacketBufferUltraEcoMode();
+        #ifdef FAN_CTRL_PIN
+            THERMAL_Utils::monitor();
+        #endif
         Utils::checkSleepByLowBatteryVoltage(1);
         SLEEP_Utils::startSleeping();
     } else {
@@ -184,7 +191,7 @@ void loop() {
         Utils::checkDisplayInterval();
         Utils::checkBeaconInterval();
 
-        APRS_IS_Utils::checkStatus(); // Need that to update display, maybe split this and send APRSIS status to display func?
+        APRS_IS_Utils::updateWiFiAPRSISDisplayInfo();   // WiFi / APRS-IS status line (wakes display only on status change)
 
         String packet = "";
         if (Config.loramodule.rxActive) {
@@ -196,7 +203,7 @@ void loop() {
                 APRS_IS_Utils::processLoRaPacket(packet); // Send received packet to APRSIS
             }
 
-            if (Config.loramodule.txActive && (Config.digi.mode == 2 || Config.digi.mode == 3 || backupDigiMode)) { // If Digi enabled
+            if (Config.loramodule.txActive && (Config.digi.mode == 1 || Config.digi.mode == 2 || Config.digi.mode == 3 || backupDigiMode)) { // If Digi enabled
                 DIGI_Utils::processLoRaPacket(packet); // Send received packet to Digi
             }
 
@@ -222,6 +229,9 @@ void loop() {
             displayShow(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
         #endif
 
+        #ifdef FAN_CTRL_PIN
+            THERMAL_Utils::monitor();
+        #endif
         Utils::checkRebootTime();
         Utils::checkSleepByLowBatteryVoltage(1);
     }

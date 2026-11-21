@@ -1,4 +1,4 @@
-/* Copyright (C) 2025 Ricardo Guzman - CA2RXU
+/* Copyright (C) 2026 Ricardo Guzman - CA2RXU
  *
  * This file is part of LoRa APRS iGate.
  *
@@ -36,6 +36,7 @@ namespace WX_Utils {
     String  generateHumString(const float sensorHum);
     String  generatePresString(const float sensorPres);
     String  readDataSensor();
+    float   readBoardTemperature();
 
 }
 

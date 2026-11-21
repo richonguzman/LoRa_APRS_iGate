@@ -1,4 +1,4 @@
-/* Copyright (C) 2025 Ricardo Guzman - CA2RXU
+/* Copyright (C) 2026 Ricardo Guzman - CA2RXU
  *
  * This file is part of LoRa APRS iGate.
  *
@@ -24,6 +24,7 @@
 
 namespace LoRa_Utils {
 
+    int     validPower(int requested);
     void    setup();
     void    sendNewPacket(const String& newPacket);
     String  receivePacketFromSleep();

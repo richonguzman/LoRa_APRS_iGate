@@ -1,4 +1,4 @@
-/* Copyright (C) 2025 Ricardo Guzman - CA2RXU
+/* Copyright (C) 2026 Ricardo Guzman - CA2RXU
  *
  * This file is part of LoRa APRS iGate.
  *
@@ -57,15 +57,21 @@
             String lastEpaperText;
         #else
             #include <Adafruit_GFX.h>
+            #if defined RPC_LORA_DIGIGATE_1W
+                #define SCREEN_HEIGHT 32
+            #else
+                #define SCREEN_HEIGHT 64
+            #endif
+
             #ifdef HAS_SH1106
                 #include <Adafruit_SH110X.h>
-                Adafruit_SH1106G display(128, 64, &Wire, OLED_RST);
+                Adafruit_SH1106G display(128, SCREEN_HEIGHT, &Wire, OLED_RST);
             #else
                 #include <Adafruit_SSD1306.h>
                 #ifdef HELTEC_WSL_V3_DISPLAY
-                    Adafruit_SSD1306 display(128, 64, &Wire1, OLED_RST);
+                    Adafruit_SSD1306 display(128, SCREEN_HEIGHT, &Wire1, OLED_RST);
                 #else
-                    Adafruit_SSD1306 display(128, 64, &Wire, OLED_RST);
+                    Adafruit_SSD1306 display(128, SCREEN_HEIGHT, &Wire, OLED_RST);
                 #endif
             #endif
         #endif
@@ -75,6 +81,7 @@
 extern  Configuration   Config;
 
 bool    displayFound    = false;
+int     maxLines;
 
 void displaySetup() {
     #ifdef HAS_DISPLAY
@@ -97,6 +104,13 @@ void displaySetup() {
                 sprite.createSprite(160, 80);
             #endif
         #else
+            #if (SCREEN_HEIGHT == 64)
+                maxLines = 6;
+            #elif (SCREEN_HEIGHT == 32)
+                maxLines = 3;
+            #else
+                maxLines = 6;
+            #endif
             #ifdef HAS_EPAPER
                 display.landscape();
                 display.printCenter("LoRa APRS iGate Initialising...");
@@ -297,7 +311,7 @@ void displayShow(const String& header, const String& line1, const String& line2,
                     display.setCursor(0, 0);
                     display.println(header);
                     display.setTextSize(1);
-                    for (int i = 0; i < 6; i++) {
+                    for (int i = 0; i < maxLines; i++) {
                         display.setCursor(0, 16 + (8 * i));
                         display.println(*lines[i]);
                     }

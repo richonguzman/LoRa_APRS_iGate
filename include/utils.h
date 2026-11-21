@@ -1,4 +1,4 @@
-/* Copyright (C) 2025 Ricardo Guzman - CA2RXU
+/* Copyright (C) 2026 Ricardo Guzman - CA2RXU
  *
  * This file is part of LoRa APRS iGate.
  *
@@ -19,11 +19,12 @@
 #ifndef UTILS_H_
 #define UTILS_H_
 
+#include <APRSPacketLib.h>
 #include <Arduino.h>
-
 
 class ReceivedPacket {
 public:
+    String  rxDate;
     String  rxTime;
     String  packet;
     int     RSSI;
@@ -39,7 +40,9 @@ namespace Utils {
     void    checkBeaconInterval();
     void    checkDisplayInterval();
     void    validateFreqs();
-    void    typeOfPacket(const String& packet, const uint8_t packetType);
+    String  padForDisplay(const String& text);
+    void    updateLoRaPacketDisplayInfo(APRSPacket& aprsPacket, const uint8_t packetType);
+    void    updateAPRSISPacketDisplayInfo(const String& packet);
     void    print(const String& text);
     void    println(const String& text);
     void    checkRebootMode();

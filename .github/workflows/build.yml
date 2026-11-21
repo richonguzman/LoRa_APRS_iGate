@@ -18,7 +18,7 @@ jobs:
                     - name: ttgo-lora32-v21_915
                       chip: esp32
                     - name: ttgo-lora32-v21_915_GPS
-                      chip: esp32                      
+                      chip: esp32
                     - name: ttgo_lora32_t3s3_v1_2
                       chip: esp32s3
                     - name: heltec-lora32-v2
@@ -37,17 +37,19 @@ jobs:
                       chip: esp32s3
                     - name: heltec_wireless_bridge
                       chip: esp32
-                    - name: ESP32_DIY_LoRa
+                    - name: ESP32_DIY_LoRa_SX1278
                       chip: esp32
-                    - name: ESP32_DIY_LoRa_915
+                    - name: ESP32_DIY_LoRa_915_SX1276
                       chip: esp32
-                    - name: ESP32_DIY_1W_LoRa
+                    - name: ESP32_DIY_1W_LoRa_E22_400M30S
                       chip: esp32
-                    - name: ESP32_DIY_1W_LoRa_915
+                    - name: ESP32_DIY_1W_LoRa_915_E22_900M30S
                       chip: esp32
-                    - name: ESP32_DIY_1W_LoRa_LLCC68
+                    - name: ESP32_DIY_1W_LoRa_E220_400M30S
                       chip: esp32
-                    - name: ESP32_DIY_1W_LoRa_Mesh_V1_2
+                    - name: ESP32_DIY_1W_LoRa_E32_400M30S
+                      chip: esp32
+                    - name: ESP32_DIY_1W_LoRa_Mesh_V1_2_E22_400M30S
                       chip: esp32
                     - name: ttgo-t-beam-v1_2
                       chip: esp32
@@ -69,9 +71,11 @@ jobs:
                       chip: esp32s3
                     - name: ttgo_t_beam_s3_SUPREME_v3
                       chip: esp32s3
-                    - name: ESP32_DIY_LoRa_A7670
+                    - name: ttgo-t-beam-1W
+                      chip: esp32s3
+                    - name: ESP32_DIY_LoRa_A7670_SX1278
                       chip: esp32
-                    - name: ESP32_DIY_LoRa_A7670_915
+                    - name: ESP32_DIY_LoRa_A7670_915_SX1276
                       chip: esp32
                     - name: heltec_wireless_tracker
                       chip: esp32s3
@@ -85,34 +89,45 @@ jobs:
                       chip: esp32s3
                     - name: OE5HWN_MeshCom
                       chip: esp32
-                    - name: WEMOS-LOLIN32-OLED-DIY
+                    - name: WEMOS_LOLIN32_OLED_DIY_LoRa_SX1278
                       chip: esp32
-                    - name: WEMOS-D1-R32-RA02
+                    - name: WEMOS_D1_R32_DIY_LoRa_SX1278
                       chip: esp32
-                    - name: WEMOS_S2_MINI_DIY_LoRa
+                    - name: WEMOS_S2_MINI_DIY_LoRa_SX1278
                       chip: esp32s2
-                    - name: esp32c3_DIY_1W_LoRa
+                    - name: ESP32C3_DIY_1W_LoRa_E22_400M30S
                       chip: esp32c3
-                    - name: esp32c3_DIY_1W_LoRa_915
+                    - name: ESP32C3_DIY_1W_LoRa_915_E22_900M30S
                       chip: esp32c3
-                    - name: ESP32_C3_OctopusLab_LoRa
+                    - name: ESP32C3_OctopusLab_LoRa
+                      chip: esp32c3
+                    - name: ESP32C3_SuperMini_DIY_LoRa_SX1278
                       chip: esp32c3
                     - name: QRPLabs_LightGateway_1_0
                       chip: esp32s3
                     - name: QRPLabs_LightGateway_Plus_1_0
                       chip: esp32s3
+                    - name: RPC_LORA_DIGIGATE_1W
+                      chip: esp32
                     - name: XIAO_ESP32S3_WIO_SX1262
+                      chip: esp32s3
+                    - name: RAK3312
+                      chip: esp32s3
+                    - name: RAK3112
                       chip: esp32s3
                     - name: TROY_LoRa_APRS
                       chip: esp32
-                    - name: ESP32_9M2IBR_1W_LoRa_GPS
+                    - name: ESP32_9M2IBR_1W_LoRa_GPS_E22_400M30S
                       chip: esp32
         steps:
-            - uses: actions/checkout@v3
+            - uses: actions/checkout@v7
 
-            - uses: actions/setup-python@v4
+            - uses: actions/setup-python@v7
               with:
-                  python-version: "3.9"
+                  python-version: "3.13"
+
+            - name: Install esptool
+              run: pip install "esptool>=5,<6"
 
             - name: Install PlatformIO Core
               run: pip install --upgrade platformio
@@ -138,44 +153,44 @@ jobs:
             - name: Merge for web flashing
               run: |
                   if [ "${{ matrix.target.chip }}" == "esp32" ]; then
-                    python installer/bin/esptool/esptool.py --chip esp32 merge_bin \
+                    esptool --chip esp32 merge-bin \
                       -o installer/web_factory.bin \
-                      --flash_mode dio \
-                      --flash_freq 40m \
-                      --flash_size 4MB \
+                      --flash-mode dio \
+                      --flash-freq 40m \
+                      --flash-size 4MB \
                       0x1000 installer/firmware/bootloader.bin \
                       0x8000 installer/firmware/partitions.bin \
                       0xe000 installer/firmware/boot_app0.bin \
                       0x10000 installer/firmware/firmware.bin \
                       0x3D0000 installer/firmware/spiffs.bin
                   elif [ "${{ matrix.target.chip }}" == "esp32s2" ]; then
-                    python installer/bin/esptool/esptool.py --chip esp32s2 merge_bin \
+                    esptool --chip esp32s2 merge-bin \
                       -o installer/web_factory.bin \
-                      --flash_mode dio \
-                      --flash_freq 40m \
-                      --flash_size 4MB \
+                      --flash-mode dio \
+                      --flash-freq 40m \
+                      --flash-size 4MB \
                       0x1000 installer/firmware/bootloader.bin \
                       0x8000 installer/firmware/partitions.bin \
                       0xe000 installer/firmware/boot_app0.bin \
                       0x10000 installer/firmware/firmware.bin \
                       0x3D0000 installer/firmware/spiffs.bin
                   elif [ "${{ matrix.target.chip }}" == "esp32s3" ]; then
-                    python installer/bin/esptool/esptool.py --chip esp32s3 merge_bin \
+                    esptool --chip esp32s3 merge-bin \
                       -o installer/web_factory.bin \
-                      --flash_mode dio \
-                      --flash_freq 40m \
-                      --flash_size 8MB \
+                      --flash-mode dio \
+                      --flash-freq 40m \
+                      --flash-size 8MB \
                       0x0000 installer/firmware/bootloader.bin \
                       0x8000 installer/firmware/partitions.bin \
                       0xe000 installer/firmware/boot_app0.bin \
                       0x10000 installer/firmware/firmware.bin \
                       0x3D0000 installer/firmware/spiffs.bin
                   elif [ "${{ matrix.target.chip }}" == "esp32c3" ]; then
-                    python installer/bin/esptool/esptool.py --chip esp32c3 merge_bin \
+                    esptool --chip esp32c3 merge-bin \
                       -o installer/web_factory.bin \
-                      --flash_mode dio \
-                      --flash_freq 40m \
-                      --flash_size 4MB \
+                      --flash-mode dio \
+                      --flash-freq 40m \
+                      --flash-size 4MB \
                       0x1000 installer/firmware/bootloader.bin \
                       0x8000 installer/firmware/partitions.bin \
                       0xe000 installer/firmware/boot_app0.bin \
@@ -189,12 +204,69 @@ jobs:
             - name: Archive Files
               run: zip -r installer.zip installer/
 
+            - name: Rename zip for upload
+              run: mv installer.zip ${{ matrix.target.name }}.zip
+
             - name: Upload Release Asset
-              uses: actions/upload-release-asset@v1
+              uses: softprops/action-gh-release@v3
+              with:
+                  files: ${{ matrix.target.name }}.zip
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    build-rp2350:
+        # RP2350 boards (src/rp2350/, maintained by @cvaldess): one zip per board with
+        # firmware.uf2 for the first install (BOOTSEL USB drive) and ota_update.bin
+        # for the web OTA. If one does not build, the release goes on without its zip
+        # and this run stays green with a warning.
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write     # upload the zips to the release
+        strategy:
+            fail-fast: false
+            matrix:
+                target:
+                    - name: pico2_w5500_e22
+                    - name: wiznet_5500_evb_pico2_e22p
+                    - name: wiznet_5100s_evb_pico2_e22p
+        steps:
+            - uses: actions/checkout@v7
+
+            - uses: actions/setup-python@v7
               with:
-                  upload_url: ${{ github.event.release.upload_url }}
-                  asset_path: ./installer.zip
-                  asset_name: ${{ matrix.target.name }}.zip
-                  asset_content_type: application/zip
+                  python-version: "3.13"
+
+            - name: Install PlatformIO Core
+              run: pip install --upgrade platformio
+
+            - name: Build target
+              id: build
+              continue-on-error: true
+              run: pio run -e ${{ matrix.target.name }}
+
+            - name: Report
+              if: steps.build.outcome == 'failure'
+              run: echo "::warning title=RP2350::${{ matrix.target.name }} did not build, so this release has no zip for it. The RP2350 boards (src/rp2350/) are maintained by @cvaldess."
+
+            - name: Move Files
+              if: steps.build.outcome == 'success'
+              run: |
+                  mkdir -p installer/firmware
+                  cp .pio/build/${{ matrix.target.name }}/firmware.bin installer/ota_update.bin
+                  cp .pio/build/${{ matrix.target.name }}/firmware.uf2 installer/firmware/
+
+            - name: Install Zip
+              if: steps.build.outcome == 'success'
+              run: sudo apt-get install zip
+
+            - name: Archive Files
+              if: steps.build.outcome == 'success'
+              run: zip -r ${{ matrix.target.name }}.zip installer/
+
+            - name: Upload Release Asset
+              if: steps.build.outcome == 'success'
+              uses: softprops/action-gh-release@v3
+              with:
+                  files: ${{ matrix.target.name }}.zip
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

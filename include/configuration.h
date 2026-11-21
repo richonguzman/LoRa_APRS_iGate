@@ -1,4 +1,4 @@
-/* Copyright (C) 2025 Ricardo Guzman - CA2RXU
+/* Copyright (C) 2026 Ricardo Guzman - CA2RXU
  *
  * This file is part of LoRa APRS iGate.
  *
@@ -42,6 +42,7 @@ public:
     double  latitude;
     double  longitude;
     String  comment;
+    int     rfCommentEveryXBeacons;
     int     interval;
     String  overlay;
     String  symbol;
@@ -64,6 +65,7 @@ public:
     String  filter;
     bool    messagesToRF;
     bool    objectsToRF;
+    bool    is2Metadata;
 };
 
 class DIGI {
@@ -86,6 +88,7 @@ public:
     int     txCodingRate4;
     long    txSignalBandwidth;
     int     power;
+    bool    cadActive;
 };
 
 class Display {
@@ -131,6 +134,7 @@ public:
     bool    enableSerial;
     bool    acceptOwn;
     bool    aprsBridgeActive;
+    bool    kissProtocol;    // true = KISS, false = TNC2 -- applies to both Serial and TCP server
 };
 
 class OTA {
@@ -169,6 +173,15 @@ public:
     bool    beaconOverMqtt;
 };
 
+class NETWORK {                     // IP configuration (Ethernet boards)
+public:
+    bool    dhcp;                   // true = DHCP, false = static IP below
+    String  ip;
+    String  gateway;
+    String  subnet;
+    String  dns;                    // one or more servers, space/comma-separated
+};
+
 class Configuration {
 public:
     String                  callsign;
@@ -195,6 +208,7 @@ public:
     NTP                     ntp;
     REMOTE_MANAGEMENT       remoteManagement;
     MQTT                    mqtt;
+    NETWORK                 network;
 
     void setup();
     void setDefaultValues();

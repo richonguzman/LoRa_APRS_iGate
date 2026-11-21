@@ -1,4 +1,4 @@
-/* Copyright (C) 2025 Ricardo Guzman - CA2RXU
+/* Copyright (C) 2026 Ricardo Guzman - CA2RXU
  *
  * This file is part of LoRa APRS iGate.
  *
@@ -197,6 +197,7 @@
         }
 
         void uploadToAPRSIS(const String& packet) {
+            if (packet == "") return;               // never send an empty line to APRS-IS
             beaconBytesSent = checkATResponse("AT+CIPSEND=0," + String(packet.length()+1));
             delay(2000);
             if (beaconBytesSent) {
@@ -214,7 +215,7 @@
 
         void listenAPRSIS() {
             if (SerialAT.available()) {
-                String packetAPRSIS = SerialAT.readStringUntil('\r');
+                String packetAPRSIS = SerialAT.readStringUntil('\n');   // modem lines end with "\r\n": reading up to '\r' left the '\n' and the next call stalled for the 1 s stream timeout (same fix as listenAPRSIS in aprs_is_utils.cpp); trim() removes the '\r'
                 packetAPRSIS.trim();
                 if (!packetAPRSIS.startsWith("#") && packetAPRSIS.indexOf("+IPD") == -1 && packetAPRSIS.indexOf("RECV") == -1 && packetAPRSIS.length() > 0) {
                     APRS_IS_Utils::processAPRSISPacket(packetAPRSIS);

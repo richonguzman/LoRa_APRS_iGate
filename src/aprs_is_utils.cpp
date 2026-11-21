@@ -1,4 +1,4 @@
-/* Copyright (C) 2025 Ricardo Guzman - CA2RXU
+/* Copyright (C) 2026 Ricardo Guzman - CA2RXU
  *
  * This file is part of LoRa APRS iGate.
  *
@@ -16,7 +16,7 @@
  * along with LoRa APRS iGate. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <APRSPacketLib.h> 
+#include <APRSPacketLib.h>
 #include <WiFiClient.h>
 #include "configuration.h"
 #include "network_manager.h"
@@ -33,6 +33,7 @@
 
 
 extern Configuration        Config;
+extern APRSPacket           lastAprsPacket;
 extern NetworkManager       *networkManager;
 extern WiFiClient           aprsIsClient;
 extern uint32_t             lastScreenOn;
@@ -47,7 +48,6 @@ extern bool                 modemLoggedToAPRSIS;
 extern bool                 backupDigiMode;
 extern String               versionNumber;
 
-uint32_t    lastRxTime      = millis();
 bool        passcodeValid   = false;
 uint32_t    lastServerCheck = 0;
 
@@ -60,6 +60,7 @@ uint32_t    lastServerCheck = 0;
 namespace APRS_IS_Utils {
 
     void upload(const String& line) {
+        if (line == "") return;                     // never send an empty line to APRS-IS
         aprsIsClient.print(line + "\r\n");
     }
 
@@ -93,7 +94,9 @@ namespace APRS_IS_Utils {
         }
     }
 
-    void checkStatus() {
+    void updateWiFiAPRSISDisplayInfo() {
+        static String lastWifiState     = "";
+        static String lastAprsisState   = "";
         String wifiState, aprsisState;
         if (networkManager->isWiFiConnected()) {
             wifiState = "OK";
@@ -103,10 +106,6 @@ namespace APRS_IS_Utils {
             } else {
                 wifiState = "AP";
             }
-            if (!Config.display.alwaysOn && Config.display.timeout != 0) {
-                displayToggle(true);
-            }
-            lastScreenOn = millis();
         }
 
         if (!Config.aprs_is.active) {
@@ -125,20 +124,19 @@ namespace APRS_IS_Utils {
                     aprsisState = "--";
                 }
             #endif
-            if(aprsisState == "--" && !Config.display.alwaysOn && Config.display.timeout != 0) {
-                displayToggle(true);
-                lastScreenOn = millis();
-            }
         }
+
+        if (wifiState != lastWifiState || aprsisState != lastAprsisState) {     // wake display only on status change (not every loop) so display timeout works
+            if (!Config.display.alwaysOn && Config.display.timeout != 0) displayToggle(true);
+            lastScreenOn    = millis();
+            lastWifiState   = wifiState;
+            lastAprsisState = aprsisState;
+        }
+
         secondLine = "WiFi: ";
         secondLine += wifiState;
         secondLine += " APRS-IS: ";
         secondLine += aprsisState;
-    }
-
-    String checkForStartingBytes(const String& packet) {
-        int index = packet.indexOf("\x3c\xff\x01");
-        return (index != -1) ? packet.substring(0, index) : packet;
     }
 
     String buildPacketToUpload(const String& packet) {
@@ -150,88 +148,79 @@ namespace APRS_IS_Utils {
             packetToUpload += ",qAO,";
         }
         packetToUpload += Config.callsign;
-        packetToUpload += checkForStartingBytes(packet.substring(colonIndex));
+        packetToUpload += APRSPacketLib::checkForStartingBytes(packet.substring(colonIndex));
         return packetToUpload;
     }
 
-    bool processReceivedLoRaMessage(const String& sender, const String& packet, bool thirdParty) {
+    String buildIS2Meta() {
+        static String fixedTail;                    // rx_modem + rx_bitrate + rx_frequency: RX config doesn't change at runtime
+        if (fixedTail == "") {
+            // LoRa bit rate = SF * (BW / 2^SF) * 4/CR   (CR = denominator: 5..8)
+            uint32_t bitrate = (uint32_t)(Config.loramodule.rxSpreadingFactor
+                               * ((float)Config.loramodule.rxSignalBandwidth / (1 << Config.loramodule.rxSpreadingFactor))
+                               * (4.0 / Config.loramodule.rxCodingRate4));
+            fixedTail = " rx_modem=2 rx_bitrate=" + String(bitrate) + " rx_frequency=" + String(Config.loramodule.rxFreq);
+        }
+        return "#is2-meta rx_rssi_dbm=" + String(lastAprsPacket.rssi) + " rx_snr_db=" + String(lastAprsPacket.snr, 1) + fixedTail;
+    }
+
+    bool processReceivedLoRaMessage(const String& sender, const String& packet) {
         String receivedMessage;
         int leftCurlyBraceIndex = packet.indexOf("{");
         int colonIndex          = packet.indexOf(":");
         if (leftCurlyBraceIndex > 0) {     // ack?
-            String ackMessage = "ack";
-            ackMessage.concat(packet.substring(leftCurlyBraceIndex + 1));
-            ackMessage.trim();
-            //Serial.println(ackMessage);
-
-            String addToBuffer = Config.callsign;
-            addToBuffer += ">APLRG1";
-            if (!thirdParty) addToBuffer += ",RFONLY";
-            if (Config.beacon.path != "") {
-                addToBuffer += ",";
-                addToBuffer += Config.beacon.path;
-            }
-            addToBuffer += "::";
-
-            String processedSender = sender;
-            for (int i = sender.length(); i < 9; i++) {
-                processedSender += ' ';
-            }
-            addToBuffer += processedSender;
-
-            addToBuffer += ":";
-            addToBuffer += ackMessage;
-            STATION_Utils::addToOutputPacketBuffer(addToBuffer);
+            String ackCallsign  = (Config.tacticalCallsign == "") ? Config.callsign : Config.tacticalCallsign;     // ack from the callsign the message was addressed to
+            String ackPath      = (lastAprsPacket.header == "") ? "RFONLY," + Config.beacon.path : Config.beacon.path;
+            String ackPacket    = APRSPacketLib::generateAckPacket(ackCallsign, "APLRG1", ackPath, sender, packet);
+            if (ackPacket != "") STATION_Utils::addToOutputPacketBuffer(ackPacket);
             receivedMessage = packet.substring(colonIndex + 1, leftCurlyBraceIndex);
         } else {
             receivedMessage = packet.substring(colonIndex + 1);
         }
-        if (receivedMessage.indexOf("?") == 0) {
-            if (!Config.display.alwaysOn && Config.display.timeout != 0) {
-                displayToggle(true);
-            }
-            STATION_Utils::addToOutputPacketBuffer(QUERY_Utils::process(receivedMessage, sender, false, thirdParty));
+        if (QUERY_Utils::isQuery(receivedMessage)) {
+            if (!Config.display.alwaysOn && Config.display.timeout != 0) displayToggle(true);
+
+            String queryAnswer = QUERY_Utils::process(receivedMessage, sender, false, lastAprsPacket.header != "");
+            if (queryAnswer != "") STATION_Utils::addToOutputPacketBuffer(queryAnswer);     // unknown query: no answer
             lastScreenOn = millis();
             displayShow(firstLine, secondLine, thirdLine, fourthLine, fifthLine, "Callsign = " + sender, "TYPE --> QUERY", 0);
             return true;
-        }
-        else {
+        } else {
             return false;
         }
     }
 
     void processLoRaPacket(const String& packet) {
         if (passcodeValid && (aprsIsClient.connected() || modemLoggedToAPRSIS)) {
-            if (packet.indexOf("NOGATE") == -1 && packet.indexOf("RFONLY") == -1) {
-                int firstColonIndex = packet.indexOf(":");
-                if (firstColonIndex > 5 && firstColonIndex < (packet.length() - 1) && packet[firstColonIndex + 1] != '}' && packet.indexOf("TCPIP") == -1) {
-                    const String& Sender = packet.substring(3, packet.indexOf(">"));
-                    if (Sender != Config.callsign && Utils::callsignIsValid(Sender)) {
-                        STATION_Utils::updateLastHeard(Sender);
-                        Utils::typeOfPacket(packet.substring(3), 0);  // LoRa-APRS
-                        int doubleColonIndex = packet.indexOf("::");
-                        const String& AddresseeAndMessage = packet.substring(doubleColonIndex + 2);
-                        String Addressee = AddresseeAndMessage.substring(0, AddresseeAndMessage.indexOf(":"));
-                        Addressee.trim();
+            if (lastAprsPacket.path.indexOf("NOGATE") == -1 && lastAprsPacket.path.indexOf("RFONLY") == -1) {
+                if (lastAprsPacket.header == "" && lastAprsPacket.path.indexOf("TCPIP") == -1) {
+                    if (lastAprsPacket.sender != Config.callsign && Utils::callsignIsValid(lastAprsPacket.sender)) {
+                        STATION_Utils::updateLastHeard(lastAprsPacket.sender);
+                        Utils::updateLoRaPacketDisplayInfo(lastAprsPacket, 0);  // LoRa-APRS
                         bool queryMessage = false;
-                        if (doubleColonIndex > 10 && Addressee == Config.callsign) {      // its a message for me!
-                            queryMessage = processReceivedLoRaMessage(Sender, checkForStartingBytes(AddresseeAndMessage), false);
+                        if (lastAprsPacket.type == 1 && lastAprsPacket.addressee == Config.callsign) {      // its a message for me!
+                            String AddresseeAndMessage = lastAprsPacket.addressee + ":" + lastAprsPacket.payload;
+                            queryMessage = processReceivedLoRaMessage(lastAprsPacket.sender, APRSPacketLib::checkForStartingBytes(AddresseeAndMessage));
                         }
                         if (queryMessage) return;
 
-                        const String& aprsPacket = buildPacketToUpload(packet);
+                        const String& aprsPacketToUpload = buildPacketToUpload(packet);
                         if (!Config.display.alwaysOn && Config.display.timeout != 0) {
                             displayToggle(true);
                         }
                         lastScreenOn = millis();
                         #ifdef HAS_A7670
                             stationBeacon = true;
-                            A7670_Utils::uploadToAPRSIS(aprsPacket);
+                            A7670_Utils::uploadToAPRSIS(aprsPacketToUpload);
                             stationBeacon = false;
                         #else
-                            upload(aprsPacket);
+                            if (Config.aprs_is.is2Metadata && aprsPacketToUpload != "") {
+                                upload(buildIS2Meta() + "\r\n" + aprsPacketToUpload);     // IS2PLAIN: meta line right before the packet, same write
+                            } else {
+                                upload(aprsPacketToUpload);
+                            }
                         #endif
-                        Utils::println("---> Uploaded to APRS-IS");
+                        Utils::println("(Uploaded to APRS-IS)");
                         displayShow(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
                     }
                 }
@@ -284,21 +273,9 @@ namespace APRS_IS_Utils {
     }
 
     void processAckMessage(const String& sender, const String& message) {
-        String ackPacket = Config.callsign;
-        ackPacket += ">APLRG1,TCPIP,qAC::";
-
-        String senderCallsign = sender;
-        for (int i = sender.length(); i < 9; i++) {
-            senderCallsign += ' ';
-        }
-        ackPacket += senderCallsign;
-        ackPacket += ":";
-
-        String ackMessage = "ack";
-        ackMessage += message.substring(message.indexOf("{") + 1);
-        ackMessage.trim();
-        ackPacket += ackMessage;
-
+        String ackPacket = APRSPacketLib::generateAckPacket(Config.callsign, "APLRG1", "", sender, message);
+        if (ackPacket == "") return;
+        ackPacket = APRSPacketLib::generateAPRSISPacket(ackPacket);
         #ifdef HAS_A7670
             A7670_Utils::uploadToAPRSIS(ackPacket);
         #else
@@ -324,7 +301,7 @@ namespace APRS_IS_Utils {
                 if (Config.digi.backupDigiMode) lastServerCheck = currentTime;
             } else {
                 int doubleColonIndex = packet.indexOf("::");
-                if (Config.aprs_is.messagesToRF && doubleColonIndex > 0) {
+                if (doubleColonIndex > 0) {     // messages for this station are always answered; messagesToRF only gates forwarding to RF
                     String Sender = packet.substring(0, packet.indexOf(">"));
                     const String& AddresseeAndMessage = packet.substring(doubleColonIndex + 2);
                     int colonIndex = AddresseeAndMessage.indexOf(":");
@@ -339,7 +316,7 @@ namespace APRS_IS_Utils {
                         } else {
                             receivedMessage = AddresseeAndMessage.substring(colonIndex + 1);
                         }
-                        if (receivedMessage.indexOf("?") == 0) {
+                        if (QUERY_Utils::isQuery(receivedMessage)) {
                             Utils::println("Rx Query (APRS-IS)  : " + packet);
                             String queryAnswer = QUERY_Utils::process(receivedMessage, Sender, true, false);
                             //Serial.println("---> QUERY Answer : " + queryAnswer.substring(0,queryAnswer.indexOf("\n")));
@@ -347,30 +324,29 @@ namespace APRS_IS_Utils {
                                 displayToggle(true);
                             }
                             lastScreenOn = currentTime;
-                            #ifdef HAS_A7670
-                                A7670_Utils::uploadToAPRSIS(queryAnswer);
-                            #else
-                                upload(queryAnswer);
-                            #endif
-                            SYSLOG_Utils::log(2, queryAnswer, 0, 0.0, 0); // APRSIS TX
-                            fifthLine = "APRS-IS ----> APRS-IS";
-                            sixthLine = Config.callsign;
-                            for (int j = sixthLine.length();j < 9;j++) {
-                                sixthLine += " ";
+                            if (queryAnswer != "") {                                // unknown query: no answer
+                                #ifdef HAS_A7670
+                                    A7670_Utils::uploadToAPRSIS(queryAnswer);
+                                #else
+                                    upload(queryAnswer);
+                                #endif
+                                SYSLOG_Utils::logAPRSISTx(queryAnswer);
                             }
+                            fifthLine = "APRS-IS ----> APRS-IS";
+                            sixthLine = Utils::padForDisplay(Config.callsign);
                             sixthLine += "> ";
                             sixthLine += Sender;
                             seventhLine = "QUERY = ";
                             seventhLine += receivedMessage;
                         }
                         displayShow(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
-                    } else {
+                    } else if (Config.aprs_is.messagesToRF) {
                         Utils::print("Rx Message (APRS-IS): " + packet);
                         if (STATION_Utils::wasHeard(Addressee) && packet.indexOf("EQNS.") == -1 && packet.indexOf("UNIT.") == -1 && packet.indexOf("PARM.") == -1) {
                             STATION_Utils::addToOutputPacketBuffer(buildPacketToTx(packet, 1));
                             displayToggle(true);
                             lastScreenOn = currentTime;
-                            Utils::typeOfPacket(packet, 1); // APRS-LoRa
+                            Utils::updateAPRSISPacketDisplayInfo(packet); // APRS-LoRa
                             displayShow(firstLine, secondLine, thirdLine, fourthLine, fifthLine, sixthLine, seventhLine, 0);
                         }
                     }
@@ -380,7 +356,7 @@ namespace APRS_IS_Utils {
                         STATION_Utils::addToOutputPacketBuffer(buildPacketToTx(packet, 5));
                         displayToggle(true);
                         lastScreenOn = currentTime;
-                        Utils::typeOfPacket(packet, 1); // APRS-LoRa
+                        Utils::updateAPRSISPacketDisplayInfo(packet); // APRS-LoRa
                         Serial.println();
                     } else {
                         Serial.println(" ---> Rejected (Time): No Tx");
@@ -400,10 +376,12 @@ namespace APRS_IS_Utils {
         #else
             if (aprsIsClient.connected()) {
                 if (aprsIsClient.available()) {
-                    String aprsisPacket = aprsIsClient.readStringUntil('\r');
+                    // APRS-IS lines end with "\r\n". Reading up to '\r' left the '\n' in the buffer, and the next call then waited the stream's default 1 s
+                    // for another '\r' before returning, so the main loop (and with it the radio) stalled for a second after every line from the server.
+                    // Read up to '\n' instead; trim() below removes the '\r'.
+                    String aprsisPacket = aprsIsClient.readStringUntil('\n');
                     aprsisPacket.trim();    // Serial.println(aprsisPacket);
                     processAPRSISPacket(aprsisPacket);
-                    lastRxTime = millis();
                 }
             }
         #endif

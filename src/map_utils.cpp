@@ -1,0 +1,124 @@
+/* Copyright (C) 2026 Ricardo Guzman - CA2RXU
+ *
+ * This file is part of LoRa APRS iGate.
+ *
+ * LoRa APRS iGate is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * LoRa APRS iGate is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with LoRa APRS iGate. If not, see <https://www.gnu.org/licenses/>.
+ */
+
+#include <ArduinoJson.h>
+#include "map_utils.h"
+#if defined(ARDUINO_ARCH_RP2040)
+    #include "rp2350/ntp_rp2350.h"      // RP2350 port: lean SNTP client over W5500
+#else
+    #include "ntp_utils.h"
+#endif
+
+#define MAX_MAP_STATIONS    50
+#define STATION_TTL_MS      3600000UL   // 1 hora (en milisegundos)
+
+
+std::vector<MapStation> mapStations;
+
+
+namespace MAP_Utils {
+
+    void writeFormatedTime(char* dst, size_t size) { // gets NTP time ("HH:MM:SS") and writes it to dst if valid
+#if defined(ARDUINO_ARCH_RP2040)
+        String t = Ntp::synced() ? Ntp::hms(Ntp::nowEpoch()) : String("");
+#else
+        String t = NTP_Utils::getFormatedTime();
+#endif
+        if (t.length() == 8 && t.charAt(2) == ':') {
+            t.toCharArray(dst, size);
+        } else {
+            dst[0] = '\0';
+        }
+    }
+
+    void upsert(const String& callsign, float latitude, float longitude, const String& path, const String& symbol, int rssi, float snr) {   // Upsert station only with valid position with callsign dedup.
+        for (auto &s : mapStations) {                       // 1) update
+            if (callsign.equals(s.callsign)) {
+                s.latitude  = latitude;
+                s.longitude = longitude;
+                s.rssi      = rssi;
+                s.snr       = snr;
+                s.count++;
+                symbol.toCharArray(s.symbol, sizeof(s.symbol));
+                path.toCharArray(s.path, sizeof(s.path));
+                if (path.indexOf('*') == -1) s.heardDirect = true;   // se oyo directo alguna vez; no se resetea si despues llega repetido
+                writeFormatedTime(s.lastHeard, sizeof(s.lastHeard));
+                s.lastHeardMillis = millis();
+                return;
+            }
+        }
+
+        if (mapStations.size() >= MAX_MAP_STATIONS) {       // 2) full? delete oldest one
+            size_t oldest = 0;
+            for (size_t i = 1; i < mapStations.size(); i++) {
+                if (mapStations[i].lastHeardMillis < mapStations[oldest].lastHeardMillis) {
+                    oldest = i;
+                }
+            }
+            mapStations.erase(mapStations.begin() + oldest);
+        }
+
+        MapStation st = {};                                 // 3) insert new
+        callsign.toCharArray(st.callsign, sizeof(st.callsign));
+        symbol.toCharArray(st.symbol, sizeof(st.symbol));
+        path.toCharArray(st.path, sizeof(st.path));
+        st.latitude  = latitude;
+        st.longitude = longitude;
+        st.rssi      = rssi;
+        st.snr       = snr;
+        st.count     = 1;
+        st.heardDirect = (path.indexOf('*') == -1);         // primer paquete: directo si no trae digis usados
+        writeFormatedTime(st.lastHeard, sizeof(st.lastHeard));
+        st.lastHeardMillis = millis();
+        mapStations.push_back(st);
+    }
+
+    void purgeOldStations() {
+        uint32_t now = millis();
+        for (int i = (int)mapStations.size() - 1; i >= 0; i--) {
+            if (now - mapStations[i].lastHeardMillis > STATION_TTL_MS) {
+                mapStations.erase(mapStations.begin() + i);
+            }
+        }
+    }
+
+    String getStationsJson() {
+        purgeOldStations();
+        JsonDocument data;
+
+        for (size_t i = 0; i < mapStations.size(); i++) {
+            data[i]["callsign"]  = mapStations[i].callsign;
+            data[i]["lat"]       = mapStations[i].latitude;
+            data[i]["lon"]       = mapStations[i].longitude;
+            data[i]["symbol"]    = mapStations[i].symbol;
+            data[i]["RSSI"]      = mapStations[i].rssi;
+            data[i]["SNR"]       = mapStations[i].snr;
+            data[i]["count"]     = mapStations[i].count;
+            data[i]["lastHeard"] = mapStations[i].lastHeard;
+            data[i]["path"]      = mapStations[i].path;
+            data[i]["heardDirect"] = mapStations[i].heardDirect;
+        }
+
+        String buffer;
+
+        serializeJson(data, buffer);
+
+        return buffer;
+    }
+
+}

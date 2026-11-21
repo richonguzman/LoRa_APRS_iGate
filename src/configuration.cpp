@@ -1,4 +1,4 @@
-/* Copyright (C) 2025 Ricardo Guzman - CA2RXU
+/* Copyright (C) 2026 Ricardo Guzman - CA2RXU
  *
  * This file is part of LoRa APRS iGate.
  *
@@ -17,7 +17,17 @@
  */
 
 #include <ArduinoJson.h>
+#if defined(ARDUINO_ARCH_RP2040)
+#include <LittleFS.h>
+#define IGATE_FS LittleFS
+#define IGATE_FS_BEGIN() LittleFS.begin()
+#define IGATE_RESTART() rp2040.restart()
+#else
 #include <SPIFFS.h>
+#define IGATE_FS SPIFFS
+#define IGATE_FS_BEGIN() SPIFFS.begin(false)
+#define IGATE_RESTART() ESP.restart()
+#endif
 #include "configuration.h"
 #include "board_pinout.h"
 #include "display.h"
@@ -30,7 +40,7 @@ bool Configuration::writeFile() {
     Serial.println("Saving configuration...");
 
     JsonDocument data;
-    File configFile = SPIFFS.open("/igate_conf.json", "w");
+    File configFile = IGATE_FS.open("/igate_conf.json", "w");
 
     if (!configFile) {
         Serial.println("Error: Could not open config file for writing");
@@ -63,8 +73,10 @@ bool Configuration::writeFile() {
         data["aprs_is"]["filter"]                   = aprs_is.filter;
         data["aprs_is"]["messagesToRF"]             = aprs_is.messagesToRF;
         data["aprs_is"]["objectsToRF"]              = aprs_is.objectsToRF;
+        data["aprs_is"]["is2Metadata"]              = aprs_is.is2Metadata;
 
         data["beacon"]["comment"]                   = beacon.comment;
+        data["beacon"]["rfCommentEveryXBeacons"]    = beacon.rfCommentEveryXBeacons;
         data["beacon"]["interval"]                  = beacon.interval;
         data["beacon"]["latitude"]                  = beacon.latitude;
         data["beacon"]["longitude"]                 = beacon.longitude;
@@ -106,6 +118,7 @@ bool Configuration::writeFile() {
         data["lora"]["txCodingRate4"]               = loramodule.txCodingRate4;
         data["lora"]["txSignalBandwidth"]           = loramodule.txSignalBandwidth;
         data["lora"]["power"]                       = loramodule.power;
+        data["lora"]["cadActive"]                   = loramodule.cadActive;
 
         int rxSpreadingFactor = loramodule.rxSpreadingFactor;
         int txSpreadingFactor = loramodule.txSpreadingFactor;
@@ -156,6 +169,7 @@ bool Configuration::writeFile() {
         data["tnc"]["enableSerial"]                 = tnc.enableSerial;
         data["tnc"]["acceptOwn"]                    = tnc.acceptOwn;
         data["tnc"]["aprsBridgeActive"]             = tnc.aprsBridgeActive;
+        data["tnc"]["kissProtocol"]                 = tnc.kissProtocol;
 
         data["mqtt"]["active"]                      = mqtt.active;
         data["mqtt"]["server"]                      = mqtt.server;
@@ -178,6 +192,16 @@ bool Configuration::writeFile() {
         data["ntp"]["server"]                       = ntp.server;
         data["ntp"]["gmtCorrection"]                = ntp.gmtCorrection;
 
+#if defined(ARDUINO_ARCH_RP2040)
+        // Wired IP settings: only the RP2350 + W5500 build has an Ethernet stack
+        // to configure (the web UI shows its "IP Config" block when this exists).
+        data["network"]["dhcp"]                     = network.dhcp;
+        data["network"]["ip"]                       = network.ip;
+        data["network"]["gateway"]                  = network.gateway;
+        data["network"]["subnet"]                   = network.subnet;
+        data["network"]["dns"]                      = network.dns;
+#endif
+
         data["other"]["rebootMode"]                 = rebootMode;
         data["other"]["rebootModeTime"]             = rebootModeTime;
 
@@ -195,7 +219,7 @@ bool Configuration::writeFile() {
 
 bool Configuration::readFile() {
     Serial.println("Reading config..");
-    File configFile = SPIFFS.open("/igate_conf.json", "r");
+    File configFile = IGATE_FS.open("/igate_conf.json", "r");
 
     if (configFile) {
         bool needsRewrite = false;
@@ -235,7 +259,8 @@ bool Configuration::readFile() {
             data["aprs_is"]["port"].isNull() ||
             data["aprs_is"]["filter"].isNull() ||
             data["aprs_is"]["messagesToRF"].isNull() ||
-            data["aprs_is"]["objectsToRF"].isNull()) needsRewrite = true;
+            data["aprs_is"]["objectsToRF"].isNull() ||
+            data["aprs_is"]["is2Metadata"].isNull()) needsRewrite = true;
         aprs_is.active                  = data["aprs_is"]["active"] | false;
         aprs_is.passcode                = data["aprs_is"]["passcode"] | "XYZWV";
         aprs_is.server                  = data["aprs_is"]["server"] | "rotate.aprs2.net";
@@ -243,10 +268,12 @@ bool Configuration::readFile() {
         aprs_is.filter                  = data["aprs_is"]["filter"] | "m/10";
         aprs_is.messagesToRF            = data["aprs_is"]["messagesToRF"] | false;
         aprs_is.objectsToRF             = data["aprs_is"]["objectsToRF"] | false;
+        aprs_is.is2Metadata             = data["aprs_is"]["is2Metadata"] | false;
 
         if (data["beacon"]["latitude"].isNull() ||
             data["beacon"]["longitude"].isNull() ||
             data["beacon"]["comment"].isNull() ||
+            data["beacon"]["rfCommentEveryXBeacons"].isNull() ||
             data["beacon"]["interval"].isNull() ||
             data["beacon"]["overlay"].isNull() ||
             data["beacon"]["symbol"].isNull() ||
@@ -261,6 +288,7 @@ bool Configuration::readFile() {
         beacon.latitude                 = data["beacon"]["latitude"] | 0.0;
         beacon.longitude                = data["beacon"]["longitude"] | 0.0;
         beacon.comment                  = data["beacon"]["comment"] | "LoRa APRS";
+        beacon.rfCommentEveryXBeacons   = data["beacon"]["rfCommentEveryXBeacons"] | 1;
         beacon.interval                 = data["beacon"]["interval"] | 15;
         beacon.overlay                  = data["beacon"]["overlay"] | "L";
         beacon.symbol                   = data["beacon"]["symbol"] | "a";
@@ -290,7 +318,6 @@ bool Configuration::readFile() {
         #endif
         digi.backupDigiMode             = data["digi"]["backupDigiMode"] | false;
 
-
         if (data["lora"]["rxActive"].isNull() ||
             data["lora"]["rxFreq"].isNull() ||
             data["lora"]["rxSpreadingFactor"].isNull() ||
@@ -301,7 +328,8 @@ bool Configuration::readFile() {
             data["lora"]["txSpreadingFactor"].isNull() ||
             data["lora"]["txCodingRate4"].isNull() ||
             data["lora"]["txSignalBandwidth"].isNull() ||
-            data["lora"]["power"].isNull()) needsRewrite = true;
+            data["lora"]["power"].isNull() ||
+            data["lora"]["cadActive"].isNull()) needsRewrite = true;
         loramodule.rxActive             = data["lora"]["rxActive"] | true;
         loramodule.rxFreq               = data["lora"]["rxFreq"] | 433775000;
         loramodule.rxSpreadingFactor    = data["lora"]["rxSpreadingFactor"] | 12;
@@ -313,6 +341,7 @@ bool Configuration::readFile() {
         loramodule.txCodingRate4        = data["lora"]["txCodingRate4"] | 5;
         loramodule.txSignalBandwidth    = data["lora"]["txSignalBandwidth"] | 125000;
         loramodule.power                = data["lora"]["power"] | 20;
+        loramodule.cadActive            = data["lora"]["cadActive"] | true;
 
         if (data["display"]["alwaysOn"].isNull() ||
             data["display"]["timeout"].isNull() ||
@@ -367,11 +396,13 @@ bool Configuration::readFile() {
         if (data["tnc"]["enableServer"].isNull() ||
             data["tnc"]["enableSerial"].isNull() ||
             data["tnc"]["acceptOwn"].isNull() ||
-            data["tnc"]["aprsBridgeActive"].isNull()) needsRewrite = true;
+            data["tnc"]["aprsBridgeActive"].isNull() ||
+            data["tnc"]["kissProtocol"].isNull()) needsRewrite = true;
         tnc.enableServer                = data["tnc"]["enableServer"] | false;
         tnc.enableSerial                = data["tnc"]["enableSerial"] | false;
         tnc.acceptOwn                   = data["tnc"]["acceptOwn"] | false;
         tnc.aprsBridgeActive            = data["tnc"]["aprsBridgeActive"] | false;
+        tnc.kissProtocol                = data["tnc"]["kissProtocol"] | true;
 
         if (data["mqtt"]["active"].isNull() ||
             data["mqtt"]["server"].isNull() ||
@@ -410,6 +441,15 @@ bool Configuration::readFile() {
         ntp.server                      = data["ntp"]["server"] | "pool.ntp.org";
         ntp.gmtCorrection               = data["ntp"]["gmtCorrection"] | 0.0;
 
+#if defined(ARDUINO_ARCH_RP2040)
+        if (data["network"]["dhcp"].isNull()) needsRewrite = true;
+        network.dhcp                    = data["network"]["dhcp"] | true;
+        network.ip                      = data["network"]["ip"] | "";
+        network.gateway                 = data["network"]["gateway"] | "";
+        network.subnet                  = data["network"]["subnet"] | "255.255.255.0";
+        network.dns                     = data["network"]["dns"] | "";
+#endif
+
         if (data["other"]["rebootMode"].isNull() ||
             data["other"]["rebootModeTime"].isNull()) needsRewrite = true;
         rebootMode                      = data["other"]["rebootMode"] | false;
@@ -431,7 +471,7 @@ bool Configuration::readFile() {
             Serial.println("Config JSON incomplete, rewriting...");
             writeFile();
             delay(1000);
-            ESP.restart();
+            IGATE_RESTART();
         }
         Serial.println("Config read successfuly");
         return true;
@@ -465,8 +505,10 @@ void Configuration::setDefaultValues() {
     aprs_is.filter                  = "m/10";
     aprs_is.messagesToRF            = false;
     aprs_is.objectsToRF             = false;
+    aprs_is.is2Metadata             = false;
 
     beacon.comment                  = "LoRa APRS";
+    beacon.rfCommentEveryXBeacons   = 1;
     beacon.latitude                 = 0.0;
     beacon.longitude                = 0.0;
     beacon.interval                 = 15;
@@ -503,6 +545,7 @@ void Configuration::setDefaultValues() {
     loramodule.txCodingRate4        = 5;
     loramodule.txSignalBandwidth    = 125000;
     loramodule.power                = 20;
+    loramodule.cadActive            = true;
 
     display.alwaysOn                = true;
     display.timeout                 = 4;
@@ -535,6 +578,7 @@ void Configuration::setDefaultValues() {
     tnc.enableSerial                = false;
     tnc.acceptOwn                   = false;
     tnc.aprsBridgeActive            = false;
+    tnc.kissProtocol                = true;
 
     mqtt.active                     = false;
     mqtt.server                     = "";
@@ -557,6 +601,12 @@ void Configuration::setDefaultValues() {
     ntp.server                      = "pool.ntp.org";
     ntp.gmtCorrection               = 0.0;
 
+    network.dhcp                    = true;
+    network.ip                      = "";
+    network.gateway                 = "";
+    network.subnet                  = "255.255.255.0";
+    network.dns                     = "";
+
     rebootMode                      = false;
     rebootModeTime                  = 0;
 
@@ -566,19 +616,58 @@ void Configuration::setDefaultValues() {
 }
 
 void Configuration::setup() {
-    if (!SPIFFS.begin(false)) {
-        Serial.println("SPIFFS Mount Failed");
-        return;
+    if (!IGATE_FS_BEGIN()) {
+#if defined(ARDUINO_ARCH_RP2040)
+        // A stale/incompatible LittleFS (e.g. this board previously ran a
+        // firmware with a different filesystem_size, leaving the FS region with
+        // data that mounts but can't be written) fails to mount cleanly — format
+        // once and retry rather than giving up.
+        Serial.println("File system mount failed — formatting...");
+        LittleFS.format();
+        if (!IGATE_FS_BEGIN()) {
+            Serial.println("File system unusable after format");
+            return;
+        }
+        Serial.println("File system formatted and mounted");
+#else
+        Serial.println("SPIFFS Mount Failed, formatting...");
+
+        if (!SPIFFS.begin(true)) {
+            Serial.println("SPIFFS Format Failed");
+            return;
+        }
+        Serial.println("SPIFFS Ready");
+#endif
     } else {
-        Serial.println("SPIFFS Mounted");
+        Serial.println("File system mounted");
     }
 
-    bool exists = SPIFFS.exists("/igate_conf.json");
+    bool exists = IGATE_FS.exists("/igate_conf.json");
     if (!exists) {
+        Serial.println("Config not found, creating default...");
         setDefaultValues();
-        writeFile();
+        bool ok = writeFile();
+#if defined(ARDUINO_ARCH_RP2040)
+        if (!ok) {
+            // Mounted but the write was rejected (stale FS from a different
+            // layout). Format once, remount and retry so we never reboot-loop
+            // here on a config that can't be created.
+            Serial.println("Config write failed — formatting file system and retrying...");
+            LittleFS.format();
+            IGATE_FS_BEGIN();
+            ok = writeFile();
+        }
+        if (ok) {
+            delay(1000);
+            IGATE_RESTART();
+        } else {
+            Serial.println("Config could not be persisted — continuing with defaults");
+        }
+#else
+        (void)ok;
         delay(1000);
-        ESP.restart();
+        IGATE_RESTART();
+#endif
     }
 
     readFile();

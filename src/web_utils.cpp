@@ -1,4 +1,4 @@
-/* Copyright (C) 2025 Ricardo Guzman - CA2RXU
+/* Copyright (C) 2026 Ricardo Guzman - CA2RXU
  *
  * This file is part of LoRa APRS iGate.
  *
@@ -17,14 +17,18 @@
  */
 
 #include <ArduinoJson.h>
+#include "network_manager.h"
 #include "configuration.h"
+#include "lora_utils.h"
 #include "ota_utils.h"
 #include "web_utils.h"
+#include "map_utils.h"
 #include "display.h"
 #include "utils.h"
 
 
 extern Configuration               Config;
+extern NetworkManager              *networkManager;
 extern uint32_t                    lastBeaconTx;
 extern std::vector<ReceivedPacket> receivedPackets;
 
@@ -48,10 +52,30 @@ extern const char web_bootstrap_js[] asm("_binary_data_embed_bootstrap_js_gz_sta
 extern const char web_bootstrap_js_end[] asm("_binary_data_embed_bootstrap_js_gz_end");
 extern const size_t web_bootstrap_js_len = web_bootstrap_js_end - web_bootstrap_js;
 
+extern const char web_leaflet_css[] asm("_binary_data_embed_leaflet_css_gz_start");
+extern const char web_leaflet_css_end[] asm("_binary_data_embed_leaflet_css_gz_end");
+extern const size_t web_leaflet_css_len = web_leaflet_css_end - web_leaflet_css;
+
+extern const char web_leaflet_js[] asm("_binary_data_embed_leaflet_js_gz_start");
+extern const char web_leaflet_js_end[] asm("_binary_data_embed_leaflet_js_gz_end");
+extern const size_t web_leaflet_js_len = web_leaflet_js_end - web_leaflet_js;
+
 // Declare external symbols for the embedded image data
 extern const unsigned char favicon_data[] asm("_binary_data_embed_favicon_png_gz_start");
 extern const unsigned char favicon_data_end[] asm("_binary_data_embed_favicon_png_gz_end");
 extern const size_t favicon_data_len = favicon_data_end - favicon_data;
+
+extern const unsigned char aprs_symbols_24_0_data[] asm("_binary_data_embed_aprs_symbols_24_0_png_gz_start");
+extern const unsigned char aprs_symbols_24_0_data_end[] asm("_binary_data_embed_aprs_symbols_24_0_png_gz_end");
+extern const size_t aprs_symbols_24_0_data_len = aprs_symbols_24_0_data_end - aprs_symbols_24_0_data;
+
+extern const unsigned char aprs_symbols_24_1_data[] asm("_binary_data_embed_aprs_symbols_24_1_png_gz_start");
+extern const unsigned char aprs_symbols_24_1_data_end[] asm("_binary_data_embed_aprs_symbols_24_1_png_gz_end");
+extern const size_t aprs_symbols_24_1_data_len = aprs_symbols_24_1_data_end - aprs_symbols_24_1_data;
+
+extern const unsigned char aprs_symbols_24_2_data[] asm("_binary_data_embed_aprs_symbols_24_2_png_gz_start");
+extern const unsigned char aprs_symbols_24_2_data_end[] asm("_binary_data_embed_aprs_symbols_24_2_png_gz_end");
+extern const size_t aprs_symbols_24_2_data_len = aprs_symbols_24_2_data_end - aprs_symbols_24_2_data;
 
 
 namespace WEB_Utils {
@@ -83,6 +107,42 @@ namespace WEB_Utils {
         request->send(response);
     }
 
+    void handleAprsSymbols24Primary(AsyncWebServerRequest *request) {
+        AsyncWebServerResponse *response = request->beginResponse(
+            200,
+            "image/png",
+            (const uint8_t*)aprs_symbols_24_0_data,
+            aprs_symbols_24_0_data_len
+        );
+        response->addHeader("Content-Encoding", "gzip");
+        response->addHeader("Cache-Control", "max-age=3600");
+        request->send(response);
+    }
+
+    void handleAprsSymbols24Alternate(AsyncWebServerRequest *request) {
+        AsyncWebServerResponse *response = request->beginResponse(
+            200,
+            "image/png",
+            (const uint8_t*)aprs_symbols_24_1_data,
+            aprs_symbols_24_1_data_len
+        );
+        response->addHeader("Content-Encoding", "gzip");
+        response->addHeader("Cache-Control", "max-age=3600");
+        request->send(response);
+    }
+
+    void handleAprsSymbols24Overlay(AsyncWebServerRequest *request) {
+        AsyncWebServerResponse *response = request->beginResponse(
+            200,
+            "image/png",
+            (const uint8_t*)aprs_symbols_24_2_data,
+            aprs_symbols_24_2_data_len
+        );
+        response->addHeader("Content-Encoding", "gzip");
+        response->addHeader("Cache-Control", "max-age=3600");
+        request->send(response);
+    }
+
     void handleReadConfiguration(AsyncWebServerRequest *request) {
         if(Config.webadmin.active && !request->authenticate(Config.webadmin.username.c_str(), Config.webadmin.password.c_str()))
             return request->requestAuthentication();
@@ -101,6 +161,7 @@ namespace WEB_Utils {
         JsonDocument data;
 
         for (int i = 0; i < receivedPackets.size(); i++) {
+            data[i]["rxDate"]   = receivedPackets[i].rxDate;
             data[i]["rxTime"]   = receivedPackets[i].rxTime;
             data[i]["packet"]   = receivedPackets[i].packet;
             data[i]["RSSI"]     = receivedPackets[i].RSSI;
@@ -112,6 +173,10 @@ namespace WEB_Utils {
         serializeJson(data, buffer);
 
         request->send(200, "application/json", buffer);
+    }
+
+    void handleStations(AsyncWebServerRequest *request) {
+        request->send(200, "application/json", MAP_Utils::getStationsJson());
     }
 
     void handleWriteConfiguration(AsyncWebServerRequest *request) {
@@ -169,6 +234,7 @@ namespace WEB_Utils {
         if (Config.aprs_is.active) {
             Config.aprs_is.messagesToRF     = request->hasParam("aprs_is.messagesToRF", true);
             Config.aprs_is.objectsToRF      = request->hasParam("aprs_is.objectsToRF", true);
+            Config.aprs_is.is2Metadata      = request->hasParam("aprs_is.is2Metadata", true);
             Config.aprs_is.server           = getParamStringSafe("aprs_is.server", Config.aprs_is.server);
             Config.aprs_is.passcode         = getParamStringSafe("aprs_is.passcode", Config.aprs_is.passcode);
             Config.aprs_is.port             = getParamIntSafe("aprs_is.port", Config.aprs_is.port);
@@ -182,6 +248,7 @@ namespace WEB_Utils {
         Config.beacon.latitude              = getParamDoubleSafe("beacon.latitude", Config.beacon.latitude);
         Config.beacon.longitude             = getParamDoubleSafe("beacon.longitude", Config.beacon.longitude);
         Config.beacon.comment               = getParamStringSafe("beacon.comment", Config.beacon.comment);
+        Config.beacon.rfCommentEveryXBeacons = getParamIntSafe("beacon.rfCommentEveryXBeacons", Config.beacon.rfCommentEveryXBeacons);
         Config.beacon.overlay               = getParamStringSafe("beacon.overlay", Config.beacon.overlay);
         Config.beacon.symbol                = getParamStringSafe("beacon.symbol", Config.beacon.symbol);
         Config.beacon.path                  = getParamStringSafe("beacon.path", Config.beacon.path);
@@ -212,7 +279,9 @@ namespace WEB_Utils {
         Config.loramodule.txSpreadingFactor = getParamIntSafe("lora.txSpreadingFactor", Config.loramodule.txSpreadingFactor);
         Config.loramodule.txCodingRate4     = getParamIntSafe("lora.txCodingRate4", Config.loramodule.txCodingRate4);
         Config.loramodule.txSignalBandwidth = getParamIntSafe("lora.txSignalBandwidth", Config.loramodule.txSignalBandwidth);
-        Config.loramodule.power             = getParamIntSafe("lora.power", Config.loramodule.power);
+        Config.loramodule.power             = LoRa_Utils::validPower(getParamIntSafe("lora.power", Config.loramodule.power));  // saved as the power the radio chip really uses
+        if (Config.loramodule.txActive)
+            Config.loramodule.cadActive     = request->hasParam("lora.cadActive", true);
 
         Config.display.alwaysOn             = request->hasParam("display.alwaysOn", true);
         if (!Config.display.alwaysOn) {
@@ -259,6 +328,7 @@ namespace WEB_Utils {
         Config.tnc.enableSerial             = request->hasParam("tnc.enableSerial", true);
         Config.tnc.acceptOwn                = request->hasParam("tnc.acceptOwn", true);
         Config.tnc.aprsBridgeActive         = request->hasParam("tnc.aprsBridgeActive", true);
+        Config.tnc.kissProtocol             = getParamStringSafe("tnc.kissProtocol", Config.tnc.kissProtocol ? "KISS" : "TNC2") != "TNC2";
 
         Config.mqtt.active                  = request->hasParam("mqtt.active", true);
         if (Config.mqtt.active) {
@@ -356,11 +426,26 @@ namespace WEB_Utils {
         request->send(response);
     }
 
+    void handleLeafletStyle(AsyncWebServerRequest *request) {
+        AsyncWebServerResponse *response = request->beginResponse(200, "text/css", (const uint8_t*)web_leaflet_css, web_leaflet_css_len);
+        response->addHeader("Content-Encoding", "gzip");
+        response->addHeader("Cache-Control", "max-age=3600");
+        request->send(response);
+    }
+
+    void handleLeafletScript(AsyncWebServerRequest *request) {
+        AsyncWebServerResponse *response = request->beginResponse(200, "text/javascript", (const uint8_t*)web_leaflet_js, web_leaflet_js_len);
+        response->addHeader("Content-Encoding", "gzip");
+        response->addHeader("Cache-Control", "max-age=3600");
+        request->send(response);
+    }
+
     void setup() {
-        if (Config.digi.ecoMode == 0) {
+        if (Config.digi.ecoMode == 0 && networkManager->hasActiveInterface()) {  // no WiFi STA/AP or Ethernet started = no TCP/IP stack
             server.on("/", HTTP_GET, handleHome);
             server.on("/status", HTTP_GET, handleStatus);
             server.on("/received-packets.json", HTTP_GET, handleReceivedPackets);
+            server.on("/stations.json", HTTP_GET, handleStations);
             server.on("/configuration.json", HTTP_GET, handleReadConfiguration);
             server.on("/configuration.json", HTTP_POST, handleWriteConfiguration);
             server.on("/action", HTTP_POST, handleAction);
@@ -368,7 +453,12 @@ namespace WEB_Utils {
             server.on("/script.js", HTTP_GET, handleScript);
             server.on("/bootstrap.css", HTTP_GET, handleBootstrapStyle);
             server.on("/bootstrap.js", HTTP_GET, handleBootstrapScript);
+            server.on("/leaflet.css", HTTP_GET, handleLeafletStyle);
+            server.on("/leaflet.js", HTTP_GET, handleLeafletScript);
             server.on("/favicon.png", HTTP_GET, handleFavicon);
+            server.on("/aprs-symbols-24-0.png", HTTP_GET, handleAprsSymbols24Primary);
+            server.on("/aprs-symbols-24-1.png", HTTP_GET, handleAprsSymbols24Alternate);
+            server.on("/aprs-symbols-24-2.png", HTTP_GET, handleAprsSymbols24Overlay);
 
             OTA_Utils::setup(&server); // Include OTA Updater for WebServer
 

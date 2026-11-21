@@ -1,4 +1,4 @@
-/* Copyright (C) 2025 Ricardo Guzman - CA2RXU
+/* Copyright (C) 2026 Ricardo Guzman - CA2RXU
  *
  * This file is part of LoRa APRS iGate.
  *
@@ -16,6 +16,7 @@
  * along with LoRa APRS iGate. If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <APRSPacketLib.h>
 #include "configuration.h"
 #include "battery_utils.h"
 #include "station_utils.h"
@@ -36,11 +37,17 @@ extern String                           versionNumber;
 
 namespace QUERY_Utils {
 
+    bool isQuery(const String& message) {   // "?..." queries, plus "HELP" (any case) without the "?"
+        String queryQuestion = message;
+        queryQuestion.toUpperCase();
+        return queryQuestion.startsWith("?") || queryQuestion == "HELP";
+    }
+
     String process(const String& query, const String& station, bool queryFromAPRSIS, bool thirdParty) {
         String answer;
         String queryQuestion = query;
         queryQuestion.toUpperCase();
-        if (queryQuestion == "?APRS?" || queryQuestion == "H" || queryQuestion == "HELP" || queryQuestion=="?") {
+        if (queryQuestion == "?APRS?" || queryQuestion == "?" || queryQuestion == "HELP") {
             answer.concat("?APRSV ?APRSP ?APRSL ?APRSSR ?EM=? ?TX=? "); // ?APRSH ?WHERE callsign
         } else if (queryQuestion == "?APRSV") {
             answer.concat("CA2RXU_LoRa_iGate v");
@@ -82,7 +89,7 @@ namespace QUERY_Utils {
             int radioTxActive       = Config.loramodule.txActive;
             bool onlyRadioActive    = radioTxActive && Config.loramodule.rxActive && !Config.aprs_is.active;
             if (queryQuestion.startsWith("?EM=OFF")) {
-                if ((digiMode == 2 || digiMode == 3) && onlyRadioActive) {
+                if ((digiMode == 1 || digiMode == 2 || digiMode == 3) && onlyRadioActive) {
                     if (digiEcoMode == 1 || digiEcoMode == 2) { // Exit Digipeater EcoMode or Digipeater without WiFiAP
                         answer = (digiEcoMode == 1) ? "DigiEcoMode:OFF" : "Digipeater + WiFiAP enabled";
                         Config.digi.ecoMode         = 0;
@@ -97,7 +104,7 @@ namespace QUERY_Utils {
                     answer = "Digipeater Mode control not possible";
                 }
             } else if (queryQuestion.startsWith("?EM=ON")) {
-                if ((digiMode == 2 || digiMode == 3) && onlyRadioActive) {
+                if ((digiMode == 1 || digiMode == 2 || digiMode == 3) && onlyRadioActive) {
                     if (digiEcoMode == 0) {     // Start Digipeater EcoMode
                         answer = "DigiEcoMode:ON";
                         Config.digi.ecoMode         = 1;
@@ -139,32 +146,15 @@ namespace QUERY_Utils {
 
         if (answer == "") return "";
 
-        String queryAnswer = Config.callsign;
-        queryAnswer += ">APLRG1";
-        if (queryFromAPRSIS) {
-            queryAnswer += ",TCPIP,qAC";
-        } else {
-            if (!thirdParty) queryAnswer += ",RFONLY";
-            if (Config.beacon.path != "") {
-                queryAnswer += ",";
-                queryAnswer += Config.beacon.path;
-            }
-        }
-        queryAnswer += "::";
+        answer += " *";
+        answer += char(random(97, 123));
+        answer += char(random(97, 123));
+        answer += "*";
 
-        String processedStation = station;
-        for (int i = station.length(); i < 9; i++) {
-            processedStation += ' ';
-        }
-        queryAnswer += processedStation;
-        queryAnswer += ":";
-        queryAnswer += answer;
-
-        queryAnswer += " *";
-        queryAnswer += char(random(97, 123));
-        queryAnswer += char(random(97, 123));
-        queryAnswer += "*";
-        return queryAnswer;
+        String queryCallsign    = (Config.tacticalCallsign == "") ? Config.callsign : Config.tacticalCallsign;
+        String queryPath        = queryFromAPRSIS ? "" : (thirdParty ? Config.beacon.path : "RFONLY," + Config.beacon.path);
+        String queryAnswer      = APRSPacketLib::generateMessagePacket(queryCallsign, "APLRG1", queryPath, station, answer);
+        return queryFromAPRSIS ? APRSPacketLib::generateAPRSISPacket(queryAnswer) : queryAnswer;
     }
 
 }

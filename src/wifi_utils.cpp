@@ -1,4 +1,4 @@
-/* Copyright (C) 2025 Ricardo Guzman - CA2RXU
+/* Copyright (C) 2026 Ricardo Guzman - CA2RXU
  *
  * This file is part of LoRa APRS iGate.
  *
@@ -34,6 +34,7 @@ extern uint32_t         lastServerCheck;
 uint8_t     wifiCounter         = 0;
 uint32_t    lastBackupDigiTime  = millis();
 uint32_t    lastWiFiCheck       = 0;
+bool        firstWiFiAttempt    = true;
 
 
 namespace WIFI_Utils {
@@ -48,12 +49,12 @@ namespace WIFI_Utils {
         uint32_t currentTime = millis();
 
         if (backupDigiMode) {
-            if (!networkManager->isWiFiConnected() && ((currentTime - lastBackupDigiTime) >= 15 * 60 * 1000)) {
-                Serial.println("*** Stopping BackUp Digi Mode ***");
+            if (lastServerCheck > lastBackupDigiTime) {     // APRS-IS server spoke after entering backup (with or without a WiFi drop)
+                Serial.println("*** APRS-IS Server Back (Stopping Backup Digi Mode) ***");
                 backupDigiMode = false;
                 wifiCounter = 0;
-            } else if (networkManager->isWiFiConnected()) {
-                Serial.println("*** WiFi Reconnect Success (Stopping Backup Digi Mode) ***");
+            } else if (!networkManager->isWiFiConnected() && ((currentTime - lastBackupDigiTime) >= 15 * 60 * 1000)) {
+                Serial.println("*** Stopping BackUp Digi Mode ***");    // no WiFi for 15 min: leave backup to retry WiFi
                 backupDigiMode = false;
                 wifiCounter = 0;
             }
@@ -99,12 +100,17 @@ namespace WIFI_Utils {
             if (Config.wifiAutoAP.enabled) {
                 Serial.println("Starting AP fallback...");
                 startAutoAP();
+            } else {
+                Serial.println("AutoAP disabled: no network, WebUI/TNC server not started (reconfigure over USB)");
+                displayShow("", "  No WiFi / No AP", "  WebUI disabled", "     loading ...", 2000);
             }
             return;
         }
 
         displayShow("", "Connecting to WiFi:", "", "     loading ...", 0);
         networkManager->connectWiFi();
+        bool showAuthError = firstWiFiAttempt;
+        firstWiFiAttempt = false;
 
         #ifdef INTERNAL_LED_PIN
             digitalWrite(INTERNAL_LED_PIN, LOW);
@@ -117,6 +123,10 @@ namespace WIFI_Utils {
             displayShow("", "     Connected!!", "" , "     loading ...", 1000);
         } else {
             Serial.println("[WiFi] Not connected to WiFi!");
+            String authFailSSID = networkManager->getWiFiAuthFailSSID();
+            if (showAuthError && !authFailSSID.isEmpty()) {
+                displayShow("", "SSID: " + authFailSSID.substring(0, 15), "Bad WiFi password", "Double check settings", 5000);
+            }
             if (Config.wifiAutoAP.enabled) {
                 Serial.println("Starting AP fallback...");
                 displayShow("", " WiFi Not Connected!", "" , "     loading ...", 1000);
@@ -129,7 +139,6 @@ namespace WIFI_Utils {
 
     void setup() {
         if (Config.digi.ecoMode == 0) startWiFi();
-        btStop();
     }
 
 }

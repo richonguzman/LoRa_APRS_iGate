@@ -1,4 +1,4 @@
-/* Copyright (C) 2025 Ricardo Guzman - CA2RXU
+/* Copyright (C) 2026 Ricardo Guzman - CA2RXU
  *
  * This file is part of LoRa APRS iGate.
  *
@@ -18,6 +18,7 @@
 
 #include <APRSPacketLib.h>
 #include <TinyGPS++.h>
+#include <SPIFFS.h>
 #include <WiFi.h>
 #include "configuration.h"
 #include "board_pinout.h"
@@ -31,22 +32,91 @@
     #define GPS_BAUD    9600
 #endif
 
+#define GPS_BAUD_FILE           "/gps_baud.dat"
+#define GPS_BAUD_PROBE_TIME_MS  1500
+const uint32_t gpsBaudRates[] = {9600, 115200, 38400, 4800, 57600};     // most common first
+
 extern Configuration    Config;
 extern HardwareSerial   gpsSerial;
 extern TinyGPSPlus      gps;
 extern bool             stationCallsignIsValid;
-String                  distance, iGateBeaconPacket, iGateLoRaBeaconPacket;
+String                  distance, iGateAPRSISBeaconPacket, iGateLoRaBeaconPacket;
 
 
 namespace GPS_Utils {
 
-    String getiGateLoRaBeaconPacket() {
-        return iGateLoRaBeaconPacket;
+#ifdef HAS_GPS
+    bool isKnownBaudRate(uint32_t baud) {
+        if (baud == GPS_BAUD) return true;
+        for (uint32_t knownBaud : gpsBaudRates) {
+            if (knownBaud == baud) return true;
+        }
+        return false;
     }
 
+    uint32_t readSavedBaudRate() {
+        File file = SPIFFS.open(GPS_BAUD_FILE, "r");
+        if (!file) return 0;
+        uint32_t baud = file.readString().toInt();
+        file.close();
+        return isKnownBaudRate(baud) ? baud : 0;
+    }
+
+    void saveBaudRate(uint32_t baud) {
+        File file = SPIFFS.open(GPS_BAUD_FILE, "w");
+        if (!file) {
+            Utils::println("GPS: could not save baud rate");
+            return;
+        }
+        file.print(baud);
+        file.close();
+    }
+
+    bool probeBaudRate(uint32_t baud) {
+        gpsSerial.end();
+        delay(50);
+        gpsSerial.begin(baud, SERIAL_8N1, GPS_TX, GPS_RX);
+        uint32_t validSentences = gps.passedChecksum();
+        uint32_t probeStart     = millis();
+        while (millis() - probeStart < GPS_BAUD_PROBE_TIME_MS) {
+            while (gpsSerial.available() > 0) gps.encode(gpsSerial.read());
+            if (gps.passedChecksum() > validSentences) return true;   // NMEA with valid checksum
+            delay(10);
+        }
+        return false;
+    }
+
+    uint32_t detectBaudRate() {
+        uint32_t savedBaud = readSavedBaudRate();
+
+        uint32_t candidates[2 + sizeof(gpsBaudRates) / sizeof(gpsBaudRates[0])];
+        size_t   count = 0;
+        auto addCandidate = [&](uint32_t baud) {
+            if (baud == 0) return;
+            for (size_t i = 0; i < count; i++) {
+                if (candidates[i] == baud) return;
+            }
+            candidates[count++] = baud;
+        };
+        addCandidate(savedBaud);                                // saved first, then board default, then common ones
+        addCandidate(GPS_BAUD);
+        for (uint32_t baud : gpsBaudRates) addCandidate(baud);
+
+        for (size_t i = 0; i < count; i++) {
+            if (i == 1) displayShow("GPS", "Searching", "baud rate...", "", 0);
+            bool found = probeBaudRate(candidates[i]);
+            if (!found && i == 0) found = probeBaudRate(candidates[i]);    // retry first one: GPS may be slow to start
+            if (found) {
+                if (candidates[i] != savedBaud) saveBaudRate(candidates[i]);
+                return candidates[i];
+            }
+        }
+        return 0;
+    }
+#endif
+
     void generateBeacons() {
-        String beaconPacket = APRSPacketLib::generateBasePacket(Config.callsign, "APLRG1", Config.beacon.path);
-        String encodedGPS   = APRSPacketLib::encodeGPSIntoBase91(Config.beacon.latitude, Config.beacon.longitude, 0, 0, Config.beacon.symbol, false, 0, true, Config.beacon.ambiguityLevel);
+        String beaconCallsign = Config.callsign;
 
         if (Config.callsign.indexOf("NOCALL-10") != 0) {
             if (!stationCallsignIsValid) {
@@ -58,7 +128,7 @@ namespace GPS_Utils {
                 Config.digi.mode            = 0;
                 Config.digi.backupDigiMode  = false;
             } else if (stationCallsignIsValid && Config.tacticalCallsign != "") {
-                beaconPacket = APRSPacketLib::generateBasePacket(Config.tacticalCallsign, "APLRG1", Config.beacon.path);
+                beaconCallsign              = Config.tacticalCallsign;
                 Config.aprs_is.active       = false;
                 Config.beacon.sendViaAPRSIS = false;
                 Config.digi.backupDigiMode  = false;
@@ -68,15 +138,10 @@ namespace GPS_Utils {
             Config.beacon.sendViaRF     = false;
         }
 
-        iGateBeaconPacket       = beaconPacket;
-        iGateBeaconPacket       += ",qAC:=";
-        iGateBeaconPacket       += Config.beacon.overlay;
-        iGateBeaconPacket       += encodedGPS;
+        String encodedGPS       = APRSPacketLib::encodeGPSIntoBase91(Config.beacon.latitude, Config.beacon.longitude, 0, 0, Config.beacon.symbol, false, 0, true, Config.beacon.ambiguityLevel);
 
-        iGateLoRaBeaconPacket   = beaconPacket;
-        iGateLoRaBeaconPacket   += ":=";
-        iGateLoRaBeaconPacket   += Config.beacon.overlay;
-        iGateLoRaBeaconPacket   += encodedGPS;
+        iGateLoRaBeaconPacket   = APRSPacketLib::generateBase91GPSBeaconPacket(beaconCallsign, "APLRG1", Config.beacon.path, Config.beacon.overlay, encodedGPS);
+        iGateAPRSISBeaconPacket = APRSPacketLib::generateAPRSISPacket(iGateLoRaBeaconPacket);
     }
 
     double calculateDistanceTo(double latitude, double longitude) {
@@ -101,94 +166,18 @@ namespace GPS_Utils {
 
     }
 
-    String decodeEncodedGPS(const String& packet) {
-        int indexOfExclamation  = packet.indexOf(":!");
-        int indexOfEqual        = packet.indexOf(":=");
-
-        const uint8_t OFFSET = 3;     // Offset for encoded data in the packet
-        String infoGPS;
-        if (indexOfExclamation > 10) {
-            infoGPS = packet.substring(indexOfExclamation + OFFSET);
-        } else if (indexOfEqual > 10) {
-            infoGPS = packet.substring(indexOfEqual + OFFSET);
-        }
-
-        float decodedLatitude   = APRSPacketLib::decodeBase91EncodedLatitude(infoGPS.substring(0,4));
-        float decodedLongitude  = APRSPacketLib::decodeBase91EncodedLongitude(infoGPS.substring(4,8));
-
-        return buildDistanceAndComment(decodedLatitude, decodedLongitude, infoGPS.substring(12));
-    }
-
-    String getReceivedGPS(const String& packet) {
-        int indexOfExclamation  = packet.indexOf(":!");
-        int indexOfEqual        = packet.indexOf(":=");
-        int indexOfAt           = packet.indexOf(":@");
-
-        String infoGPS;
-        if (indexOfExclamation > 10) {
-            infoGPS = packet.substring(indexOfExclamation + 2);
-        } else if (indexOfEqual > 10) {
-            infoGPS = packet.substring(indexOfEqual + 2);
-        } else if (indexOfAt > 10) {
-            infoGPS = packet.substring(indexOfAt + 9);  // 9 = 2+7 (when 7 is timestamp characters)
-        }
-
-        String Latitude             = infoGPS.substring(0,8);                   // First 8 characters are Latitude
-        int latitudeColonIndex      = Latitude.indexOf(".");
-        float convertedLatitude     = Latitude.substring(0,2).toFloat();        // First 2 digits (Degrees)
-        convertedLatitude += Latitude.substring(2,4).toFloat() / 60;            // Next 2 digits (Minutes)
-        convertedLatitude += Latitude.substring(latitudeColonIndex + 1, latitudeColonIndex + 3).toFloat() / (60*100);
-        if (Latitude.endsWith("S")) convertedLatitude = -convertedLatitude;     // Handle Southern Hemisphere
-
-        String Longitude            = infoGPS.substring(9,18);                  // Next 9 characters are Longitude
-        int longitudeColonIndex     = Longitude.indexOf(".");
-        float convertedLongitude    = Longitude.substring(0,3).toFloat();       // First 3 digits (Degrees)
-        convertedLongitude += Longitude.substring(3,5).toFloat() / 60;          // Next 2 digits (Minutes)
-        convertedLongitude += Longitude.substring(longitudeColonIndex + 1, longitudeColonIndex + 3).toFloat() / (60*100);
-        if (Longitude.endsWith("W")) convertedLongitude = -convertedLongitude;  // Handle Western Hemisphere
-
-        return buildDistanceAndComment(convertedLatitude, convertedLongitude, infoGPS.substring(19));
-    }
-
-    String getDistanceAndComment(const String& packet) {
-        int indexOfAt = packet.indexOf(":@");
-        if (indexOfAt > 10) return getReceivedGPS(packet);
-
-        const uint8_t nonEncondedLatitudeOffset     = 9;    // "N" / "S"
-        const uint8_t nonEncondedLongitudeOffset    = 19;   // "E" / "W"
-        const uint8_t encodedByteOffset             = 14;
-
-        int indexOfExclamation  = packet.indexOf(":!");
-        int indexOfEqual        = packet.indexOf(":=");
-        int baseIndex           = - 1;
-        if (indexOfExclamation > 10) {
-            baseIndex = indexOfExclamation;
-        } else if (indexOfEqual > 10) {
-            baseIndex = indexOfEqual;
-        }
-        if (baseIndex == -1) return " _ / _ / _ ";
-
-        int latitudeIndex       = baseIndex + nonEncondedLatitudeOffset;
-        int longitudeIndex      = baseIndex + nonEncondedLongitudeOffset;
-        int encodedByteIndex    = baseIndex + encodedByteOffset;
-        int packetLength        = packet.length();
-
-        if (latitudeIndex < packetLength && longitudeIndex < packetLength) {
-            char latChar = packet[latitudeIndex];
-            char lngChar = packet[longitudeIndex];
-            if ((latChar == 'N' || latChar == 'S') && (lngChar == 'E' || lngChar == 'W')) return getReceivedGPS(packet);
-        }
-        if (encodedByteIndex < packetLength) {
-            char byteChar = packet[encodedByteIndex];
-            if (byteChar == 'G' || byteChar == 'Q' || byteChar == '[' || byteChar == 'H' || byteChar == 'X' || byteChar == '3') return decodeEncodedGPS(packet);
-        }
-        return " _ / _ / _ ";
-    }
-
     void setup() {
         #ifdef HAS_GPS
             if (Config.beacon.gpsActive && Config.digi.ecoMode != 1) {
-                gpsSerial.begin(GPS_BAUD, SERIAL_8N1, GPS_TX, GPS_RX);
+                uint32_t detectedBaud = detectBaudRate();
+                if (detectedBaud != 0) {
+                    Utils::println("GPS: baud rate detected: " + String(detectedBaud));
+                } else {
+                    Utils::println("GPS: no NMEA data found, using default baud rate: " + String(GPS_BAUD));
+                    gpsSerial.end();
+                    delay(50);
+                    gpsSerial.begin(GPS_BAUD, SERIAL_8N1, GPS_TX, GPS_RX);
+                }
             }
         #endif
         generateBeacons();
