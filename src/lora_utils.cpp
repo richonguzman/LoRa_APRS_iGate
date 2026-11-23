@@ -305,8 +305,14 @@ namespace LoRa_Utils {
     String receivePacketFromSleep() {
         String packet = "";
         int state = radio.readData(packet);
-        if (state == RADIOLIB_ERR_NONE) {
-            Utils::println("<--- LoRa Packet Rx : " + packet.substring(3));
+        if (state == RADIOLIB_ERR_NONE && packet != "") {
+            String sender = packet.substring(3, packet.indexOf(">"));
+            if (packet.substring(0,3) == "\x3c\xff\x01" && !STATION_Utils::isBlacklisted(sender)) {
+                Utils::println("<--- LoRa Packet Rx : " + packet.substring(3));
+                lastAprsPacket = APRSPacketLib::processReceivedPacket(packet.substring(3), 0, 0, 0);   // processLoRaPacket() relies on it (RSSI/SNR/FreqErr not used in UEM)
+            } else {
+                packet = "";    // not a LoRa-APRS packet, or blacklisted
+            }
         } else {
             packet = "";
         }
