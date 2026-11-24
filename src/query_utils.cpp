@@ -32,6 +32,7 @@ extern float                            snr;
 extern int                              freqError;
 extern bool                             shouldSleepLowVoltage;
 extern bool                             saveNewDigiEcoModeConfig;
+extern bool                             pendingTxOff;
 extern String                           versionNumber;
 
 
@@ -123,7 +124,10 @@ namespace QUERY_Utils {
                     default: answer = "DigiEcoMode:OFF/Only Serial Output";
                 }
             } else  if (queryQuestion.startsWith("?TX=ON")) {
-                if (radioTxActive) {
+                if (pendingTxOff) {         // cancel a TX=OFF that has not been applied yet
+                    pendingTxOff = false;
+                    answer = "TX=ON";
+                } else if (radioTxActive) {
                     answer = "TX was ON";
                 } else {
                     Config.loramodule.txActive = true;
@@ -133,7 +137,7 @@ namespace QUERY_Utils {
                 if (!radioTxActive) {
                     answer = "TX was OFF";
                 } else {
-                    Config.loramodule.txActive = false;
+                    pendingTxOff = true;    // applied once this answer has been transmitted (see processOutputPacketBuffer)
                     answer = "TX=OFF";
                 }
             } else if (queryQuestion.startsWith("?TX=?")) {

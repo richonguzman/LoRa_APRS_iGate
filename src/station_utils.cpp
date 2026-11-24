@@ -49,6 +49,7 @@ struct Packet25SegBuffer {
 std::vector<Packet25SegBuffer>  packet25SegBuffer;
 
 bool saveNewDigiEcoModeConfig   = false;
+bool pendingTxOff               = false;    // ?TX=OFF received: Tx is disabled after the answer has been sent
 bool packetIsBeacon             = false;
 
 
@@ -199,6 +200,10 @@ namespace STATION_Utils {
             currentIndex++;
         }
         outputPacketBuffer.clear();
+        if (pendingTxOff) {
+            Config.loramodule.txActive  = false;
+            pendingTxOff                = false;
+        }
         //
         if (saveNewDigiEcoModeConfig) {
             Config.writeFile();
@@ -224,6 +229,10 @@ namespace STATION_Utils {
                 outputPacketBuffer.erase(outputPacketBuffer.begin());
                 delay(4000);
             }
+        }
+        if (pendingTxOff && outputPacketBuffer.empty()) {     // answer to ?TX=OFF (and any ack) already sent
+            Config.loramodule.txActive  = false;
+            pendingTxOff                = false;
         }
         if (saveNewDigiEcoModeConfig) {
             Config.writeFile();
