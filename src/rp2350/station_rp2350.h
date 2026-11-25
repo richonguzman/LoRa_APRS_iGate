@@ -34,4 +34,10 @@ namespace Station {
     uint32_t takeRxCount();                            // RX packets since last call, then resets (for telemetry)
     void   processTxBuffer();                          // call each loraTask iteration
     size_t txPending();
+
+    // ?TX=OFF: switching TX off right away would drop the ack and the answer still
+    // waiting in the output buffer, so it is applied once the buffer is empty
+    // (as upstream's pendingTxOff). cancelTxOff() is true if one was pending.
+    void   requestTxOff();
+    bool   cancelTxOff();
 }

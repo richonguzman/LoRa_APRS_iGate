@@ -27,6 +27,7 @@ std::vector<DedupEntry> dedup;
 
 uint32_t lastRxTime = 0;
 uint32_t lastTxTime = 0;
+bool     pendingTxOff = false;  // ?TX=OFF received: TX goes off once the output buffer is empty
 volatile size_t   activeStations = 0;
 volatile uint32_t rxCounter      = 0;   // RX packets since last telemetry (benign cross-task read-reset)
 
@@ -197,8 +198,22 @@ uint32_t takeRxCount() { uint32_t n = rxCounter; rxCounter = 0; return n; }
 
 size_t txPending() { return outBuffer.size(); }
 
+void requestTxOff() { pendingTxOff = true; }
+
+bool cancelTxOff() {
+    bool wasPending = pendingTxOff;
+    pendingTxOff    = false;
+    return wasPending;
+}
+
 void processTxBuffer() {
-    if (outBuffer.empty()) return;
+    if (outBuffer.empty()) {
+        if (pendingTxOff) {                     // the ack and the "TX=OFF" answer are already on air
+            Config.loramodule.txActive = false;
+            pendingTxOff               = false;
+        }
+        return;
+    }
     uint32_t now    = millis();
     uint32_t window = SECS_TO_WAIT * 1000;
     if ((now - lastTxTime) <= window || (now - lastRxTime) <= window) return;  // let the channel settle

@@ -68,13 +68,14 @@ String answerFor(const String& query, const String& sender) {
     // --- manager-only remote management ---
     if (Station::isManager(sender)) {
         if (q.startsWith("?TX=ON")) {
+            if (Station::cancelTxOff()) return "TX=ON";      // a ?TX=OFF not applied yet: cancel it
             if (Config.loramodule.txActive) return "TX was ON";
             Config.loramodule.txActive = true;
             return "TX=ON";
         }
         if (q.startsWith("?TX=OFF")) {
             if (!Config.loramodule.txActive) return "TX was OFF";
-            Config.loramodule.txActive = false;
+            Station::requestTxOff();    // applied once the ack and this answer are on air
             return "TX=OFF";
         }
         if (q.startsWith("?TX=?"))
