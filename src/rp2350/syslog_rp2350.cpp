@@ -22,16 +22,20 @@ static void send(const String &message) {
     pkt += Config.callsign;
     pkt += " RP2350iGate - - - ";
     pkt += message;
+    // A socket only for this datagram, as Ntp does: holding one for good leaves
+    // the W5100S (4 sockets) with none free once the web server, APRS-IS and the
+    // TNC have theirs, and then neither server can listen again after a client.
+    if (udp.begin(0) != 1) return;                          // no free socket right now: drop this line
     udp.beginPacket(serverIp, Config.syslog.port);          // resolved IP -> no DNS
     udp.write((const uint8_t *)pkt.c_str(), pkt.length());
     udp.endPacket();
+    udp.stop();
 }
 
 namespace Syslog {
 
 void setup() {
     if (!Config.syslog.active) return;
-    udp.begin(0);
     if (serverIp.fromString(Config.syslog.server)) {        // literal IP
         ready = true;
     } else {                                                // resolve hostname once
