@@ -17,7 +17,11 @@ extern Configuration Config;
 extern void enqueueRfFrame(const String &frame);   // main.cpp: push to txMsgQueue -> loraTask
 
 #define TNC_PORT        8001
+#ifdef USE_W5100S
+#define TNC_MAX_CLIENTS 1   // 4 sockets in all: a second client would starve the web server
+#else
 #define TNC_MAX_CLIENTS 2
+#endif
 #define TNC_MAX_BUF     512
 
 static EthernetServer tncServer(TNC_PORT);
@@ -109,20 +113,30 @@ void setup() {
 void poll() {
     if (!tncStarted) return;
 
-    EthernetClient nc = tncServer.accept();
-    if (nc) {
-        bool placed = false;
-        for (int i = 0; i < TNC_MAX_CLIENTS; i++) {
-            if (!tncClients[i] || !tncClients[i].connected()) {
-                tncClients[i].stop();
-                tncClients[i] = nc;
-                tncBuf[i] = "";
-                placed = true;
-                Serial.printf("[tnc] client %d connected\n", i);
-                break;
-            }
+    // Free the socket of a client that has gone away right now. Left alone it
+    // stays in CLOSE_WAIT (the Ethernet library never reuses those) until the
+    // next client is accepted.
+    int freeSlot = -1;
+    for (int i = 0; i < TNC_MAX_CLIENTS; i++) {
+        if (tncClients[i] && !tncClients[i].connected()) {
+            tncClients[i].stop();
+            tncBuf[i] = "";
+            Serial.printf("[tnc] client %d disconnected\n", i);
         }
-        if (!placed) { Serial.println("[tnc] no free slots, refused"); nc.stop(); }
+        if (!tncClients[i] && freeSlot < 0) freeSlot = i;
+    }
+
+    // Only look for a new client while a slot is free. Each accept() that finds
+    // the server not listening takes another socket to listen again; with every
+    // slot in use that socket is not needed, and on the W5100S (4 sockets) it is
+    // the one the web server has just closed, which then has none to listen on.
+    if (freeSlot >= 0) {
+        EthernetClient nc = tncServer.accept();
+        if (nc) {
+            tncClients[freeSlot] = nc;
+            tncBuf[freeSlot]     = "";
+            Serial.printf("[tnc] client %d connected\n", freeSlot);
+        }
     }
 
     for (int i = 0; i < TNC_MAX_CLIENTS; i++) {
