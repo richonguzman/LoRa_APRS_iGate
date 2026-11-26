@@ -61,8 +61,8 @@ function fetchSettings(retries = 2) {
 function loadSettings(settings) {
     currentSettings = settings;
     // General
-    document.getElementById("callsign").value                           = settings.callsign;
-    document.getElementById("tacticalCallsign").value                   = settings.tacticalCallsign;
+    document.getElementById("callsign").value                           = String(settings.callsign ?? "").replace(/\s+/g, "");
+    document.getElementById("tacticalCallsign").value                   = String(settings.tacticalCallsign ?? "").replace(/\s+/g, "");
     document.getElementById("beacon.comment").value                     = settings.beacon.comment;
     document.getElementById("beacon.rfCommentEveryXBeacons").value      = settings.beacon.rfCommentEveryXBeacons;
     document.getElementById("beacon.path").value                        = settings.beacon.path;

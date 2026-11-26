@@ -239,7 +239,7 @@ body{background:var(--msh-bg);color:var(--msh-text);font-family:"Inter",system-u
                                             class="form-control"
                                             id="message.to"
                                             placeholder="EA4XXX-7"
-                                            oninput="this.value = this.value.toUpperCase();"
+                                            oninput="this.value = this.value.toUpperCase().replace(/\s+/g, '');"
                                         />
                                     </div>
                                     <div class="col-lg-8 col-sm-12">
@@ -377,7 +377,7 @@ body{background:var(--msh-bg);color:var(--msh-text);font-family:"Inter",system-u
                                             class="form-control"
                                             placeholder="N0CALL-10"
                                             required=""
-                                            oninput="this.value = this.value.toUpperCase();"
+                                            oninput="this.value = this.value.toUpperCase().replace(/\s+/g, '');"
                                         />
                                     </div>
                                     <div class="col-6">
@@ -390,7 +390,7 @@ body{background:var(--msh-bg);color:var(--msh-text);font-family:"Inter",system-u
                                             id="tacticalCallsign"
                                             class="form-control"
                                             placeholder=""
-                                            oninput="this.value = this.value.toUpperCase();"
+                                            oninput="this.value = this.value.toUpperCase().replace(/\s+/g, '');"
                                         />
                                     </div>
                                     <div class="col-12 col-md-9 mt-3">

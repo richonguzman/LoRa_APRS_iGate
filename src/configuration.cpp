@@ -62,8 +62,10 @@ bool Configuration::writeFile() {
         data["wifi"]["autoAP"]["timeout"]           = wifiAutoAP.timeout;
 
         callsign.trim();
+        callsign.replace(" ", "");
         data["callsign"]                            = callsign;
         tacticalCallsign.trim();
+        tacticalCallsign.replace(" ", "");
         data["tacticalCallsign"]                    = tacticalCallsign;
 
         data["aprs_is"]["active"]                   = aprs_is.active;
